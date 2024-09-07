@@ -43,7 +43,7 @@ const HomeTemplate = () => {
         </div>
         <div className="col-span-2 flex justify-center items-center">
           <img
-            className="w-[80%] h-auto"
+            className="w-[100%] mb-[100px] h-auto"
             src="../../public/images/image1.png"
             alt="image1"
           />
@@ -73,7 +73,7 @@ const HomeTemplate = () => {
         </div>
       </AnimatedSection>
 
-      <AnimatedSection className="grid grid-cols-3 mb-[60px]">
+      <AnimatedSection className="grid grid-cols-3 mb-[100px]">
         <div className="col-span-1 flex flex-col justify-center items-center ml-[100px]">
           <h1 className="text-[52px] font-bold">
             Calculate the correct amount of salt for treatments!
