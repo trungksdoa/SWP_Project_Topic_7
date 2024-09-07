@@ -3,15 +3,17 @@ import { Link } from "react-router-dom";
 import { PATH } from "../../constant";
 import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
 import { UserMenu } from "./navbar/UserMenu";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
+  const { t } = useTranslation();
   return (
     <header className="p-4 bg-orange-500">
       <div className="container flex justify-between h-16 mx-auto">
         <Link to={PATH.HOME}>
           <img
             className="w-[80px]"
-            src="../../public/images/logo.png"
+            src="../../images/logo.png"
             alt="logo"
           />
         </Link>
@@ -19,10 +21,19 @@ const Header = () => {
           <li className="flex text-white">
             <a
               rel="noopener noreferrer"
-              href="#"
+              href={PATH.HOME}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              Home
+              {t("Home")}
+            </a>
+          </li>
+          <li className="flex text-white">
+            <a
+              rel="noopener noreferrer"
+              href={PATH.STORE}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+            >
+              {t("Store")}
             </a>
           </li>
           <li className="flex text-white">
@@ -31,7 +42,7 @@ const Header = () => {
               href="#"
               className="flex items-center px-4 -mb-1  dark:border-"
             >
-              Dealer
+              {t("Dealer")}
             </a>
           </li>
           <li className="flex text-white">
@@ -40,7 +51,7 @@ const Header = () => {
               href="#"
               className="flex items-center px-4 -mb-1  dark:border-"
             >
-              Base
+              {t("Base")}
             </a>
           </li>
           <li className="flex text-white">
@@ -49,7 +60,7 @@ const Header = () => {
               href="#"
               className="flex items-center px-4 -mb-1  dark:border-"
             >
-              Blog
+              {t("Blog")}
             </a>
           </li>
         </ul>
