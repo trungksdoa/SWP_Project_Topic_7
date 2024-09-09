@@ -17,6 +17,6 @@ const router = [
                 element: <StorePage />
             }
         ]
-    }
+    },
 ]
 export const Router = () => useRoutes(router)
