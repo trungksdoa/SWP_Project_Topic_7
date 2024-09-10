@@ -19,6 +19,7 @@
 https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/edit?usp=sharing
 
 **Bảng tiếng Việt**
+
  **I. Yêu cầu chức năng (Functional Requirements):**
    1. Quản lý hồ cá:
    - Thêm, sửa, xóa thông tin hồ cá
