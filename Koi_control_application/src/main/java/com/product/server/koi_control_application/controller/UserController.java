@@ -6,12 +6,16 @@ import com.product.server.koi_control_application.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final IUserService userService;

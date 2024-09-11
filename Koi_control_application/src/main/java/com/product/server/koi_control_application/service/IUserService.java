@@ -10,8 +10,7 @@ public interface IUserService {
     Page<Users> getUsers(int page, int size);
     void deleteUser(int id);
     void updateUser(Users user);
-
-    boolean checkPassword(String password, String encodedPassword);
+    
 
     void addPackage(int id, int packageId);
 }
