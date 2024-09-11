@@ -3,7 +3,6 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.model.Users;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 public interface IUserService {
     void saveUser(Users user);
