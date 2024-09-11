@@ -25,5 +25,11 @@
   "Dealer": "Đại lý",
   "Base": "Cơ sở",
   "Blog": "Blog",
-  "Store": "Cửa hàng"
+  "Store": "Cửa hàng",
+  "Register": "Đăng ký",
+  "Login": "Đăng nhập",
+  "Email": "Email",
+  "Password": "Mật khẩu",
+  "Do you have an account?": "Bạn đã có tài khoản?",
+  "Don't have an account?": "Bạn không có tài khoản?"
 }
