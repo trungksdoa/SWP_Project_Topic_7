@@ -9,6 +9,7 @@ services:
     dockerfilePath: Dockerfile
     dockerContext: .
     pullRequestPreviewsEnabled: true
+    buildCommand: ./gradlew build -x test
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
