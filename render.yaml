@@ -5,21 +5,19 @@ services:
     repo: https://github.com/trungksdoa/SWP_Project_Topic_7.git
     plan: free
     branch: main
-    rootDir: ./Koi_control_application
-    dockerfilePath: ./Koi_control_application/Dockerfile
-    dockerContext: ./Koi_control_application
+    rootDir: Koi_control_application
+    dockerfilePath: Dockerfile
+    dockerContext: .
     pullRequestPreviewsEnabled: true
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306
+        value: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306/koicontrol
       - key: SPRING_DATASOURCE_USERNAME
         value: adminuser
       - key: SPRING_DATASOURCE_PASSWORD
         value: g#H-GthWyfq_2bKs;7'R9}
-      - key: SPRING_DATABASE_NAME
-        value: koicontrol
     region: singapore
     healthCheckPath: /actuator/health
-    dockerCommand: java -jar app.jar
+    dockerCommand: java -cp app:app/lib/* com.product.server.koi_control_application.KoiControlApplication
