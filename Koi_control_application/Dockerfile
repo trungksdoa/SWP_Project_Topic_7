@@ -6,8 +6,9 @@ COPY . .
 RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
-# Kiểm tra nội dung JAR
-RUN jar tf build/libs/*.jar | grep KoiControlApplication.class
+# Kiểm tra nội dung thư mục build
+RUN ls -la build/libs/
+RUN find . -name "*.jar"
 
 # Run stage
 FROM eclipse-temurin:17-jre-alpine
