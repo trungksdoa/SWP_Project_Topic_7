@@ -6,8 +6,10 @@ COPY gradle gradle
 COPY build.gradle settings.gradle gradlew ./
 COPY src src
 
-RUN ./gradlew build -x test
-RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*.jar)
+RUN chmod +x ./gradlew && \
+    ./gradlew build -x test && \
+    mkdir -p build/dependency && \
+    (cd build/dependency; jar -xf ../libs/*.jar)
 
 # Run stage
 FROM eclipse-temurin:17-jre-alpine
