@@ -8,18 +8,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class IUserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void saveUser(Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(user.getPassword());
         usersRepository.save(user);
     }
 
@@ -45,10 +43,6 @@ public class IUserServiceImpl implements IUserService {
         // TODO document why this method is empty
     }
 
-    @Override
-    public boolean checkPassword(String password, String encodedPassword) {
-        return passwordEncoder.matches(password, encodedPassword);
-    }
 
     @Override
     public void addPackage(int id, int packageId) {
