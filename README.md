@@ -58,31 +58,15 @@ https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/
    - Hiển thị và quản lý bài viết, tin tức
 
    8. Quản lý người dùng:
-   - Phân quyền: Guest, Member, Shop Admin
+   - Phân quyền: Member, Shop Admin
    - Đăng ký, đăng nhập, quản lý thông tin cá nhân
 
 **II. Yêu cầu phi chức năng (Non-functional Requirements):**
-   1. Hiệu suất:
-   - Thời gian phản hồi nhanh (< 2 giây) cho hầu hết các thao tác
-   - Xử lý đồng thời nhiều người dùng
-
-   2. Bảo mật:
-   - Mã hóa dữ liệu nhạy cảm (ví dụ: mật khẩu)
-   - Xác thực và ủy quyền cho mọi thao tác
-
-   3. Khả năng mở rộng:
-   - Thiết kế cho phép dễ dàng thêm tính năng mới
-   - Hỗ trợ tăng số lượng người dùng và dữ liệu
-
-   4. Độ tin cậy:
-   - Uptime > 99.9%
-   - Sao lưu dữ liệu định kỳ
-
-   5. Giao diện người dùng:
+   1. Giao diện người dùng:
    - Thân thiện, dễ sử dụng
    - Responsive design cho các thiết bị khác nhau
 
-   6. Khả năng tương thích:
+   2. Khả năng tương thích:
    - Hoạt động trên các trình duyệt phổ biến (Chrome, Firefox, Safari, Edge)
 
 **III. Yêu cầu kỹ thuật:**
@@ -90,4 +74,4 @@ https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/
    - Cơ sở dữ liệu quan hệ MySQL Workbench
    - API RESTful cho tương tác giữa frontend và backend
    - Sử dụng framework frontend Vite và React
-   - Backend sử dụng ngôn ngữ server-side Java
+   - Backend sử dụng ngôn ngữ server-side Java Spring Boot
