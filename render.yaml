@@ -20,4 +20,3 @@ services:
         value: g#H-GthWyfq_2bKs;7'R9}
     region: singapore
     healthCheckPath: /actuator/health
-    dockerCommand: java -cp app:app/lib/* com.product.server.koi_control_application.KoiControlApplication
