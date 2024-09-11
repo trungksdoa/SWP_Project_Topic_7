@@ -17,7 +17,7 @@ public class UserController {
     private final IUserService userService;
 
     @RequestMapping(value = "/fetchUser", method = RequestMethod.GET)
-    public ResponseEntity<BaseResponse> getCourse(@RequestParam int userId) {
+    public ResponseEntity<BaseResponse> getUsers(@RequestParam int userId) {
         BaseResponse response = BaseResponse.builder()
                 .data(userService.getUser(userId))
                 .statusCode(HttpStatus.OK.value())
@@ -25,5 +25,16 @@ public class UserController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public ResponseEntity<BaseResponse> testing() {
+        BaseResponse response = BaseResponse.builder()
+                .data("helloClient")
+                .statusCode(HttpStatus.OK.value())
+                .message("Success")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 }
