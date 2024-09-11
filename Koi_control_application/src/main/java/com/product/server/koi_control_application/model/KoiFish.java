@@ -1,43 +1,79 @@
 package com.product.server.koi_control_application.model;
 
-import lombok.*;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "koi_fish")
-@Data
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class KoiFish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
+    @NotBlank(message = "Koi name is required")
+    @Size(max = 100, message = "Koi name must be less than 100 characters")
     @Column(nullable = false)
-    private String koiName;
+    private String name;
 
+    @NotBlank(message = "Koi variety is required")
+    @Size(max = 50, message = "Koi variety must be less than 50 characters")
     @Column(nullable = false)
-    private String koiVariety;
+    private String variety;
 
+    @NotNull(message = "Koi sex is required")
     @Column(nullable = false)
-    private Boolean koiSex;
+    private Boolean sex;
 
-    @Column(nullable = false)
-    private BigDecimal purchasePrice;
+    @NotNull(message = "Purchase price is required")
+    @Positive(message = "Purchase price must be positive")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private int purchasePrice;
 
+    @Size(max = 100, message = "Breeder name must be less than 100 characters")
     private String breeder;
+
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "created_at")
+    @Column(name = "pond_id")
+    private int pondId;
+
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pond_id")
-    private Pond pond;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -1,45 +1,67 @@
 package com.product.server.koi_control_application.model;
 
-import lombok.*;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "koi_growth_history")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class KoiGrowthHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "in_pond_from")
     private LocalDate inPondFrom;
 
-    @Column(nullable = false)
-    private BigDecimal weight;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private int weight;
 
     @Column(nullable = false)
-    private Integer length;
+    private int length;
 
     @Column(name = "is_first_measurement")
     private Boolean isFirstMeasurement;
 
-    @Column(name = "created_at")
+    @Column(name = "koi_id")
+    private int koiId;
+
+    @Column(name = "pond_id")
+    private int pondId;
+
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "koi_id")
-    private KoiFish koiFish;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pond_id")
-    private Pond pond;
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
