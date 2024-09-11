@@ -4,6 +4,7 @@ import { PATH } from "../../constant";
 import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
 import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
+import { ShoppingCartOutlined } from "@ant-design/icons";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -51,15 +52,6 @@ const Header = () => {
               href="#"
               className="flex items-center px-4 -mb-1  dark:border-"
             >
-              {t("Dealer")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              href="#"
-              className="flex items-center px-4 -mb-1  dark:border-"
-            >
               {t("Base")}
             </NavLink>
           </li>
@@ -74,6 +66,7 @@ const Header = () => {
           </li>
         </ul>
         <div className="items-center flex-shrink-0 hidden lg:flex">
+        <ShoppingCartOutlined style={{color: "white", marginRight: "15px", fontSize: "24px", cursor: "pointer"}} />
           <UserMenu />
           <div className="ml-4">
             <LanguageSwitcher />
@@ -105,10 +98,7 @@ const Header = () => {
       >
         <div className="p-4">
           <div className="text-right">
-            <button
-              onClick={toggleMenu}
-              className="mb-4"
-            >
+            <button onClick={toggleMenu} className="mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -146,33 +136,52 @@ const Header = () => {
               </NavLink>
             </li>
             <li className="!my-[30px]">
-                <NavLink href="#" className="block text-white hover:text-black transition-all duration-300" onClick={toggleMenu}>
+              <NavLink
+                href="#"
+                className="block text-white hover:text-black transition-all duration-300"
+                onClick={toggleMenu}
+              >
                 {t("Dealer")}
               </NavLink>
             </li>
             <li className="!my-[30px]">
-              <NavLink href="#" className="block text-white hover:text-black transition-all duration-300" onClick={toggleMenu}>
+              <NavLink
+                href="#"
+                className="block text-white hover:text-black transition-all duration-300"
+                onClick={toggleMenu}
+              >
                 {t("Base")}
               </NavLink>
             </li>
             <li className="!my-[30px]">
-              <NavLink href="#" className="block text-white hover:text-black transition-all duration-300" onClick={toggleMenu}>
+              <NavLink
+                href="#"
+                className="block text-white hover:text-black transition-all duration-300"
+                onClick={toggleMenu}
+              >
                 {t("Blog")}
               </NavLink>
             </li>
             <li className="!my-[30px]">
-              <NavLink href="#" className="block text-white hover:text-black transition-all duration-300" onClick={toggleMenu}>
+              <NavLink
+                href="#"
+                className="block text-white hover:text-black transition-all duration-300"
+                onClick={toggleMenu}
+              >
                 {t("Login")}
               </NavLink>
             </li>
             <li className="!my-[30px]">
-              <NavLink href="#" className="block text-white hover:text-black transition-all duration-300" onClick={toggleMenu}>
+              <NavLink
+                href="#"
+                className="block text-white hover:text-black transition-all duration-300"
+                onClick={toggleMenu}
+              >
                 {t("Register")}
               </NavLink>
             </li>
           </ul>
           <div className="mt-4">
-            
             <div className="mt-2">
               <LanguageSwitcher />
             </div>

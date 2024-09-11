@@ -7,6 +7,8 @@ import { Button, Popover } from "antd";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { PATH } from "../../../constant";
+import LoginForm from "../auth/LoginForm";
+import RegisterForm from "../auth/RegisterForm";
 
 export const UserMenu = () => {
   const [open, setOpen] = useState(false);
@@ -18,9 +20,11 @@ export const UserMenu = () => {
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalRegister, setIsModalRegister] = useState(false);
   const showModalLogin = () => {
+    setIsModalRegister(false);
     setIsModalLogin(true);
   };
   const showModalRegister = () => {
+    setIsModalLogin(false);
     setIsModalRegister(true);
   };
 
@@ -54,7 +58,7 @@ export const UserMenu = () => {
           {t("login")}
         </Button>
         <Button
-          className="mb-[10px] w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
+          className="w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
           onClick={showModalRegister}
         >
           {t("register")}
@@ -82,20 +86,20 @@ export const UserMenu = () => {
       </div>
       {/* Modal được đưa ra ngoài */}
       <Modal
-        title="Login"
+        title=""
         open={isModalLogin}
         onOk={handleOkLogin}
         onCancel={handleCancelLogin}
       >
-        <h1>Login</h1>
+        <LoginForm showModalRegister={showModalRegister} />
       </Modal>
       <Modal
-        title="Register"
+        title=""
         open={isModalRegister}
         onOk={handleOkRegister}
         onCancel={handleCancelRegister}
       >
-        <h1>Register</h1>
+        <RegisterForm showModalLogin={showModalLogin} />
       </Modal>
     </div>
   );

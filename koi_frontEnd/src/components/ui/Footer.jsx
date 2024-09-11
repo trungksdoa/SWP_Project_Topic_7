@@ -130,7 +130,7 @@ const Footer = () => {
                   href="/"
                   className="text-white text-[16px] hover:text-white-500 duration-300"
                 >
-                  {t(" Biện pháp mùa dịch")}
+                  {t("Biện pháp mùa dịch")}
                 </a>
               </li>
             </ul>
