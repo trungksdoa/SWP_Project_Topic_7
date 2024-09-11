@@ -1,6 +1,8 @@
 # Koi Care System at Home - Phần mềm quản lý chăm sóc cá Koi tại nhà
  
-**Role:** Guest, Member, Shop, Admin
+ Role:
+ Member
+ Admin
 
 **Feature:**
  - Chức năng cho phép quản lý thông tin hồ cá Koi (tên, hình ảnh, kích thước, độ sâu, thể tích, số lượng cống thoát, công suất máy bơm, ...).
