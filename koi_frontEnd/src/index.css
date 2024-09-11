@@ -5,3 +5,10 @@
 /* body {
     background-color: rgba(232, 71, 27, 0.08);
 } */
+ /* .ant-modal-content {
+    background-color: rgba(249, 116, 22, 0.8) !important;
+ } */
+
+ .ant-modal-footer {
+    display: none;
+ }
