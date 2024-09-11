@@ -84,7 +84,6 @@ https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/
 
    6. Khả năng tương thích:
    - Hoạt động trên các trình duyệt phổ biến (Chrome, Firefox, Safari, Edge)
-   - Tương thích với các hệ điều hành mobile (iOS, Android)
 
 **III. Yêu cầu kỹ thuật:**
    - Nền tảng web-based
