@@ -48,11 +48,4 @@ public class IUserServiceImpl implements IUserService {
         // TODO document why this method is empty
     }
 
-
-    @Override
-    public void addPackage(int id, int packageId) {
-        Users user = getUser(id);
-        user.setPackageId(packageId);
-        usersRepository.save(user);
-    }
 }
