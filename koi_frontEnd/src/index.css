@@ -12,3 +12,8 @@
  .ant-modal-footer {
     display: none;
  }
+
+ /* Card  */
+ .ant-card-body {
+    padding: 10px !important;
+ }
