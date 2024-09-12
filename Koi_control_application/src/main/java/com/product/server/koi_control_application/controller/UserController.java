@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.dto.BaseResponse;
+import com.product.server.koi_control_application.dto.LoginRequest;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +40,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<BaseResponse>  userLogin(@RequestBody String username, @RequestBody String password) {
-        BaseResponse response;
-        try{
-            response = BaseResponse.builder().data(userService.userLogin(username, password)).statusCode(HttpStatus.OK.value()).message("Success").build();
-        }catch (Exception e){
-            response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
+            BaseResponse response;
+            try {
+                response = BaseResponse.builder().data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword())).statusCode(HttpStatus.OK.value()).message("Success").build();
+            } catch (Exception e) {
+                response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-
 }
