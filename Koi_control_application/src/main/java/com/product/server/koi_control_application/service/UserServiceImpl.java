@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class IUserServiceImpl implements IUserService {
+public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
 
     @Override

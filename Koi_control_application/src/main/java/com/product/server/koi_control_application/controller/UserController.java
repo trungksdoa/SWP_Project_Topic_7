@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Validated
+@CrossOrigin(origins = "*") // Allow all origins
 public class UserController {
 
     private final IUserService userService;
