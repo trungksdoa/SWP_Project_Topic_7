@@ -2,13 +2,7 @@ package com.product.server.koi_control_application.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -53,6 +47,12 @@ public class Users {
     @Size(max = 255, message = "Address must be less than 255 characters")
     @Column(nullable = true)
     private String address;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private Role roles;
+
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

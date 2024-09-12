@@ -4,6 +4,7 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.dto.BaseResponse;
 import com.product.server.koi_control_application.dto.LoginRequest;
 import com.product.server.koi_control_application.dto.UserResponse;
+import com.product.server.koi_control_application.model.Role;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,16 @@ public class UserController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
         BaseResponse response;
+        users.setRoles(Role.ROLE_USER);
         Users savedUser = userService.saveUser(users);
-        UserResponse userResponse = UserResponse.builder().id(savedUser.getId()).username(users.getUsername()).email(users.getEmail()).build();
+        UserResponse userResponse = UserResponse.builder()
+                .id(savedUser.getId())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .address(savedUser.getAddress())
+                .phoneNumber(savedUser.getPhoneNumber())
+                .roles(Role.ROLE_USER)
+                .build();
         response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.CREATED.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
