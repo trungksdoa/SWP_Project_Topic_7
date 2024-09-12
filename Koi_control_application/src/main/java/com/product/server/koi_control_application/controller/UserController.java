@@ -3,6 +3,7 @@ package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.dto.BaseResponse;
 import com.product.server.koi_control_application.dto.LoginRequest;
+import com.product.server.koi_control_application.dto.UserResponse;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +29,17 @@ public class UserController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
         BaseResponse response;
-        try {
-            userService.saveUser(users);
-            response = BaseResponse.builder().data(users).statusCode(HttpStatus.CREATED.value()).message("Success").build();
-        } catch (Exception e) {
-            response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
+        Users savedUser = userService.saveUser(users);
+        UserResponse userResponse = UserResponse.builder().id(savedUser.getId()).username(users.getUsername()).email(users.getEmail()).build();
+        response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.CREATED.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
         BaseResponse response;
-        try {
-            response = BaseResponse.builder().data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword())).statusCode(HttpStatus.OK.value()).message("Success").build();
-        } catch (Exception e) {
-            response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        response = BaseResponse.builder().data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword())).statusCode(HttpStatus.OK.value()).message("Success").build();
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -55,25 +47,15 @@ public class UserController {
     @RequestMapping(value = "/manage/remove", method = RequestMethod.DELETE)
     public ResponseEntity<BaseResponse> removeUsers(@RequestParam int userId) {
         BaseResponse response;
-        try {
-            userService.deleteUser(userId);
-            response = BaseResponse.builder().data("User deleted successfully").statusCode(HttpStatus.OK.value()).message("Success").build();
-        } catch (Exception e) {
-            response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        userService.deleteUser(userId);
+        response = BaseResponse.builder().data("User deleted successfully").statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/manage/readAll", method = RequestMethod.GET)
     public ResponseEntity<BaseResponse> fetchAllUser() {
         BaseResponse response;
-        try {
-            response = BaseResponse.builder().data(userService.getUsers(0, 10)).statusCode(HttpStatus.OK.value()).message("Success").build();
-        } catch (Exception e) {
-            response = BaseResponse.builder().data("No response").statusCode(HttpStatus.BAD_REQUEST.value()).message("Failed").build();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        response = BaseResponse.builder().data(userService.getUsers(0, 10)).statusCode(HttpStatus.OK.value()).message("Success").build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
