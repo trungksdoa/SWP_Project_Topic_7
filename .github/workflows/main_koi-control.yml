@@ -1,12 +1,11 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy JAR app to Azure Web App - koi-control
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'Koi_control_application/**'
   workflow_dispatch:
 
 jobs:
@@ -24,12 +23,13 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+        working-directory: ./Koi_control_application
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: '${{ github.workspace }}/Koi_control_application/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write
   
     steps:
       - name: Download artifact from build job
@@ -60,4 +60,3 @@ jobs:
           app-name: 'koi-control'
           slot-name: 'Production'
           package: '*.jar'
-          
