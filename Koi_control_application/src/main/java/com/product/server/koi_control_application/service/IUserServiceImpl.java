@@ -18,11 +18,12 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public Users saveUser(Users user) {
-        if(getUsersByUsername(user.getUsername()) != null) {
-            throw new UserExistedException(user.getUsername());
+        if (getUsersByUsername(user.getUsername()) == null){
+            user.setPassword(user.getPassword());
+            return usersRepository.save(user);
         }
-        user.setPassword(user.getPassword());
-        return usersRepository.save(user);
+
+        throw new UserExistedException(user.getUsername());
     }
 
     @Override
@@ -32,7 +33,7 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public Users getUsersByUsername(String username) {
-        return usersRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+        return usersRepository.findByUsername(username).orElse(null);
     }
 
     @Override
