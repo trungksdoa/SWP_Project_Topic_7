@@ -13,6 +13,4 @@ public interface IUserService {
     void deleteUser(int id);
     void updateUser(Users user);
 
-
-    void addPackage(int id, int packageId);
 }

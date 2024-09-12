@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +39,7 @@ public class Users {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @NotBlank(message = "Email is required")
@@ -46,12 +48,12 @@ public class Users {
     private String email;
 
     @Pattern(regexp = "^[0-9]{9}$", message = "Invalid Vietnamese phone number")
+    @Column(nullable = true)
     private String phoneNumber;
 
     @Size(max = 255, message = "Address must be less than 255 characters")
+    @Column(nullable = true)
     private String address;
-
-    private int packageId ;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
