@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 
 
 public interface IUserService {
-    void saveUser(Users user);
+    Users saveUser(Users user);
     Users getUser(int id);
+
+    Users getUsersByUsername(String username);
 
     Users userLogin(String username, String password);
     Page<Users> getUsers(int page, int size);

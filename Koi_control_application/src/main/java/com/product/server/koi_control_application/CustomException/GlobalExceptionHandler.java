@@ -26,6 +26,10 @@ public class GlobalExceptionHandler {
             status = HttpStatus.NOT_FOUND;
             message = ex.getMessage();
         }
+        else if(ex instanceof UserExistedException){
+            status = HttpStatus.CONFLICT;
+            message = ex.getMessage();
+        }
         // Add more specific exception handlers here if needed
 
         ErrorResponse errorResponse = ErrorResponse.of(status.value(), message);

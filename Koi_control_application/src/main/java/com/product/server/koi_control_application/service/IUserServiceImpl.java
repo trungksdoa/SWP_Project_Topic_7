@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.CustomException.UserExistedException;
 import com.product.server.koi_control_application.CustomException.UserNotFoundException;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
@@ -16,14 +17,22 @@ public class IUserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
 
     @Override
-    public void saveUser(Users user) {
+    public Users saveUser(Users user) {
+        if(getUsersByUsername(user.getUsername()) != null) {
+            throw new UserExistedException(user.getUsername());
+        }
         user.setPassword(user.getPassword());
-        usersRepository.save(user);
+        return usersRepository.save(user);
     }
 
     @Override
     public Users getUser(int id) {
         return usersRepository.fetchUsersById(id).orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+    }
+
+    @Override
+    public Users getUsersByUsername(String username) {
+        return usersRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 
     @Override
