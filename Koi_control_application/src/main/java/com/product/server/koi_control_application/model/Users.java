@@ -45,9 +45,6 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Size(max = 100, message = "Full name must be less than 100 characters")
-    private String fullName;
-
     @Pattern(regexp = "^[0-9]{9}$", message = "Invalid Vietnamese phone number")
     private String phoneNumber;
 

@@ -23,7 +23,12 @@ public class IUserServiceImpl implements IUserService {
 
     @Override
     public Users getUser(int id) {
-        return usersRepository.fetchUsersById(id).orElseThrow(() -> new UserNotFoundException(id));
+        return usersRepository.fetchUsersById(id).orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+    }
+
+    @Override
+    public Users userLogin(String username, String password) {
+        return usersRepository.fetchUserByUserNamePassword(username, password).orElseThrow(() -> new UserNotFoundException(username));
     }
 
     @Override
