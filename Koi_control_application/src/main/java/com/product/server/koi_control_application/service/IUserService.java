@@ -7,10 +7,12 @@ import org.springframework.data.domain.Page;
 public interface IUserService {
     void saveUser(Users user);
     Users getUser(int id);
+
+    Users userLogin(String username, String password);
     Page<Users> getUsers(int page, int size);
     void deleteUser(int id);
     void updateUser(Users user);
-    
+
 
     void addPackage(int id, int packageId);
 }
