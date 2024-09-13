@@ -12,7 +12,7 @@ import { LOCAL_STORAGE_LOGIN_KEY } from '../../../constant/localStorage'
 import { PATH } from '../../../constant/config'
 import { Navigate } from 'react-router-dom'
 
-const LoginForm = ({ showModalRegister, showModalLogin, handleOkLogin }) => {
+const LoginForm = ({ showModalRegister, handleOkLogin }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,12 +27,11 @@ const LoginForm = ({ showModalRegister, showModalLogin, handleOkLogin }) => {
     formState: { errors }
   } = useForm();
 
-  // Kiểm tra role và điều hướng hoặc đóng modal
   if (userLogin) {
     if (role === "ROLE_ADMIN") {
       return <Navigate to={PATH.ADMIN} />;
     } else if (role === "ROLE_USER") {
-      handleOkLogin(); // Đóng modal khi role là ROLE_USER
+      handleOkLogin();
     }
   }
 

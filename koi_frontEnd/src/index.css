@@ -26,3 +26,18 @@
  .ant-tabs-content.ant-tabs-content-top {
    position: inherit;
  }
+
+ /* layout */
+
+ .ant-layout-sider-children, 
+ .ant-menu {
+   background-color: #fe8732 !important;
+ }
+
+ .ant-layout-sider-trigger{
+   background-color: #F97316 !important;
+ }
+
+ .ant-layout-header  {
+   background-color: white;
+ }

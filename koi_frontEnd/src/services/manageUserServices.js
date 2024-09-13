@@ -8,5 +8,5 @@ export const manageUserServices = {
     login: (payload) => api.post("/login", payload),
     register: (payload) => api.post("/register", payload),
     getUserAll: () => api.get("/manage/readAll"),
-    deleteUser: (id) => api.delete(`/manage/delete/${id}`)
+    deleteUser: (id) => api.delete(`/manage/remove?userId=${id}`)
 }

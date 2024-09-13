@@ -5,11 +5,11 @@ import { Input, Button } from "antd";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { manageUserActionThunks } from '../../../store/manageUser'
+import { manageUserActionThunks } from "../../../store/manageUser";
 
 const RegisterForm = ({ showModalLogin }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const { isFetchingRegister } = useSelector((state) => state.manageUser);
 
@@ -26,15 +26,15 @@ const RegisterForm = ({ showModalLogin }) => {
   const onSubmit = (data) => {
     console.log(data);
     dispatch(manageUserActionThunks.registerThunk(data))
-    .unwrap()
-    .then((res) => {
-      console.log(res.data)
-      toast.success(res.data.message)
-      showModalLogin()
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+      .unwrap()
+      .then((res) => {
+        console.log(res.data);
+        toast.success(res.data.message);
+        showModalLogin();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -48,9 +48,7 @@ const RegisterForm = ({ showModalLogin }) => {
         className="flex flex-col items-center justify-center w-[80%]"
       >
         <div className="w-full">
-          <p className="text-[16px] font-bold text-orange-500">
-            User Name
-          </p>
+          <p className="text-[16px] font-bold text-orange-500">User Name</p>
           <Controller
             control={control}
             name="username"
@@ -62,10 +60,18 @@ const RegisterForm = ({ showModalLogin }) => {
                 placeholder="User Name"
               />
             )}
+            rules={{
+              required: "Please enter your username",
+              pattern: {
+                value: /^[a-zA-Z0-9]{5,}$/,
+                message: "Username must contain only letters and numbers, and be at least 5 characters long",
+              },
+            }}
           />
-          <p className="text-[16px] font-bold text-orange-500">
-            Email
-          </p>
+          {!!errors.username && (
+            <p className="text-red-500">{errors.username.message}</p>
+          )}
+          <p className="text-[16px] font-bold text-orange-500">Email</p>
           <Controller
             control={control}
             name="email"
@@ -77,17 +83,18 @@ const RegisterForm = ({ showModalLogin }) => {
                 placeholder="Email"
               />
             )}
-            // rules={{
-            //   required: "Required",
-            //   pattern: {
-            //     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
-            //     message: "Invalid email address",
-            //   },
-            // }}
+            rules={{
+              required: "Please enter your email",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                message: "Invalid email address",
+              },
+            }}
           />
-          <p
-            className="text-[16px] justify-start font-bold text-orange-500"
-          >
+          {!!errors.email && (
+            <p className="text-red-500">{errors.email.message}</p>
+          )}
+          <p className="text-[16px] justify-start font-bold text-orange-500">
             {t("Password")}
           </p>
           <Controller
@@ -101,16 +108,19 @@ const RegisterForm = ({ showModalLogin }) => {
                 placeholder="Password"
               />
             )}
-            // rules={{
-            //   required: "Required",
-            //   pattern: {
-            //     value:
-            //       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i,
-            //     message:
-            //       "Password must include uppercase, lowercase, number, and special character",
-            //   },
-            // }}
+            rules={{
+              required: "Please enter your password",
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i,
+                message:
+                  "Password must include uppercase, lowercase, number, and special character",
+              },
+            }}
           />
+          {!!errors.password && (
+          <p className="text-red-500">{errors.password.message}</p>
+        )}
         </div>
         <Button
           className="w-full col-6 mt-[20px]"

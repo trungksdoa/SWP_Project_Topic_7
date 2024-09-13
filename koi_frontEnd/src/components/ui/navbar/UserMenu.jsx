@@ -87,10 +87,10 @@ export const UserMenu = () => {
     if(userLogin) {
       if(userLogin.roles === "ROLE_ADMIN") {
         return (
-          <div>
-            <Button>
-              {t("dashboard")}
-            </Button>
+          <div className="flex flex-col">
+            <NavLink to={PATH.ADMIN} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600">
+              {t("Admin")}
+            </NavLink>
             <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600">
               {t("Logout")}
             </Button>

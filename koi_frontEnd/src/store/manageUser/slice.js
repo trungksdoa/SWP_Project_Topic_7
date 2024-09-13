@@ -36,7 +36,6 @@ export const { reducer: manageUserReducer, actions: manageUserActions } =
         })
         .addCase(manageUserActionThunks.registerThunk.fulfilled, (state, { payload }) => {
             state.isFetchingRegister = false
-            state.userLogin = payload.data
         })
         .addCase(manageUserActionThunks.registerThunk.rejected, (state) => {
             state.isFetchingRegister = false

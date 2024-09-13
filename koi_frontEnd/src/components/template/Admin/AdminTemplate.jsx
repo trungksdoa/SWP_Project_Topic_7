@@ -5,11 +5,21 @@ import { useState } from "react";
 import { PATH } from "../../../constant";
 import { Button, Layout, Menu, theme } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
-import { UserOutlined, CarFilled, HomeFilled, DesktopOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  CarFilled,
+  HomeFilled,
+  DesktopOutlined,
+} from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
-import { manageUserActions, manageUserReducer } from "../../../store/manageUser/slice";
+import {
+  manageUserActions,
+  manageUserReducer,
+} from "../../../store/manageUser/slice";
+import { useTranslation } from "react-i18next";
 
 const AdminTemplate = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getSelectedKeys = (pathname) => {
@@ -26,59 +36,54 @@ const AdminTemplate = () => {
 
   const handleLogout = () => {
     localStorage.removeItem(LOCAL_STORAGE_LOGIN_KEY);
-    dispatch(manageUserActions.updateUserLogin(null))
+    dispatch(manageUserActions.updateUserLogin(null));
     navigate(PATH.HOME);
   };
-
 
   return (
     <div>
       <Layout
         style={{
+          backgroundColor: "#F97316 !important",
           minHeight: "100vh",
         }}
       >
         <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
           <div className="demo-logo-vertical" />
           <Menu theme="dark" mode="inline" selectedKeys={selectedKeys}>
-            <NavLink to="/">
-              <img src="" alt="" />
-            </NavLink>
-            <Menu.Item key={5} icon={<UserOutlined />}>
-              <NavLink key={1} to={PATH.MANAGE_USER}>Manage User</NavLink>
-            </Menu.Item>
-            <Menu.Item key={6} icon={<CarFilled />}>
-              <NavLink key={2}>Quản lý thông tin vị trí</NavLink>
-            </Menu.Item>
-            <Menu.Item key={7} icon={<HomeFilled />}>
-              <NavLink key={3}>Quản lý thông tin phòng</NavLink>
-            </Menu.Item>
-            {/* <SubMenu key="sub1" icon={<FileOutlined />} title="Films">
-            
-          </SubMenu> */}
-            <Menu.Item key={8} icon={<DesktopOutlined />}>
-              <NavLink key={4}>Quản lý đặt phòng</NavLink>
+            <div className="flex justify-center items-center mt-[20px]">
+              <NavLink to="/">
+                <img
+                  src="../../../images/logo.png"
+                  className="w-[100px] h-[100px]"
+                  alt=""
+                />
+              </NavLink>
+            </div>
+            <Menu.Item className="text-white" key={5} icon={<UserOutlined  style={{color: "white"}}/>}>
+              <NavLink key={1} to={PATH.MANAGE_USER} className="!text-white">
+                {t("manageUser")}
+              </NavLink>
             </Menu.Item>
           </Menu>
         </Sider>
         <Layout>
-          <Header
-          >
+          <Header>
             <div className="container text-right">
               <Button
-                className="ms-auto"
+                className="ms-auto bg-orange-500 text-white hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
                 onClick={() => {
-                    handleLogout()
+                  handleLogout();
                 }}
               >
-                Đăng xuất
+                {t("Logout")}
               </Button>
             </div>
           </Header>
           <div
             style={{
               padding: 24,
-              height: '100%'
+              height: "100%",
             }}
           >
             <Outlet />

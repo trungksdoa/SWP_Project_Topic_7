@@ -5,6 +5,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { PATH } from "../../../constant";
+import { toast } from "react-toastify";
 
 const ManageUser = () => {
   const { data: lstUser, refetch } = useGetUserAll();
@@ -19,12 +20,11 @@ const ManageUser = () => {
     if (window.confirm("Bạn có chắc chắn muốn xoá người dùng này không?")) {
         mutate.mutate(id, {
           onSuccess: () => {
-            toast.success("Xoá Thành Công!");
+            toast.success("Delete User Successfully!");
             refetch();
           },
           onError: (error) => {
-            console.log(error);
-            toast.error("Xoá Thất Bại!");
+            toast.error("Delete User Failed!");
           },
         });
       }
