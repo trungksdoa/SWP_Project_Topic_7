@@ -30,7 +30,7 @@ const LoginForm = ({ showModalRegister, showModalLogin, handleOkLogin }) => {
   // Kiểm tra role và điều hướng hoặc đóng modal
   if (userLogin) {
     if (role === "ROLE_ADMIN") {
-      return <Navigate to={PATH.DASHBOARD} />;
+      return <Navigate to={PATH.ADMIN} />;
     } else if (role === "ROLE_USER") {
       handleOkLogin(); // Đóng modal khi role là ROLE_USER
     }

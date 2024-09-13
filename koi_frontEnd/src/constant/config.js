@@ -7,5 +7,7 @@ export const PATH = {
     NEWS: '/news',
     CONTACT: '/contact',
     DASHBOARD: '/dashboard',
-    PROFILE: '/profile'
+    PROFILE: '/profile',
+    ADMIN: '/admin',
+    MANAGE_USER: '/admin/manage-user'
 }

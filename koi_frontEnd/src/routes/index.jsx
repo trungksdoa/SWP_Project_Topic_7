@@ -6,7 +6,9 @@ import StorePage from "../pages/StorePage"
 import DashboardPage from "../pages/DashboardPage"
 import DashboardLayout from "../components/layouts/DashboardLayout"
 import ProfilePage from "../pages/ProfilePage"
-
+import AdminPage from "../pages/AdminPage"
+import AdminLayout from "../components/layouts/AdminLayout"
+import ManageUser from "../components/ui/admin/ManageUser"
 const router = [
     {
         element: <MainLayout />,
@@ -26,11 +28,17 @@ const router = [
         ]
     },
     {
-        element: <DashboardLayout />,
+        element: <AdminLayout />,
         children: [
             {
-                path: PATH.DASHBOARD,
-                element: <DashboardPage />
+                path: PATH.ADMIN,
+                element: <AdminPage />,
+                children: [
+                    {
+                        path: PATH.MANAGE_USER,
+                        element: <ManageUser />
+                    }
+                ]
             }
         ]
     }
