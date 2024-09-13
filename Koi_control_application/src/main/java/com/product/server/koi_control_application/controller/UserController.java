@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 
 public class UserController {
 
