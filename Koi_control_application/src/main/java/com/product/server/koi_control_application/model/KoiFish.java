@@ -50,8 +50,8 @@ public class KoiFish {
     @Column(nullable = false, precision = 10, scale = 2)
     private int purchasePrice;
 
-    @Size(max = 100, message = "Breeder name must be less than 100 characters")
-    private String breeder;
+    @Column(nullable = false)
+    private int breeder;
 
     @Column(name = "image_url")
     private String imageUrl;

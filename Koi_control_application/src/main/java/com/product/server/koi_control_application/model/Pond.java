@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -55,6 +54,9 @@ public class Pond {
     @PositiveOrZero(message = "Fish count must be zero or positive")
     @Column(name = "fish_count")
     private Integer fishCount;
+
+    @Column(name = "breeder")
+    private int breeder;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
