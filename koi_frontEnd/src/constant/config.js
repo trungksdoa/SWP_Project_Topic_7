@@ -6,4 +6,6 @@ export const PATH = {
     PRODUCT: '/product',
     NEWS: '/news',
     CONTACT: '/contact',
+    DASHBOARD: '/dashboard',
+    PROFILE: '/profile'
 }

@@ -17,3 +17,12 @@
  .ant-card-body {
     padding: 10px !important;
  }
+
+ /* Tab */
+ .ant-tabs-nav-wrap {
+   justify-content: center;
+ }
+
+ .ant-tabs-content.ant-tabs-content-top {
+   position: inherit;
+ }

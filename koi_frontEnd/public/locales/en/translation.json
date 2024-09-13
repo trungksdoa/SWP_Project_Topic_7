@@ -31,5 +31,8 @@
   "Email": "Email",
   "Password": "Password",
   "Do you have an account?": "Do you have an account?",
-  "Don't have an account?": "Don't have an account?"
+  "Don't have an account?": "Don't have an account?",
+  "Dashboard": "Dashboard",
+  "Profile": "Profile",
+  "Logout": "Logout"
 }
