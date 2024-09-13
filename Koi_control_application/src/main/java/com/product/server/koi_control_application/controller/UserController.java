@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "*") // Allow all origins
+@CrossOrigin(origins = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/", allowedHeaders = "*", allowCredentials = "true")
+
 public class UserController {
 
     private final IUserService userService;
@@ -47,8 +48,11 @@ public class UserController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
-        BaseResponse response;
-        response = BaseResponse.builder().data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword())).statusCode(HttpStatus.OK.value()).message("Success").build();
+        BaseResponse response = BaseResponse.builder()
+                .data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword()))
+                .statusCode(HttpStatus.OK.value()
+                ).message("Success")
+                .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -58,7 +62,11 @@ public class UserController {
     public ResponseEntity<BaseResponse> removeUsers(@RequestParam int userId) {
         BaseResponse response;
         userService.deleteUser(userId);
-        response = BaseResponse.builder().data("User deleted successfully").statusCode(HttpStatus.OK.value()).message("Success").build();
+        response = BaseResponse.builder()
+                .data("User deleted successfully")
+                .statusCode(HttpStatus.OK.value())
+                .message("Success")
+                .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -69,4 +77,6 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.CustomException;
+package com.product.server.koi_control_application.customException;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String value) {
