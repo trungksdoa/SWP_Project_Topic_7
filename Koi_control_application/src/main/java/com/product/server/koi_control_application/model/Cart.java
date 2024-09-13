@@ -28,10 +28,10 @@ public class Cart {
     private int id;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private int userId;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private int productId;
 
     @Column(nullable = false)
     private Integer quantity;

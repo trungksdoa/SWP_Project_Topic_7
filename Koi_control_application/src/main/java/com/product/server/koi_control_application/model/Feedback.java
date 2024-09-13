@@ -1,35 +1,29 @@
 package com.product.server.koi_control_application.model;
 
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Getter
 @Setter
 @ToString
-@EntityListeners(AuditingEntityListener.class)
-public class Orders {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Column(name = "users_id", nullable = false)
+    @NotNull(message = "Please fill in the feedback")
+    private String feedback;
+    @NotNull(message = "Please rating the product")
+    private int rating;
     private int userId;
-
-    private int totalAmount;
-
-    @NotBlank(message = "Status is required")
-    @Size(max = 50, message = "Status must be less than 50 characters")
-    @Column(nullable = false)
-    private String status;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
