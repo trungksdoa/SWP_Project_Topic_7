@@ -1,11 +1,11 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.CustomException.UserExistedException;
-import com.product.server.koi_control_application.CustomException.UserNotFoundException;
+import com.product.server.koi_control_application.customException.*;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +18,20 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Users saveUser(Users user) {
-        if (getUsersByUsername(user.getUsername()) == null){
-            user.setPassword(user.getPassword());
-            return usersRepository.save(user);
+        try {
+            if (getUsersByUsername(user.getUsername()) == null) {
+                user.setPassword(user.getPassword());
+                return usersRepository.save(user);
+            }
+
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getMessage().contains("users_email_unique")) {
+                throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
+            } else if (ex.getMessage().contains("users_username_unique")) {
+                throw new UsernameAlreadyExistsException("Username already exists: " + user.getUsername());
+            } else {
+                throw ex;
+            }
         }
 
         throw new UserExistedException(user.getUsername());
@@ -50,6 +61,9 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteUser(int id) {
         Users user = getUser(id);
+        if(user == null) {
+            throw new UserNotFoundException(String.valueOf(id));
+        }
         usersRepository.delete(user);
     }
 
