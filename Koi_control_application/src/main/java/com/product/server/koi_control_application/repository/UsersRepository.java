@@ -16,4 +16,10 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     @Query("select u from Users u where u.username= ?1 and u.password = ?2")
     Optional<Users> fetchUserByUserNamePassword(@NonNull String username, @NonNull String password);
+
+    @Query("select u from Users u where u.email = ?1 and u.password = ?2")
+    Optional<Users> findByEmailAndPassword(String email, String password);
+
+    @Query("select u from Users u where u.email = ?1")
+    Optional<Users> findByEmail(String email);
 }

@@ -36,3 +36,4 @@ logging:
   level:
     org.springframework.web: DEBUG
     com.product.server.koi_control_application: DEBUG
+

@@ -49,7 +49,7 @@ public class UserController {
     @PostMapping("/auth")
     public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
         BaseResponse response = BaseResponse.builder()
-                .data(userService.userLogin(loginRequest.getUsername(), loginRequest.getPassword()))
+                .data(userService.userLogin(loginRequest.getEmail(), loginRequest.getPassword()))
                 .statusCode(HttpStatus.OK.value()
                 ).message("Success")
                 .build();
@@ -57,6 +57,16 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/user/reset")
+    public ResponseEntity<BaseResponse> resetPassword(@RequestParam String email) {
+        userService.resetPassword(email);
+        BaseResponse response = BaseResponse.builder()
+                .data("Password reset link sent to your email")
+                .statusCode(HttpStatus.OK.value())
+                .message("Success")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 
 
