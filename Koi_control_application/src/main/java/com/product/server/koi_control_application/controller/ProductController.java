@@ -22,14 +22,27 @@ public class ProductController {
     private final IImageService imageService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse> createProduct(@RequestPart("product") Product product, @RequestParam("image") MultipartFile file) throws IOException {
-        String filename = imageService.uploadImage(file);
-        product.setImageUrl(filename);
+    public ResponseEntity<BaseResponse> createProduct(@RequestBody Product product)  {
+        product.setImageUrl("");
         Product createdProduct = productService.createProduct(product);
         BaseResponse response = BaseResponse.builder()
                 .data(createdProduct)
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Product created successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("{productId}/image/upload/")
+    public ResponseEntity<BaseResponse> uploadProductImage(@PathVariable int productId, @RequestParam("image") MultipartFile file) throws IOException {
+        String filename = imageService.uploadImage(file);
+        Product savedProduct = productService.getProduct(productId);
+        savedProduct.setImageUrl(filename);
+        productService.createProduct(savedProduct);
+        BaseResponse response = BaseResponse.builder()
+                .data(savedProduct)
+                .statusCode(HttpStatus.CREATED.value())
+                .message("Upload image success to "+ savedProduct.getName())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
