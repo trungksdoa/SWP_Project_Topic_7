@@ -1,7 +1,10 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.customException.*;
+import com.product.server.koi_control_application.customException.EmailAlreadyExistsException;
+import com.product.server.koi_control_application.customException.UserExistedException;
+import com.product.server.koi_control_application.customException.UserNotFoundException;
+import com.product.server.koi_control_application.customException.UsernameAlreadyExistsException;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
+    private final IEmailService service;
 
     @Override
     public Users saveUser(Users user) {
@@ -48,8 +52,8 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Users userLogin(String username, String password) {
-        return usersRepository.fetchUserByUserNamePassword(username, password).orElseThrow(() -> new UserNotFoundException(username));
+    public Users userLogin(String email, String password) {
+        return usersRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new UserNotFoundException(email));
     }
 
     @Override
@@ -61,10 +65,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteUser(int id) {
         Users user = getUser(id);
-        if(user == null) {
+        if (user == null) {
             throw new UserNotFoundException(String.valueOf(id));
         }
         usersRepository.delete(user);
+    }
+
+    @Override
+    public void resetPassword(String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        service.sendMail(user.getEmail(),"Request reset password","");
+        usersRepository.save(user);
     }
 
     @Override
