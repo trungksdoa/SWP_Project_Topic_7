@@ -2,6 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,22 +24,22 @@ import java.nio.file.Paths;
 @RequestMapping("/api/image")
 @RequiredArgsConstructor
 public class ImageController {
-    private static final String IMAGE_DIR = "src/main/resources/image/";
-    @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
-        try {
-            Path filePath = Paths.get(IMAGE_DIR).resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
+    private static final String IMAGE_DIR = "image/";
 
-            if (resource.exists()) {
+    @GetMapping("/{filename:.+}")
+    public ResponseEntity<InputStreamResource> getImage(@PathVariable String filename) {
+        try {
+            ClassPathResource imgFile = new ClassPathResource(IMAGE_DIR + filename);
+
+            if (imgFile.exists()) {
+                InputStream in = imgFile.getInputStream();
                 return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
+                        .contentType(MediaType.IMAGE_JPEG) // Hoặc xác định loại MIME dựa trên phần mở rộng của file
+                        .body(new InputStreamResource(in));
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
