@@ -25,7 +25,6 @@ public class ProductServiceImpl implements IProductService {
     @Transactional
     public Product createProduct(Product product) {
         product = productRepository.save(product);
-        productImageRepository.save(ProductImage.builder().name(product.getImageUrl()).productId(product.getId()).build());
         return product;
     }
 
