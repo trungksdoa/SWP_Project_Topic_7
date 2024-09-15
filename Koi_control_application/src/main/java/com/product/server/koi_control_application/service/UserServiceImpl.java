@@ -29,6 +29,10 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    public void updatedUser(Users user) {
+        usersRepository.save(user);
+    }
+    @Override
     public Users saveUser(Users user) {
         try {
             if (getUsersByUsername(user.getUsername()) == null) {

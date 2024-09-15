@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 
 
 public interface IUserService {
+    void updatedUser(Users user);
+
     Users saveUser(Users user);
     Users getUser(int id);
 
