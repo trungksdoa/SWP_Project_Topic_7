@@ -68,7 +68,7 @@ public class UserController {
 
 
             BaseResponse response = BaseResponse.builder()
-                    .data(new AuthResponse(user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(),user.isActive(), accessToken))
+                    .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(),user.isActive(), accessToken))
                     .statusCode(HttpStatus.OK.value()
                     ).message("Success")
                     .build();
