@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.service.IUserService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

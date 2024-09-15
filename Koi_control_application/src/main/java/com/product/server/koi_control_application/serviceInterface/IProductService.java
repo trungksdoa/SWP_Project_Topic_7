@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.service;
+package com.product.server.koi_control_application.serviceInterface;
 
 import com.product.server.koi_control_application.model.Product;
 import org.springframework.data.domain.Page;
