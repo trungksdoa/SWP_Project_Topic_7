@@ -53,7 +53,7 @@ public class UserController {
             throw new RuntimeException(e);
         }
 
-        String verificationLink = "http://localhost:8080/api/users/verify/email/" + encodedEmail;
+        String verificationLink = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/users/verify/email/" + encodedEmail;
         String emailBody = "Your account has been created successfully. Please verify your email to activate your account by clicking the following link: " + verificationLink;
         emailService.sendMail(savedUser.getEmail(), "Welcome to KOI Control Application", emailBody);
         UserResponse userResponse = UserResponse.builder()
