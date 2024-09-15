@@ -1,12 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +18,7 @@ import java.io.InputStream;
 @RestController
 @RequestMapping("/api/image")
 @RequiredArgsConstructor
+@RolesAllowed({"ROLE_ADMIN"})
 public class ImageController {
     private static final String IMAGE_DIR = "image/";
 

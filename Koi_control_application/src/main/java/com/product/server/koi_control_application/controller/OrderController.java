@@ -1,8 +1,11 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.dto.BaseResponse;
+import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.service.IOrderService;
+import com.product.server.koi_control_application.ultil.JwtTokenUtil;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,9 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final IOrderService orderService;
+    private final JwtTokenUtil jwtUtil;
 
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<BaseResponse> createOrder(@PathVariable int userId) {
+
+    @PostMapping("/create")
+    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
+    public ResponseEntity<BaseResponse> createOrder(HttpServletRequest request) {
+        int userId = jwtUtil.getUserIdFromToken(request);
         Orders createdOrder = orderService.createOrder(userId);
         BaseResponse response = BaseResponse.builder()
                 .data(createdOrder)
@@ -29,6 +36,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
+    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
         BaseResponse response = BaseResponse.builder()
@@ -40,6 +48,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}/page/{page}/size/{size}")
+    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @PathVariable int page,
                                                            @PathVariable int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
@@ -52,6 +61,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
+    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> updateOrderStatus(@PathVariable int id, @RequestParam String status) {
         Orders updatedOrder = orderService.updateOrderStatus(id, status);
         BaseResponse response = BaseResponse.builder()
@@ -63,6 +73,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
+    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
                                                         @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
@@ -76,8 +87,9 @@ public class OrderController {
     }
 
     @DeleteMapping("/user/{userId}/order/{orderId}")
-    public ResponseEntity<BaseResponse> cancelOrder(@PathVariable int userId, @PathVariable int orderId) {
-        orderService.cancelOrder(userId, orderId);
+    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
+    public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
+        orderService.cancelPendingOrder(userId, orderId);
         BaseResponse response = BaseResponse.builder()
                 .data("The order has been cancelled")
                 .statusCode(HttpStatus.OK.value())
@@ -86,4 +98,15 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @DeleteMapping("/user/{userId}/order/{orderId}/message/{message}")
+    @RolesAllowed({"ROLE_ADMIN"})
+    public ResponseEntity<BaseResponse> cancelOrderByAdmin(@PathVariable int userId, @PathVariable int orderId, @PathVariable String message) {
+        orderService.cancelOrderByAdmin(userId, orderId, message);
+        BaseResponse response = BaseResponse.builder()
+                .data("The order has been cancelled")
+                .statusCode(HttpStatus.OK.value())
+                .message("Admin cancelled the order")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

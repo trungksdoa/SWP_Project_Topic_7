@@ -10,6 +10,11 @@
 #     database-platform: org.hibernate.dialect.MySQLDialect
 # server:
 #   port
+
+app:
+  jwt:
+    secret: SecretKeyToGenJWTs
+
 spring:
   mvc:
     throw-exception-if-no-handler-found: true

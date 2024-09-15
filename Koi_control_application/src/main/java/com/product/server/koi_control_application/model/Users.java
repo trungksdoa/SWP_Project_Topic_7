@@ -9,8 +9,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @AllArgsConstructor
@@ -20,7 +24,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString(exclude = "password")
 
-public class Users {
+public class Users  implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -49,11 +53,6 @@ public class Users {
     private String address;
 
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
-    private Role roles;
-
-
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -70,4 +69,28 @@ public class Users {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
+    //UserDetails interface methods
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<UserRole> roles = new HashSet<>();
+
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        for (UserRole role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return authorities;
+    }
+
+
+
 }

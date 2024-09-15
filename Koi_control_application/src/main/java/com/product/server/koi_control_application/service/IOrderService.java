@@ -9,6 +9,8 @@ public interface IOrderService {
     Orders getOrderById(int id) ;
     Orders updateOrderStatus(int id, String status) ;
 
-    void cancelOrder(int id,int orderId) ;
+    void cancelPendingOrder(int id,int orderId) ;
+
+    void cancelOrderByAdmin(int id,int orderId,String message) ;
     Page<Orders> getOrdersByUser(int userId, int page, int size);
 }

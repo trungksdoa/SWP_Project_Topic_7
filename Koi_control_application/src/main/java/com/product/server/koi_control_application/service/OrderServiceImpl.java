@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UsersRepository usersRepository;
-    private final OrderItemsRepository orderItemsService;
+    private final OrderItemsRepository orderItemsRepository;
     private final CartRepository cartRepository;
 
 
@@ -32,31 +34,36 @@ public class OrderServiceImpl implements IOrderService {
         Orders order = Orders.builder()
                 .userId(userId)
                 .status("PENDING")
+                .items(new HashSet<>())
                 .build();
-        orderRepository.save(order);
+
+        Orders savedOrder =   orderRepository.save(order);
+
+        if (cartRepository.findByUserId(userId).isEmpty()) {
+            throw new ProductNotFoundException("Your cart may be empty, please add some products to cart, then try again");
+        }
+
         cartRepository.findByUserId(userId).forEach(
                 cart -> {
                     Product product = productRepository.findById(cart.getProductId()).get();
+                  
                     if (product.getStock() < cart.getQuantity()) {
                         throw new InsufficientException("Insufficient stock for product " + product.getName());
                     }
-                    product.setStock(product.getStock() - cart.getQuantity());
-                    productRepository.save(product);
-                    OrderItems orderItems = OrderItems.builder()
-                            .orderId(order.getId())
-                            .productId(cart.getProductId())
-                            .quantity(cart.getQuantity())
-                            .build();
 
-                    order.setTotalAmount(product.getPrice() * cart.getQuantity());
-                    orderItemsService.save(orderItems);
+                    product.setStock(product.getStock() - cart.getQuantity());
+
+                    OrderItems orderItems = OrderItems.builder()
+                            .productId(productRepository.save(product))
+                            .quantity(cart.getQuantity())
+                            .order(savedOrder)
+                            .build();
+                    savedOrder.setTotalAmount(order.getTotalAmount() + product.getPrice() * cart.getQuantity());
+                    savedOrder.getItems().add(orderItemsRepository.save(orderItems));
                     cartRepository.deleteByProductId(cart.getProductId());
                 }
         );
-
-
-
-
+        orderRepository.save(savedOrder);
         return order;
     }
 
@@ -74,12 +81,29 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public void cancelOrder(int userId,int orderId) {
+    public void cancelPendingOrder(int userId, int orderId) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId);
         if (order == null) {
             throw new ProductNotFoundException("Order not found");
         }
+        if(!order.getStatus().equals("PENDING")){
+            throw new InsufficientException("Order cannot be cancelled");
+        }
+
         order.setStatus("CANCELLED");
+        orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrderByAdmin(int userId, int orderId, String message) {
+        Orders order = orderRepository.findByUserIdAndId(userId, orderId);
+        if (order == null) {
+            throw new ProductNotFoundException("Order not found");
+        }
+
+        order.setStatus("CANCELLED");
+        order.setResponseFromAdmin(message);
         orderRepository.save(order);
     }
 

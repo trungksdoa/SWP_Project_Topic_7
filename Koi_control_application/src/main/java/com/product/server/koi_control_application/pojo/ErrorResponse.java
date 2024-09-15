@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.dto;
+package com.product.server.koi_control_application.pojo;
 
 import lombok.Builder;
 import lombok.Data;

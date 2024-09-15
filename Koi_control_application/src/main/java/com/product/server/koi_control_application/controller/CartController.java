@@ -1,9 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.dto.BaseResponse;
-import com.product.server.koi_control_application.dto.CartDTO;
+import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.service.ICartService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/carts")
 @Validated
 @CrossOrigin(origins = "*")
+@RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
 public class CartController {
     private final ICartService cartService;
 
@@ -53,8 +55,8 @@ public class CartController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping()
-    public ResponseEntity<BaseResponse> removeFromCart(@RequestParam int productId, @RequestParam int userId) {
+    @DeleteMapping("/remove/{productId}/user/{userId}")
+    public ResponseEntity<BaseResponse> removeFromCart(@PathVariable int productId, @PathVariable int userId) {
         cartService.deleteCart(productId, userId);
         BaseResponse response = BaseResponse.builder()
                 .data("Item removed from cart successfully")

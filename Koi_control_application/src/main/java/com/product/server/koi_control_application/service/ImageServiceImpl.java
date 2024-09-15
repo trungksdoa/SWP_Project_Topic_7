@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements IImageService {
 
-    private static final String IMAGE_DIR = "src/main/resources/image/";
+    private static final String IMAGE_DIR = "image/";
     private static final String HOST ="https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/";
     public String uploadImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
