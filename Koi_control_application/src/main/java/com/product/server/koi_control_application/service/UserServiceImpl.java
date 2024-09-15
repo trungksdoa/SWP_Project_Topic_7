@@ -29,6 +29,10 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    public void updatedUser(Users user) {
+        usersRepository.save(user);
+    }
+    @Override
     public Users saveUser(Users user) {
         try {
             if (getUsersByUsername(user.getUsername()) == null) {
@@ -83,6 +87,7 @@ public class UserServiceImpl implements IUserService {
         if (user == null) {
             throw new UserNotFoundException(String.valueOf(id));
         }
+        user.removeRole();
         usersRepository.delete(user);
     }
 

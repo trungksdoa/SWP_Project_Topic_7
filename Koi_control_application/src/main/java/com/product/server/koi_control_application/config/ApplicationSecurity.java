@@ -32,6 +32,9 @@ public class ApplicationSecurity {
     private final String[] AUTH_REQUEST = new String[]{
             "/api/users/auth/register",
             "/api/users/auth/login",
+            "/api/users/auth/forgot-password",
+            "/api/users/auth/reset-password",
+            "/api/users/verify/email/**",
             "/api/products/**",
     };
     @Bean
