@@ -18,7 +18,7 @@ import java.io.InputStream;
 @RestController
 @RequestMapping("/api/image")
 @RequiredArgsConstructor
-@RolesAllowed({"ROLE_ADMIN"})
+@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ImageController {
     private static final String IMAGE_DIR = "image/";
 
