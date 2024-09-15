@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.service.ICartService;
+import com.product.server.koi_control_application.serviceInterface.ICartService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,14 +1,14 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.pojo.AuthResponse;
-import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.LoginRequest;
-import com.product.server.koi_control_application.pojo.UserResponse;
+import com.product.server.koi_control_application.customException.UserNotFoundException;
+import com.product.server.koi_control_application.pojo.*;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.service.IUserService;
+import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,7 @@ public class UserController {
     private final IUserService userService;
     private final  AuthenticationManager authManager;
     private final JwtTokenUtil jwtUtil;
+    private final IEmailService emailService;
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         BaseResponse response = BaseResponse.builder().data(userService.getUser(userId)).statusCode(HttpStatus.OK.value()).message("Success").build();
@@ -65,7 +66,7 @@ public class UserController {
 
 
             BaseResponse response = BaseResponse.builder()
-                    .data(new AuthResponse(user.getEmail(), accessToken))
+                    .data(new AuthResponse(user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), accessToken))
                     .statusCode(HttpStatus.OK.value()
                     ).message("Success")
                     .build();
@@ -79,15 +80,27 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/reset")
-    public ResponseEntity<BaseResponse> resetPassword(@RequestParam String email) {
-        userService.resetPassword(email);
-        BaseResponse response = BaseResponse.builder()
-                .data("Password reset link sent to your email")
-                .statusCode(HttpStatus.OK.value())
-                .message("Success")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PostMapping("/forgot-password")
+    public ResponseEntity<BaseResponse> forgotPassword(@RequestBody @Valid EmailRequest emailRequest) {
+        try {
+            String newPassword = userService.generateNewPassword();
+            userService.updatePassword(emailRequest.getEmail(), newPassword);
+            emailService.sendPasswordToEmail(emailRequest.getEmail(), newPassword);
+
+            BaseResponse response = BaseResponse.builder()
+                    .data("A new password has been sent to your email")
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Success")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            BaseResponse response = BaseResponse.builder()
+                    .data(null)
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .message("User not found")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
     }
 
 

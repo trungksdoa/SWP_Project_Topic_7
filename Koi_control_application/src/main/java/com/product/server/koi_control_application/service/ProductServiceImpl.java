@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.serviceInterface.IProductService;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.repository.CategoryRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;

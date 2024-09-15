@@ -1,6 +1,8 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.customException.EmailAlreadyExistsException;
 import com.product.server.koi_control_application.customException.UserExistedException;
 import com.product.server.koi_control_application.customException.UserNotFoundException;
@@ -9,6 +11,7 @@ import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,7 +84,20 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void resetPassword(String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
-        service.sendMail(user.getEmail(),"Request reset password","");
+        usersRepository.save(user);
+    }
+
+    @Override
+    public String generateNewPassword() {
+        return RandomStringUtils.randomAlphanumeric(12);
+    }
+
+    @Override
+    public void updatePassword(String email, String newPassword) {
+        Users user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
         usersRepository.save(user);
     }
 
@@ -89,5 +105,7 @@ public class UserServiceImpl implements IUserService {
     public void updateUser(Users user) {
         // TODO document why this method is empty
     }
+
+
 
 }
