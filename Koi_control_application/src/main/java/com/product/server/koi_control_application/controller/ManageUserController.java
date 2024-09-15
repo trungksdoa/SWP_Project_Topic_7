@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN"})
+@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ManageUserController {
     private final IUserService userService;
     @DeleteMapping("/{userId}")

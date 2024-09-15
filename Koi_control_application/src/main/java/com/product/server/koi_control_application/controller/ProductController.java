@@ -4,6 +4,7 @@ import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.service.IImageService;
 import com.product.server.koi_control_application.service.IProductService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ProductController {
     private final IProductService productService;
     private final IImageService imageService;

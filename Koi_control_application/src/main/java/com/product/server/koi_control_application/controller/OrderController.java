@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class OrderController {
 
     private final IOrderService orderService;
@@ -23,7 +24,6 @@ public class OrderController {
 
 
     @PostMapping("/create")
-    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
     public ResponseEntity<BaseResponse> createOrder(HttpServletRequest request) {
         int userId = jwtUtil.getUserIdFromToken(request);
         Orders createdOrder = orderService.createOrder(userId);
@@ -36,7 +36,6 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
         BaseResponse response = BaseResponse.builder()
@@ -48,7 +47,6 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}/page/{page}/size/{size}")
-    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @PathVariable int page,
                                                            @PathVariable int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
@@ -61,7 +59,6 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/status")
-    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> updateOrderStatus(@PathVariable int id, @RequestParam String status) {
         Orders updatedOrder = orderService.updateOrderStatus(id, status);
         BaseResponse response = BaseResponse.builder()
@@ -73,7 +70,6 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
                                                         @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
@@ -87,7 +83,6 @@ public class OrderController {
     }
 
     @DeleteMapping("/user/{userId}/order/{orderId}")
-    @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
         BaseResponse response = BaseResponse.builder()
@@ -99,7 +94,6 @@ public class OrderController {
     }
 
     @DeleteMapping("/user/{userId}/order/{orderId}/message/{message}")
-    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BaseResponse> cancelOrderByAdmin(@PathVariable int userId, @PathVariable int orderId, @PathVariable String message) {
         orderService.cancelOrderByAdmin(userId, orderId, message);
         BaseResponse response = BaseResponse.builder()

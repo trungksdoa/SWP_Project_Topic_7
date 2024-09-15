@@ -18,7 +18,7 @@ import java.io.IOException;
 @RequestMapping("/manage/api/products")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN"})
+@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ManageProductController {
     private final IProductService productService;
     private final IImageService imageService;
