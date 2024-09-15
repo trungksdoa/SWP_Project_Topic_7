@@ -73,12 +73,14 @@ public class Users  implements UserDetails {
 
 
     //UserDetails interface methods
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    //Set on delete cascade
+
     private Set<UserRole> roles = new HashSet<>();
 
 
@@ -90,6 +92,10 @@ public class Users  implements UserDetails {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
+    }
+
+    public void removeRole(){
+        this.getRoles().clear();
     }
 
 

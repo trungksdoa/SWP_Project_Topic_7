@@ -83,6 +83,7 @@ public class UserServiceImpl implements IUserService {
         if (user == null) {
             throw new UserNotFoundException(String.valueOf(id));
         }
+        user.removeRole();
         usersRepository.delete(user);
     }
 
