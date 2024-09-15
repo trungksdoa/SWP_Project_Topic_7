@@ -2,9 +2,7 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.model.Product;
-import com.product.server.koi_control_application.model.ProductImage;
 import com.product.server.koi_control_application.repository.CategoryRepository;
-import com.product.server.koi_control_application.repository.ProductImageRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,14 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductImageRepository productImageRepository;
     @Override
     @Transactional
     public Product createProduct(Product product) {

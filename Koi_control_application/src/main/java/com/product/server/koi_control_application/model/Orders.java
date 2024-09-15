@@ -6,6 +6,8 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "orders")
@@ -30,6 +32,17 @@ public class Orders {
     @Size(max = 50, message = "Status must be less than 50 characters")
     @Column(nullable = false)
     private String status;
+
+    @ManyToMany
+    @JoinTable(
+            name = "orders_items",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private Set<OrderItems> items = new HashSet<>();
+
+
+    private String responseFromAdmin;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

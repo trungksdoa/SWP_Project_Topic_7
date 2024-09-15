@@ -1,8 +1,9 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.dto.BaseResponse;
+import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service.IUserService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
+@RolesAllowed({"ROLE_ADMIN"})
 public class ManageUserController {
     private final IUserService userService;
     @DeleteMapping("/{userId}")

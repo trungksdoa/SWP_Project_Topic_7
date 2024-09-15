@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.customException.ProductNotFoundException;
-import com.product.server.koi_control_application.dto.CartDTO;
+import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.repository.CartRepository;
 import lombok.RequiredArgsConstructor;

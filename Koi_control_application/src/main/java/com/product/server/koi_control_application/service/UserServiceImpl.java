@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.customException.EmailAlreadyEx
 import com.product.server.koi_control_application.customException.UserExistedException;
 import com.product.server.koi_control_application.customException.UserNotFoundException;
 import com.product.server.koi_control_application.customException.UsernameAlreadyExistsException;
+import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,19 +13,25 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.product.server.koi_control_application.model.UserRoleEnum.ROLE_MEMBER;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
     private final IEmailService service;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Users saveUser(Users user) {
         try {
             if (getUsersByUsername(user.getUsername()) == null) {
-                user.setPassword(user.getPassword());
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.getRoles().add(new UserRole(ROLE_MEMBER.getValue()));
+
                 return usersRepository.save(user);
             }
 

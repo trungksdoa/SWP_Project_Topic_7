@@ -1,15 +1,21 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.dto.BaseResponse;
-import com.product.server.koi_control_application.dto.LoginRequest;
-import com.product.server.koi_control_application.dto.UserResponse;
-import com.product.server.koi_control_application.model.Role;
+import com.product.server.koi_control_application.pojo.AuthResponse;
+import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.LoginRequest;
+import com.product.server.koi_control_application.pojo.UserResponse;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.service.IUserService;
+import com.product.server.koi_control_application.ultil.JwtTokenUtil;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +28,17 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final IUserService userService;
-
+    private final  AuthenticationManager authManager;
+    private final JwtTokenUtil jwtUtil;
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         BaseResponse response = BaseResponse.builder().data(userService.getUser(userId)).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/auth/register")
     public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
         BaseResponse response;
-        users.setRoles(Role.ROLE_USER);
         Users savedUser = userService.saveUser(users);
         UserResponse userResponse = UserResponse.builder()
                 .id(savedUser.getId())
@@ -40,21 +46,37 @@ public class UserController {
                 .email(savedUser.getEmail())
                 .address(savedUser.getAddress())
                 .phoneNumber(savedUser.getPhoneNumber())
-                .roles(Role.ROLE_USER)
                 .build();
         response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.CREATED.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/auth")
+    @PostMapping("/auth/login")
     public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
-        BaseResponse response = BaseResponse.builder()
-                .data(userService.userLogin(loginRequest.getEmail(), loginRequest.getPassword()))
-                .statusCode(HttpStatus.OK.value()
-                ).message("Success")
-                .build();
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(), loginRequest.getPassword())
+            );
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            Users user = (Users) authentication.getPrincipal();
+            String accessToken = jwtUtil.generateAccessToken(user);
+
+
+
+            BaseResponse response = BaseResponse.builder()
+                    .data(new AuthResponse(user.getEmail(), accessToken))
+                    .statusCode(HttpStatus.OK.value()
+                    ).message("Success")
+                    .build();
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+
     }
 
     @GetMapping("/user/reset")
@@ -69,5 +91,10 @@ public class UserController {
     }
 
 
+    @GetMapping("/test")
+    @RolesAllowed("ROLE_ADMIN")
+    public String test(){
+        return "Hello admin";
+    }
 
 }

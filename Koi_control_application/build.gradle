@@ -30,6 +30,11 @@ dependencies {
     implementation 'org.springframework.session:spring-session-core'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation('org.springframework.boot:spring-boot-starter-mail')
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 //    implementation 'org.springframework.boot:spring-boot-starter-security'
 
