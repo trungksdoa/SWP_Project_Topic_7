@@ -8,6 +8,8 @@ public interface IUserService {
     Users saveUser(Users user);
     Users getUser(int id);
 
+    Users getUsersByEmail(String email);
+
     Users getUsersByUsername(String username);
 
     Users userLogin(String username, String password);

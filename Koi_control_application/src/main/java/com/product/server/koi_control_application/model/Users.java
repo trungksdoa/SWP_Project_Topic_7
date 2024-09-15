@@ -52,6 +52,7 @@ public class Users  implements UserDetails {
     @Column(nullable = true)
     private String address;
 
+    private boolean active = false;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

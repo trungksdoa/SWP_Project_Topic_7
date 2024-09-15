@@ -39,7 +39,6 @@ public class UserController {
 
     @PostMapping("/auth/register")
     public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
-        BaseResponse response;
         Users savedUser = userService.saveUser(users);
         UserResponse userResponse = UserResponse.builder()
                 .id(savedUser.getId())
@@ -48,7 +47,7 @@ public class UserController {
                 .address(savedUser.getAddress())
                 .phoneNumber(savedUser.getPhoneNumber())
                 .build();
-        response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.CREATED.value()).message("Success").build();
+        BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.CREATED.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -66,7 +65,7 @@ public class UserController {
 
 
             BaseResponse response = BaseResponse.builder()
-                    .data(new AuthResponse(user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), accessToken))
+                    .data(new AuthResponse(user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(),user.isActive(), accessToken))
                     .statusCode(HttpStatus.OK.value()
                     ).message("Success")
                     .build();
@@ -91,6 +90,26 @@ public class UserController {
                     .data("A new password has been sent to your email")
                     .statusCode(HttpStatus.OK.value())
                     .message("Success")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            BaseResponse response = BaseResponse.builder()
+                    .data(null)
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .message("User not found")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/verify/email/")
+    public ResponseEntity<BaseResponse> verifyEmail(@RequestBody @Valid EmailRequest emailRequest){
+        try {
+            userService.getUsersByEmail(emailRequest.getEmail()).setActive(true);
+            BaseResponse response = BaseResponse.builder()
+                    .data("Success")
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Validate email success, your account have been activated")
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (UserNotFoundException e) {
