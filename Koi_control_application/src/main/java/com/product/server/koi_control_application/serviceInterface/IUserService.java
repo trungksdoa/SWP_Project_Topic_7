@@ -12,9 +12,11 @@ public interface IUserService {
 
     Users userLogin(String username, String password);
     Page<Users> getUsers(int page, int size);
-
-    void resetPassword(String email);
     void deleteUser(int id);
     void updateUser(Users user);
+    void resetPassword(String email);
 
+    String generateNewPassword();
+
+    void updatePassword(String email, String newPassword);
 }
