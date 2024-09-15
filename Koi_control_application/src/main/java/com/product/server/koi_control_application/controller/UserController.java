@@ -40,6 +40,9 @@ public class UserController {
     @PostMapping("/auth/register")
     public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
         Users savedUser = userService.saveUser(users);
+        String verificationLink = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/users/verify/email/" + savedUser.getEmail();
+        String emailBody = "Your account has been created successfully. Please verify your email to activate your account by clicking the following link: " + verificationLink;
+        emailService.sendMail(savedUser.getEmail(), "Welcome to KOI Control Application", emailBody);
         UserResponse userResponse = UserResponse.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
@@ -102,10 +105,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/verify/email/")
-    public ResponseEntity<BaseResponse> verifyEmail(@RequestBody @Valid EmailRequest emailRequest){
+    @GetMapping("/verify/email/{email}")
+    public ResponseEntity<BaseResponse> verifyEmail(@PathVariable String email) {
         try {
-            userService.getUsersByEmail(emailRequest.getEmail()).setActive(true);
+            userService.getUsersByEmail(email).setActive(true);
             BaseResponse response = BaseResponse.builder()
                     .data("Success")
                     .statusCode(HttpStatus.OK.value())
