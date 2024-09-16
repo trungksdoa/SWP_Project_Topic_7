@@ -23,6 +23,8 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private String fullName;
+
     @Column(name = "users_id", nullable = false)
     private int userId;
 

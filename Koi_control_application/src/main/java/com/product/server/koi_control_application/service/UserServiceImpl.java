@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.model.UserLimit;
+import com.product.server.koi_control_application.pojo.userRegister;
 import com.product.server.koi_control_application.repository.UserLimitRepository;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.product.server.koi_control_application.model.UserRoleEnum.ROLE_MEMBER;
 
 @Service
@@ -36,12 +40,18 @@ public class UserServiceImpl implements IUserService {
         usersRepository.save(user);
     }
     @Override
-    public Users saveUser(Users user) {
+    public Users saveUser(userRegister register) {
         try {
-            if (getUsersByUsername(user.getUsername()) == null) {
+            if (getUsersByUsername(register.getUsername()) == null) {
+
+                Users user = Users.builder()
+                        .username(register.getUsername())
+                        .email(register.getEmail())
+                        .roles(new HashSet<>())
+                        .build();
                 //Create user
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-                user.getRoles().add(new UserRole(ROLE_MEMBER.getValue()));
+                user.setPassword(passwordEncoder.encode(register.getPassword()));
+                user.getRoles().add(new UserRole(register.getRole().getValue()));
                 Users savedUser = usersRepository.save(user);
 
                 // Create user limit
@@ -55,15 +65,15 @@ public class UserServiceImpl implements IUserService {
 
         } catch (DataIntegrityViolationException ex) {
             if (ex.getMessage().contains("users_email_unique")) {
-                throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
+                throw new EmailAlreadyExistsException("Email already exists: " + register.getEmail());
             } else if (ex.getMessage().contains("users_username_unique")) {
-                throw new UsernameAlreadyExistsException("Username already exists: " + user.getUsername());
+                throw new UsernameAlreadyExistsException("Username already exists: " + register.getUsername());
             } else {
                 throw ex;
             }
         }
 
-        throw new UserExistedException(user.getUsername());
+        throw new UserExistedException(register.getUsername());
     }
 
     @Override
