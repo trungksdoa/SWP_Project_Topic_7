@@ -14,8 +14,7 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
     private static final long EXPIRE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
-    private static final long EXPIRE_DURATION_ADMIN = 99999999 * 24 * 60 * 60 * 1000; // infinity day
-
+    private static final long EXPIRE_DURATION_ADMIN = Long.MAX_VALUE; // infinity day
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
 
@@ -36,7 +35,7 @@ public class JwtTokenUtil {
                 .setIssuer("FPT University")
                 .claim("roles", user.getRoles().toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION_ADMIN))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
