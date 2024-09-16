@@ -48,7 +48,7 @@ public class ManageProductController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    @DeleteMapping("/manage/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteProduct(@PathVariable int id) {
         productService.deleteProduct(id);
         BaseResponse response = BaseResponse.builder()

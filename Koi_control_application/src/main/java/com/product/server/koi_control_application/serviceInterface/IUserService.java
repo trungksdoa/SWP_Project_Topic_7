@@ -1,13 +1,14 @@
 package com.product.server.koi_control_application.serviceInterface;
 
 import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.pojo.userRegister;
 import org.springframework.data.domain.Page;
 
 
 public interface IUserService {
     void updatedUser(Users user);
 
-    Users saveUser(Users user);
+    Users saveUser(userRegister user);
 
     void userRegisterMail(String email, Users savedUser);
 

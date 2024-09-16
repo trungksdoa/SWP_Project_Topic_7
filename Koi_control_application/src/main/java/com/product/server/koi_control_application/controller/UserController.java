@@ -41,12 +41,21 @@ public class UserController {
 
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
-        BaseResponse response = BaseResponse.builder().data(userService.getUser(userId)).statusCode(HttpStatus.OK.value()).message("Success").build();
+        Users user = userService.getUser(userId);
+        UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getRoles())
+                .build();
+        BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) throws UnsupportedEncodingException {
+    public ResponseEntity<BaseResponse> registerUser(@RequestBody userRegister users) throws UnsupportedEncodingException {
         Users savedUser = userService.saveUser(users);
 
         userService.userRegisterMail(

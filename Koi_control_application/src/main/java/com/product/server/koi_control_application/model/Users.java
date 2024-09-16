@@ -71,8 +71,6 @@ public class Users  implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
-
-    //UserDetails interface methods
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
             name = "users_roles",
@@ -83,6 +81,8 @@ public class Users  implements UserDetails {
 
     private Set<UserRole> roles = new HashSet<>();
 
+
+//
 
 
     @Override

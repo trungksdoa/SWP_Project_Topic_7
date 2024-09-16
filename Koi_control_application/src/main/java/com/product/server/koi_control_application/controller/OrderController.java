@@ -24,7 +24,7 @@ public class OrderController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createOrder(HttpServletRequest request) {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody  HttpServletRequest request) {
         int userId = jwtUtil.getUserIdFromToken(request);
         Orders createdOrder = orderService.createOrder(userId);
         BaseResponse response = BaseResponse.builder()
