@@ -93,7 +93,7 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new BadCredentialsException("Incorrect email or password", ex);
         }
 
 

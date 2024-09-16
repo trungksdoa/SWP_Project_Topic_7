@@ -3,9 +3,8 @@ package com.product.server.koi_control_application.pojo;
 
 import com.product.server.koi_control_application.model.UserRole;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
+
 import java.util.Set;
 
 @Builder
