@@ -2,8 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.customException.UserNotFoundException;
-import com.product.server.koi_control_application.pojo.*;
 import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.pojo.*;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,19 +24,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
+@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
 public class UserController {
 
     private final IUserService userService;
-    private final  AuthenticationManager authManager;
+    private final AuthenticationManager authManager;
     private final JwtTokenUtil jwtUtil;
     private final IEmailService emailService;
+
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         BaseResponse response = BaseResponse.builder().data(userService.getUser(userId)).statusCode(HttpStatus.OK.value()).message("Success").build();
@@ -43,19 +46,14 @@ public class UserController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) {
+    public ResponseEntity<BaseResponse> registerUser(@RequestBody Users users) throws UnsupportedEncodingException {
         Users savedUser = userService.saveUser(users);
 
-        String encodedEmail = "";
-        try {
-            encodedEmail = URLEncoder.encode(savedUser.getEmail(), StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        userService.userRegisterMail(
+                URLEncoder.encode(savedUser.getEmail(), StandardCharsets.UTF_8),
+                savedUser
+        );
 
-        String verificationLink = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/users/verify/email/" + encodedEmail;
-        String emailBody = "Your account has been created successfully. Please verify your email to activate your account by clicking the following link: " + verificationLink;
-        emailService.sendMail(savedUser.getEmail(), "Welcome to KOI Control Application", emailBody);
         UserResponse userResponse = UserResponse.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
@@ -78,10 +76,10 @@ public class UserController {
             Users user = (Users) authentication.getPrincipal();
             String accessToken = jwtUtil.generateAccessToken(user);
 
-
+            Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
 
             BaseResponse response = BaseResponse.builder()
-                    .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(),user.isActive(), accessToken))
+                    .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(),roles, accessToken))
                     .statusCode(HttpStatus.OK.value()
                     ).message("Success")
                     .build();
@@ -152,7 +150,7 @@ public class UserController {
 
     @GetMapping("/test")
     @RolesAllowed("ROLE_ADMIN")
-    public String test(){
+    public String test() {
         return "Hello admin";
     }
 

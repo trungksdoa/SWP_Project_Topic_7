@@ -8,6 +8,9 @@ public interface IUserService {
     void updatedUser(Users user);
 
     Users saveUser(Users user);
+
+    void userRegisterMail(String email, Users savedUser);
+
     Users getUser(int id);
 
     Users getUsersByEmail(String email);

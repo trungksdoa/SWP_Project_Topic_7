@@ -35,6 +35,7 @@ public class ApplicationSecurity {
             "/api/users/auth/forgot-password",
             "/api/users/auth/reset-password",
             "/api/users/verify/email/**",
+            "/api/image/**",
             "/api/products/**",
     };
     @Bean

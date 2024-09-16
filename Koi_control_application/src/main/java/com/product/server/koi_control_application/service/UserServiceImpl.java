@@ -1,6 +1,8 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.model.UserLimit;
+import com.product.server.koi_control_application.repository.UserLimitRepository;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.customException.EmailAlreadyExistsException;
@@ -27,7 +29,8 @@ public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
     private final IEmailService service;
     private final PasswordEncoder passwordEncoder;
-
+    private final UserLimitRepository userLimitRepository;
+    private final EmailServiceImpl emailService;
     @Override
     public void updatedUser(Users user) {
         usersRepository.save(user);
@@ -36,10 +39,18 @@ public class UserServiceImpl implements IUserService {
     public Users saveUser(Users user) {
         try {
             if (getUsersByUsername(user.getUsername()) == null) {
+                //Create user
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
                 user.getRoles().add(new UserRole(ROLE_MEMBER.getValue()));
+                Users savedUser = usersRepository.save(user);
 
-                return usersRepository.save(user);
+                // Create user limit
+                UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build();
+                userLimitRepository.save(UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build());
+
+                // Send email to user
+                userRegisterMail(user.getEmail(), savedUser);
+                return savedUser;
             }
 
         } catch (DataIntegrityViolationException ex) {
@@ -53,6 +64,13 @@ public class UserServiceImpl implements IUserService {
         }
 
         throw new UserExistedException(user.getUsername());
+    }
+
+    @Override
+    public void userRegisterMail(String email, Users savedUser) {
+        String verificationLink = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/users/verify/email/" + email;
+        String emailBody = "Your account has been created successfully. Please verify your email to activate your account by clicking the following link: " + verificationLink;
+        emailService.sendMail(savedUser.getEmail(), "Welcome to KOI Control Application", emailBody);
     }
 
     @Override
