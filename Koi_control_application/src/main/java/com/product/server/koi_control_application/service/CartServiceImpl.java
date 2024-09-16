@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,14 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public Cart createCart(Cart cart) {
+        if(cart.getQuantity() == 0){
+            throw new DataIntegrityViolationException("Quantity must be greater than 0");
+        }
+
+        if(cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId()).isPresent()){
+            throw new IllegalArgumentException("This item is already in your cart");
+        }
+
         return cartRepository.save(cart);
     }
 

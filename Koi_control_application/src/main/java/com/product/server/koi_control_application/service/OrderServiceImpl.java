@@ -22,7 +22,6 @@ import java.util.HashSet;
 public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UsersRepository usersRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final CartRepository cartRepository;
 
@@ -30,15 +29,14 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     @Transactional
     public Orders createOrder(int userId) {
-        // Validate and update product stock
-        // Take the items information in cart then place in it order_items table after create order table
+        // Create a new order
         Orders order = Orders.builder()
                 .userId(userId)
                 .status("PENDING")
                 .items(new HashSet<>())
                 .build();
 
-        Orders savedOrder =   orderRepository.save(order);
+        Orders savedOrder = orderRepository.save(order);
 
         if (cartRepository.findByUserId(userId).isEmpty()) {
             throw new ProductNotFoundException("Your cart may be empty, please add some products to cart, then try again");
@@ -46,14 +44,10 @@ public class OrderServiceImpl implements IOrderService {
 
         cartRepository.findByUserId(userId).forEach(
                 cart -> {
-                    Product product = productRepository.findById(cart.getProductId()).get();
-                  
-                    if (product.getStock() < cart.getQuantity()) {
-                        throw new InsufficientException("Insufficient stock for product " + product.getName());
-                    }
+                    Product product = productRepository.findById(cart.getProductId()).orElseThrow(() ->
+                            new ProductNotFoundException("Product not found"));
 
-                    product.setStock(product.getStock() - cart.getQuantity());
-
+                    // Create order items without stock validation
                     OrderItems orderItems = OrderItems.builder()
                             .productId(productRepository.save(product))
                             .quantity(cart.getQuantity())
