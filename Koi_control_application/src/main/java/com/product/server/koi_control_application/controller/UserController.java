@@ -78,6 +78,12 @@ public class UserController {
 
             Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
 
+            boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+            if(isAdmin) {
+                accessToken = jwtUtil.generateAdminAccessToken(user);
+            }
+
             BaseResponse response = BaseResponse.builder()
                     .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(),roles, accessToken))
                     .statusCode(HttpStatus.OK.value()

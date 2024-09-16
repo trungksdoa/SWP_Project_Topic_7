@@ -13,7 +13,8 @@ import java.util.Date;
 
 @Component
 public class JwtTokenUtil {
-    private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000; // 24 hour
+    private static final long EXPIRE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
+    private static final long EXPIRE_DURATION_ADMIN = 99999999 * 24 * 60 * 60 * 1000; // infinity day
 
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
@@ -28,6 +29,18 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
+
+    public String generateAdminAccessToken(Users user) {
+        return Jwts.builder()
+                .setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
+                .setIssuer("FPT University")
+                .claim("roles", user.getRoles().toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION_ADMIN))
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
+
 
 
     public boolean validateAccessToken(String token) {
