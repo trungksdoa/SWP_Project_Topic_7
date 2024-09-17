@@ -14,6 +14,4 @@ public class KoiFishCreationRequest {
     private String breeder;
     private String imageUrl;
     private int pondId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
