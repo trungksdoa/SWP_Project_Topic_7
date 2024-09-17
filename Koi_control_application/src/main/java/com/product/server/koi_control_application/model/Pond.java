@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,14 +40,15 @@ public class Pond {
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
-    private int width;
+    private BigDecimal width;
 
     @Positive(message = "Length must be positive")
     @Column(precision = 10, scale = 2)
-    private int length;
+    private BigDecimal length;
 
-    @Size(max = 50, message = "Depth must be less than 50 characters")
-    private String depth;
+    @Positive(message = "Depth must be positive")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal depth;
 
     @Positive(message = "Volume must be positive")
     @Column(precision = 10, scale = 2)
@@ -53,7 +56,7 @@ public class Pond {
 
     @PositiveOrZero(message = "Fish count must be zero or positive")
     @Column(name = "fish_count")
-    private Integer fishCount;
+    private int fishCount;
 
     @Column(name = "breeder")
     private int breeder;
@@ -74,4 +77,6 @@ public class Pond {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
 }

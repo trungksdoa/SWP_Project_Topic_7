@@ -31,5 +31,8 @@
   "Email": "Email",
   "Password": "Mật khẩu",
   "Do you have an account?": "Bạn đã có tài khoản?",
-  "Don't have an account?": "Bạn không có tài khoản?"
+  "Don't have an account?": "Bạn không có tài khoản?",
+  "Dashboard": "Bảng điều khiển",
+  "Profile": "Hồ sơ",
+  "Logout": "Đăng xuất"
 }
