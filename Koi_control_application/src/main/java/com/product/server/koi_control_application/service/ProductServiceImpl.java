@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.serviceInterface.IProductService;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.repository.CategoryRepository;
@@ -8,7 +9,6 @@ import com.product.server.koi_control_application.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,18 +61,22 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Product getProduct(int productId) {
-        return productRepository.findById(productId).orElse(null);
+        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
+        product.calculateAverageRating();
+        return product;
     }
 
     @Override
     public Page<Product> getAllProducts(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findAll(pageable);
+        Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
+        products.getContent().forEach(Product::calculateAverageRating);
+        return products;
     }
 
     @Override
     public Page<Product> getProductsByCategory(int categoryId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findByCategoryId(categoryId, pageable);
+        Page<Product> products = productRepository.findByCategoryId(categoryId,PageRequest.of(page, size));
+        products.getContent().forEach(Product::calculateAverageRating);
+        return products;
     }
 }

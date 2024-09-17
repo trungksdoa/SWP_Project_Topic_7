@@ -3,8 +3,6 @@ package com.product.server.koi_control_application.ultil;
 import com.product.server.koi_control_application.model.Users;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,9 +12,9 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
     private static final long EXPIRE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
-    private static final long EXPIRE_DURATION_ADMIN = Long.MAX_VALUE; // infinity day
+    private static final long EXPIRE_DURATION_ADMIN = 3 * 60 * 1000; // 3 minutes    @Value("${app.jwt.secret}")
     @Value("${app.jwt.secret}")
-    private String SECRET_KEY;
+    private String SECRET_KEY ;
 
     public String generateAccessToken(Users user) {
         return Jwts.builder()
@@ -29,17 +27,17 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public String generateAdminAccessToken(Users user) {
+    //Removing after testing
+    public String generateTest(Users user) {
         return Jwts.builder()
                 .setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
                 .setIssuer("FPT University")
                 .claim("roles", user.getRoles().toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION_ADMIN))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
-
 
 
     public boolean validateAccessToken(String token) {
@@ -58,6 +56,7 @@ public class JwtTokenUtil {
             throw new SignatureException("Signature validation failed");
         }
     }
+
     public String getSubject(String token) {
         return parseClaims(token).getSubject();
     }
@@ -71,7 +70,7 @@ public class JwtTokenUtil {
             String[] parts = subject.split(",");
             return Integer.parseInt(parts[0]);
         }
-       throw new IllegalArgumentException("Token is null, empty or only whitespace");
+        throw new IllegalArgumentException("Token is null, empty or only whitespace");
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

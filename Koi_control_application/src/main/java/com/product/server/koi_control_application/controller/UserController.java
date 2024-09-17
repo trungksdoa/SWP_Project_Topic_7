@@ -1,7 +1,8 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.customException.UserNotFoundException;
+import com.product.server.koi_control_application.customException.ForbiddenException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.*;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
@@ -83,18 +84,20 @@ public class UserController {
             );
 
             Users user = (Users) authentication.getPrincipal();
+
+
+            if(!user.isActive()) {
+               throw new ForbiddenException("Account is not activated");
+            }
+
             String accessToken = jwtUtil.generateAccessToken(user);
 
-            Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
-
-            boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
-
-            if(isAdmin) {
-                accessToken = jwtUtil.generateAdminAccessToken(user);
+            if(user.getUsername().equals("testAccount")) {
+                accessToken = jwtUtil.generateTest(user);
             }
 
             BaseResponse response = BaseResponse.builder()
-                    .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(),user.getRoles(), accessToken))
+                    .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(), user.getRoles(), accessToken))
                     .statusCode(HttpStatus.OK.value()
                     ).message("Success")
                     .build();
@@ -121,7 +124,7 @@ public class UserController {
                     .message("Success")
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             BaseResponse response = BaseResponse.builder()
                     .data(null)
                     .statusCode(HttpStatus.NOT_FOUND.value())
@@ -152,7 +155,7 @@ public class UserController {
                     .message("Validate email success, your account have been activated")
                     .build();
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             BaseResponse response = BaseResponse.builder()
                     .data(null)
                     .statusCode(HttpStatus.NOT_FOUND.value())

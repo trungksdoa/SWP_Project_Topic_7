@@ -24,6 +24,8 @@ public class Orders {
     private int id;
 
     private String fullName;
+    private String address;
+    private String phone;
 
     @Column(name = "users_id", nullable = false)
     private int userId;

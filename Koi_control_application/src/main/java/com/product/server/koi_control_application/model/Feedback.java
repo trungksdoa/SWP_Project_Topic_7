@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -19,11 +20,20 @@ public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull(message = "Please fill in the feedback")
-    private String feedback;
-    @NotNull(message = "Please rating the product")
-    private int rating;
-    private int userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"feedbacks", "password", "authorities"})
+    private Users user;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(nullable = false)
+    private Integer rating;
+
+    @Column(length = 1000)
+    private String comment;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
