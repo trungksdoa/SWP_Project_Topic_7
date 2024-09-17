@@ -12,3 +12,43 @@
  .ant-modal-footer {
     display: none;
  }
+
+ /* Card  */
+ .ant-card-body {
+    padding: 10px !important;
+ }
+
+ /* Tab */
+ .ant-tabs-nav-wrap {
+   justify-content: center;
+ }
+
+ .ant-tabs-content.ant-tabs-content-top {
+   position: inherit;
+ }
+
+ /* layout */
+
+ .ant-layout-sider-children, 
+ .ant-menu {
+   background-color: #fe8732 !important;
+ }
+
+ .ant-layout-sider-trigger{
+   background-color: #F97316 !important;
+ }
+
+ .ant-layout-header  {
+   background-color: white;
+ }
+
+ /* button antd  */
+ /* .ant-btn {
+  background-color: #F97316 !important;
+  color: white !important;
+ }
+
+ .ant-btn:hover {
+  background-color: #fb6400 !important;
+  color: white !important;
+ } */
