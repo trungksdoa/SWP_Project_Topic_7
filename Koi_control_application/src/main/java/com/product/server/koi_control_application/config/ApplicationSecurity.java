@@ -38,6 +38,8 @@ public class ApplicationSecurity {
             "/api/image/**",
             "/api/products/**",
     };
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
