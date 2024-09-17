@@ -45,9 +45,6 @@ public class KoiGrowthHistory {
     @Column(name = "koi_id")
     private int koiId;
 
-    @Column(name = "pond_id")
-    private int pondId;
-
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
