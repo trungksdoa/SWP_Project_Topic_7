@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/manage/api/users")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = {"Authorization", "Content-Type"})
 @RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ManageUserController {
     private final IUserService userService;
