@@ -8,7 +8,6 @@ import { NavLink } from "react-router-dom";
 const ProfileTemplage = () => {
   const { userLogin } = useSelector((state) => state.manageUser);
 
-  console.log(userLogin);
   const [mode, setMode] = useState("top");
   const handleModeChange = (e) => {
     setMode(e.target.value);

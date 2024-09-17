@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
-import { manageUserServices } from "../../services/manageUserServices"
-
+import { ManageUserAll } from "../../services/admin/ManageUserAll"
 export const useGetUserAll = () => {
     const q = useQuery({
         queryKey: ['user-all'],
-        queryFn: () => manageUserServices.getUserAll()
+        queryFn: () => ManageUserAll.getUserAll()
     })
     return { 
         ...q,

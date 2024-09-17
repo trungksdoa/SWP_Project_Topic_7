@@ -9,5 +9,7 @@ export const PATH = {
     DASHBOARD: '/dashboard',
     PROFILE: '/profile',
     ADMIN: '/admin',
-    MANAGE_USER: '/admin/manage-user'
+    MANAGE_USER: '/admin/manage-user',
+    MANAGE_PRODUCTS: '/admin/manage-products',
+    DETAIL_PRODUCT: '/store/detail'
 }

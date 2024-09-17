@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { manageUserActionThunks } from "../../../store/manageUser";
+import { Radio } from "antd";
 
 const RegisterForm = ({ showModalLogin }) => {
   const { t } = useTranslation();
@@ -21,14 +22,24 @@ const RegisterForm = ({ showModalLogin }) => {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
 
+  const password = watch("password");
+
   const onSubmit = (data) => {
-    console.log(data);
-    dispatch(manageUserActionThunks.registerThunk(data))
+    // Remove confirmPassword from the data object
+    const { confirmPassword, ...formData } = data;
+    
+    // Convert the single role to an array of objects
+    const formattedData = {
+      ...formData,
+      roles: [{ name: data.roles }]
+    };
+
+    dispatch(manageUserActionThunks.registerThunk(formattedData))
       .unwrap()
       .then((res) => {
-        console.log(res.data);
         toast.success(res.data.message);
         showModalLogin();
       })
@@ -48,14 +59,14 @@ const RegisterForm = ({ showModalLogin }) => {
         className="flex flex-col items-center justify-center w-[80%]"
       >
         <div className="w-full">
-          <p className="text-[16px] font-bold text-orange-500">User Name</p>
+          <p className="text-[16px] font-bold text-orange-500 mb-[10px]">User Name</p>
           <Controller
             control={control}
             name="username"
             render={({ field }) => (
               <Input
                 {...field}
-                className="!mb-[10px] !border-[1px] !border-black"
+                className="!mb-[10px] !border-[1px] !border-gray-300"
                 style={{ border: "1px solid #000 !important" }}
                 placeholder="User Name"
               />
@@ -64,21 +75,22 @@ const RegisterForm = ({ showModalLogin }) => {
               required: "Please enter your username",
               pattern: {
                 value: /^[a-zA-Z0-9]{5,}$/,
-                message: "Username must contain only letters and numbers, and be at least 5 characters long",
+                message:
+                  "Username must contain only letters and numbers, and be at least 5 characters long",
               },
             }}
           />
           {!!errors.username && (
             <p className="text-red-500">{errors.username.message}</p>
           )}
-          <p className="text-[16px] font-bold text-orange-500">Email</p>
+          <p className="text-[16px] font-bold text-orange-500 mb-[10px]">Email</p>
           <Controller
             control={control}
             name="email"
             render={({ field }) => (
               <Input
                 {...field}
-                className="!mb-[10px] !border-[1px] !border-black"
+                className="!mb-[10px] !border-[1px] !border-g"
                 style={{ border: "1px solid #000 !important" }}
                 placeholder="Email"
               />
@@ -94,7 +106,7 @@ const RegisterForm = ({ showModalLogin }) => {
           {!!errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
-          <p className="text-[16px] justify-start font-bold text-orange-500">
+          <p className="text-[16px] justify-start font-bold text-orange-500 mb-[10px]">
             {t("Password")}
           </p>
           <Controller
@@ -103,7 +115,7 @@ const RegisterForm = ({ showModalLogin }) => {
             render={({ field }) => (
               <Input.Password
                 {...field}
-                className="!mb-[10px] !border-[1px] !border-black"
+                className="!mb-[10px] !border-[1px] !border-g"
                 style={{ border: "1px solid #000 !important" }}
                 placeholder="Password"
               />
@@ -119,9 +131,60 @@ const RegisterForm = ({ showModalLogin }) => {
             }}
           />
           {!!errors.password && (
-          <p className="text-red-500">{errors.password.message}</p>
-        )}
+            <p className="text-red-500">{errors.password.message}</p>
+          )}
+          <p className="text-[16px] justify-start font-bold text-orange-500 mb-[10px]">
+            {t("Confirm Password")}
+          </p>
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <Input.Password
+                {...field}
+                className="!mb-[10px] !border-[1px] !border-g"
+                style={{ border: "1px solid #000 !important" }}
+                placeholder="Confirm Password"
+              />
+            )}
+            rules={{
+              required: "Please confirm your password",
+              validate: (value) =>
+                value === password || "Passwords do not match",
+            }}
+          />
+          {!!errors.confirmPassword && (
+            <p className="text-red-500">{errors.confirmPassword.message}</p>
+          )}
+          
+          <p className="text-[16px] justify-start font-bold text-orange-500 mb-[10px]">
+            {t("Roles")}
+          </p>
         </div>
+        <Controller
+          control={control}
+          name="roles"
+          render={({ field }) => (
+            <Radio.Group
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "",
+              }}
+              {...field}
+              onChange={(e) => {
+                field.onChange(e.target.value);
+              }}
+            >
+              <Radio className="mr-[100px]" value="ROLE_MEMBER">Farmer</Radio>
+              <Radio value="ROLE_SHOP">Collaborator</Radio>
+            </Radio.Group>
+          )}
+          rules={{ required: "Please select a role" }}
+        />
+        {!!errors.roles && (
+          <p className="text-red-500">{errors.roles.message}</p>
+        )}
         <Button
           className="w-full col-6 mt-[20px]"
           style={{

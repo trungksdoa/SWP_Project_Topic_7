@@ -56,7 +56,7 @@ const HomeTemplate = () => {
       <AnimatedSection className="grid grid-cols-3 mb-[100px]">
         <div className="col-span-1 flex justify-center items-center">
           <img
-            className="w-[70%] h-auto"
+            className="w-[926px]"
             src="../../images/image2.png"
             alt="image2"
           />
@@ -82,7 +82,7 @@ const HomeTemplate = () => {
         </div>
         <div className="col-span-2 flex justify-center items-center">
           <img
-            className="w-[30%] h-auto"
+            className="w-[70%] h-auto"
             src="../../images/image3.png"
             alt="image3"
           />

@@ -30,7 +30,6 @@ export const UserMenu = () => {
 
   const { userLogin } = useSelector((state) => state.manageUser);
 
-  console.log(userLogin)
 
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalRegister, setIsModalRegister] = useState(false);
@@ -65,7 +64,7 @@ export const UserMenu = () => {
   };
 
   const renderUser = () => {
-    if(!userLogin) {
+    if (!userLogin) {
       return (
         <div className="flex flex-col">
           <Button
@@ -80,14 +79,16 @@ export const UserMenu = () => {
           >
             {t("register")}
           </Button>
-  
         </div>
       );
     }
-    if(userLogin) {
-      if(userLogin.roles === "ROLE_ADMIN") {
+
+    // If user is logged in
+    return userLogin.roles?.map((role) => {
+      if (role.name === "ROLE_ADMIN") {
+        console.log("a")
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col" key="admin">
             <NavLink to={PATH.ADMIN} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600">
               {t("Admin")}
             </NavLink>
@@ -97,9 +98,9 @@ export const UserMenu = () => {
           </div>
         );
       }
-      if(userLogin.roles === "ROLE_USER") {
+      if (role.name === "ROLE_MEMBER") {
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col" key="member">
             <NavLink to={PATH.PROFILE} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600">
               {t("Profile")}
             </NavLink>
@@ -109,8 +110,8 @@ export const UserMenu = () => {
           </div>
         );
       }
-    }
-
+      return null;
+    });
   };
 
   return (

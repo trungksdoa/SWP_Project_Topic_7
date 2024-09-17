@@ -28,11 +28,13 @@ const LoginForm = ({ showModalRegister, handleOkLogin }) => {
   } = useForm();
 
   if (userLogin) {
-    if (role === "ROLE_ADMIN") {
-      return <Navigate to={PATH.ADMIN} />;
-    } else if (role === "ROLE_USER") {
-      handleOkLogin();
-    }
+    userLogin?.roles?.map((role) => {
+      if (role.name === "ROLE_ADMIN") {
+        return <Navigate to={PATH.ADMIN} />;
+      } else if (role.name === "ROLE_MEMBER") {
+        handleOkLogin();
+      }
+    })
   }
 
   const onSubmit = (data) => {
@@ -41,7 +43,7 @@ const LoginForm = ({ showModalRegister, handleOkLogin }) => {
       .then((res) => {
         toast.success(t('Login successfully'));
         if (res.roles === "ROLE_USER") {
-          handleOkLogin(); // Đóng modal nếu role là ROLE_USER
+          handleOkLogin();
         }
       })
       .catch((error) => {
@@ -59,10 +61,10 @@ const LoginForm = ({ showModalRegister, handleOkLogin }) => {
       <h1 className='text-[30px] font-bold text-orange-500 mt-[10px]'>{t('login')}</h1>
       <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col items-center justify-center w-[80%]'>
         <div className='flex flex-col items-start justify-center w-[100%]'>
-          <p htmlFor="username" className='text-[16px] !mb-[8px] font-bold text-orange-500'>User Name</p>
+          <p htmlFor="username" className='text-[16px] !mb-[8px] font-bold text-orange-500'>Email</p>
           <Controller
             control={control}
-            name="username"
+            name="email"
             render={({ field }) => <Input {...field} />}
           />
           <p htmlFor="password" className='text-[16px] mb-[8px] mt-[20px] justify-start font-bold text-orange-500'>{t('Password')}</p>
@@ -87,6 +89,7 @@ const LoginForm = ({ showModalRegister, handleOkLogin }) => {
         >
           {t('login')}
         </Button>
+        <p className='underline cursor-pointer my-[10px] hover:text-orange-500 transition-all duration-300'>Forgot Password ?</p>
         <p className='text-[16px]'>{t("Don't have an account?")} <span onClick={handleShowModalRegister} className='text-orange-400 underline hover:!text-orange-600 cursor-pointer'>{t('register')}</span></p>
       </form>
     </div>

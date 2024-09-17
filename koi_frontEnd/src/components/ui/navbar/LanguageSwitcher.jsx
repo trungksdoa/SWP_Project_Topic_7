@@ -9,9 +9,7 @@ export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
   const changeLanguage = (value) => {
-    console.log(value)
     i18n.changeLanguage(value);
-    // i18n.changeLanguage(value);
   };
 
   return (

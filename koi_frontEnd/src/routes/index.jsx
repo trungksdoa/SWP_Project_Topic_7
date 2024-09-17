@@ -9,6 +9,9 @@ import ProfilePage from "../pages/ProfilePage"
 import AdminPage from "../pages/AdminPage"
 import AdminLayout from "../components/layouts/AdminLayout"
 import ManageUser from "../components/ui/admin/ManageUser"
+import ManageProducts from "../components/ui/admin/manageProducts/ManageProducts"
+import DetailPage from "../pages/DetailPage"
+import ProductDetail from "../components/ui/detail/ProductDetail"
 const router = [
     {
         element: <MainLayout />,
@@ -24,7 +27,17 @@ const router = [
             {
                 path: PATH.PROFILE,
                 element: <ProfilePage />
-            }
+            },
+            {
+                path: PATH.DETAIL_PRODUCT,
+                element: <DetailPage />,
+                children: [
+                  {
+                    path: `${PATH.DETAIL_PRODUCT}/:id`,
+                    element: <ProductDetail />,
+                  },
+                ],
+              }
         ]
     },
     {
@@ -37,6 +50,10 @@ const router = [
                     {
                         path: PATH.MANAGE_USER,
                         element: <ManageUser />
+                    },
+                    {
+                        path: PATH.MANAGE_PRODUCTS,
+                        element: <ManageProducts />
                     }
                 ]
             }
