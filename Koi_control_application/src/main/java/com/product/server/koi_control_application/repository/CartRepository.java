@@ -22,4 +22,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
     @Modifying
     @Query("delete from Cart c where c.productId = ?1")
     int deleteByProductId(int productId);
+
+    @Query("select c from Cart c where c.productId = ?1")
+    Cart findByProductId(int productId);
 }

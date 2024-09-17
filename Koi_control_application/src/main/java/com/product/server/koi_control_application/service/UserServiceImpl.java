@@ -1,15 +1,12 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.customException.*;
 import com.product.server.koi_control_application.model.UserLimit;
 import com.product.server.koi_control_application.pojo.userRegister;
 import com.product.server.koi_control_application.repository.UserLimitRepository;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
-import com.product.server.koi_control_application.customException.EmailAlreadyExistsException;
-import com.product.server.koi_control_application.customException.UserExistedException;
-import com.product.server.koi_control_application.customException.UserNotFoundException;
-import com.product.server.koi_control_application.customException.UsernameAlreadyExistsException;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.UsersRepository;
@@ -65,15 +62,15 @@ public class UserServiceImpl implements IUserService {
 
         } catch (DataIntegrityViolationException ex) {
             if (ex.getMessage().contains("users_email_unique")) {
-                throw new EmailAlreadyExistsException("Email already exists: " + register.getEmail());
+                throw new AlreadyExistedException("Email already exists: " + register.getEmail());
             } else if (ex.getMessage().contains("users_username_unique")) {
-                throw new UsernameAlreadyExistsException("Username already exists: " + register.getUsername());
+                throw new AlreadyExistedException("Username already exists: " + register.getUsername());
             } else {
                 throw ex;
             }
         }
 
-        throw new UserExistedException(register.getUsername());
+        throw new AlreadyExistedException(register.getUsername());
     }
 
     @Override
@@ -85,12 +82,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Users getUser(int id) {
-        return usersRepository.fetchUsersById(id).orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+        return usersRepository.fetchUsersById(id).orElseThrow(() -> new NotFoundException(String.valueOf(id)));
     }
 
     @Override
     public Users getUsersByEmail(String email) {
-        return usersRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        return usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(email));
     }
 
     @Override
@@ -100,7 +97,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Users userLogin(String email, String password) {
-        return usersRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new UserNotFoundException(email));
+        return usersRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new NotFoundException(email));
     }
 
     @Override
@@ -113,7 +110,7 @@ public class UserServiceImpl implements IUserService {
     public void deleteUser(int id) {
         Users user = getUser(id);
         if (user == null) {
-            throw new UserNotFoundException(String.valueOf(id));
+            throw new NotFoundException(String.valueOf(id));
         }
         user.removeRole();
         usersRepository.delete(user);
@@ -121,7 +118,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void resetPassword(String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(email));
         usersRepository.save(user);
     }
 
@@ -133,7 +130,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void updatePassword(String email, String newPassword) {
         Users user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         usersRepository.save(user);

@@ -1,7 +1,8 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.model.Orders;
+import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.CheckOut;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
+@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
 public class OrderController {
 
     private final IOrderService orderService;
@@ -24,9 +25,11 @@ public class OrderController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody  HttpServletRequest request) {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody CheckOut checkout, HttpServletRequest request) {
+
         int userId = jwtUtil.getUserIdFromToken(request);
-        Orders createdOrder = orderService.createOrder(userId);
+
+        Orders createdOrder = orderService.createOrder(userId,checkout);
         BaseResponse response = BaseResponse.builder()
                 .data(createdOrder)
                 .statusCode(HttpStatus.CREATED.value())

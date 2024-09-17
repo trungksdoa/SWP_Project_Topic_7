@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -28,6 +29,7 @@ public class OrderItems {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties("feedbacks")
     private Product productId;
 
     @NotNull(message = "Quantity is required")
@@ -35,10 +37,7 @@ public class OrderItems {
     @Column(nullable = false)
     private int quantity;
 
-//    @NotNull(message = "Price is required")
-//    @Positive(message = "Price must be positive")
-//    @Column(nullable = false)
-//    private int price;
+
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

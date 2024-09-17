@@ -1,7 +1,6 @@
 package com.product.server.koi_control_application.customException;
 
 import com.product.server.koi_control_application.pojo.ErrorResponse;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -16,33 +15,32 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.rmi.ServerException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class GlobalExceptionHandler  {
+public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex) {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.NOT_FOUND.value(), "Resource not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+    @ExceptionHandler(AlreadyExistedException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(AlreadyExistedException ex) {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.CONFLICT.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFoundException(NotFoundException ex) {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException ex) {
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
 
@@ -108,8 +106,6 @@ public class GlobalExceptionHandler  {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.UNAUTHORIZED.value(), "Signature validation failed");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
-
-
 
 
     @ExceptionHandler(Exception.class)

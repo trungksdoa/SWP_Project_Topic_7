@@ -1,75 +1,78 @@
-//package com.product.server.koi_control_application.service;
-//
-//import com.product.server.koi_control_application.model.Feedback;
-//import com.product.server.koi_control_application.model.Product;
-//import com.product.server.koi_control_application.model.Users;
-//import com.product.server.koi_control_application.repository.FeedbackRepository;
-//import com.product.server.koi_control_application.repository.ProductRepository;
-//import com.product.server.koi_control_application.repository.UsersRepository;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDateTime;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class FeedBackServiceImpl implements IFeedbackService {
-//    private final FeedbackRepository feedbackRepository;
-//    private final ProductRepository productRepository;
-//    private final UsersRepository usersRepository;
-//
-//    @Override
-//    @Transactional
-//    public Feedback createFeedback(Feedback feedback) {
-//        // Validate user
-//        Users user = usersRepository.findById(feedback.getUserId())
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Validate product
-//        Product product = productRepository.findById(feedback.getProductId())
-//                .orElseThrow(() -> new RuntimeException("Product not found"));
-//
-//        // Set creation time
-//        feedback.setCreatedAt(LocalDateTime.now());
-//        feedback.setUpdatedAt(LocalDateTime.now());
-//
-//        // Validate rating
-//        if (feedback.getRating() < 1 || feedback.getRating() > 5) {
-//            throw new IllegalArgumentException("Rating must be between 1 and 5");
-//        }
-//
-//        return feedbackRepository.save(feedback);
-//    }
-//
-//    @Override
-//    public void updateFeedback(Feedback fb) {
-//
-//    }
-//
-//    @Override
-//    public void deleteFeedback(int userId) {
-//
-//    }
-//
-//    @Override
-//    public void getFeedback(int userId) {
-//
-//    }
-//
-//    @Override
-//    public void getAllFeedbacks() {
-//
-//    }
-//
-//    // ... other methods remain the same
-//
-////    @Override
-////    public Page<Feedback> getFeedbacksByProduct(int productId, int page, int size) {
-////        // Validate product
-////        productRepository.findById(productId)
-////                .orElseThrow(() -> new RuntimeException("Product not found"));
-////
-////        return feedbackRepository.findByProductId(productId, PageRequest.of(page, size));
-////    }
-//}
+package com.product.server.koi_control_application.service;
+
+import com.product.server.koi_control_application.model.Feedback;
+import com.product.server.koi_control_application.model.Product;
+import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.repository.FeedbackRepository;
+import com.product.server.koi_control_application.repository.ProductRepository;
+import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class FeedbackServiceImpl implements IFeedbackService {
+    private final FeedbackRepository feedbackRepository;
+    private final ProductRepository productRepository;
+    private final UsersRepository usersRepository;
+
+    @Override
+    @Transactional
+    public Feedback createFeedback(Feedback feedback) {
+        Users user = usersRepository.findById(feedback.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepository.findById(feedback.getProduct().getId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        feedback.setUser(user);
+        feedback.setProduct(product);
+        feedback.setCreatedAt(LocalDateTime.now());
+        feedback.setUpdatedAt(LocalDateTime.now());
+
+        if (feedback.getRating() < 1 || feedback.getRating() > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+
+        product.calculateAverageRating();
+        productRepository.save(product);
+        return feedbackRepository.save(feedback);
+    }
+
+    @Override
+    public Feedback updateFeedback(Integer id, Feedback feedback) {
+        return null;
+    }
+
+    @Override
+    public void deleteFeedback(Integer id) {
+
+    }
+
+    @Override
+    public Feedback getFeedbackById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<Feedback> getFeedbacksByProductId(Integer productId) {
+        return null;
+    }
+
+    @Override
+    public List<Feedback> getFeedbacksByUserId(Integer userId) {
+        return null;
+    }
+
+    @Override
+    public Page<Feedback> getAllFeedbacks(int page, int size) {
+        return null;
+    }
+
+    // ... other methods implementation ...
+}

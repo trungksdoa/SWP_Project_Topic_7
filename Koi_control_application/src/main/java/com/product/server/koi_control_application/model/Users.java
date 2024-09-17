@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -86,7 +87,6 @@ public class Users  implements UserDetails {
 
 
     @Override
-    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (UserRole role : roles) {
@@ -99,6 +99,10 @@ public class Users  implements UserDetails {
         this.getRoles().clear();
     }
 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"user", "product"})
+    private List<Feedback> feedbacks = new ArrayList<>();
 
 
 }

@@ -1,8 +1,10 @@
 package com.product.server.koi_control_application.service;
 
+import com.product.server.koi_control_application.customException.EmptyException;
+import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.pojo.CheckOut;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.customException.InsufficientException;
-import com.product.server.koi_control_application.customException.ProductNotFoundException;
 import com.product.server.koi_control_application.model.OrderItems;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Product;
@@ -28,24 +30,27 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public Orders createOrder(int userId) {
+    public Orders createOrder(int userId, CheckOut checkOut) {
         // Create a new order
         Orders order = Orders.builder()
                 .userId(userId)
                 .status("PENDING")
+                .fullName(checkOut.getFullName())
+                .address(checkOut.getAddress())
+                .phone(checkOut.getPhone())
                 .items(new HashSet<>())
                 .build();
 
         Orders savedOrder = orderRepository.save(order);
 
         if (cartRepository.findByUserId(userId).isEmpty()) {
-            throw new ProductNotFoundException("Your cart may be empty, please add some products to cart, then try again");
+            throw new NotFoundException("Your cart may be empty, please add some products to cart, then try again");
         }
 
         cartRepository.findByUserId(userId).forEach(
                 cart -> {
                     Product product = productRepository.findById(cart.getProductId()).orElseThrow(() ->
-                            new ProductNotFoundException("Product not found"));
+                            new NotFoundException("Product not found"));
 
                     // Create order items without stock validation
                     OrderItems orderItems = OrderItems.builder()
@@ -79,7 +84,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelPendingOrder(int userId, int orderId) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId);
         if (order == null) {
-            throw new ProductNotFoundException("Order not found");
+            throw new NotFoundException("Order not found");
         }
         if(!order.getStatus().equals("PENDING")){
             throw new InsufficientException("Order cannot be cancelled");
@@ -94,7 +99,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelOrderByAdmin(int userId, int orderId, String message) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId);
         if (order == null) {
-            throw new ProductNotFoundException("Order not found");
+            throw new NotFoundException("Order not found");
         }
 
         order.setStatus("CANCELLED");

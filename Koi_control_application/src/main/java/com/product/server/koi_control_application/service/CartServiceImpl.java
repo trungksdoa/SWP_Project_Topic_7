@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.service;
 
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
-import com.product.server.koi_control_application.customException.ProductNotFoundException;
 import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.repository.CartRepository;
@@ -33,13 +33,16 @@ public class CartServiceImpl implements ICartService {
     @Override
     public Cart updateCart(CartDTO cartDTO, int userId) {
         Cart cart = cartRepository.findByProductIdAndUserId(cartDTO.getProductId(), userId)
-                .orElseThrow(() -> new ProductNotFoundException("Sorry, this item has been deleted or not exist "));
+                .orElseThrow(() -> new NotFoundException("Sorry, this item has been deleted or not exist "));
 
         cart.setQuantity(cartDTO.getQuantity());
         return cartRepository.save(cart);
     }
         @Override
     public void deleteCart(int productId, int userId) {
+        if(cartRepository.findByProductIdAndUserId(productId, userId).isEmpty()){
+            throw new NotFoundException("Sorry, this item has been deleted or not exist ");
+        }
         cartRepository.deleteByUserIdAndProductId(userId, productId);
     }
 
