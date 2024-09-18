@@ -25,6 +25,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./Koi_control_application/gradlew
 
+      - name: Clean Gradle Cache
+        run: ./gradlew clean --build-cache
+        working-directory: ./Koi_control_application
+        
       - name: Build with Gradle
         run: ./gradlew build
         working-directory: ./Koi_control_application
