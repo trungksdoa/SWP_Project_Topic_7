@@ -1,7 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.model.Feedback;
+import com.product.server.koi_control_application.model.Product;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.FeedbackRequest;
 import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +21,15 @@ public class FeedbackController {
     private final IFeedbackService feedbackService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse> createFeedback(@RequestBody Feedback feedback) {
-        Feedback createdFeedback = feedbackService.createFeedback(feedback);
+    public ResponseEntity<BaseResponse> createFeedback(@RequestBody FeedbackRequest feedback) {
+        Users users = Users.builder().id(feedback.getUserId()).build();
+        Product product = Product.builder().id(feedback.getProductId()).build();
+        Feedback createdFeedback = feedbackService.createFeedback(Feedback.builder()
+                .user(users)
+                .product(product)
+                .rating(feedback.getRating())
+                .comment(feedback.getComment())
+                .build());
         BaseResponse response = BaseResponse.builder()
                 .data(createdFeedback)
                 .statusCode(HttpStatus.CREATED.value())
