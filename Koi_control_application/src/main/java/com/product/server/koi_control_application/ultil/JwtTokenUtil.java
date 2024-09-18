@@ -70,7 +70,7 @@ public class JwtTokenUtil {
             String[] parts = subject.split(",");
             return Integer.parseInt(parts[0]);
         }
-        throw new IllegalArgumentException("Token is null, empty or only whitespace");
+        throw new IllegalArgumentException("Token may be not match with the user or invalid");
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
