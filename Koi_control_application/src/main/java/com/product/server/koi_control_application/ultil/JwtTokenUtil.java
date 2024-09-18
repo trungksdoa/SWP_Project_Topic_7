@@ -47,7 +47,7 @@ public class JwtTokenUtil {
         } catch (ExpiredJwtException ex) {
             throw new ExpiredJwtException(null, null, "Token is expired");
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Token is null, empty or only whitespace");
+            throw new IllegalArgumentException("Token may be not match with the user or invalid");
         } catch (MalformedJwtException ex) {
             throw new MalformedJwtException("Token is invalid");
         } catch (UnsupportedJwtException ex) {

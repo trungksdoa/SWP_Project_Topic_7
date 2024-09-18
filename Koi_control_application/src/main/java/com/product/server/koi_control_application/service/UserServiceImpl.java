@@ -1,15 +1,16 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.customException.*;
+import com.product.server.koi_control_application.customException.AlreadyExistedException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.UserLimit;
-import com.product.server.koi_control_application.pojo.userRegister;
-import com.product.server.koi_control_application.repository.UserLimitRepository;
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.pojo.userRegister;
+import com.product.server.koi_control_application.repository.UserLimitRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,9 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Set;
-
-import static com.product.server.koi_control_application.model.UserRoleEnum.ROLE_MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -32,45 +30,41 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final UserLimitRepository userLimitRepository;
     private final EmailServiceImpl emailService;
+
     @Override
     public void updatedUser(Users user) {
         usersRepository.save(user);
     }
+
     @Override
     public Users saveUser(userRegister register) {
         try {
-            if (getUsersByUsername(register.getUsername()) == null) {
 
-                Users user = Users.builder()
-                        .username(register.getUsername())
-                        .email(register.getEmail())
-                        .roles(new HashSet<>())
-                        .build();
-                //Create user
-                user.setPassword(passwordEncoder.encode(register.getPassword()));
-                user.getRoles().add(new UserRole(register.getRole().getValue()));
-                Users savedUser = usersRepository.save(user);
+            Users user = Users.builder()
+                    .username(register.getUsername())
+                    .email(register.getEmail())
+                    .roles(new HashSet<>())
+                    .build();
+            //Create user
+            user.setPassword(passwordEncoder.encode(register.getPassword()));
+            user.getRoles().add(new UserRole(register.getRole().getValue()));
+            Users savedUser = usersRepository.save(user);
 
-                // Create user limit
-                UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build();
-                userLimitRepository.save(UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build());
+            // Create user limit
+            UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build();
+            userLimitRepository.save(UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build());
 
-                // Send email to user
-                userRegisterMail(user.getEmail(), savedUser);
-                return savedUser;
-            }
-
+            // Send email to user
+            userRegisterMail(user.getEmail(), savedUser);
+            return savedUser;
         } catch (DataIntegrityViolationException ex) {
             if (ex.getMessage().contains("users_email_unique")) {
                 throw new AlreadyExistedException("Email already exists: " + register.getEmail());
             } else if (ex.getMessage().contains("users_username_unique")) {
                 throw new AlreadyExistedException("Username already exists: " + register.getUsername());
-            } else {
-                throw ex;
             }
         }
-
-        throw new AlreadyExistedException(register.getUsername());
+        throw new DataIntegrityViolationException("Error occurred while saving user: user account already exists");
     }
 
     @Override
@@ -140,7 +134,6 @@ public class UserServiceImpl implements IUserService {
     public void updateUser(Users user) {
         // TODO document why this method is empty
     }
-
 
 
 }

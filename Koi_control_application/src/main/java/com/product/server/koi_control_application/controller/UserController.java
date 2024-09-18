@@ -96,7 +96,7 @@ public class UserController {
             BaseResponse response = BaseResponse.builder()
                     .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(), user.getRoles(), accessToken))
                     .statusCode(HttpStatus.OK.value()
-                    ).message("Success")
+                    ).message("Login successful")
                     .build();
 
             return new ResponseEntity<>(response, HttpStatus.OK);
