@@ -4,7 +4,9 @@ import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
+import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +23,13 @@ import java.util.List;
 @RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
 public class CartController {
     private final ICartService cartService;
-
+    private final JwtTokenUtil jwtUtil;
     @PostMapping
-    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart) {
-        Cart addedCart = cartService.createCart(cart);
+    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
+
+        int userId = jwtUtil.getUserIdFromToken(request);
+
+        Cart addedCart = cartService.createCart(cart,userId);
         BaseResponse response = BaseResponse.builder()
                 .data(addedCart)
                 .statusCode(HttpStatus.CREATED.value())
