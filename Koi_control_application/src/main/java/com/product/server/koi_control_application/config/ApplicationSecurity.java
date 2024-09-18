@@ -35,11 +35,12 @@ public class ApplicationSecurity {
     private final String[] AUTH_REQUEST = new String[]{
             "/api/users/auth/register",
             "/api/users/auth/login",
-            "/api/users/auth/forgot-password",
-            "/api/users/auth/reset-password",
+            "/api/users/forgot-password",
+            "/api/users/reset-password",
             "/api/users/verify/email/**",
             "/api/image/**",
             "/api/products/**",
+            "/api/payment/payment-return"
     };
 
 
