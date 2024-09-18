@@ -92,9 +92,6 @@ public class UserController {
 
             String accessToken = jwtUtil.generateAccessToken(user);
 
-            if(user.getUsername().equals("testAccount")) {
-                accessToken = jwtUtil.generateTest(user);
-            }
 
             BaseResponse response = BaseResponse.builder()
                     .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(), user.getRoles(), accessToken))
