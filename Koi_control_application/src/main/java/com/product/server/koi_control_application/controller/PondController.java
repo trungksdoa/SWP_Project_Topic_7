@@ -1,12 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.dto.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.dto.PondUpdateRequest;
-import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.service.IPondService;
+import com.product.server.koi_control_application.serviceInterface.IPondService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

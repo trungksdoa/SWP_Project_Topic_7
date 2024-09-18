@@ -10,6 +10,13 @@
 #     database-platform: org.hibernate.dialect.MySQLDialect
 # server:
 #   port
+vnpay:
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: http://localhost:8080/api/payment/payment-return
+  tmn-code: OUW9LAD4
+  hash-secret: H4KUKCD1972B96JQSTYQBDTYJEQMT8AD
+  api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+
 
 app:
   jwt:
