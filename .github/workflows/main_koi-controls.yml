@@ -30,7 +30,7 @@ jobs:
         working-directory: ./Koi_control_application
         
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -refresh-dependencies
         working-directory: ./Koi_control_application
 
       - name: Upload artifact for deployment job
