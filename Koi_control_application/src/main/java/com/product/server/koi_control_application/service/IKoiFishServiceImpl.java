@@ -1,12 +1,12 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.dto.KoiFishCreationRequest;
 import com.product.server.koi_control_application.dto.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class IKoiFishServiceImpl implements IKoiFishService{
+public class IKoiFishServiceImpl implements IKoiFishService {
     private final UsersRepository usersRepository;
     private final KoiFishRepository koiFishRepository;
     private final PondRepository pondRepository;

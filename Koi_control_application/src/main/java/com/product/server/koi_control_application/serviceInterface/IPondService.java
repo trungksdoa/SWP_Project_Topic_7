@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.service;
+package com.product.server.koi_control_application.serviceInterface;
 
 import com.product.server.koi_control_application.dto.PondCreationRequest;
 import com.product.server.koi_control_application.dto.PondUpdateRequest;

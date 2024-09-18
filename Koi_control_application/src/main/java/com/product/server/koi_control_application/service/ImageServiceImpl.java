@@ -34,5 +34,8 @@ public class ImageServiceImpl implements IImageService {
 
         return HOST+filename;
     }
+
+
+
 }
 
