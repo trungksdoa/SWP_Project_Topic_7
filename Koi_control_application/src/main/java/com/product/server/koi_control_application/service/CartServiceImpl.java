@@ -28,9 +28,10 @@ public class CartServiceImpl implements ICartService {
         if (cart.getUserId() != validUserId) {
             throw new IllegalAccessException("You are not allowed to add item to this cart");
         }
-
         if (cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId()).isPresent()) {
-            cart.setQuantity(cart.getQuantity() + 1);
+            Cart savedCart = cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId()).get();
+            savedCart.setQuantity(savedCart.getQuantity() + 1);
+            return cartRepository.save(savedCart);
         }
 
         try {
