@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.customException.AlreadyExisted
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.pojo.UserPatchDTO;
 import com.product.server.koi_control_application.pojo.userRegister;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 
@@ -104,6 +106,7 @@ public class UserServiceImpl implements IUserService {
         usersRepository.delete(user);
     }
 
+
     @Override
     public void resetPassword(String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(email));
@@ -125,8 +128,28 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updateUser(Users user) {
-        // TODO document why this method is empty
+    public void updateUser(int id, UserPatchDTO userPatchDTO) {
+        Users user = usersRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        if (userPatchDTO.getUsername() != null) {
+            user.setUsername(userPatchDTO.getUsername());
+        }
+        if (userPatchDTO.getAddress() != null) {
+            user.setAddress(userPatchDTO.getAddress());
+        }
+        if (userPatchDTO.getPhone() != null) {
+            user.setPhoneNumber(userPatchDTO.getPhone());
+        }
+        if (userPatchDTO.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userPatchDTO.getPassword()));
+        }
+
+        try {
+            usersRepository.save(user);
+        } catch (Exception ex) {
+            throw new RuntimeException("Something error in server, try later");
+        }
     }
 
 

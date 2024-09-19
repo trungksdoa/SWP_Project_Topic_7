@@ -161,6 +161,16 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable int id, @RequestBody UserPatchDTO userPatchDTO) {
+        userService.updateUser(id, userPatchDTO);
+        BaseResponse response = BaseResponse.builder()
+                .data("Update success")
+                .statusCode(HttpStatus.OK.value())
+                .message("User updated successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 
     @GetMapping("/test")
