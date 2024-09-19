@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
     @Override
-    public WaterParameter saveWaterParameter(WaterParameterCreationRequest request) {
-        WaterParameter waterParameter = new WaterParameter();
+    public WaterParameter saveWaterParameter(WaterParameter waterParameter) {
 
         return waterParameterRepository.save(waterParameter);
     }
@@ -35,9 +34,10 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
     }
 
     @Override
-    public void createWaterParameter(int pondId) {
+    public void deleteWaterParameter(int pondId) {
 
     }
+
 
 
 }

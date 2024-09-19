@@ -5,10 +5,10 @@ import com.product.server.koi_control_application.dto.WaterParameterUpdateReques
 import com.product.server.koi_control_application.model.WaterParameter;
 
 public interface IWaterParameterService {
-    WaterParameter saveWaterParameter(WaterParameterCreationRequest request);
+    WaterParameter saveWaterParameter(WaterParameter waterParameter);
 
     WaterParameter getWaterParameterByPondId(int pondId);
 
     WaterParameter updateWaterParameter(int pondId, WaterParameterUpdateRequest request);
-    void createWaterParameter(int pondId);
+    void deleteWaterParameter(int pondId);
 }
