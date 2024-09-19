@@ -1,10 +1,9 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.dto.KoiFishCreationRequest;
 import com.product.server.koi_control_application.dto.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.service.IKoiFishService;
+import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

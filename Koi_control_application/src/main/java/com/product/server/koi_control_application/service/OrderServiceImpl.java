@@ -96,11 +96,8 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     @Transactional
-    public void cancelOrderByAdmin(int userId, int orderId, String message) {
-        Orders order = orderRepository.findByUserIdAndId(userId, orderId);
-        if (order == null) {
-            throw new NotFoundException("Order not found");
-        }
+    public void cancelOrderByAdmin(int orderId, String message) {
+        Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
 
         order.setStatus("CANCELLED");
         order.setResponseFromAdmin(message);

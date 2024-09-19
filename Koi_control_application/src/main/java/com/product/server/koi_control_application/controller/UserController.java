@@ -92,14 +92,11 @@ public class UserController {
 
             String accessToken = jwtUtil.generateAccessToken(user);
 
-            if(user.getUsername().equals("testAccount")) {
-                accessToken = jwtUtil.generateTest(user);
-            }
 
             BaseResponse response = BaseResponse.builder()
                     .data(new AuthResponse(user.getId(), user.getEmail(), user.getUsername(), user.getAddress(), user.getPhoneNumber(), user.isActive(), user.getRoles(), accessToken))
                     .statusCode(HttpStatus.OK.value()
-                    ).message("Success")
+                    ).message("Login successful")
                     .build();
 
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -163,6 +160,16 @@ public class UserController {
                     .build();
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
+    }
+    @PatchMapping("/{userId}")
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable int userId, @RequestBody UserPatchDTO userPatchDTO) {
+        userService.updateUser(userId, userPatchDTO);
+        BaseResponse response = BaseResponse.builder()
+                .data("Update success")
+                .statusCode(HttpStatus.OK.value())
+                .message("User updated successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

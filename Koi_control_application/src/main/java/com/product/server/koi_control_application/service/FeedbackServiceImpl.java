@@ -52,6 +52,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Override
     public void deleteFeedback(Integer id) {
 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

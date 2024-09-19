@@ -14,7 +14,7 @@ public class JwtTokenUtil {
     private static final long EXPIRE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
     private static final long EXPIRE_DURATION_ADMIN = 3 * 60 * 1000; // 3 minutes    @Value("${app.jwt.secret}")
     @Value("${app.jwt.secret}")
-    private String SECRET_KEY ;
+    private String SECRET_KEY;
 
     public String generateAccessToken(Users user) {
         return Jwts.builder()
@@ -46,14 +46,14 @@ public class JwtTokenUtil {
             return true;
         } catch (ExpiredJwtException ex) {
             throw new ExpiredJwtException(null, null, "Token is expired");
+        } catch (SignatureException ex) {
+            throw new SignatureException(ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Token is null, empty or only whitespace");
+            throw new IllegalArgumentException("Token may be not match with the user or invalid");
         } catch (MalformedJwtException ex) {
             throw new MalformedJwtException("Token is invalid");
         } catch (UnsupportedJwtException ex) {
             throw new UnsupportedJwtException("JWT is not supported");
-        } catch (SignatureException ex) {
-            throw new SignatureException("Signature validation failed");
         }
     }
 
@@ -70,7 +70,7 @@ public class JwtTokenUtil {
             String[] parts = subject.split(",");
             return Integer.parseInt(parts[0]);
         }
-        throw new IllegalArgumentException("Token is null, empty or only whitespace");
+        throw new IllegalArgumentException("Token may be not match with the user or invalid");
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

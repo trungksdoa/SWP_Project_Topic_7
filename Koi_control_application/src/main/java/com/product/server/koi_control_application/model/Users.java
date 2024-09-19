@@ -104,5 +104,9 @@ public class Users  implements UserDetails {
     @JsonIgnoreProperties({"user", "product"})
     private List<Feedback> feedbacks = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "package_id")
+    @JsonIgnoreProperties("users")
+    private Package aPackage;
 
 }

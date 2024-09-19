@@ -1,10 +1,11 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.dto.PondCreationRequest;
 import com.product.server.koi_control_application.dto.PondUpdateRequest;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.serviceInterface.IPondService;
+import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class IPondServiceImpl implements  IPondService {
+public class IPondServiceImpl implements IPondService {
     private final PondRepository pondRepository;
     private final UsersRepository usersRepository;
     private final IWaterParameterService iWaterParameterService;

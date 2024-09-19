@@ -12,6 +12,6 @@ public interface IOrderService {
 
     void cancelPendingOrder(int id,int orderId) ;
 
-    void cancelOrderByAdmin(int id,int orderId,String message) ;
+    void cancelOrderByAdmin(int orderId,String message) ;
     Page<Orders> getOrdersByUser(int userId, int page, int size);
 }

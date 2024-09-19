@@ -18,4 +18,7 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
 
     @Query("select o from Orders o where o.userId = ?1 and o.id = ?2")
     Orders findByUserIdAndId(int userId, int id);
+
+    @Override
+    void deleteById(Integer integer);
 }

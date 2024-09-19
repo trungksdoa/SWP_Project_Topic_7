@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.dto.WaterParameterCreationRequ
 import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
+import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
