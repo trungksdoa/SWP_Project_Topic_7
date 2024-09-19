@@ -1,11 +1,11 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.model.Cart;
+import com.product.server.koi_control_application.pojo.CartDTO;
+import com.product.server.koi_control_application.repository.CartRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
-import com.product.server.koi_control_application.pojo.CartDTO;
-import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -18,23 +18,29 @@ import java.util.List;
 public class CartServiceImpl implements ICartService {
     private final CartRepository cartRepository;
     private final UsersRepository usersRepository;
+
     @Override
     public Cart createCart(Cart cart, int validUserId) throws IllegalAccessException {
-        if(cart.getQuantity() == 0){
+        if (cart.getQuantity() == 0) {
             throw new DataIntegrityViolationException("Quantity must be greater than 0");
         }
 
-        if(cart.getUserId() != validUserId){
+        if (cart.getUserId() != validUserId) {
             throw new IllegalAccessException("You are not allowed to add item to this cart");
         }
 
-        if(cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId()).isPresent()){
-            throw new IllegalArgumentException("This item is already in your cart");
+        if (cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId()).isPresent()) {
+            cart.setQuantity(cart.getQuantity() + 1);
         }
 
-
-
-        return cartRepository.save(cart);
+        try {
+            return cartRepository.save(cart);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("Cannot add or update a child row")) {
+                throw new NotFoundException("Sorry, this item has been deleted or not exist ");
+            }
+        }
+        return null;
     }
 
     @Override
@@ -45,15 +51,19 @@ public class CartServiceImpl implements ICartService {
         cart.setQuantity(cartDTO.getQuantity());
         return cartRepository.save(cart);
     }
-        @Override
+
+    @Override
     public void deleteCart(int productId, int userId) {
-        if(cartRepository.findByProductIdAndUserId(productId, userId).isEmpty()){
-            throw new NotFoundException("Sorry, this item has been deleted or not exist ");
+
+        try {
+            if (cartRepository.findByProductIdAndUserId(productId, userId).isEmpty()) {
+                throw new NotFoundException("Sorry, this item has been deleted or not exist ");
+            }
+            cartRepository.deleteByUserIdAndProductId(userId, productId);
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
-        cartRepository.deleteByUserIdAndProductId(userId, productId);
     }
-
-
 
     @Override
     public List<Cart> getCart(int userId) {

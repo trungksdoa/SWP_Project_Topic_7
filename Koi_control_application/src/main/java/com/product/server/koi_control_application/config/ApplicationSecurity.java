@@ -40,7 +40,7 @@ public class ApplicationSecurity {
             "/api/users/verify/email/**",
             "/api/image/**",
             "/api/products/**",
-            "/api/payment/payment-return"
+            "/api/orders/payment-return"
     };
 
 
