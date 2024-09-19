@@ -3,8 +3,11 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CheckOut;
+import com.product.server.koi_control_application.pojo.PaymentStatus;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
+import com.product.server.koi_control_application.serviceInterface.IPaymentService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
+import com.product.server.koi_control_application.ultil.OrderInfoUtil;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -22,20 +28,73 @@ public class OrderController {
 
     private final IOrderService orderService;
     private final JwtTokenUtil jwtUtil;
+    private final PaymentController paymentController;
+    private final IPaymentService vnPayService;
 
 
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody CheckOut checkout, HttpServletRequest request) {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody CheckOut checkout, HttpServletRequest request) throws UnsupportedEncodingException {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 
-        Orders createdOrder = orderService.createOrder(userId,checkout);
+        Orders createdOrder = orderService.createOrder(userId, checkout);
+
+        Map<String, String> data = new HashMap<>();
+
+        data.put("orderCode", String.valueOf(createdOrder.getId()));
+        data.put("orderType", "payment");
+        data.put("orderInfo", "OrderId: " + createdOrder.getId());
+        data.put("amount", String.valueOf(createdOrder.getTotalAmount()));
+
+
+        ResponseEntity<Map<String, String>> map = paymentController.createPayment(data);
+
         BaseResponse response = BaseResponse.builder()
-                .data(createdOrder)
+                .data(map.getBody())
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Order created successfully")
                 .build();
+
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/payment-return")
+    public ResponseEntity<Void> paymentReturn(HttpServletRequest request) {
+        Map<String, String> vnpayParams = new HashMap<>();
+        Enumeration<String> paramNames = request.getParameterNames();
+        int statusCode = HttpStatus.OK.value();
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            String paramValue = request.getParameter(paramName);
+            vnpayParams.put(paramName, paramValue);
+        }
+
+        PaymentStatus paymentResult = vnPayService.processPaymentReturn(vnpayParams);
+        OrderInfoUtil ultils = new OrderInfoUtil();
+        Optional<Integer> orderIdOpt = ultils.extractOrderId(paymentResult.getOrderInfo());
+
+        if (orderIdOpt.isPresent()) {
+            int orderId = orderIdOpt.get();
+            if (!Objects.equals(paymentResult.getStatus(), "00")) {
+                orderService.cancelOrderByAdmin(orderId, "Cancel by admin: Payment failed");
+                statusCode = HttpStatus.OK.value();
+            }
+        } else {
+            statusCode = HttpStatus.BAD_REQUEST.value();
+        }
+        BaseResponse response = BaseResponse.builder()
+                .data(paymentResult)
+                .statusCode(statusCode)
+                .message(paymentResult.getMessage())
+                .build();
+
+
+
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "https://google.com.vn")
+                .build();
     }
 
     @GetMapping("/{id}")
@@ -61,16 +120,30 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<BaseResponse> updateOrderStatus(@PathVariable int id, @RequestParam String status) {
-        Orders updatedOrder = orderService.updateOrderStatus(id, status);
+    @GetMapping("/status/{orderId}")
+    public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
+        Orders order = orderService.getOrderById(orderId);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("status", order.getStatus());
         BaseResponse response = BaseResponse.builder()
-                .data(updatedOrder)
+                .data(map)
                 .statusCode(HttpStatus.OK.value())
-                .message("Order status updated successfully")
+                .message("Return order status successfully")
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+//    @PutMapping("/{id}/status")
+//    public ResponseEntity<BaseResponse> updateOrderStatus(@PathVariable int id, @RequestParam String status) {
+//        Orders updatedOrder = orderService.updateOrderStatus(id, status);
+//        BaseResponse response = BaseResponse.builder()
+//                .data(updatedOrder)
+//                .statusCode(HttpStatus.OK.value())
+//                .message("Order status updated successfully")
+//                .build();
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
@@ -96,14 +169,5 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/user/{userId}/order/{orderId}/message/{message}")
-    public ResponseEntity<BaseResponse> cancelOrderByAdmin(@PathVariable int userId, @PathVariable int orderId, @PathVariable String message) {
-        orderService.cancelOrderByAdmin(userId, orderId, message);
-        BaseResponse response = BaseResponse.builder()
-                .data("The order has been cancelled")
-                .statusCode(HttpStatus.OK.value())
-                .message("Admin cancelled the order")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+
 }

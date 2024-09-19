@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.config.VNPayConfig;
+import com.product.server.koi_control_application.pojo.PaymentStatus;
 import com.product.server.koi_control_application.serviceInterface.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,9 @@ public class PaymentService implements IPaymentService {
     private final VNPayConfig vnPayConfig;
 
     @Override
-    public String createPayment(long amount, String orderCode, String orderType, String orderInfo) throws UnsupportedEncodingException {
+    public String createPayment(long amount, String orderType, String orderInfo) throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
-        String vnp_OrderInfo = orderCode;
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = "127.0.0.1";
         String vnp_TmnCode = vnPayConfig.getVnpTmnCode();
@@ -34,7 +34,7 @@ public class PaymentService implements IPaymentService {
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_BankCode", null);
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
+        vnp_Params.put("vnp_OrderInfo", orderInfo);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnpReturnUrl());
@@ -75,13 +75,13 @@ public class PaymentService implements IPaymentService {
         String queryUrl = query.toString();
         String vnp_SecureHash = VNPayConfig.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = vnPayConfig.getVnpPayUrl() + "?" + queryUrl;
-        return paymentUrl;
+        return vnPayConfig.getVnpPayUrl() + "?" + queryUrl;
     }
 
     @Override
-    public Map<String, String> processPaymentReturn(Map<String, String> vnpayParams) {
-        Map<String, String> result = new HashMap<>();
+    public PaymentStatus processPaymentReturn(Map<String, String> vnpayParams) {
+        PaymentStatus payStatus = new PaymentStatus();
+
         try {
             String vnp_SecureHash = vnpayParams.get("vnp_SecureHash");
 
@@ -108,32 +108,30 @@ public class PaymentService implements IPaymentService {
             }
 
             String signValue = VNPayConfig.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData.toString());
-
             if (signValue.equals(vnp_SecureHash)) {
                 if ("00".equals(vnpayParams.get("vnp_ResponseCode"))) {
-                    result.put("status", "success");
-                    result.put("message", "Thanh toán thành công");
+                    payStatus.setStatus("success");
+                    payStatus.setMessage("Thanh toán thành công");
                 } else {
-                    result.put("status", "fail");
-                    result.put("message", "Thanh toán thất bại");
+                    payStatus.setStatus("fail");
+                    payStatus.setMessage("Thanh toán thất bại");
                 }
             } else {
-                result.put("status", "invalid");
-                result.put("message", "Chữ ký không hợp lệ");
+                payStatus.setStatus("invalid");
+                payStatus.setMessage("Chữ ký không hợp lệ");
             }
         } catch (UnsupportedEncodingException e) {
-            result.put("status", "error");
-            result.put("message", "Lỗi trong quá trình xử lý");
+            payStatus.setStatus("error");
+            payStatus.setMessage("Lỗi trong quá trình xử lý");
         }
 
-        // Add additional payment info
-        result.put("amount", vnpayParams.get("vnp_Amount"));
-        result.put("orderInfo", vnpayParams.get("vnp_OrderInfo"));
-        result.put("responseCode", vnpayParams.get("vnp_ResponseCode"));
-        result.put("transactionNo", vnpayParams.get("vnp_TransactionNo"));
-        result.put("bankCode", vnpayParams.get("vnp_BankCode"));
-        result.put("payDate", vnpayParams.get("vnp_PayDate"));
+        payStatus.setAmount(vnpayParams.get("vnp_Amount"));
+        payStatus.setOrderInfo(vnpayParams.get("vnp_OrderInfo"));
+        payStatus.setResponseCode(vnpayParams.get("vnp_ResponseCode"));
+        payStatus.setTransactionNo(System.currentTimeMillis());
+        payStatus.setBankCode(vnpayParams.get("vnp_BankCode"));
+        payStatus.setPayDate(vnpayParams.get("vnp_PayDate"));
 
-        return result;
+        return payStatus;
     }
 }

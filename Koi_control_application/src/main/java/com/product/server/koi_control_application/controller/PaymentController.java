@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@RolesAllowed({ "ROLE_MEMBER", "ROLE_SHOP" })
 public class PaymentController {
 
     private final IPaymentService vnPayService;
@@ -22,7 +24,6 @@ public class PaymentController {
     public ResponseEntity<Map<String, String>> createPayment(@RequestBody Map<String, String> paymentInfo) throws UnsupportedEncodingException {
         String paymentUrl = vnPayService.createPayment(
                 Long.parseLong(paymentInfo.get("amount")),
-                paymentInfo.get("orderCode"),
                 paymentInfo.get("orderType"),
                 paymentInfo.get("orderInfo")
         );
@@ -33,18 +34,5 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/payment-return")
-    public ResponseEntity<Map<String, String>> paymentReturn(HttpServletRequest request) {
-        Map<String, String> vnpayParams = new HashMap<>();
-        Enumeration<String> paramNames = request.getParameterNames();
 
-      while (paramNames.hasMoreElements()) {
-            String paramName = paramNames.nextElement();
-            String paramValue = request.getParameter(paramName);
-            vnpayParams.put(paramName, paramValue);
-        }
-
-        Map<String, String> paymentResult = vnPayService.processPaymentReturn(vnpayParams);
-        return ResponseEntity.ok(paymentResult);
-    }
 }

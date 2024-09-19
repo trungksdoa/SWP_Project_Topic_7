@@ -3,11 +3,9 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.customException.AlreadyExistedException;
 import com.product.server.koi_control_application.customException.NotFoundException;
-import com.product.server.koi_control_application.model.UserLimit;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.userRegister;
-import com.product.server.koi_control_application.repository.UserLimitRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.serviceInterface.IEmailService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
@@ -28,7 +26,6 @@ public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
     private final IEmailService service;
     private final PasswordEncoder passwordEncoder;
-    private final UserLimitRepository userLimitRepository;
     private final EmailServiceImpl emailService;
 
     @Override
@@ -50,9 +47,6 @@ public class UserServiceImpl implements IUserService {
             user.getRoles().add(new UserRole(register.getRole().getValue()));
             Users savedUser = usersRepository.save(user);
 
-            // Create user limit
-            UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build();
-            userLimitRepository.save(UserLimit.builder().pondLimit(50).fishLimit(500).userId(savedUser.getId()).build());
 
             // Send email to user
             userRegisterMail(user.getEmail(), savedUser);
