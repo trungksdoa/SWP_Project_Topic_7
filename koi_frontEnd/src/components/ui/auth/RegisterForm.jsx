@@ -28,10 +28,8 @@ const RegisterForm = ({ showModalLogin }) => {
   const password = watch("password");
 
   const onSubmit = (data) => {
-    // Remove confirmPassword from the data object
     const { confirmPassword, ...formData } = data;
     
-    // Convert the single role to an array of objects
     const formattedData = {
       ...formData,
       roles: [{ name: data.roles }]

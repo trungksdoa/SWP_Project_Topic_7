@@ -11,6 +11,7 @@ import { Input, Space } from "antd";
 const ManageUser = () => {
   const { data: lstUser, refetch } = useGetUserAll();
   const mutate = useDeleteUser();
+  console.log(lstUser)
 
   useEffect(() => {
     refetch();
@@ -47,29 +48,21 @@ const ManageUser = () => {
       showSorterTooltip: {
         target: "full-header",
       },
+      sorter: (a, b) => a.id - b.id,
     },
     {
       title: "User Name",
       dataIndex: "username",
-      showSorterTooltip: {
-        target: "full-header",
-      },
-      onFilter: (value, record) => record.name.indexOf(value) === 0,
-      sorter: (a, b) => a.name.length - b.name.length,
-      sortDirections: ["descend"],
     },
     {
       title: "Email",
       dataIndex: "email",
     },
-    {
-      title: "Address",
-      dataIndex: "address",
-    },
-    {
-      title: "Role",
-      dataIndex: "roles",
-    },
+    // {
+    //   title: "Role",
+    //   dataIndex: "roles",
+    //   render: (roles) => Array.isArray(roles) ? roles.join(', ') : roles,
+    // },
     {
       title: "Action",
       dataIndex: "",

@@ -11,5 +11,12 @@ export const PATH = {
     ADMIN: '/admin',
     MANAGE_USER: '/admin/manage-user',
     MANAGE_PRODUCTS: '/admin/manage-products',
-    DETAIL_PRODUCT: '/store/detail'
+    ADD_PRODUCT: '/admin/manage-product/add-product',
+    DETAIL_PRODUCT: '/store/detail',
+    CART: '/cart',
+    KOI_MANAGEMENT: '/koi-management',
+    POND_MANAGEMENT: '/pond-management',
+    WATER_PARAMETER: '/water-parameter',
+    FOOD_CALCULATOR: '/food-calculator',
+    SALT_CALCULATOR: '/salt-calculator'
 }

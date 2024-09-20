@@ -7,4 +7,5 @@ const api = apiInstanceHeader.create({
 
 export const ManageUserAll = {
   getUserAll: () => api.get("/manage/api/users"),
+  deleteUser: (id) => api.delete(`/manage/api/users/${id}`)
 };

@@ -6,27 +6,7 @@ const PondManegement = () => {
       <div className='col-span-1'>
         <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
       </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
-      <div className='col-span-1'>
-        <img src="../../../images/pondexem.jpg" className='w-full rounded-[12px]' alt="" />
-      </div>
+      {/* Repeat for other images */}
     </div>
   )
 }

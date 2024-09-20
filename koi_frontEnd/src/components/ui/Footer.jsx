@@ -7,25 +7,28 @@ const Footer = () => {
   const { t } = useTranslation()
   return (
     <div className="w-full bg-black-400">
-    <footer className="px-4 divide-y bg-orange-500 text-white">
+    <footer className="px-4 divide-y bg-black text-white">
       <div className="modal"></div>
       <div className="container grid-cols-4 pb-10 justify-between  lg:pb-10 mx-auto space-y-8 lg:flex-row lg:space-y-0 !z-10 content">
-        <div className="col-span-1 flex justify-center mb-[20px]">
+        <div className="col-span-1 mx-auto  my-[50px] flex justify-center">
           <NavLink
             to={PATH.HOME}
             rel="noopener noreferrer"
             className="inline"
           >
+            <div className='flex justify-center'>
             <img
-              className="h-40 my-[40px]"
-              src="../../../images/logo.png"
+              className="w-[150px]"
+              src="../../../images/logo.webp"
               alt="travel_logo"
             />
+            </div>
+            <p className='text-orange-400 font-bold text-[40px]'>Koi Control</p>
           </NavLink>
         </div>
         <div className="grid grid-cols-2 text-sm gap-x-3 gap-y-8 col-span-2 sm:grid-cols-4 text-center">
           <div className="space-y-3">
-            <h3 className=" tracking-wide uppercase text-black text-[25px] font-bold mb-[30px]">
+            <h3 className=" tracking-wide  uppercase text-orange-400 text-[25px] font-semibold mb-[20px]">
               {t("GIỚI THIỆU")}
             </h3>
             <ul className="space-y-1">
@@ -68,7 +71,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="space-y-3">
-            <h3 className=" tracking-wide uppercase text-black text-[25px] font-bold mb-[30px]">
+            <h3 className=" tracking-wide  uppercase text-orange-400 text-[25px] font-semibold mb-[20px]">
               {t("DỊCH VỤ")}
             </h3>
             <ul className="space-y-1">
@@ -102,7 +105,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="space-y-3">
-            <h3 className=" uppercase text-black text-[25px] font-bold mb-[30px]">
+            <h3 className=" uppercase text-orange-400 text-[25px] font-semibold mb-[20px]">
               {t("HỖ TRỢ")}
             </h3>
             <ul className="space-y-1">
@@ -136,7 +139,7 @@ const Footer = () => {
             </ul>
           </div>
           <div className="space-y-3">
-            <div className="uppercase text-black text-[25px] font-bold mb-[30px]">
+            <div className="uppercase text-orange-400 text-[25px] font-semibold mb-[20px]">
               Social media
             </div>
             <div className="flex justify-start flex-col space-x-3">
@@ -171,8 +174,8 @@ const Footer = () => {
       <div className="py-6 copyright text-sm text-center text-white text-[16px]">
         © 2024 All rights reserved. Design by{" "}
         <a href="/khailuu1512/" target="blank">
-          <span className="text-black text-[16px] font-semibold">
-            Khải Lưu
+          <span className="text-orange-400 text-[16px] font-semibold">
+            GROUP 3
           </span>
         </a>
       </div>
