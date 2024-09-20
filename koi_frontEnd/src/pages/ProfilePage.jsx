@@ -4,7 +4,7 @@ import ProfileTemplate from '../components/template/ProfileTemplage'
 const ProfilePage = () => {
   return (
     <div>
-      <ProfileTemplate />
+      {/* <ProfileTemplate /> */}
     </div>
   )
 }

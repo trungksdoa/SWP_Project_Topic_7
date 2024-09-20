@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -19,23 +19,23 @@ const LoginForm = ({ showModalRegister, handleOkLogin }) => {
   const { isFetchingLogin, userLogin } = useSelector(
     (state) => state.manageUser
   );
-  const role = userLogin?.roles;
+
+  useEffect(() => {
+    if (userLogin) {
+      const role = userLogin.roles[0]?.name; // Assuming roles is an array
+      if (role === "ROLE_ADMIN") {
+        navigate(PATH.ADMIN);
+      } else if (role === "ROLE_MEMBER") {
+        navigate(PATH.KOI_MANAGEMENT);
+      }
+    }
+  }, [userLogin, navigate]);
 
   const {
     control, 
     handleSubmit,
     formState: { errors }
   } = useForm();
-
-  if (userLogin) {
-    userLogin?.roles?.map((role) => {
-      if (role.name === "ROLE_ADMIN") {
-        return <Navigate to={PATH.ADMIN} />;
-      } else if (role.name === "ROLE_MEMBER") {
-        handleOkLogin();
-      }
-    })
-  }
 
   const onSubmit = (data) => {
     dispatch(manageUserActionThunks.loginThunk(data))

@@ -68,13 +68,13 @@ export const UserMenu = () => {
       return (
         <div className="flex flex-col">
           <Button
-            className="mb-[10px] w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600"
+            className="mb-[10px] w-full bg-black text-white hover:!text-white border-none hover:!bg-black"
             onClick={showModalLogin}
           >
             {t("login")}
           </Button>
           <Button
-            className="w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
+            className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
             onClick={showModalRegister}
           >
             {t("register")}
@@ -89,10 +89,10 @@ export const UserMenu = () => {
         console.log("a")
         return (
           <div className="flex flex-col" key="admin">
-            <NavLink to={PATH.ADMIN} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600">
+            <NavLink to={PATH.ADMIN} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
               {t("Admin")}
             </NavLink>
-            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600">
+            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
               {t("Logout")}
             </Button>
           </div>
@@ -101,10 +101,10 @@ export const UserMenu = () => {
       if (role.name === "ROLE_MEMBER") {
         return (
           <div className="flex flex-col" key="member">
-            <NavLink to={PATH.PROFILE} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-orange-500 text-white hover:!text-white border-none hover:!bg-orange-600">
-              {t("Profile")}
+            <NavLink to={PATH.KOI_MANAGEMENT} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
+              {t("Manage")}
             </NavLink>
-            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-orange-600 hover:!bg-orange-600">
+            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
               {t("Logout")}
             </Button>
           </div>

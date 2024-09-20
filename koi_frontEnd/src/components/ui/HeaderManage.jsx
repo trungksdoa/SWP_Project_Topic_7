@@ -6,21 +6,12 @@ import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
 import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
 
-const Header = () => {
+const HeaderManage = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
   const cartCount = useSelector((state) => state.manageCart.cartCount);
-  const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const userId = userLogin?.id
-  console.log(userId)
-  const { data: carts } = useGetCartByUserId(userId);
-
-  // Calculate total quantity from carts
-  const totalQuantity = carts?.reduce((acc, cart) => acc + cart.quantity, 0) || 0;
-
   const navigate = useNavigate();
 
   const toggleOverlay = () => {
@@ -43,57 +34,50 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              to={PATH.HOME}
+              to={PATH.KOI_MANAGEMENT}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Home")}
+              {t("Koi Management")}
             </NavLink>
           </li>
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              to={PATH.STORE}
+              to={PATH.POND_MANAGEMENT}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Store")}
+              {t("Pond Management")}
             </NavLink>
           </li>
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              href="#"
-              className="flex items-center px-4 -mb-1  dark:border-"
+              to={PATH.WATER_PARAMETER}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Base")}
+              {t("Water Parameter")}
             </NavLink>
           </li>
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              href="#"
-              className="flex items-center px-4 -mb-1  dark:border-"
+              to={PATH.FOOD_CALCULATOR}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Blog")}
+              {t("Food Calculator")}
+            </NavLink>
+          </li>
+          <li className="flex text-white">
+            <NavLink
+              rel="noopener noreferrer"
+              to={PATH.SALT_CALCULATOR}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+            >
+              {t("Salt Calculator")}
             </NavLink>
           </li>
         </ul>
         <div className="items-center flex-shrink-0 hidden lg:flex">
-          <div className="relative">
-            <ShoppingCartOutlined
-              style={{
-                color: "white",
-                marginRight: "15px",
-                fontSize: "30px",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(PATH.CART)}
-            />
-            {totalQuantity > 0 && (
-              <span className="text-white text-center absolute top-[-17px] right-[0px] bg-green-400 !w-[30px] !h-[30px] leading-[30px] !rounded-full">
-                {totalQuantity}
-              </span>
-            )}
-          </div>
           <UserMenu />
           <div className="ml-4">
             <LanguageSwitcher />
@@ -119,7 +103,7 @@ const Header = () => {
 
       {/* Mobile sliding menu */}
       <div
-        className={`z-20 fixed top-0 left-0 w-[50%] h-full bg-orange-500 transform transition-transform duration-300 ease-in-out ${
+        className={`z-20 fixed top-0 left-0 w-[50%] h-full bg-black transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } lg:hidden`}
       >
@@ -225,4 +209,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderManage;

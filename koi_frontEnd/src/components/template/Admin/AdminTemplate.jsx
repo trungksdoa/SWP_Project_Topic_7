@@ -65,7 +65,7 @@ const AdminTemplate = () => {
                 {t("Manage Users")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={5} icon={<UserOutlined  style={{color: "white"}}/>}>
+            <Menu.Item className="text-white" key={6} icon={<UserOutlined  style={{color: "white"}}/>}>
               <NavLink key={1} to={PATH.MANAGE_PRODUCTS} className="!text-white">
                 {t("Manage Products")}
               </NavLink>
