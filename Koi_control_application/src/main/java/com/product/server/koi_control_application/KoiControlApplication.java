@@ -13,8 +13,8 @@ import org.springframework.context.event.EventListener;
 public class KoiControlApplication {
 
 
-    @Autowired
     public static void main(String[] args) {
+
         SpringApplication.run(KoiControlApplication.class, args);
     }
 
