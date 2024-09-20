@@ -11,6 +11,6 @@ export const useGetAllKoi = () => {
     });
     return {
         ...q,
-        data: q?.data?.data?.data,
+        data: q?.data?.data?.data?.content,
     };
 };
