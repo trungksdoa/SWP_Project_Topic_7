@@ -5,8 +5,6 @@ export const apiInstanceHeader = {
   create: (configDefault) => {
     const api = axios.create(configDefault);
     api.interceptors.request.use((config) => {
-      console.log(config);
-      console.log("Bearer " + getUserLogin()?.accessToken);
       return {
         ...config,
         headers: {
