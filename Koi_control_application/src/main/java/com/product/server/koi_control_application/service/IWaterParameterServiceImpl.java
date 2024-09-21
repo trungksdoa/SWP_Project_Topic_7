@@ -1,15 +1,18 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.dto.WaterParameterCreationRequest;
 import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
 import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,24 +22,12 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
     public WaterParameter saveWaterParameter(int pondId, WaterParameter waterParameter) {
 
         if(waterParameterRepository.existsByPondId(pondId)){
-            WaterParameterUpdateRequest  request = new WaterParameterUpdateRequest();
-            request.setNitriteNO2(waterParameter.getNitriteNO2());
-            request.setNitrateNO3(waterParameter.getNitrateNO3());
-            request.setPhosphatePO4(waterParameter.getPhosphatePO4());
-            request.setAmmoniumNH4(waterParameter.getAmmoniumNH4());
-            request.setHardnessGH(waterParameter.getHardnessGH());
-            request.setSalt(waterParameter.getSalt());
-            request.setOutdoorTemperature(waterParameter.getOutdoorTemperature());
-            request.setTemperature(waterParameter.getTemperature());
-            request.setPH(waterParameter.getPH());
-            request.setCarbonateHardnessKH(waterParameter.getCarbonateHardnessKH());
-            request.setCo2(waterParameter.getCo2());
-            request.setTotalChlorines(waterParameter.getTotalChlorines());
-            request.setAmountFed(waterParameter.getAmountFed());
+            WaterParameterUpdateRequest request = new WaterParameterUpdateRequest();
+            BeanUtils.copyProperties(waterParameter, request);
             return updateWaterParameter(pondId, request);
         }
+            waterParameter.setPondId(pondId);
             waterParameter.setLastCleanedAt(LocalDateTime.now());
-
         return waterParameterRepository.save(waterParameter);
     }
 
@@ -44,7 +35,7 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         public WaterParameter getWaterParameterByPondId(int pondId) {
             WaterParameter waterParameter = waterParameterRepository.findByPondId(pondId);
             if (waterParameter == null) {
-                throw new RuntimeException("WaterParameter not found for pondId: ");
+                throw new NotFoundException("WaterParameter not found for pondId: ");
             }
             return waterParameter;
         }
@@ -52,62 +43,24 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
     @Override
     public WaterParameter updateWaterParameter(int pondId, WaterParameterUpdateRequest request) {
         WaterParameter waterParameter = getWaterParameterByPondId(pondId);
-        if (request.getNitriteNO2() != null) {
-            waterParameter.setNitriteNO2(request.getNitriteNO2());
-        }
+        Optional.ofNullable(request.getNitriteNO2()).ifPresent(waterParameter::setNitriteNO2);
+        Optional.ofNullable(request.getNitrateNO3()).ifPresent(waterParameter::setNitrateNO3);
+        Optional.ofNullable(request.getPhosphatePO4()).ifPresent(waterParameter::setPhosphatePO4);
+        Optional.ofNullable(request.getAmmoniumNH4()).ifPresent(waterParameter::setAmmoniumNH4);
+        Optional.ofNullable(request.getHardnessGH()).ifPresent(waterParameter::setHardnessGH);
+        Optional.ofNullable(request.getSalt()).ifPresent(waterParameter::setSalt);
+        Optional.ofNullable(request.getOutdoorTemperature()).ifPresent(waterParameter::setOutdoorTemperature);
+        Optional.ofNullable(request.getTemperature()).ifPresent(waterParameter::setTemperature);
+        Optional.ofNullable(request.getPH()).ifPresent(waterParameter::setPH);
+        Optional.ofNullable(request.getCarbonateHardnessKH()).ifPresent(waterParameter::setCarbonateHardnessKH);
+        Optional.ofNullable(request.getCo2()).ifPresent(waterParameter::setCo2);
+        Optional.ofNullable(request.getTotalChlorines()).ifPresent(waterParameter::setTotalChlorines);
+        Optional.ofNullable(request.getAmountFed()).ifPresent(waterParameter::setAmountFed);
 
-        if (request.getNitrateNO3() != null) {
-            waterParameter.setNitrateNO3(request.getNitrateNO3());
-        }
-
-        if (request.getPhosphatePO4() != null) {
-            waterParameter.setPhosphatePO4(request.getPhosphatePO4());
-        }
-
-        if (request.getAmmoniumNH4() != null) {
-            waterParameter.setAmmoniumNH4(request.getAmmoniumNH4());
-        }
-
-        if (request.getHardnessGH() != null) {
-            waterParameter.setHardnessGH(request.getHardnessGH());
-        }
-
-        if (request.getSalt() != null) {
-            waterParameter.setSalt(request.getSalt());
-        }
-
-        if (request.getOutdoorTemperature() != null) {
-            waterParameter.setOutdoorTemperature(request.getOutdoorTemperature());
-        }
-
-        if (request.getTemperature() != null) {
-            waterParameter.setTemperature(request.getTemperature());
-        }
-
-        if (request.getPH() != null) {
-            waterParameter.setPH(request.getPH());
-        }
-
-        if (request.getCarbonateHardnessKH() != null) {
-            waterParameter.setCarbonateHardnessKH(request.getCarbonateHardnessKH());
-        }
-
-        if (request.getCo2() != null) {
-            waterParameter.setCo2(request.getCo2());
-        }
-
-        if (request.getTotalChlorines() != null) {
-            waterParameter.setTotalChlorines(request.getTotalChlorines());
-        }
-
-        if (request.getAmountFed() != null) {
-            waterParameter.setAmountFed(request.getAmountFed());
-        }
-
-
-        if (request.getLastCleaned() != null && request.getLastCleaned()) {
+        if (Boolean.TRUE.equals(request.getLastCleaned())) {
             waterParameter.setLastCleanedAt(LocalDateTime.now());
         }
+
         return waterParameterRepository.save(waterParameter);
     }
 

@@ -78,8 +78,8 @@ public class KoiFishController {
     }
 
     @GetMapping("/listkoi/bypondid/{pondId}")
-    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int koiFishId) {
-        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(koiFishId, 0, 10);
+    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId) {
+        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, 0, 10);
         String mess = "Get koifishs by pondId succesfully";
         if (koiFishs.isEmpty())
             mess = "List is emmty";

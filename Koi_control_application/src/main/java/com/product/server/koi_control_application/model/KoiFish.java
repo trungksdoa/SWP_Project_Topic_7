@@ -50,8 +50,8 @@ public class KoiFish {
     @Column(nullable = false, precision = 10, scale = 2)
     private int purchasePrice;
 
-    @Column(nullable = false)
-    private int breeder;
+    @Column(name = "user_id",nullable = false)
+    private int userId;
 
     @Column(name = "image_url")
     private String imageUrl;

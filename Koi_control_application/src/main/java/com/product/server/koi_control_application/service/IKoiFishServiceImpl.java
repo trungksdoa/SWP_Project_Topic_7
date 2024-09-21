@@ -1,6 +1,8 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.customException.AlreadyExistedException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.dto.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
@@ -8,10 +10,13 @@ import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,24 +26,24 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     private final PondRepository pondRepository;
     @Override
     public KoiFish addKoiFish(KoiFish koiFish) {
-        if(!usersRepository.existsById(koiFish.getBreeder()))
-            throw new RuntimeException("User not found.");
+        if(!usersRepository.existsById(koiFish.getUserId()))
+            throw new NotFoundException("User not found.");
 
         if(!pondRepository.existsById(koiFish.getPondId()))
-            throw new RuntimeException("Pond not found.");
+            throw new NotFoundException("Pond not found.");
 
-        if(!pondRepository.existsByIdAndBreeder(koiFish.getPondId(), koiFish.getBreeder()))
-            throw new RuntimeException("This Breeder dont have this Pond!.");
+        if(!pondRepository.existsByIdAndUserId(koiFish.getPondId(), koiFish.getUserId()))
+            throw new NotFoundException("This Breeder dont have this Pond!.");
 
         if(koiFishRepository.existsByNameAndPondId(koiFish.getName(), koiFish.getPondId()))
-            throw new RuntimeException("KoiFish name existed.");
+            throw new AlreadyExistedException("KoiFish name existed.");
 
         return koiFishRepository.save(koiFish);
     }
 
     @Override
     public KoiFish getKoiFish(int id) {
-        return koiFishRepository.findById(id).orElseThrow(() -> new RuntimeException("KoiFish not found"));
+        return koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
     }
 
     @Override
@@ -55,26 +60,32 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    public int countKoiFishByPondId(int pondId) {
+        return koiFishRepository.countByPondId(pondId);
+    }
+
+    @Override
     public KoiFish updateKoiFish(int id, KoiFishUpdateRequest request) {
         KoiFish koiFish = getKoiFish(id);
 
-        if(!usersRepository.existsById(request.getBreeder()))
-            throw new RuntimeException("User not found.");
+        if(!usersRepository.existsById(request.getUserId()))
+            throw new NotFoundException("User not found.");
 
-        if(!pondRepository.existsByIdAndBreeder(request.getPondId(), request.getBreeder()))
-            throw new RuntimeException("This Breeder dont have this Pond!.");
+        if(!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+            throw new NotFoundException("This Breeder dont have this Pond!.");
 
         if(koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
-            throw new RuntimeException("KoiFish name existed.");
+            throw new AlreadyExistedException("KoiFish name existed.");
 
 
-        koiFish.setName(request.getName());
-        koiFish.setVariety(request.getVariety());
-        koiFish.setSex(request.getSex());
-        koiFish.setPurchasePrice(request.getPurchasePrice());
-        koiFish.setBreeder(request.getBreeder());
-        koiFish.setImageUrl(request.getImageUrl());
-        koiFish.setPondId(request.getPondId());
+
+        Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
+        Optional.ofNullable(request.getVariety()).ifPresent(koiFish::setVariety);
+        Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
+        Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
+        Optional.ofNullable(request.getUserId()).ifPresent(koiFish::setUserId);
+        Optional.ofNullable(request.getImageUrl()).ifPresent(koiFish::setImageUrl);
+        Optional.ofNullable(request.getPondId()).ifPresent(koiFish::setPondId);
 
 
 
@@ -84,7 +95,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     @Override
     public Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return koiFishRepository.findAllByBreeder(userId,pageable);
+        return koiFishRepository.findAllByUserId(userId,pageable);
     }
 
     @Override

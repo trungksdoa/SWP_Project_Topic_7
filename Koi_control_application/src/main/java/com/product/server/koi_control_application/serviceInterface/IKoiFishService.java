@@ -13,7 +13,7 @@ public interface IKoiFishService {
     Page<KoiFish> getKoiFishsByPondId(int pondId, int page, int size);
     Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size);
     void deleteKoiFish(int id);
-
+    int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFishUpdateRequest request);
 
 
