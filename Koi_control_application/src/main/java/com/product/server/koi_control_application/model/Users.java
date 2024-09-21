@@ -108,24 +108,5 @@ public class Users implements UserDetails {
     private Package aPackage;
 
     // UserDetails methods "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"
-    @Override
-    public boolean isEnabled() {
-        return active;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
 
 }
