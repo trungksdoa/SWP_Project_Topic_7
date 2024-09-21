@@ -58,8 +58,8 @@ public class Pond {
     @Column(name = "fish_count")
     private int fishCount;
 
-    @Column(name = "breeder")
-    private int breeder;
+    @Column(name = "user_id")
+    private int userId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

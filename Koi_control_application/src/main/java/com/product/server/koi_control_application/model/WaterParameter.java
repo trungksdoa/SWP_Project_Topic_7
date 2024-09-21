@@ -71,6 +71,10 @@ public class WaterParameter {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "last_cleaned_at")
+    private LocalDateTime lastCleanedAt;
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

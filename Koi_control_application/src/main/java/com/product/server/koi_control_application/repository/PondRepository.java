@@ -10,15 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public interface PondRepository extends JpaRepository<Pond, Integer> {
-    boolean existsByNameAndBreeder(String name, int breeder);
+    boolean existsByNameAndUserId(String name, int userId);
 
-    Page<Pond> findAllByBreeder(int breeder, Pageable pageable);
-    boolean existsById(int breeder);
-    boolean existsByIdAndBreeder(int id, int breeder);
+    Page<Pond> findAllByUserId(int userId, Pageable pageable);
+    boolean existsById(int id);
+    boolean existsByIdAndUserId(int id, int userId);
 
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
-            "FROM Pond c WHERE c.name = :name AND c.breeder = :breeder AND c.id <> :id")
-    boolean existsByNameAndBreederExceptId(@Param("name") String name,
-                                           @Param("breeder") int breeder,
+            "FROM Pond c WHERE c.name = :name AND c.userId= :userId AND c.id <> :id")
+    boolean existsByNameAndUserIdExceptId(@Param("name") String name,
+                                           @Param("userId") int userId,
                                            @Param("id") int id);
 }

@@ -10,8 +10,8 @@ public class KoiFishCreationRequest {
     private String name;
     private String variety;
     private Boolean sex;
-    private int purchasePrice;
-    private String breeder;
+    private Integer purchasePrice;
+    private String userId;
     private String imageUrl;
-    private int pondId;
+    private Integer pondId;
 }

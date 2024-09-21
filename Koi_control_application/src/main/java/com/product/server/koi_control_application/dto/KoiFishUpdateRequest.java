@@ -12,8 +12,8 @@ public class KoiFishUpdateRequest {
     private String name;
     private String variety;
     private Boolean sex;
-    private int purchasePrice;
-    private int breeder;
+    private Integer purchasePrice;
+    private Integer userId;
     private String imageUrl;
-    private int pondId;
+    private Integer pondId;
 }

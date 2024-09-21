@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/koifishs")
 @RequiredArgsConstructor
 @Validated
-@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
+@RolesAllowed({ "ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP" })
 public class KoiFishController {
     @Autowired
     private IKoiFishService iKoiFishService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse> createKoi(@RequestBody @Valid KoiFish koiFish){
+    public ResponseEntity<BaseResponse> createKoi(@RequestBody @Valid KoiFish koiFish) {
         KoiFish koiFish1 = iKoiFishService.addKoiFish(koiFish);
 
         BaseResponse response = BaseResponse.builder()
@@ -33,11 +33,11 @@ public class KoiFishController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("{koiFishId}")
-    public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId){
+    public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId) {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
 
         BaseResponse response = BaseResponse.builder()
@@ -46,12 +46,13 @@ public class KoiFishController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("{koiFishId}")
-    public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,@RequestBody @Valid  KoiFishUpdateRequest request){
-        KoiFish koiFish1 = iKoiFishService.updateKoiFish(koiFishId,request);
+    public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
+            @RequestBody @Valid KoiFishUpdateRequest request) {
+        KoiFish koiFish1 = iKoiFishService.updateKoiFish(koiFishId, request);
 
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
@@ -59,11 +60,11 @@ public class KoiFishController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{koiFishId}")
-    public ResponseEntity<BaseResponse> deleteKoiFish(@PathVariable("koiFishId") int koiFishId){
+    public ResponseEntity<BaseResponse> deleteKoiFish(@PathVariable("koiFishId") int koiFishId) {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
         iKoiFishService.deleteKoiFish(koiFishId);
 
@@ -73,32 +74,31 @@ public class KoiFishController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/listkoi/bypondid/{pondId}")
-    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int koiFishId){
-         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(koiFishId,0,10);
-         String mess="Get koifishs by pondId succesfully";
-        if(koiFishs.isEmpty())
-            mess="List is emmty";
+    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId) {
+        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, 0, 10);
+        String mess = "Get koifishs by pondId succesfully";
+        if (koiFishs.isEmpty())
+            mess = "List is emmty";
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
                 .message(mess)
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/listkoi/byuserid/{userId}")
-    public ResponseEntity<BaseResponse> getKoisByUserId(@PathVariable("userId") int userId){
-        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId,0,10);
+    public ResponseEntity<BaseResponse> getKoisByUserId(@PathVariable("userId") int userId) {
+        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, 0, 10);
 
-        String mess="Get koifishs by userId succesfully";
-        if(koiFishs.isEmpty())
-            mess="List is emmty";
+        String mess = "Get koifishs by userId succesfully";
+        if (koiFishs.isEmpty())
+            mess = "List is emmty";
 
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
@@ -106,7 +106,7 @@ public class KoiFishController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/listkoi")

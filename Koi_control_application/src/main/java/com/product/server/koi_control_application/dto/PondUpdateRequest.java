@@ -15,8 +15,7 @@ public class PondUpdateRequest {
     private BigDecimal width;
     private BigDecimal length;
     private BigDecimal depth;
-    private int volume;
-    private int fishCount;
-    private int breeder;
+    private Integer volume;
+    private Integer userId;
 
 }
