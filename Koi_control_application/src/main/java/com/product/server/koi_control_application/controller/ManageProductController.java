@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
@@ -8,6 +9,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +28,12 @@ public class ManageProductController {
     private final IProductService productService;
     private final IImageService imageService;
 
-    @PostMapping
-    public ResponseEntity<BaseResponse> createProduct(@RequestPart("product") @Valid Product product, @RequestParam("image") MultipartFile file) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> createProduct(@RequestPart("product") String productJson, @RequestParam("image") MultipartFile file) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        Product product = mapper.readValue(productJson, Product.class);
+
         String filename = imageService.uploadImage(file);
         product.setImageUrl(filename);
         Product createdProduct = productService.createProduct(product);
@@ -39,9 +45,12 @@ public class ManageProductController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateProduct(@PathVariable("id") int productId, @RequestPart("product") @Valid Product product, @RequestParam("image") MultipartFile file) throws IOException {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> updateProduct(@PathVariable("id") int productId, @RequestPart("product") String productJson, @RequestParam("image") MultipartFile file) throws IOException {
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        Product product = objectMapper.readValue(productJson, Product.class);
+        
         if (file != null) {
             String filename = imageService.updateImage(product.getImageUrl(), file);
             product.setImageUrl(filename);

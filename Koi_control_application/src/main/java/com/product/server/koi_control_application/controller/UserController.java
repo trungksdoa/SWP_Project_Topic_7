@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.custom_exception.ForbiddenException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Users;
@@ -12,6 +13,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -157,9 +159,12 @@ public class UserController {
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") Users userData, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
-        userService.updateUser(userId, userData, file);
+    @PutMapping(value ="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Users userData = objectMapper.readValue(userJson, Users.class);
+
+       userService.updateUser(userId, userData, file);
         BaseResponse response = BaseResponse.builder()
                 .data("Update success")
                 .statusCode(HttpStatus.OK.value())

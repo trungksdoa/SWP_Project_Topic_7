@@ -27,8 +27,9 @@ import java.io.IOException;
 public class PondController {
     private final IPondService iPondService;
     private final IImageService iImageService;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse> createPond(@RequestPart("pond")  String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<BaseResponse> createPond(@RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -38,7 +39,7 @@ public class PondController {
 
         pond.setImageUrl(filename);
 
-        Pond    pond1 = iPondService.addPond(pond);
+        Pond pond1 = iPondService.addPond(pond);
 
         BaseResponse response = BaseResponse.builder()
                 .data(pond1)
@@ -46,10 +47,11 @@ public class PondController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @GetMapping("{pondId}")
-    public ResponseEntity<BaseResponse> getPond(@PathVariable("pondId") int pondId){
+    public ResponseEntity<BaseResponse> getPond(@PathVariable("pondId") int pondId) {
         Pond pond1 = iPondService.getPond(pondId);
 
         BaseResponse response = BaseResponse.builder()
@@ -58,23 +60,28 @@ public class PondController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
-    @PutMapping("{pondId}")
-    public ResponseEntity<BaseResponse> updatePond(@PathVariable("pondId") int pondId,@RequestPart("pond")  @Valid Pond pond, @RequestParam("image") MultipartFile file) throws IOException {
+    @PutMapping(value = "{pondId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> updatePond(@PathVariable("pondId") int pondId, @RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Pond pond = mapper.readValue(pondJson, Pond.class);
+
         BaseResponse response = BaseResponse.builder()
-                .data( iPondService.updatePond(pondId,pond,file))
+                .data(iPondService.updatePond(pondId, pond, file))
                 .message("Update pond succesfully")
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{pondId}")
-    public ResponseEntity<BaseResponse> deleteKoiFish(@PathVariable("pondId") int pondId){
+    public ResponseEntity<BaseResponse> deleteKoiFish(@PathVariable("pondId") int pondId) {
 
         Pond pond1 = iPondService.getPond(pondId);
         iPondService.deletePond(pondId);
@@ -85,15 +92,15 @@ public class PondController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/listpond/byuserid/{userId}")
-    public ResponseEntity<BaseResponse> getPondByUserId(@PathVariable("userId") int userId){
-        Page<Pond> Ponds = iPondService.getAllPondByUserId(userId,0,10);
-        String mess="Get ponds by userID succesfully";
-        if(Ponds.isEmpty())
-            mess="List is emmty";
+    public ResponseEntity<BaseResponse> getPondByUserId(@PathVariable("userId") int userId) {
+        Page<Pond> Ponds = iPondService.getAllPondByUserId(userId, 0, 10);
+        String mess = "Get ponds by userID succesfully";
+        if (Ponds.isEmpty())
+            mess = "List is emmty";
         BaseResponse response = BaseResponse.builder()
                 .data(Ponds)
                 .message(mess)
@@ -101,15 +108,15 @@ public class PondController {
                 .build();
 
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/listpond")
-    public ResponseEntity<BaseResponse> getPons(){
-        Page<Pond> Ponds = iPondService.getPonds(0,10);
-        String mess="Get all pond succesfully";
-        if(Ponds.isEmpty())
-            mess="List is emmty";
+    public ResponseEntity<BaseResponse> getPons() {
+        Page<Pond> Ponds = iPondService.getPonds(0, 10);
+        String mess = "Get all pond succesfully";
+        if (Ponds.isEmpty())
+            mess = "List is emmty";
         BaseResponse response = BaseResponse.builder()
                 .data(Ponds)
                 .message(mess)
@@ -117,7 +124,7 @@ public class PondController {
                 .build();
 
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
