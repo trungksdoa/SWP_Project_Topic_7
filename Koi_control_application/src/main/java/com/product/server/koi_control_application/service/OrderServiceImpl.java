@@ -1,6 +1,5 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.customException.EmptyException;
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.pojo.CheckOut;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;

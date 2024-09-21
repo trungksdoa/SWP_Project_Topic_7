@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+:User: as User
+:Admin: as Admin
+
+(Verify Email) as (VerifyEmail)
+(Patch User) as (PatchUser)
+(Create Order) as (CreateOrder)
+(Get Order) as (GetOrder)
+(Cancel Order) as (CancelOrder)
+(Process Payment Return) as (ProcessPaymentReturn)
+
+User -- (VerifyEmail)
+User -- (PatchUser)
+User -- (CreateOrder)
+User -- (GetOrder)
+User -- (CancelOrder)
+User -- (ProcessPaymentReturn)
+
+Admin -up-  (PatchUser)
+Admin -- (GetOrder)
+Admin -- (CancelOrder)
+Admin -- (ProcessPaymentReturn)
+
+@enduml

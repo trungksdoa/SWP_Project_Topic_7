@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { manageUserServices } from "../../services/manageUserServices";
+import { ManageUserAll } from "../../services/admin/ManageUserAll";
 export const useDeleteUser = () => {
     return useMutation({
-        mutationFn: (id) => manageUserServices.deleteUser(id)
+        mutationFn: (id) => ManageUserAll.deleteUser(id)
     })
 }

@@ -31,11 +31,11 @@
 
  .ant-layout-sider-children, 
  .ant-menu {
-   background-color: #fe8732 !important;
+   background-color: #000000 !important; /* Changed from #fe8732 to #000000 */
  }
 
  .ant-layout-sider-trigger{
-   background-color: #F97316 !important;
+   background-color: #000000 !important; /* Changed from #F97316 to #000000 */
  }
 
  .ant-layout-header  {
@@ -52,3 +52,9 @@
   background-color: #fb6400 !important;
   color: white !important;
  } */
+
+ *{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+ }

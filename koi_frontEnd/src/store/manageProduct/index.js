@@ -1,0 +1,1 @@
+export * as manageProductThunks from './thunk'

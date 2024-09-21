@@ -40,7 +40,8 @@ public class ApplicationSecurity {
             "/api/users/verify/email/**",
             "/api/image/**",
             "/api/products/**",
-            "/api/orders/payment-return"
+            "/api/orders/payment-return",
+            "/api/sse/**"
     };
 
 
@@ -49,6 +50,7 @@ public class ApplicationSecurity {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
+//                    config.setAllowedOrigins(List.of("http://your-client-host.com")); // Chỉ cho phép một origin cụ thể
                     config.setAllowedOrigins(List.of("*")); // Allow all origins
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
@@ -62,6 +64,7 @@ public class ApplicationSecurity {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+    
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepo.findByEmail(username)
