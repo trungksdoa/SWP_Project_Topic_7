@@ -1,12 +1,14 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.serviceInterface.IImageService;
+import com.product.server.koi_control_application.service_interface.IImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +16,11 @@ import java.nio.file.Paths;
 @Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements IImageService {
+    private ClassPathResource imgFile;
 
+    public ImageServiceImpl(ClassPathResource imgFile) {
+        this.imgFile = imgFile;
+    }
     private static final String IMAGE_DIR = "image/";
     private static final String HOST ="https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/";
     public String uploadImage(MultipartFile file) throws IOException {
@@ -35,7 +41,33 @@ public class ImageServiceImpl implements IImageService {
         return HOST+filename;
     }
 
+    @Override
+    public InputStream getImage() throws IOException {
+        return imgFile.getInputStream();
+    }
+    @Override
+    public boolean imageExists() {
+        return imgFile.exists();
+    }
 
+    @Override
+    public String updateImage(String filename, MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File không được để trống");
+        }
 
+        Path imagePath = Paths.get(IMAGE_DIR, filename);
+        if (!Files.exists(imagePath)) {
+            throw new IOException("Image not found: " + filename);
+        }
+
+        // Delete the existing file
+        Files.delete(imagePath);
+
+        // Write the new file
+        Files.write(imagePath, file.getBytes());
+
+        return HOST + filename;
+    }
 }
 

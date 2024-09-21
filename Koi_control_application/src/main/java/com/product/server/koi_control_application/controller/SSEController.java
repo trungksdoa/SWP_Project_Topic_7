@@ -22,8 +22,5 @@ public class SSEController<T> {
         return sseService.getEventStream();
     }
 
-//    @PostMapping("/emit")
-//    public void emitEvent(@RequestBody String event) {
-//        sseService.emitEvent(event);
-//    }
+
 }

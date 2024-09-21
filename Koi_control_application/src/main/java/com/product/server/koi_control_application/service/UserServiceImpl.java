@@ -1,15 +1,15 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.customException.AlreadyExistedException;
-import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.UserPatchDTO;
 import com.product.server.koi_control_application.pojo.userRegister;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.service_interface.IEmailService;
+import com.product.server.koi_control_application.service_interface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 

@@ -2,8 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.serviceInterface.IImageService;
-import com.product.server.koi_control_application.serviceInterface.IProductService;
+import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.service_interface.IProductService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

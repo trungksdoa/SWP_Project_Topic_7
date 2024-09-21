@@ -1,12 +1,12 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.customException.ForbiddenException;
-import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.custom_exception.ForbiddenException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.*;
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.service_interface.IEmailService;
+import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -17,7 +17,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/users")

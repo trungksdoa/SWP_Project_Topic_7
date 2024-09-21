@@ -1,7 +1,6 @@
-package com.product.server.koi_control_application.serviceInterface;
+package com.product.server.koi_control_application.service_interface;
 
-import com.product.server.koi_control_application.dto.KoiFishCreationRequest;
-import com.product.server.koi_control_application.dto.KoiFishUpdateRequest;
+import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
 import org.springframework.data.domain.Page;
 

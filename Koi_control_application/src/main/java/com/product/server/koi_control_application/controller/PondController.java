@@ -1,10 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.dto.PondUpdateRequest;
+import com.product.server.koi_control_application.pojo.PondUpdateRequest;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.serviceInterface.IPondService;
+import com.product.server.koi_control_application.service_interface.IPondService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

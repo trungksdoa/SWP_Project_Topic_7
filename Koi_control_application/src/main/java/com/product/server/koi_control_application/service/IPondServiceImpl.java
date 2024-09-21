@@ -1,15 +1,14 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.customException.AlreadyExistedException;
-import com.product.server.koi_control_application.customException.NotFoundException;
-import com.product.server.koi_control_application.dto.PondUpdateRequest;
+import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.pojo.PondUpdateRequest;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.serviceInterface.IPondService;
-import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
+import com.product.server.koi_control_application.service_interface.IPondService;
+import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

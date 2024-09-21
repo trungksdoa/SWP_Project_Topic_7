@@ -1,7 +1,6 @@
-package com.product.server.koi_control_application.serviceInterface;
+package com.product.server.koi_control_application.service_interface;
 
-import com.product.server.koi_control_application.dto.PondCreationRequest;
-import com.product.server.koi_control_application.dto.PondUpdateRequest;
+import com.product.server.koi_control_application.pojo.PondUpdateRequest;
 import com.product.server.koi_control_application.model.Pond;
 import org.springframework.data.domain.Page;
 

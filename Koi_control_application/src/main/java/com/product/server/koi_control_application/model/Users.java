@@ -23,7 +23,7 @@ import java.util.*;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = "password")
+@ToString(exclude = {"password","enabled","accountNonExpired","accountNonLocked","credentialsNonExpired"})
 
 public class Users  implements UserDetails {
     @Id

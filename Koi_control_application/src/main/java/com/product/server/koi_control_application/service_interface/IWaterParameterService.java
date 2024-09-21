@@ -1,7 +1,6 @@
-package com.product.server.koi_control_application.serviceInterface;
+package com.product.server.koi_control_application.service_interface;
 
-import com.product.server.koi_control_application.dto.WaterParameterCreationRequest;
-import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
+import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 
 public interface IWaterParameterService {

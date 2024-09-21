@@ -6,7 +6,7 @@ import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.FeedbackRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
+import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,6 +42,11 @@ public class FeedbackServiceImpl implements IFeedbackService {
         product.calculateAverageRating();
         productRepository.save(product);
         return feedbackRepository.save(feedback);
+    }
+
+    @Override
+    public List<Feedback> getAll() {
+        return feedbackRepository.findAll();
     }
 
     @Override

@@ -2,14 +2,15 @@ package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.model.Product;
-import com.product.server.koi_control_application.serviceInterface.IImageService;
-import com.product.server.koi_control_application.serviceInterface.IProductService;
+import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.service_interface.IProductService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/products")
@@ -45,7 +46,8 @@ public class ProductController {
     }
 
 //    @PutMapping("/{id}")
-//    public ResponseEntity<BaseResponse> updateProduct(@PathVariable int id, @RequestBody Product product) {
+//    public ResponseEntity<BaseResponse> updateProduct(@RequestPart("product") Product product, @RequestParam("image") MultipartFile file) {
+//
 //        Product updatedProduct = productService.updateProduct(id, product);
 //        BaseResponse response = BaseResponse.builder()
 //                .data(updatedProduct)

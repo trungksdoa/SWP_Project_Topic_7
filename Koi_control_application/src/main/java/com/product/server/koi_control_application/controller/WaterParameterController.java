@@ -1,10 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
+import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
+import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

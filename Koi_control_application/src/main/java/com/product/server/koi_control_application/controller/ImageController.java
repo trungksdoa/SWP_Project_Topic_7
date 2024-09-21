@@ -1,6 +1,8 @@
 package com.product.server.koi_control_application.controller;
 
 
+import com.product.server.koi_control_application.service.ImageServiceImpl;
+import com.product.server.koi_control_application.service_interface.IImageService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -20,15 +22,16 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 @RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ImageController {
+
+    public  IImageService imageService;
     private static final String IMAGE_DIR = "image/";
 
     @GetMapping("/{filename:.+}")
     public ResponseEntity<InputStreamResource> getImage(@PathVariable String filename) {
+        imageService = new ImageServiceImpl(new ClassPathResource(IMAGE_DIR + filename));
         try {
-            ClassPathResource imgFile = new ClassPathResource(IMAGE_DIR + filename);
-
-            if (imgFile.exists()) {
-                InputStream in = imgFile.getInputStream();
+            if (imageService.imageExists()) {
+                InputStream in = imageService.getImage();
                 return ResponseEntity.ok()
                         .contentType(MediaType.IMAGE_JPEG) // Hoặc xác định loại MIME dựa trên phần mở rộng của file
                         .body(new InputStreamResource(in));
@@ -39,4 +42,6 @@ public class ImageController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+
 }

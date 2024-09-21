@@ -5,12 +5,14 @@ import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.FeedbackRequest;
-import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
+import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/feedbacks")
@@ -36,6 +38,11 @@ public class FeedbackController {
                 .message("Feedback created successfully")
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Feedback>> getAll(){
+        return new ResponseEntity<>(feedbackService.getAll(), HttpStatus.CREATED);
     }
 
     // ... other endpoints for update, delete, get feedbacks ...

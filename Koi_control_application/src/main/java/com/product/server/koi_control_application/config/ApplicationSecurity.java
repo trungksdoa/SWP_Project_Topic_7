@@ -56,6 +56,7 @@ public class ApplicationSecurity {
                     config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
                     return config;
                 }))
+
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(AUTH_REQUEST).permitAll())
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())

@@ -1,12 +1,11 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.customException.NotFoundException;
-import com.product.server.koi_control_application.dto.WaterParameterCreationRequest;
-import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
-import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
+import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

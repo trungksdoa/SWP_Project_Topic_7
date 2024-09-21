@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.serviceInterface;
+package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.pojo.PaymentStatus;
 
