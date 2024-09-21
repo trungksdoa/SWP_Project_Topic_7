@@ -67,12 +67,12 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
     @Override
     public List<Feedback> getFeedbacksByProductId(Integer productId) {
-        return null;
+        return feedbackRepository.findByProduct_Id(productId);
     }
 
     @Override
     public List<Feedback> getFeedbacksByUserId(Integer userId) {
-        return null;
+        return feedbackRepository.findByUser_Id(userId);
     }
 
     @Override

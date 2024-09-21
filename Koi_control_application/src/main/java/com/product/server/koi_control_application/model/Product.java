@@ -71,7 +71,7 @@ public class Product {
 
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"product"})
+    @JsonIgnoreProperties({"product","feedbacks"})
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @Column(name = "average_rating")

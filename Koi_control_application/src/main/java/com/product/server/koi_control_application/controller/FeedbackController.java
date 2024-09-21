@@ -45,5 +45,11 @@ public class FeedbackController {
         return new ResponseEntity<>(feedbackService.getAll(), HttpStatus.CREATED);
     }
 
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<Feedback>> getByProduct(@PathVariable int productId){
+        return new ResponseEntity<>(feedbackService.getFeedbacksByProductId(productId), HttpStatus.OK);
+    }
+
+
     // ... other endpoints for update, delete, get feedbacks ...
 }
