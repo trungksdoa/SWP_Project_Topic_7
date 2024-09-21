@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class userRegister {
+public class UserRegister {
     @NotBlank(message = "Username is required")
     private String username;
     @NotBlank(message = "Email is required")
@@ -19,4 +19,5 @@ public class userRegister {
     @NotBlank(message = "Password is required")
     private String password;
     private UserRoleEnum role;
+    private String avatar;
 }

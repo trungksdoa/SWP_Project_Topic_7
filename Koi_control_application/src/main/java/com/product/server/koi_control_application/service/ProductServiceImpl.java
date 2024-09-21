@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
@@ -24,35 +25,17 @@ public class ProductServiceImpl implements IProductService {
         return product;
     }
 
-//    @Override
-//    @Transactional
-//    public Product updateProduct(int id, Product product) {
-//        Product existingProduct = getProduct(id);
-//
-//        // Validate category if changed
-//        if (existingProduct.getCategoryId() != product.getCategoryId()) {
-//            categoryRepository.findById(product.getCategoryId())
-//                    .orElseThrow(() -> new RuntimeException("Category not found"));
-//        }
-//
-//        existingProduct.setName(product.getName());
-//        existingProduct.setPrice(product.getPrice());
-//        existingProduct.setDescription(product.getDescription());
-//        existingProduct.setImageUrl(product.getImageUrl());
-//        existingProduct.setStock(product.getStock());
-//        existingProduct.setCategoryId(product.getCategoryId());
-//        existingProduct.setUpdatedAt(LocalDateTime.now());
-//
-//        // Validate price and stock
-//        if (existingProduct.getPrice() <= 0) {
-//            throw new IllegalArgumentException("Price must be positive");
-//        }
-//        if (existingProduct.getStock() < 0) {
-//            throw new IllegalArgumentException("Stock cannot be negative");
-//        }
-//
-//        return productRepository.save(existingProduct);
-//    }
+    @Override
+    @Transactional
+    public Product updateProduct(int id, Product product) {
+        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
+        existingProduct.setName(product.getName());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setCategoryId(product.getCategoryId());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setStock(product.getStock());
+        return productRepository.save(existingProduct);
+    }
 
     @Override
     public void deleteProduct(int productId) {

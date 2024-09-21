@@ -3,19 +3,23 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
+import com.product.server.koi_control_application.model.KoiGrowthHistory;
+import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
+import com.product.server.koi_control_application.repository.KoiGrowthHistoryRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +27,34 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     private final UsersRepository usersRepository;
     private final KoiFishRepository koiFishRepository;
     private final PondRepository pondRepository;
+    private final IImageService iImageService;
+    private final KoiGrowthHistoryRepository koiGrowthHistoryRepository;
+
     @Override
     public KoiFish addKoiFish(KoiFish koiFish) {
-        if(!usersRepository.existsById(koiFish.getUserId()))
+        if (!usersRepository.existsById(koiFish.getUserId()))
             throw new NotFoundException("User not found.");
 
-        if(!pondRepository.existsById(koiFish.getPondId()))
+        if (!pondRepository.existsById(koiFish.getPondId()))
             throw new NotFoundException("Pond not found.");
 
-        if(!pondRepository.existsByIdAndUserId(koiFish.getPondId(), koiFish.getUserId()))
+        if (!pondRepository.existsByIdAndUserId(koiFish.getPondId(), koiFish.getUserId()))
             throw new NotFoundException("This Breeder dont have this Pond!.");
 
-        if(koiFishRepository.existsByNameAndPondId(koiFish.getName(), koiFish.getPondId()))
+        if (koiFishRepository.existsByNameAndPondId(koiFish.getName(), koiFish.getPondId()))
             throw new AlreadyExistedException("KoiFish name existed.");
 
-        return koiFishRepository.save(koiFish);
+        KoiFish saved = koiFishRepository.save(koiFish);
+        koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+                .koiId(saved.getId())
+                .inPondFrom(koiFish.getCreatedAt())
+                .isFirstMeasurement(true)
+                .weight(koiFish.getWeight())
+                .length(koiFish.getLength())
+                .pondId(koiFish.getPondId())
+                .build());
+
+        return saved;
     }
 
     @Override
@@ -64,28 +81,54 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
-    public KoiFish updateKoiFish(int id, KoiFishUpdateRequest request) {
+    public KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException {
         KoiFish koiFish = getKoiFish(id);
 
-        if(!usersRepository.existsById(request.getUserId()))
+        if (!usersRepository.existsById(request.getUserId()))
             throw new NotFoundException("User not found.");
 
-        if(!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+        if (!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
             throw new NotFoundException("This Breeder dont have this Pond!.");
 
-        if(koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
+        if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
             throw new AlreadyExistedException("KoiFish name existed.");
 
+        if (!file.isEmpty()) {
+            String filename = iImageService.updateImage(koiFish.getImageUrl(), file);
+            koiFish.setImageUrl(filename);
+        } else {
+            koiFish.setImageUrl(koiFish.getImageUrl());
+        }
+
+        koiFish.setName(request.getName());
+        koiFish.setVariety(request.getVariety());
+        koiFish.setSex(request.getSex());
+        koiFish.setPurchasePrice(request.getPurchasePrice());
+
+        if (request.getPondId() != 0) {
+            //Remove fish from old pond
+            Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+            currPond.decreaseFishCount();
+            pondRepository.save(currPond);
 
 
-        Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
-        Optional.ofNullable(request.getVariety()).ifPresent(koiFish::setVariety);
-        Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
-        Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
-        Optional.ofNullable(request.getUserId()).ifPresent(koiFish::setUserId);
-        Optional.ofNullable(request.getImageUrl()).ifPresent(koiFish::setImageUrl);
-        Optional.ofNullable(request.getPondId()).ifPresent(koiFish::setPondId);
+            koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+                    .koiId(koiFish.getId())
+                    .inPondFrom(currPond.getCreatedAt())
+                    .isFirstMeasurement(false)
+                    .weight(koiFish.getWeight())
+                    .length(koiFish.getLength())
+                    .pondId(currPond.getId())
+                    .build());
 
+            //Increase fish count in new pond
+            Pond movePond = pondRepository.findById(request.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+            movePond.increaseFishCount();
+            pondRepository.save(movePond);
+
+            //Update new pond for fish
+            koiFish.setPondId(request.getPondId());
+        }
 
 
         return koiFishRepository.save(koiFish);
@@ -94,7 +137,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     @Override
     public Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return koiFishRepository.findAllByUserId(userId,pageable);
+        return koiFishRepository.findAllByUserId(userId, pageable);
     }
 
     @Override

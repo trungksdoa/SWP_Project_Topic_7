@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,19 +32,23 @@ public class KoiGrowthHistory {
     private int id;
 
     @Column(name = "in_pond_from")
-    private LocalDate inPondFrom;
+    private LocalDateTime inPondFrom;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private int weight;
+    @Positive(message = "Width must be positive")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal weight;
 
-    @Column(nullable = false)
-    private int length;
+    @Positive(message = "Length must be positive")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal length;
 
     @Column(name = "is_first_measurement")
     private Boolean isFirstMeasurement;
 
     @Column(name = "koi_id")
     private int koiId;
+
+    private int pondId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

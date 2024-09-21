@@ -79,4 +79,11 @@ public class Pond {
     }
 
 
+    public void increaseFishCount() {
+        fishCount++;
+    }
+
+    public void decreaseFishCount() {
+        fishCount--;
+    }
 }

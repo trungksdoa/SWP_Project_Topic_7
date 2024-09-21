@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.service_interface.IImageServic
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ImageServiceImpl implements IImageService {
     private ClassPathResource imgFile;
 
@@ -41,6 +43,15 @@ public class ImageServiceImpl implements IImageService {
         return HOST+filename;
     }
 
+
+    @Override
+    public String getDefaultImage(){
+        return HOST + "DefaultAvatar.png";
+    }
+    @Override
+    public String getFileName(String url) {
+        return url.substring(url.lastIndexOf("/") + 1);
+    }
     @Override
     public InputStream getImage() throws IOException {
         return imgFile.getInputStream();
@@ -56,6 +67,8 @@ public class ImageServiceImpl implements IImageService {
             throw new IllegalArgumentException("File không được để trống");
         }
 
+        filename = filename.substring(filename.lastIndexOf("/") + 1);
+
         Path imagePath = Paths.get(IMAGE_DIR, filename);
         if (!Files.exists(imagePath)) {
             throw new IOException("Image not found: " + filename);
@@ -68,6 +81,12 @@ public class ImageServiceImpl implements IImageService {
         Files.write(imagePath, file.getBytes());
 
         return HOST + filename;
+    }
+
+    @Override
+    public void deleteImage(String filename) throws IOException {
+        Path filePath = Paths.get(IMAGE_DIR + filename);
+        Files.deleteIfExists(filePath);
     }
 }
 

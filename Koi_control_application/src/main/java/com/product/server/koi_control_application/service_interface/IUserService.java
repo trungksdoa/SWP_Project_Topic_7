@@ -1,9 +1,11 @@
 package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.UserPatchDTO;
-import com.product.server.koi_control_application.pojo.userRegister;
+import com.product.server.koi_control_application.pojo.UserRegister;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 public interface IUserService {
@@ -18,15 +20,20 @@ public interface IUserService {
     Users getUsersByUsername(String username);
 
     Users userLogin(String username, String password);
+
     Page<Users> getUsers(int page, int size);
+
     void deleteUser(int id);
-    Users saveUser(userRegister register);
-    void updatedUser(Users user);
+
+    Users saveUser(UserRegister register);
+
     void resetPassword(String email);
 
     String generateNewPassword();
 
     void updatePassword(String email, String newPassword);
 
-    void updateUser(int id, UserPatchDTO userPatchDTO);
+    Users updateUser(int id, Users userPatchDTO, MultipartFile file) throws IOException;
+
+    Users updateUser(Users userPatchDTO);
 }

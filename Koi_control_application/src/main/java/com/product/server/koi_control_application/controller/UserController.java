@@ -19,8 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -48,13 +49,15 @@ public class UserController {
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRoles())
+                .avatar(user.getAvatarUrl())
                 .build();
         BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<BaseResponse> registerUser(@RequestBody userRegister users) throws UnsupportedEncodingException {
+    public ResponseEntity<BaseResponse> registerUser(@RequestBody UserRegister users) {
+
         Users savedUser = userService.saveUser(users);
 
         userService.userRegisterMail(
@@ -84,8 +87,8 @@ public class UserController {
             Users user = (Users) authentication.getPrincipal();
 
 
-            if(!user.isActive()) {
-               throw new ForbiddenException("Account is not activated");
+            if (!user.isActive()) {
+                throw new ForbiddenException("Account is not activated");
             }
 
             String accessToken = jwtUtil.generateAccessToken(user);
@@ -102,8 +105,6 @@ public class UserController {
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException("Incorrect email or password", ex);
         }
-
-
     }
 
     @PostMapping("/forgot-password")
@@ -130,12 +131,7 @@ public class UserController {
     }
 
     public String decodeEmail(String encodedEmail) {
-        try {
-            return URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8);
     }
 
     @GetMapping("/verify/email/{email}")
@@ -143,7 +139,7 @@ public class UserController {
         try {
             Users user = userService.getUsersByEmail(decodeEmail(email));
             user.setActive(true);
-            userService.updatedUser(user);
+            userService.updateUser(user);
             BaseResponse response = BaseResponse.builder()
                     .data("Success")
                     .statusCode(HttpStatus.OK.value())
@@ -159,9 +155,11 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse> patchUser(@PathVariable int userId, @RequestBody UserPatchDTO userPatchDTO) {
-        userService.updateUser(userId, userPatchDTO);
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") Users userData, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
+        userService.updateUser(userId, userData, file);
         BaseResponse response = BaseResponse.builder()
                 .data("Update success")
                 .statusCode(HttpStatus.OK.value())
@@ -170,11 +168,5 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    @GetMapping("/test")
-    @RolesAllowed("ROLE_ADMIN")
-    public String test() {
-        return "Hello admin";
-    }
 
 }

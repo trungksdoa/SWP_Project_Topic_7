@@ -1,8 +1,10 @@
 package com.product.server.koi_control_application.service_interface;
 
-import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.model.KoiFish;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface IKoiFishService {
     KoiFish addKoiFish( KoiFish koiFish);
@@ -13,7 +15,7 @@ public interface IKoiFishService {
     Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size);
     void deleteKoiFish(int id);
     int countKoiFishByPondId(int pondId);
-    KoiFish updateKoiFish(int id, KoiFishUpdateRequest request);
+    KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException;
 
 
 }

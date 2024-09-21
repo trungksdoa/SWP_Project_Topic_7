@@ -2,10 +2,10 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.pojo.PondUpdateRequest;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 
@@ -24,7 +26,7 @@ public class IPondServiceImpl implements IPondService {
     private final UsersRepository usersRepository;
     private final IKoiFishServiceImpl  iKoiFishService;
     private final IWaterParameterService iWaterParameterService;
-
+    private final IImageService iImageService;
     @Override
     public Pond addPond(Pond pond) {
 
@@ -64,20 +66,28 @@ public class IPondServiceImpl implements IPondService {
     }
 
     @Override
-    public Pond updatePond(int id, PondUpdateRequest request) {
+    public Pond updatePond(int id, Pond request, MultipartFile file) throws IOException {
         Pond pond = getPond(id);
         if(!usersRepository.existsById(request.getUserId()))
             throw new NotFoundException("User not found.");
         if(pondRepository.existsByNameAndUserIdExceptId(request.getName(), request.getUserId(), id))
             throw new AlreadyExistedException("Pond name existed.");
 
-        Optional.ofNullable(request.getName()).ifPresent(pond::setName);
-        Optional.ofNullable(request.getImageUrl()).ifPresent(pond::setImageUrl);
-        Optional.ofNullable(request.getWidth()).ifPresent(pond::setWidth);
-        Optional.ofNullable(request.getLength()).ifPresent(pond::setLength);
-        Optional.ofNullable(request.getDepth()).ifPresent(pond::setDepth);
-        Optional.ofNullable(request.getVolume()).ifPresent(pond::setVolume);
-        Optional.ofNullable(request.getUserId()).ifPresent(pond::setUserId);
+
+        if(file != null) {
+            String filename = iImageService.updateImage(pond.getImageUrl(), file);
+            pond.setImageUrl(filename);
+        }else{
+            pond.setImageUrl(pond.getImageUrl());
+        }
+
+
+        pond.setName(request.getName());
+        pond.setImageUrl(request.getImageUrl());
+        pond.setWidth(request.getWidth());
+        pond.setLength(request.getLength());
+        pond.setDepth(request.getDepth());
+        pond.setVolume(request.getVolume());
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(id));
 
         return pondRepository.save(pond);

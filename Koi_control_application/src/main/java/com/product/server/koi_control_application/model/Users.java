@@ -1,15 +1,12 @@
 package com.product.server.koi_control_application.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,9 +20,9 @@ import java.util.*;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"password","enabled","accountNonExpired","accountNonLocked","credentialsNonExpired"})
+@ToString(exclude = {"password", "isEnabled", "isAccountNonExpired", "isAccountNonLocked", "isCredentialsNonExpired", "roles", "feedbacks"})
 
-public class Users  implements UserDetails {
+public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -45,7 +42,6 @@ public class Users  implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Pattern(regexp = "^[0-9]{9}$", message = "Invalid Vietnamese phone number")
     @Column(nullable = true)
     private String phoneNumber;
 
@@ -83,6 +79,8 @@ public class Users  implements UserDetails {
     private Set<UserRole> roles = new HashSet<>();
 
 
+    private String avatarUrl;
+
 //
 
 
@@ -95,7 +93,7 @@ public class Users  implements UserDetails {
         return authorities;
     }
 
-    public void removeRole(){
+    public void removeRole() {
         this.getRoles().clear();
     }
 
@@ -108,5 +106,26 @@ public class Users  implements UserDetails {
     @JoinColumn(name = "package_id")
     @JsonIgnoreProperties("users")
     private Package aPackage;
+
+    // UserDetails methods "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"
+    @Override
+    public boolean isEnabled() {
+        return active;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
 
 }

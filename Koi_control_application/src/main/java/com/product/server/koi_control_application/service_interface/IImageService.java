@@ -10,4 +10,10 @@ public interface IImageService {
     InputStream getImage() throws IOException;
     boolean imageExists();
     String updateImage(String filename, MultipartFile file) throws IOException;
+
+    String getDefaultImage();
+
+    String getFileName(String url);
+    void deleteImage(String filename) throws IOException;
+
 }
