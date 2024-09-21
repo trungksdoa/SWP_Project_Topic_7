@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,12 @@ import java.io.IOException;
 public class PondController {
     private final IPondService iPondService;
     private final IImageService iImageService;
-    @PostMapping
-    public ResponseEntity<BaseResponse> createPond(@RequestPart("pond")  @Valid Pond pond, @RequestParam("image") MultipartFile file) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> createPond(@RequestPart("pond")  String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Pond pond = mapper.readValue(pondJson, Pond.class);
 
         String filename = iImageService.uploadImage(file);
 
