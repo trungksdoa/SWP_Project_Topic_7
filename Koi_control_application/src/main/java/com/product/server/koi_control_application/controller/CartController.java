@@ -26,16 +26,22 @@ public class CartController {
     private final JwtTokenUtil jwtUtil;
     @PostMapping
     public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
-
-        int userId = jwtUtil.getUserIdFromToken(request);
-
-        Cart addedCart = cartService.createCart(cart,userId);
-        BaseResponse response = BaseResponse.builder()
-                .data(addedCart)
-                .statusCode(HttpStatus.CREATED.value())
-                .message("Item added to cart successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            int userId = jwtUtil.getUserIdFromToken(request);
+            Cart addedCart = cartService.createCart(cart, userId);
+            BaseResponse response = BaseResponse.builder()
+                    .data(addedCart)
+                    .statusCode(HttpStatus.CREATED.value())
+                    .message("Item added to cart successfully")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalAccessException e) {
+            BaseResponse errorResponse = BaseResponse.builder()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .message("Error adding item to cart: " + e.getMessage())
+                    .build();
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/user/{userId}")

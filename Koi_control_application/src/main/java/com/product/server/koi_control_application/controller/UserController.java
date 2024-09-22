@@ -156,6 +156,7 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         Users userData = objectMapper.readValue(userJson, Users.class);
 
+
        userService.updateUser(userId, userData, file);
         BaseResponse response = BaseResponse.builder()
                 .data("Update success")

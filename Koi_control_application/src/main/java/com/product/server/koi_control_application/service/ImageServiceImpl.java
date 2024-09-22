@@ -1,8 +1,10 @@
 package com.product.server.koi_control_application.service;
 
 
+import com.product.server.koi_control_application.custom_exception.InsufficientException;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,10 @@ public class ImageServiceImpl implements IImageService {
     public String updateImage(String filename, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File không được để trống");
+        }
+
+        if(filename == null){
+            throw new BadRequestException("Cannot mapping property in class to get filename, please send correct and enough property");
         }
 
         filename = filename.substring(filename.lastIndexOf("/") + 1);

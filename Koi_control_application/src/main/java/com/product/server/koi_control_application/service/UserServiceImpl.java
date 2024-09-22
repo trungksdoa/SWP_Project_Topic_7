@@ -136,18 +136,26 @@ public class UserServiceImpl implements IUserService {
             String filename = imageService.updateImage(user.getAvatarUrl(), file);
             user.setAvatarUrl(filename);
         }
-
-        user.setUsername(rUser.getUsername());
-        user.setEmail(rUser.getEmail());
-        user.setAddress(rUser.getAddress());
-        user.setPhoneNumber(rUser.getPhoneNumber());
-        user.setAvatarUrl(rUser.getAvatarUrl());
-        user.setPassword(passwordEncoder.encode(rUser.getPassword()));
+        if (rUser.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(rUser.getPassword()));
+        }
+        if (rUser.getUsername() != null) {
+            user.setUsername(rUser.getUsername());
+        }
+        if (rUser.getEmail() != null) {
+            user.setEmail(rUser.getEmail());
+        }
+        if (rUser.getAddress() != null) {
+            user.setAddress(rUser.getAddress());
+        }
+        if (rUser.getPhoneNumber() != null) {
+            user.setPhoneNumber(rUser.getPhoneNumber());
+        }
         return usersRepository.save(user);
     }
 
     @Override
-    public Users updateUser( Users rUser) {
+    public Users updateUser(Users rUser) {
         return usersRepository.save(rUser);
     }
 }

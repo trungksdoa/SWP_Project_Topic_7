@@ -2,10 +2,11 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.service_interface.IProductService;
+import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.repository.CategoryRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
+import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+
     @Override
     @Transactional
     public Product createProduct(Product product) {
@@ -29,11 +31,27 @@ public class ProductServiceImpl implements IProductService {
     @Transactional
     public Product updateProduct(int id, Product product) {
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
-        existingProduct.setName(product.getName());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setCategoryId(product.getCategoryId());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setStock(product.getStock());
+
+        if (product.getCategoryId() != 0) {
+            Category gory = categoryRepository.findById(product.getCategoryId()).orElseThrow(() -> new NotFoundException("Category not found"));
+            existingProduct.setCategoryId(gory.getId());
+        }
+        if (product.getImageUrl() != null) {
+            existingProduct.setImageUrl(product.getImageUrl());
+        }
+        if (product.getName() != null) {
+            existingProduct.setName(product.getName());
+        }
+        if (product.getPrice() != 0) {
+            existingProduct.setPrice(product.getPrice());
+        }
+        if (product.getDescription() != null) {
+            existingProduct.setDescription(product.getDescription());
+        }
+        if (product.getStock() != null) {
+            existingProduct.setStock(product.getStock());
+        }
+
         return productRepository.save(existingProduct);
     }
 
@@ -50,7 +68,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(int page, int size){
+    public Page<Product> getAllProducts(int page, int size) {
         Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
         products.getContent().forEach(Product::calculateAverageRating);
         return products;
@@ -58,7 +76,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Page<Product> getProductsByCategory(int categoryId, int page, int size) {
-        Page<Product> products = productRepository.findByCategoryId(categoryId,PageRequest.of(page, size));
+        Page<Product> products = productRepository.findByCategoryId(categoryId, PageRequest.of(page, size));
         products.getContent().forEach(Product::calculateAverageRating);
         return products;
     }
