@@ -36,6 +36,7 @@ public class ProductServiceImpl implements IProductService {
             Category gory = categoryRepository.findById(product.getCategoryId()).orElseThrow(() -> new NotFoundException("Category not found"));
             existingProduct.setCategoryId(gory.getId());
         }
+
         if (product.getImageUrl() != null) {
             existingProduct.setImageUrl(product.getImageUrl());
         }

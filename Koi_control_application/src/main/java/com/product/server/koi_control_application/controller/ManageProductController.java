@@ -45,7 +45,7 @@ public class ManageProductController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<BaseResponse> updateProduct(@PathVariable("id") int productId, @RequestPart("product") String productJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
