@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koi Fish Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Koi Fish Management</h1>
+
+    <h2>Pond Management</h2>
+    <form id="pondForm">
+        <div class="form-group">
+            <label for="pondAction">Action:</label>
+            <select id="pondAction">
+                <option value="POST">Create Pond</option>
+                <option value="PUT">Update Pond</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="pondId">Pond ID (for update):</label>
+            <input type="number" id="pondId" />
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+            <label for="width">Width (m):</label>
+            <input type="number" id="width" name="width" step="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="length">Length (m):</label>
+            <input type="number" id="length" name="length" step="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="depth">Depth (m):</label>
+            <input type="number" id="depth" name="depth" step="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="volume">Volume (L):</label>
+            <input type="number" id="volume" name="volume" required />
+        </div>
+        <div class="form-group">
+            <label for="fishCount">Fish Count:</label>
+            <input type="number" id="fishCount" name="fishCount" required />
+        </div>
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="number" id="userId" name="userId" required />
+        </div>
+        <div class="form-group">
+            <label for="pondImage">Image:</label>
+            <input type="file" id="pondImage" name="pondImage" accept="image/*" required />
+        </div>
+        <button type="submit">Submit Pond</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      const pondForm = document.getElementById("pondForm");
+      const koiFishForm = document.getElementById("koiFishForm");
+      const resultDiv = document.getElementById("result");
+      const baseHost = "http://localhost:8080";
+      const token =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzNCx0cnVuZ2tzZG9hQGdtYWlsLmNvbSIsImlzcyI6IkZQVCBVbml2ZXJzaXR5Iiwicm9sZXMiOiJbUk9MRV9BRE1JTl0iLCJpYXQiOjE3MjY2NzUyMTksImV4cCI6MTcyNzI4MDAxOX0.dVxEGSmMfmbUj1z6bQBCNMbvHzY7YNE2j-_T7sjObpMdyF9L3ZRkdFPjr0U1hMntul7JSaUQynGM05BJQUmXJQ";
+      pondForm.addEventListener("submit", handlePondSubmit);
+      koiFishForm.addEventListener("submit", handleKoiFishSubmit);
+
+      async function handlePondSubmit(event) {
+        event.preventDefault();
+        const action = document.getElementById("pondAction").value;
+        const pondId = document.getElementById("pondId").value;
+
+        const formData = new FormData(event.target);
+        const pondData = {};
+        formData.forEach((value, key) => {
+          if (key !== "pondImage") {
+            pondData[key] = value;
+          }
+        });
+
+        // Convert numeric fields
+        pondData.width = parseFloat(pondData.width);
+        pondData.length = parseFloat(pondData.length);
+        pondData.depth = parseFloat(pondData.depth);
+        pondData.volume = parseInt(pondData.volume);
+        pondData.fishCount = parseInt(pondData.fishCount);
+        pondData.userId = parseInt(pondData.userId);
+
+        console.log(pondData)
+        const finalFormData = new FormData();
+        finalFormData.append(
+          "pond",
+          new Blob([JSON.stringify(pondData)], { type: "application/json" }),
+          "pond.json"
+        );
+        finalFormData.append("image", formData.get("pondImage"));
+
+        let url = "/api/ponds";
+        if (action === "PUT") {
+          url += `/${pondId}`;
+        }
+
+        try {
+          const response = await fetch(baseHost + url, {
+            method: action,
+            body: finalFormData,
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+          const result = await response.json();
+          console.log(result)
+          resultDiv.textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          resultDiv.textContent = `Error: ${error.message}`;
+        }
+      }
+
+    </script>
+</body>
+</html>

@@ -1,12 +1,15 @@
-import React from 'react'
-import KoiManegement from '../components/ui/manage/KoiManegement'
+import React from 'react';
+import KoiManegement from '../components/ui/manage/KoiManegement';
+import { useGetAllKoi } from '../hooks/koi/useGetAllKoi.js';
 
 const KoiManagementPage = () => {
-  return (
-    <div>
-      <KoiManegement />
-    </div>
-  )
+    const { data: lstKoi } = useGetAllKoi();
+
+    return (
+        <div>
+            <KoiManegement lstKoi={lstKoi} />
+        </div>
+    );
 }
 
-export default KoiManagementPage
+export default KoiManagementPage;

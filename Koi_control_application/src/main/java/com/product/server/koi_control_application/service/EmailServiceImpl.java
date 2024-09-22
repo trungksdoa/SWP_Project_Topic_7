@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.service_interface.IEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

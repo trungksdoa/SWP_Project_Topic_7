@@ -8,6 +8,8 @@ import java.util.List;
 
 @Transactional
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
-    List<Feedback> findByProductId(Integer productId);
-    List<Feedback> findByUserId(Integer userId);
+
+    List<Feedback> findByProduct_Id(int id);
+
+    List<Feedback> findByUser_Id(int id);
 }

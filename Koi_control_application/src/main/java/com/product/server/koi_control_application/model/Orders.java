@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -37,12 +38,19 @@ public class Orders {
     @Column(nullable = false)
     private String status;
 
+    @Column(nullable = true)
+    private String paymentMethod;
+
+    @Column(nullable = true)
+    private String shippingStatus;
+
     @ManyToMany
     @JoinTable(
             name = "orders_items",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
+    @JsonIgnoreProperties("order")
     private Set<OrderItems> items = new HashSet<>();
 
 
