@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.serviceInterface.ICartService;
+import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,16 +26,22 @@ public class CartController {
     private final JwtTokenUtil jwtUtil;
     @PostMapping
     public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
-
-        int userId = jwtUtil.getUserIdFromToken(request);
-
-        Cart addedCart = cartService.createCart(cart,userId);
-        BaseResponse response = BaseResponse.builder()
-                .data(addedCart)
-                .statusCode(HttpStatus.CREATED.value())
-                .message("Item added to cart successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            int userId = jwtUtil.getUserIdFromToken(request);
+            Cart addedCart = cartService.createCart(cart, userId);
+            BaseResponse response = BaseResponse.builder()
+                    .data(addedCart)
+                    .statusCode(HttpStatus.CREATED.value())
+                    .message("Item added to cart successfully")
+                    .build();
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalAccessException e) {
+            BaseResponse errorResponse = BaseResponse.builder()
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .message("Error adding item to cart: " + e.getMessage())
+                    .build();
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/user/{userId}")

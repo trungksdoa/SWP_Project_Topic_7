@@ -1,9 +1,9 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.pojo.CheckOut;
-import com.product.server.koi_control_application.serviceInterface.IOrderService;
-import com.product.server.koi_control_application.customException.InsufficientException;
+import com.product.server.koi_control_application.service_interface.IOrderService;
+import com.product.server.koi_control_application.custom_exception.InsufficientException;
 import com.product.server.koi_control_application.model.OrderItems;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Product;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 
 
 @Service
@@ -76,6 +77,11 @@ public class OrderServiceImpl implements IOrderService {
     public Orders updateOrderStatus(int id, String status) {
         Orders order = getOrderById(id).builder().status(status).build();
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<Orders> getAllOrders() {
+        return orderRepository.findAll();
     }
 
     @Override

@@ -1,22 +1,32 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.dto.WaterParameterCreationRequest;
-import com.product.server.koi_control_application.dto.WaterParameterUpdateRequest;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
-import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
+import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
     @Override
-    public WaterParameter saveWaterParameter(WaterParameterCreationRequest request) {
-        WaterParameter waterParameter = new WaterParameter();
+    public WaterParameter saveWaterParameter(int pondId, WaterParameter waterParameter) {
 
+        if(waterParameterRepository.existsByPondId(pondId)){
+            WaterParameterUpdateRequest request = new WaterParameterUpdateRequest();
+            BeanUtils.copyProperties(waterParameter, request);
+            return updateWaterParameter(pondId, request);
+        }
+            waterParameter.setPondId(pondId);
+            waterParameter.setLastCleanedAt(LocalDateTime.now());
         return waterParameterRepository.save(waterParameter);
     }
 
@@ -24,21 +34,41 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         public WaterParameter getWaterParameterByPondId(int pondId) {
             WaterParameter waterParameter = waterParameterRepository.findByPondId(pondId);
             if (waterParameter == null) {
-                throw new RuntimeException("WaterParameter not found for pondId: ");
+                throw new NotFoundException("WaterParameter not found for pondId: ");
             }
             return waterParameter;
         }
 
     @Override
     public WaterParameter updateWaterParameter(int pondId, WaterParameterUpdateRequest request) {
-            //Todo
-        return null;
+        WaterParameter waterParameter = getWaterParameterByPondId(pondId);
+        Optional.ofNullable(request.getNitriteNO2()).ifPresent(waterParameter::setNitriteNO2);
+        Optional.ofNullable(request.getNitrateNO3()).ifPresent(waterParameter::setNitrateNO3);
+        Optional.ofNullable(request.getPhosphatePO4()).ifPresent(waterParameter::setPhosphatePO4);
+        Optional.ofNullable(request.getAmmoniumNH4()).ifPresent(waterParameter::setAmmoniumNH4);
+        Optional.ofNullable(request.getHardnessGH()).ifPresent(waterParameter::setHardnessGH);
+        Optional.ofNullable(request.getSalt()).ifPresent(waterParameter::setSalt);
+        Optional.ofNullable(request.getOutdoorTemperature()).ifPresent(waterParameter::setOutdoorTemperature);
+        Optional.ofNullable(request.getTemperature()).ifPresent(waterParameter::setTemperature);
+        Optional.ofNullable(request.getPH()).ifPresent(waterParameter::setPH);
+        Optional.ofNullable(request.getCarbonateHardnessKH()).ifPresent(waterParameter::setCarbonateHardnessKH);
+        Optional.ofNullable(request.getCo2()).ifPresent(waterParameter::setCo2);
+        Optional.ofNullable(request.getTotalChlorines()).ifPresent(waterParameter::setTotalChlorines);
+        Optional.ofNullable(request.getAmountFed()).ifPresent(waterParameter::setAmountFed);
+
+        if (Boolean.TRUE.equals(request.getLastCleaned())) {
+            waterParameter.setLastCleanedAt(LocalDateTime.now());
+        }
+
+        return waterParameterRepository.save(waterParameter);
     }
 
     @Override
-    public void createWaterParameter(int pondId) {
-
+    public void deleteWaterParameter(int pondId) {
+        WaterParameter waterParameter = getWaterParameterByPondId(pondId);
+        waterParameterRepository.delete(waterParameter);
     }
+
 
 
 }

@@ -1,31 +1,32 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.customException.ForbiddenException;
-import com.product.server.koi_control_application.customException.NotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.product.server.koi_control_application.custom_exception.ForbiddenException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.*;
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.service_interface.IEmailService;
+import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/users")
@@ -43,20 +44,21 @@ public class UserController {
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         Users user = userService.getUser(userId);
+
         UserResponse userResponse = UserResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
-                .role(user.getRoles())
                 .build();
         BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<BaseResponse> registerUser(@RequestBody userRegister users) throws UnsupportedEncodingException {
+    public ResponseEntity<BaseResponse> registerUser(@RequestBody UserRegister users) {
+
         Users savedUser = userService.saveUser(users);
 
         userService.userRegisterMail(
@@ -86,8 +88,8 @@ public class UserController {
             Users user = (Users) authentication.getPrincipal();
 
 
-            if(!user.isActive()) {
-               throw new ForbiddenException("Account is not activated");
+            if (!user.isActive()) {
+                throw new ForbiddenException("Account is not activated");
             }
 
             String accessToken = jwtUtil.generateAccessToken(user);
@@ -104,8 +106,6 @@ public class UserController {
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException("Incorrect email or password", ex);
         }
-
-
     }
 
     @PostMapping("/forgot-password")
@@ -132,12 +132,7 @@ public class UserController {
     }
 
     public String decodeEmail(String encodedEmail) {
-        try {
-            return URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8);
     }
 
     @GetMapping("/verify/email/{email}")
@@ -145,7 +140,7 @@ public class UserController {
         try {
             Users user = userService.getUsersByEmail(decodeEmail(email));
             user.setActive(true);
-            userService.updatedUser(user);
+            userService.updateUser(user);
             BaseResponse response = BaseResponse.builder()
                     .data("Success")
                     .statusCode(HttpStatus.OK.value())
@@ -161,9 +156,15 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse> patchUser(@PathVariable int userId, @RequestBody UserPatchDTO userPatchDTO) {
-        userService.updateUser(userId, userPatchDTO);
+
+
+    @PutMapping(value ="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Users userData = objectMapper.readValue(userJson, Users.class);
+
+
+       userService.updateUser(userId, userData, file);
         BaseResponse response = BaseResponse.builder()
                 .data("Update success")
                 .statusCode(HttpStatus.OK.value())
@@ -172,11 +173,5 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    @GetMapping("/test")
-    @RolesAllowed("ROLE_ADMIN")
-    public String test() {
-        return "Hello admin";
-    }
 
 }

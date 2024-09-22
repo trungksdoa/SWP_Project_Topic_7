@@ -24,7 +24,6 @@ public class OrderItems {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonIgnore
     private Orders order;
 
     @ManyToOne

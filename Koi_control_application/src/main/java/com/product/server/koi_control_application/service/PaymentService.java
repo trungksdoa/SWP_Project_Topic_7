@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.config.VNPayConfig;
 import com.product.server.koi_control_application.pojo.PaymentStatus;
-import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import com.product.server.koi_control_application.service_interface.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

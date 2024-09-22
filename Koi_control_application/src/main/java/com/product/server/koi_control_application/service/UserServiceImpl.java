@@ -1,15 +1,14 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.customException.AlreadyExistedException;
-import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.UserPatchDTO;
-import com.product.server.koi_control_application.pojo.userRegister;
+import com.product.server.koi_control_application.pojo.UserRegister;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.serviceInterface.IEmailService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.service_interface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,25 +17,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
-    private final IEmailService service;
     private final PasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
+    public final IImageService imageService;
+
 
     @Override
-    public void updatedUser(Users user) {
-        usersRepository.save(user);
-    }
-
-    @Override
-    public Users saveUser(userRegister register) {
+    public Users saveUser(UserRegister register) {
         try {
 
             Users user = Users.builder()
@@ -44,8 +40,12 @@ public class UserServiceImpl implements IUserService {
                     .email(register.getEmail())
                     .roles(new HashSet<>())
                     .build();
+
+
+            user.setAvatarUrl(imageService.getDefaultImage());
             //Create user
             user.setPassword(passwordEncoder.encode(register.getPassword()));
+
             user.getRoles().add(new UserRole(register.getRole().getValue()));
             Users savedUser = usersRepository.save(user);
 
@@ -128,29 +128,35 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void updateUser(int id, UserPatchDTO userPatchDTO) {
+    public Users updateUser(int id, Users rUser, MultipartFile file) throws IOException {
         Users user = usersRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + rUser.getUsername()));
 
-        if (userPatchDTO.getUsername() != null) {
-            user.setUsername(userPatchDTO.getUsername());
-        }
-        if (userPatchDTO.getAddress() != null) {
-            user.setAddress(userPatchDTO.getAddress());
-        }
-        if (userPatchDTO.getPhone() != null) {
-            user.setPhoneNumber(userPatchDTO.getPhone());
-        }
-        if (userPatchDTO.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userPatchDTO.getPassword()));
+        if (file != null) {
+            String filename = imageService.updateImage(user.getAvatarUrl(), file);
+            user.setAvatarUrl(filename);
         }
 
-        try {
-            usersRepository.save(user);
-        } catch (Exception ex) {
-            throw new RuntimeException("Something error in server, try later");
+        if (rUser.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(rUser.getPassword()));
         }
+        if (rUser.getUsername() != null) {
+            user.setUsername(rUser.getUsername());
+        }
+        if (rUser.getEmail() != null) {
+            user.setEmail(rUser.getEmail());
+        }
+        if (rUser.getAddress() != null) {
+            user.setAddress(rUser.getAddress());
+        }
+        if (rUser.getPhoneNumber() != null) {
+            user.setPhoneNumber(rUser.getPhoneNumber());
+        }
+        return usersRepository.save(user);
     }
 
-
+    @Override
+    public Users updateUser(Users rUser) {
+        return usersRepository.save(rUser);
+    }
 }

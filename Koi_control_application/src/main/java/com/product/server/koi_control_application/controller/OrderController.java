@@ -5,8 +5,8 @@ import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CheckOut;
 import com.product.server.koi_control_application.pojo.PaymentStatus;
 import com.product.server.koi_control_application.service.SSEService;
-import com.product.server.koi_control_application.serviceInterface.IOrderService;
-import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import com.product.server.koi_control_application.service_interface.IOrderService;
+import com.product.server.koi_control_application.service_interface.IPaymentService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.OrderInfoUtil;
 import jakarta.annotation.security.RolesAllowed;
@@ -99,6 +99,15 @@ public class OrderController {
                 .build();
     }
 
+    @GetMapping
+    public ResponseEntity<BaseResponse> test() {
+        BaseResponse response = BaseResponse.builder()
+                .data(orderService.getAllOrders())
+                .statusCode(HttpStatus.OK.value())
+                .message("Test")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);

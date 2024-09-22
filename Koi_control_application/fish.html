@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koi Fish Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Koi Fish Management</h1>
+
+    <h2>KoiFish API</h2>
+    <form id="koiFishForm">
+        <div class="form-group">
+            <label for="koiFishAction">Action:</label>
+            <select id="koiFishAction">
+                <option value="POST">Create KoiFish</option>
+                <option value="PUT">Update KoiFish</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="koiFishId">KoiFish ID (for update):</label>
+            <input type="number" id="koiFishId" name="koiFishId" />
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+            <label for="variety">Variety:</label>
+            <input type="text" id="variety" name="variety" required />
+        </div>
+        <div class="form-group">
+            <label for="sex">Sex:</label>
+            <select id="sex" name="sex" required>
+                <option value="true">Male</option>
+                <option value="false">Female</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="purchasePrice">Purchase Price:</label>
+            <input type="number" id="purchasePrice" name="purchasePrice" step="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="number" id="userId" name="userId" required />
+        </div>
+        <div class="form-group">
+            <label for="pondId">Pond ID:</label>
+            <input type="number" id="pondId" name="pondId" required />
+        </div>
+        <div class="form-group">
+            <label for="koiFishImage">Image:</label>
+            <input type="file" id="koiFishImage" name="koiFishImage" accept="image/*" />
+        </div>
+        <div class="form-group">
+            <label for="weight">Weight (g):</label>
+            <input type="number" id="weight" name="weight" step="0.01" required />
+        </div>
+        <div class="form-group">
+            <label for="length">Length (cm):</label>
+            <input type="number" id="length" name="length" step="0.1" required />
+        </div>
+        <button type="submit">Submit KoiFish</button>
+    </form>
+
+    <div id="result"></div>
+
+    
+    <script>
+        const koiFishForm = document.getElementById("koiFishForm");
+        const resultDiv = document.getElementById("result");
+        const baseHost = "http://localhost:8080";
+        const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzNCx0cnVuZ2tzZG9hQGdtYWlsLmNvbSIsImlzcyI6IkZQVCBVbml2ZXJzaXR5Iiwicm9sZXMiOiJbUk9MRV9BRE1JTl0iLCJpYXQiOjE3MjY2NzUyMTksImV4cCI6MTcyNzI4MDAxOX0.dVxEGSmMfmbUj1z6bQBCNMbvHzY7YNE2j-_T7sjObpMdyF9L3ZRkdFPjr0U1hMntul7JSaUQynGM05BJQUmXJQ";
+
+        koiFishForm.addEventListener("submit", handleKoiFishSubmit);
+
+        async function handleKoiFishSubmit(event) {
+            event.preventDefault();
+            const action = document.getElementById("koiFishAction").value;
+            const koiFishId = document.getElementById("koiFishId").value;
+
+            const formData = new FormData(event.target);
+            const koiFishData = {};
+            formData.forEach((value, key) => {
+                if (key !== "koiFishImage") {
+                    koiFishData[key] = value;
+                }
+            });
+
+            // Convert numeric fields and boolean
+            koiFishData.sex = koiFishData.sex === "true";
+            koiFishData.purchasePrice = parseFloat(koiFishData.purchasePrice);
+            koiFishData.userId = parseInt(koiFishData.userId);
+            koiFishData.pondId = parseInt(koiFishData.pondId);
+            koiFishData.weight = parseFloat(koiFishData.weight);
+            koiFishData.length = parseFloat(koiFishData.length);
+
+            const finalFormData = new FormData();
+            finalFormData.append(
+                "fish",
+                new Blob([JSON.stringify(koiFishData)], { type: "application/json" }),
+                "fish.json"
+            );
+            finalFormData.append("image", formData.get("koiFishImage"));
+
+            let url = "/api/koifishs";
+            if (action === "PUT") {
+                url += `/${koiFishId}`;
+            }
+
+            try {
+                const response = await fetch(baseHost + url, {
+                    method: action,
+                    body: finalFormData,
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    },
+                });
+                const result = await response.json();
+                resultDiv.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,14 +51,22 @@ public class KoiFish {
     @Column(nullable = false, precision = 10, scale = 2)
     private int purchasePrice;
 
-    @Column(nullable = false)
-    private int breeder;
+    @Column(name = "user_id",nullable = false)
+    private int userId;
 
     @Column(name = "image_url")
     private String imageUrl;
 
     @Column(name = "pond_id")
     private int pondId;
+
+    @Positive(message = "Width must be positive")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal weight;
+
+    @Positive(message = "Length must be positive")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal length;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import com.product.server.koi_control_application.service_interface.IPaymentService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

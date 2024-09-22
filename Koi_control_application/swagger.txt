@@ -14,12 +14,18 @@ servers:
   - description: SwaggerHub API Auto Mocking
   - url:  https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/
     description: Host development server
+  - url: http://localhost:8080
+    description: Local development server
 
 tags:
   - name: users
     description: User management
   - name: admin
     description: User management
+  - name: koi-fish
+    description: Koi fish management
+  - name: pond
+    description: Pond management
 
 paths:
   /api/user:
@@ -96,7 +102,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  
+
   /api/user/manage/readAll:
     get:
         summary: Read all users records
@@ -109,10 +115,10 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/BaseResponse'
-                
-                
+
+
           '400':
-            description: Bad request 
+            description: Bad request
             content:
               application/json:
                 schema:
@@ -130,20 +136,122 @@ paths:
             type: integer
         responses:
           '200':
-            description: Successful reads all records , data return any 
+            description: Successful reads all records , data return any
             content:
               application/json:
                 schema:
                   $ref: '#/components/schemas/BaseResponse'
-                
-                
+
+
           '400':
-            description: Bad request 
+            description: Bad request
             content:
               application/json:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
-                                   
+
+  /api/koi-fish:
+    get:
+      summary: Get all koi fish
+      tags:
+        - koi-fish
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      summary: Create a new koi fish
+      tags:
+        - koi-fish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KoiFish'
+      responses:
+        '201':
+          description: Koi fish created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /api/koi-fish/{koiFishId}:
+    get:
+      summary: Get koi fish by ID
+      tags:
+        - koi-fish
+      parameters:
+        - in: path
+          name: koiFishId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Koi fish not found
+
+  /api/pond:
+    get:
+      summary: Get all ponds
+      tags:
+        - pond
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      summary: Create a new pond
+      tags:
+        - pond
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pond'
+      responses:
+        '201':
+          description: Pond created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /api/pond/{pondId}:
+    get:
+      summary: Get pond by ID
+      tags:
+        - pond
+      parameters:
+        - in: path
+          name: pondId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Pond not found
+
 components:
   schemas:
     ResponseUser:
@@ -218,4 +326,28 @@ components:
         statusCode:
           type: integer
         message:
+          type: string
+
+    KoiFish:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        age:
+          type: integer
+        species:
+          type: string
+
+    Pond:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        capacity:
+          type: integer
+        waterQuality:
           type: string

@@ -5,7 +5,7 @@ import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.FeedbackRequest;
-import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
+import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,13 +30,32 @@ public class FeedbackController {
                 .rating(feedback.getRating())
                 .comment(feedback.getComment())
                 .build());
-        BaseResponse response = BaseResponse.builder()
+
+        return new ResponseEntity<>(BaseResponse.builder()
                 .data(createdFeedback)
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Feedback created successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                .build(), HttpStatus.CREATED);
     }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse> getAll() {
+        return new ResponseEntity<>(BaseResponse.builder()
+                .data(feedbackService.getAll())
+                .message("Fetch data success")
+                .statusCode(HttpStatus.OK.value())
+                .build(), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<BaseResponse> getByProduct(@PathVariable int productId) {
+        return new ResponseEntity<>(BaseResponse.builder()
+                .data(feedbackService.getFeedbacksByProductId(productId))
+                .message("fetch data success")
+                .statusCode(HttpStatus.OK.value()
+                ).build(), HttpStatus.OK);
+    }
+
 
     // ... other endpoints for update, delete, get feedbacks ...
 }
