@@ -44,16 +44,8 @@ public class UserController {
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         Users user = userService.getUser(userId);
-        UserResponse userResponse = UserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .address(user.getAddress())
-                .phoneNumber(user.getPhoneNumber())
-                .role(user.getRoles())
-                .avatar(user.getAvatarUrl())
-                .build();
-        BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
+
+        BaseResponse response = BaseResponse.builder().data(user).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -160,7 +152,7 @@ public class UserController {
 
 
     @PutMapping(value ="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
+        public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Users userData = objectMapper.readValue(userJson, Users.class);
 
