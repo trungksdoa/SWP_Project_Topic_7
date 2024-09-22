@@ -60,7 +60,7 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("fetchAll")
+    @GetMapping("/fetchAll")
     public ResponseEntity<BaseResponse> getProductList() {
         BaseResponse response = BaseResponse.builder()
                 .data(productService.getAllProducts())
