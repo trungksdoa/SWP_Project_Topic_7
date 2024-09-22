@@ -45,7 +45,14 @@ public class UserController {
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         Users user = userService.getUser(userId);
 
-        BaseResponse response = BaseResponse.builder().data(user).statusCode(HttpStatus.OK.value()).message("Success").build();
+        UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+        BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

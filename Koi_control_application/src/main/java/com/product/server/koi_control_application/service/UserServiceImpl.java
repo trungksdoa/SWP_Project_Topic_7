@@ -136,6 +136,7 @@ public class UserServiceImpl implements IUserService {
             String filename = imageService.updateImage(user.getAvatarUrl(), file);
             user.setAvatarUrl(filename);
         }
+
         if (rUser.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(rUser.getPassword()));
         }
