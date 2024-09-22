@@ -20,6 +20,8 @@ import PondManegement from "../components/ui/manage/PondManegement";
 import WaterParameter from "../components/ui/manage/WaterParameter";
 import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import SaltCalculator from "../components/ui/manage/SaltCalculator";
+import PaymentLayout from "../components/layouts/PaymentLayout";
+import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
 const router = [
   {
     element: <MainLayout />,
@@ -41,10 +43,6 @@ const router = [
             element: <ProductDetail />,
           },
         ],
-      },
-      {
-        path: PATH.CART,
-        element: <CartPage />,
       },
     ],
   },
@@ -89,6 +87,10 @@ const router = [
             element: <AddProduct />,
           },
           {
+            path: `${PATH.EDIT_PRODUCT}/:id`,
+            element: <EditProduct />
+          },
+          {
             path: PATH.MANAGE_PRODUCTS,
             element: <ManageProducts />,
           },
@@ -96,5 +98,14 @@ const router = [
       },
     ],
   },
+  {
+    element: <PaymentLayout/>,
+    children: [
+      {
+        path: PATH.CART,
+        element: <CartPage />,
+      },
+    ]
+  }
 ];
 export const Router = () => useRoutes(router);

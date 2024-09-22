@@ -54,7 +54,7 @@ const AdminTemplate = () => {
             <div className="flex justify-center items-center mt-[20px]">
               <NavLink to="/">
                 <img
-                  src="../../../images/logo.png"
+                  src="../../../images/logo.webp"
                   className="w-[100px] h-[100px]"
                   alt=""
                 />
