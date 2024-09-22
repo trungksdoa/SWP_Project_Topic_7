@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +75,11 @@ public class ProductServiceImpl implements IProductService {
         Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
         products.getContent().forEach(Product::calculateAverageRating);
         return products;
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @Override

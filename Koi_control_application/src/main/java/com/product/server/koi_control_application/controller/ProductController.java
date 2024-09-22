@@ -59,4 +59,14 @@ public class ProductController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse> getProductList() {
+        BaseResponse response = BaseResponse.builder()
+                .data(productService.getAllProducts())
+                .statusCode(HttpStatus.OK.value())
+                .message("Products retrieved successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
