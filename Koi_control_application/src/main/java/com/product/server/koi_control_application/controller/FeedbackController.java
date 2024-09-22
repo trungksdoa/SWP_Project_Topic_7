@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/feedbacks")
 @RequiredArgsConstructor
@@ -32,22 +30,30 @@ public class FeedbackController {
                 .rating(feedback.getRating())
                 .comment(feedback.getComment())
                 .build());
-        BaseResponse response = BaseResponse.builder()
+
+        return new ResponseEntity<>(BaseResponse.builder()
                 .data(createdFeedback)
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Feedback created successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                .build(), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Feedback>> getAll(){
-        return new ResponseEntity<>(feedbackService.getAll(), HttpStatus.CREATED);
+    public ResponseEntity<BaseResponse> getAll() {
+        return new ResponseEntity<>(BaseResponse.builder()
+                .data(feedbackService.getAll())
+                .message("Fetch data success")
+                .statusCode(HttpStatus.OK.value())
+                .build(), HttpStatus.CREATED);
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<Feedback>> getByProduct(@PathVariable int productId){
-        return new ResponseEntity<>(feedbackService.getFeedbacksByProductId(productId), HttpStatus.OK);
+    public ResponseEntity<BaseResponse> getByProduct(@PathVariable int productId) {
+        return new ResponseEntity<>(BaseResponse.builder()
+                .data(feedbackService.getFeedbacksByProductId(productId))
+                .message("fetch data success")
+                .statusCode(HttpStatus.OK.value()
+                ).build(), HttpStatus.OK);
     }
 
 
