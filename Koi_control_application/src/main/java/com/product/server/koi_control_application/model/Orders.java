@@ -37,6 +37,12 @@ public class Orders {
     @Column(nullable = false)
     private String status;
 
+    @Column(nullable = true)
+    private String paymentMethod;
+
+    @Column(nullable = true)
+    private String shippingStatus;
+
     @ManyToMany
     @JoinTable(
             name = "orders_items",

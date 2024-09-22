@@ -4,6 +4,7 @@ import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.CheckOut;
 import com.product.server.koi_control_application.pojo.PaymentStatus;
+import com.product.server.koi_control_application.service.SSEService;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.serviceInterface.IPaymentService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
@@ -30,7 +31,7 @@ public class OrderController {
     private final JwtTokenUtil jwtUtil;
     private final PaymentController paymentController;
     private final IPaymentService vnPayService;
-
+    private final SSEService<BaseResponse> sseService;
 
     @PostMapping("/create")
     public ResponseEntity<BaseResponse> createOrder(@RequestBody CheckOut checkout, HttpServletRequest request) throws UnsupportedEncodingException {
@@ -83,13 +84,14 @@ public class OrderController {
         } else {
             statusCode = HttpStatus.BAD_REQUEST.value();
         }
+
         BaseResponse response = BaseResponse.builder()
                 .data(paymentResult)
                 .statusCode(statusCode)
                 .message(paymentResult.getMessage())
                 .build();
 
-
+        sseService.emitEvent(response);
 
 
         return ResponseEntity.status(HttpStatus.FOUND)
