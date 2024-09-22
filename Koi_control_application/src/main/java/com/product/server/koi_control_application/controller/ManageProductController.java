@@ -51,12 +51,7 @@ public class ManageProductController {
         ObjectMapper objectMapper = new ObjectMapper();
         @Valid Product product = objectMapper.readValue(productJson, Product.class);
 
-        if (file != null) {
-            String filename = imageService.updateImage(product.getImageUrl(), file);
-            product.setImageUrl(filename);
-        }
-
-        Product updatedProduct = productService.updateProduct(productId, product);
+        Product updatedProduct = productService.updateProduct(productId, product,file);
         BaseResponse response = BaseResponse.builder()
                 .data(updatedProduct)
                 .statusCode(HttpStatus.OK.value())

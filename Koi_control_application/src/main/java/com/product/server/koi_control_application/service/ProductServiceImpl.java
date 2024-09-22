@@ -6,13 +6,16 @@ import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.repository.CategoryRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
+import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -21,7 +24,7 @@ import java.util.List;
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
+    private final IImageService imageService;
     @Override
     @Transactional
     public Product createProduct(Product product) {
@@ -31,17 +34,21 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional
-    public Product updateProduct(int id, Product product) {
+    public Product updateProduct(int id, Product product , MultipartFile file) throws IOException {
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
+
+        if (file != null) {
+            String filename = imageService.updateImage(existingProduct.getImageUrl(), file);
+            existingProduct.setImageUrl(filename);
+        }else{
+            existingProduct.setImageUrl(existingProduct.getImageUrl());
+        }
 
         if (product.getCategoryId() != 0) {
             Category gory = categoryRepository.findById(product.getCategoryId()).orElseThrow(() -> new NotFoundException("Category not found"));
             existingProduct.setCategoryId(gory.getId());
         }
 
-        if (product.getImageUrl() != null) {
-            existingProduct.setImageUrl(product.getImageUrl());
-        }
         if (product.getName() != null) {
             existingProduct.setName(product.getName());
         }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
 public class ProductController {
     private final IProductService productService;
-    private final IImageService imageService;
+
 
 
     @GetMapping("/{id}")
