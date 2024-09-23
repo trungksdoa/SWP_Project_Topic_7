@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -112,14 +111,22 @@ public class ImageServiceImpl implements IImageService {
         // Delete the existing file
         Files.delete(imagePath);
 
-        // Generate a random name for the new file
-        String newFilename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path newFilePath = Paths.get(IMAGE_DIR, newFilename);
+        // Generate new filename
+        String newFilename = generateNewFilename(filename);
+        Path newImagePath = Paths.get(IMAGE_DIR, newFilename);
 
         // Write the new file
-        Files.write(newFilePath, file.getBytes());
+        Files.write(newImagePath, file.getBytes());
 
         return HOST + newFilename;
+    }
+
+    private String generateNewFilename(String oldFilename) {
+        // Generate a new filename based on the old filename
+        // For example, you can use a timestamp or UUID
+        String extension = oldFilename.substring(oldFilename.lastIndexOf("."));
+        String baseName = oldFilename.substring(0, oldFilename.lastIndexOf("."));
+        return baseName + "_" + System.currentTimeMillis() + extension;
     }
 
     @Override
