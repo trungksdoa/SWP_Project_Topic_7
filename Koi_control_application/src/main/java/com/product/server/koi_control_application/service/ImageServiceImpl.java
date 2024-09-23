@@ -103,13 +103,14 @@ public class ImageServiceImpl implements IImageService {
 
         log.info("Updating image: " + filename);
 
-        Path imagePath = Paths.get(IMAGE_DIR, filename);
-        if (!Files.exists(imagePath)) {
+        // Sử dụng ClassPathResource để kiểm tra sự tồn tại của file
+        ClassPathResource imgFile = new ClassPathResource(IMAGE_DIR + filename);
+        if (!imgFile.exists()) {
             throw new IOException("Image not found: " + filename);
         }
 
         // Delete the existing file
-        Files.delete(imagePath);
+        Files.delete(Paths.get(imgFile.getURI()));
 
         // Generate new filename
         String newFilename = generateNewFilename(filename);
