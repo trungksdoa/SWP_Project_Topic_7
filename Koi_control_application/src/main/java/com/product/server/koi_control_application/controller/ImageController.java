@@ -51,21 +51,12 @@ public class ImageController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> listImages() {
-        List<String> imageNames = new ArrayList<>();
-        Path dirPath = Paths.get(IMAGE_DIR);
+    public ResponseEntity<List<String>> listImages() throws IOException {
+       if(imageService.getListImages().isEmpty()){
+           return ResponseEntity.notFound().build();
+       }
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    imageNames.add(path.getFileName().toString());
-                }
-            }
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        return ResponseEntity.ok(imageNames);
+        return ResponseEntity.ok(imageService.getListImages());
     }
 
 
