@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
@@ -11,7 +11,7 @@ import { Input, Space } from "antd";
 const ManageUser = () => {
   const { data: lstUser, refetch } = useGetUserAll();
   const mutate = useDeleteUser();
-  console.log(lstUser)
+  console.log(lstUser);
 
   useEffect(() => {
     refetch();
@@ -49,15 +49,30 @@ const ManageUser = () => {
         target: "full-header",
       },
       sorter: (a, b) => a.id - b.id,
+      width: "10%"
     },
     {
       title: "User Name",
       dataIndex: "username",
+      width: "10%"
+
+    },
+    {
+      title: "Image",
+      dataIndex: "avatarUrl",
+      render: (avatarUrl) => (
+        <img className="w-[100px]" src={avatarUrl} alt="user" />
+      ),
+      width: "10%"
+
     },
     {
       title: "Email",
       dataIndex: "email",
+      width: "10%"
+
     },
+
     // {
     //   title: "Role",
     //   dataIndex: "roles",
@@ -80,23 +95,19 @@ const ManageUser = () => {
               />
             ) : (
               <>
-                <EditOutlined
-                  className="mr-[15px]"
-                  //   onClick={() => {
-                  //     navigate(`${PATH.editNguoiDung}/${nguoiDung.id}`);
-                  //   }}
-                  style={{ color: "blue" }}
-                />
-                <DeleteOutlined
+                <Button
                   onClick={() => handleDelete(user.id)}
-                  className="mr-[15px]"
-                  style={{ color: "red" }}
-                />
+                  loading={mutate.isPending}
+                >
+                  Delete
+                </Button>
               </>
             )}
           </div>
         );
       },
+      width: "10%"
+
     },
   ];
 

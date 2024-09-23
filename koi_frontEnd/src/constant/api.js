@@ -6,4 +6,4 @@ export const MANAGE_POND_API = import.meta.env.VITE_MANAGE_POND_API
 export const MANAGE_KOI_API = import.meta.env.VITE_MANAGE_KOI_API
 export const MANAGE_PRODUCTS_ADMIN_API = import.meta.env.VITE_MANAGE_PRODUCTS_ADMIN_API
 export const MANAGE_CART_API = import.meta.env.VITE_MANAGE_CART_API
-
+export const MANAGE_FEEDBACK_API = import.meta.env.VITE_MANAGE_FEEDBACK_API

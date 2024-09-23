@@ -7,15 +7,18 @@ import { ReactToastifyProvider } from "./context/ReactToastifyProvider.jsx";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { ReactQueryProvider } from "./context/ReactQueryProvider.jsx";
+import { RefetchProvider } from "./context/RefetchProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <ReactQueryProvider>
-    <Provider store={store}>
-      <ReactToastifyProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ReactToastifyProvider>
-    </Provider>
-  </ReactQueryProvider>
+  <RefetchProvider>
+    <ReactQueryProvider>
+      <Provider store={store}>
+        <ReactToastifyProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ReactToastifyProvider>
+      </Provider>
+    </ReactQueryProvider>
+  </RefetchProvider>
 );

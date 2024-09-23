@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 const CartPage = () => {
   return (
-    <div>
+    <div className='h-full' >
       <Cart />
     </div>
   );
