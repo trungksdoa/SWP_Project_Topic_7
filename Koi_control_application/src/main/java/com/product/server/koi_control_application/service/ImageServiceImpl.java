@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -95,11 +96,9 @@ public class ImageServiceImpl implements IImageService {
             throw new IllegalArgumentException("File không được để trống");
         }
 
-        if(filename == null){
+        if (filename == null) {
             throw new BadRequestException("Cannot mapping property in class to get filename, please send correct and enough property");
         }
-
-
 
         filename = filename.substring(filename.lastIndexOf("/") + 1);
 
@@ -113,10 +112,14 @@ public class ImageServiceImpl implements IImageService {
         // Delete the existing file
         Files.delete(imagePath);
 
-        // Write the new file
-        Files.write(imagePath, file.getBytes());
+        // Generate a random name for the new file
+        String newFilename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path newFilePath = Paths.get(IMAGE_DIR, newFilename);
 
-        return HOST + filename;
+        // Write the new file
+        Files.write(newFilePath, file.getBytes());
+
+        return HOST + newFilename;
     }
 
     @Override
