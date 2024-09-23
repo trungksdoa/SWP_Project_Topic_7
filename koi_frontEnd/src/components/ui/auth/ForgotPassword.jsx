@@ -3,9 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
 import { Input, Button } from "antd";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { manageUserActionThunks } from "../../../store/manageUser";
 
 const ForgotPassword = ({ showModalLogin }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch()
+  const { isFetchingForgot } = useSelector((state) => state.manageUser)
+
   const {
     control,
     handleSubmit,
@@ -13,10 +18,12 @@ const ForgotPassword = ({ showModalLogin }) => {
   } = useForm();
 
   const onSubmit = (data) => {
-    // Gửi yêu cầu quên mật khẩu
-    console.log(data);
-    toast.success("Password reset link sent to your email!");
-    showModalLogin(); // Quay lại LoginForm sau khi gửi yêu cầu
+    dispatch(manageUserActionThunks.forgotPasswordThunk(data))
+    .unwrap()
+    .then((res) => {
+      toast.success("New password sent to your email Successfully")
+      showModalLogin();
+    })
   };
 
   return (
@@ -55,7 +62,7 @@ const ForgotPassword = ({ showModalLogin }) => {
           {!!errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
-          <Button className="w-full mt-[20px] bg-black text-white mb-[15px] hover:!bg-black hover:!text-white" htmlType="submit">
+          <Button className="w-full mt-[20px] bg-black text-white mb-[15px] hover:!bg-black hover:!text-white" htmlType="submit" loading={isFetchingForgot}>
             {t("Send Reset Link")}
           </Button>
           <div className="text-center">

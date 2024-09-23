@@ -5,7 +5,7 @@ import { PATH } from "../constant";
 import StorePage from "../pages/StorePage";
 import DashboardPage from "../pages/DashboardPage";
 import DashboardLayout from "../components/layouts/DashboardLayout";
-// import ProfilePage from "../pages/ProfilePage";
+import ProfilePage from "../pages/ProfilePage";
 import AdminPage from "../pages/AdminPage";
 import AdminLayout from "../components/layouts/AdminLayout";
 import ManageUser from "../components/ui/admin/ManageUser";
@@ -44,6 +44,10 @@ const router = [
           },
         ],
       },
+      {
+        path: PATH.PROFILE,
+        element: <ProfilePage />
+      }
     ],
   },
   {
