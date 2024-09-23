@@ -104,7 +104,7 @@ public class ImageServiceImpl implements IImageService {
         log.info("Updating image: " + filename);
 
         // Sử dụng ClassPathResource để kiểm tra sự tồn tại của file
-        ClassPathResource imgFile = new ClassPathResource(IMAGE_DIR + filename);
+         imgFile = new ClassPathResource(IMAGE_DIR + filename);
         if (!imgFile.exists()) {
             throw new IOException("Image not found: " + filename);
         }
