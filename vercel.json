@@ -1,18 +1,18 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "koi_frontEnd/package.json",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "koi_frontEnd/dist"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "koi_frontEnd/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "koi_frontEnd/dist"
       }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "koi_frontEnd/$1"
-      }
-    ]
-  }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "koi_frontEnd/$1"
+    }
+  ]
+}
