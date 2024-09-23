@@ -35,7 +35,7 @@ const HomeTemplate = () => {
 
   return (
     <div>
-      <AnimatedSection className="grid grid-cols-3">
+      <AnimatedSection className="grid my-[80px] grid-cols-3">
         <div className="col-span-1 flex flex-col justify-center items-center ml-[100px]">
           <h1 className="text-[52px] font-bold">
             {t("KoiControl - The Koi Web For Your Pond")}
@@ -46,7 +46,7 @@ const HomeTemplate = () => {
         </div>
         <div className="col-span-2 flex justify-center items-center">
           <img
-            className="w-[100%] mb-[100px] h-auto"
+            className="w-[60%] h-auto"
             src="../../images/image1.png"
             alt="image1"
           />

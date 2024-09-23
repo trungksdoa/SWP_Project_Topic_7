@@ -10,6 +10,6 @@ export const useGetAllProducts = () => {
     })
     return {
         ...q,
-        data: q.data?.data?.data?.content
+        data: q.data?.data?.data
     }
 }

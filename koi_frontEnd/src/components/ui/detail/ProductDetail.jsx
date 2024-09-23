@@ -1,29 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetProductById } from "../../../hooks/user/UserGetProductById";
-import { InputNumber } from "antd";
+import { InputNumber, Button } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Flex, Spin } from "antd";
+import { useFormik } from "formik";
+import { useTranslation } from "react-i18next";
+import { StarRating } from "./StarRating";
+import { useSelector } from "react-redux";
+import { usePostFeedBack } from "../../../hooks/feedback/usePostFeedback";
+import { useGetFeedbackById } from "../../../hooks/feedback/useGetFeedbackById";
+import ProductFeedback from "./ProductFeedback";
 
 const ProductDetail = () => {
   const [productId, setProductId] = useState(null); // New state for product ID
-  const onChange = (value) => {
-    console.log("changed", value);
-  };
-
+  const onChange = (value) => {};
+  const { t } = useTranslation();
   const { id: prdId } = useParams();
   const parseID = parseInt(prdId);
+  const userLogin = useSelector((state) => state.manageUser.userLogin);
   const {
     data: product,
     refetch,
     isLoading,
     isFetching,
-  } = useGetProductById(productId || parseID); // Use productId state
+  } = useGetProductById(productId || parseID);
+  const formik = useFormik({
+    initialValues: {
+      userId: userLogin?.id,
+      productId: product?.id || parseID,
+      rating: 0,
+      comment: "",
+    },
+    onSubmit: (values) => {
+      mutation.mutate(values, {
+        onSuccess: () => {
+          formik.resetForm();
+          toast.success("Add Feedback Successfully !");
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     setProductId(parseID); // Set productId when prdId changes
     refetch(); // Refetch when productId changes
   }, [parseID]);
+
+  useEffect(() => {
+    if (product) {
+      formik.setValues({
+        userId: userLogin?.id,
+        productId: product.id,
+        rating: 0,
+        comment: "",
+      });
+    }
+  }, [product]); // Update formik values when product changes
 
   if (isFetching) {
     return (
@@ -34,10 +67,14 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="container w-[80%] mx-auto my-[60px]">
+    <div className="container w-[60%] mx-auto my-[60px]">
       <div className="grid grid-cols-2 gap-[60px]">
         <div className="col-span-1">
-          <img src={product?.imageUrl} className="w-[80%]" alt={product?.name} />
+          <img
+            src={product?.imageUrl}
+            className="w-[80%]"
+            alt={product?.name}
+          />
         </div>
         <div className="col-span-1">
           <h1 className="text-black font-semibold">{product?.name}</h1>
@@ -67,6 +104,10 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      <hr className="border-gray-600 my-[40px]" />
+
+      <ProductFeedback parseID={parseID} />
+
     </div>
   );
 };

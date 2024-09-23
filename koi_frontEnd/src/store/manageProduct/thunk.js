@@ -4,7 +4,7 @@ import { manageProductsServices } from "../../services/manageProducrsServices";
 export const getProductThunk = createAsyncThunk('manageProduct/get', async (id, {rejectWithValue}) => {
     try {
         const response = await manageProductsServices.getProductById(id)
-        return response.data?.data?.data
+        return response.data?.data
     }
     catch(err) {
         return rejectWithValue(err)

@@ -48,7 +48,7 @@ const RegisterForm = ({ showModalLogin }) => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <img src="../../../images/logo.png" className="w-20 h-20" alt="logo" />
+      <img src="../../../images/logo.webp" className="w-20 h-20" alt="logo" />
       <h1 className="text-[30px] font-bold text-orange-500 mt-[10px]">
         {t("Register")}
       </h1>
@@ -186,9 +186,10 @@ const RegisterForm = ({ showModalLogin }) => {
         <Button
           className="w-full col-6 mt-[20px]"
           style={{
-            backgroundColor: "#f97316",
+            backgroundColor: "#000000",
             border: "none",
             transition: "all .3s",
+            marginBottom: "15px"
           }}
           loading={isFetchingRegister}
           htmlType="submit"

@@ -9,6 +9,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
 import LoginForm from "../auth/LoginForm";
 import RegisterForm from "../auth/RegisterForm";
+import ForgotPassword from "../auth/ForgotPassword"; // Import ForgotPassword
 import { useDispatch, useSelector } from "react-redux";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { manageUserActions } from "../../../store/manageUser/slice";
@@ -33,14 +34,24 @@ export const UserMenu = () => {
 
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalRegister, setIsModalRegister] = useState(false);
-  
+  const [isModalForgotPassword, setIsModalForgotPassword] = useState(false); // State cho Forgot Password
+
   const showModalLogin = () => {
     setIsModalRegister(false);
+    setIsModalForgotPassword(false);
     setIsModalLogin(true);
   };
+
   const showModalRegister = () => {
     setIsModalLogin(false);
+    setIsModalForgotPassword(false);
     setIsModalRegister(true);
+  };
+
+  const showModalForgotPassword = () => {
+    setIsModalLogin(false);
+    setIsModalRegister(false);
+    setIsModalForgotPassword(true);
   };
 
   const handleOkLogin = () => {
@@ -57,6 +68,10 @@ export const UserMenu = () => {
 
   const handleCancelRegister = () => {
     setIsModalRegister(false);
+  };
+
+  const handleCancelForgotPassword = () => {
+    setIsModalForgotPassword(false);
   };
 
   const renderAvatar = () => {
@@ -137,7 +152,7 @@ export const UserMenu = () => {
         onOk={handleOkLogin}
         onCancel={handleCancelLogin}
       >
-        <LoginForm showModalRegister={showModalRegister} handleOkLogin={handleOkLogin} showModalLogin={showModalLogin} />
+        <LoginForm showModalRegister={showModalRegister} handleOkLogin={handleOkLogin} showModalForgotPassword={showModalForgotPassword} />
       </Modal>
       <Modal
         title=""
@@ -146,6 +161,14 @@ export const UserMenu = () => {
         onCancel={handleCancelRegister}
       >
         <RegisterForm showModalLogin={showModalLogin} />
+      </Modal>
+      <Modal
+        title=""
+        open={isModalForgotPassword}
+        onOk={handleCancelForgotPassword}
+        onCancel={handleCancelForgotPassword}
+      >
+        <ForgotPassword showModalLogin={showModalLogin} />
       </Modal>
     </div>
   );
