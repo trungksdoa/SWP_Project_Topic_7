@@ -22,6 +22,8 @@ import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import SaltCalculator from "../components/ui/manage/SaltCalculator";
 import PaymentLayout from "../components/layouts/PaymentLayout";
 import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
+import PondDetail from "../components/ui/manage/PondDetail";
+
 const router = [
   {
     element: <MainLayout />,
@@ -56,6 +58,10 @@ const router = [
       {
         path: PATH.POND_MANAGEMENT,
         element: <PondManegementPage />
+      },
+      {
+        path: `${PATH.DETAIL_POND}/:pondId`,
+        element: <PondDetail />
       },
       {
         path: PATH.WATER_PARAMETER,

@@ -17,6 +17,7 @@ export const PATH = {
     CART: '/cart',
     KOI_MANAGEMENT: '/koi-management',
     POND_MANAGEMENT: '/pond-management',
+    DETAIL_POND: '/pond-detail',
     WATER_PARAMETER: '/water-parameter',
     FOOD_CALCULATOR: '/food-calculator',
     SALT_CALCULATOR: '/salt-calculator'
