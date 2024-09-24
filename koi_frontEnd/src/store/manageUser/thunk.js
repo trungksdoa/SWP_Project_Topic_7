@@ -18,3 +18,13 @@ export const registerThunk = createAsyncThunk("manageUser/register", async (payl
         return rejectWithValue(error)
     }
 })
+
+export const forgotPasswordThunk = createAsyncThunk("manageUser/forgot-password", async(payload, {rejectWithValue}) => {
+    try {
+        const response = await manageUserServices.forgotPassword(payload)
+        return response.data
+    }
+    catch(err) {
+        return rejectWithValue(err)
+    }
+})

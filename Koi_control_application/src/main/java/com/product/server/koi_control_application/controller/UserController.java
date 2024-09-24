@@ -51,6 +51,7 @@ public class UserController {
                 .email(user.getEmail())
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
+                .avatar(user.getAvatarUrl())
                 .build();
         BaseResponse response = BaseResponse.builder().data(userResponse).statusCode(HttpStatus.OK.value()).message("Success").build();
         return new ResponseEntity<>(response, HttpStatus.OK);
