@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PackageServiceImpl implements IPackageService {
     private final PackageRepository packageRepository;
     private final KoiFishRepository koiFishRepository;

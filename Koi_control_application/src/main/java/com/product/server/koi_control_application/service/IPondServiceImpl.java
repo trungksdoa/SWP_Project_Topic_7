@@ -24,7 +24,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class IPondServiceImpl implements IPondService {
     private final PondRepository pondRepository;
     private final UsersRepository usersRepository;

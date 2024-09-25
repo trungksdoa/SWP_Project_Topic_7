@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
     @Override

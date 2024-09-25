@@ -24,7 +24,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class ImageServiceImpl implements IImageService {
     private ClassPathResource imgFile;

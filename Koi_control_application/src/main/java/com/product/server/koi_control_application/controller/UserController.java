@@ -1,7 +1,6 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.custom_exception.ForbiddenException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
@@ -15,7 +14,6 @@ import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-
 public class UserController {
 
     private final IUserService userService;
@@ -45,7 +42,6 @@ public class UserController {
     private final JwtTokenUtil jwtUtil;
     private final IEmailService emailService;
     private final IPackageService packageService;
-
 
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
@@ -182,7 +178,7 @@ public class UserController {
 
 
     @PostMapping("/package")
-    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request) throws JSONException, JsonProcessingException {
+    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request)   {
         int userId = jwtUtil.getUserIdFromToken(request);
         UserPackage pack = packageService.getPackageById(req.getPackageId());
 
@@ -192,7 +188,6 @@ public class UserController {
         //If I want to get this data as Map ?
         embedData.setMerchantinfo(data);
 
-//        zaloPayService.createServiceOrder(pack, 1, "http://localhost:8080/api/callback/service", embedData);
         userService.addPackage(userId, pack);
 
         BaseResponse response = BaseResponse.builder()

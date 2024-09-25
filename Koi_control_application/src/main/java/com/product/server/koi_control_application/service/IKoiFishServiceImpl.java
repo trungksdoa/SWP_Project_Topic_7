@@ -26,7 +26,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+
 public class IKoiFishServiceImpl implements IKoiFishService {
     private final UsersRepository usersRepository;
     private final KoiFishRepository koiFishRepository;

@@ -5,7 +5,7 @@ import com.product.server.koi_control_application.pojo.PaymentStatus;
 import com.product.server.koi_control_application.service_interface.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -16,7 +16,6 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PaymentService implements IPaymentService {
     private final VNPayConfig vnPayConfig;
 
