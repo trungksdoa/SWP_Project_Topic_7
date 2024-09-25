@@ -62,7 +62,7 @@ public class PaymentController {
         String secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
         String partnerCode = "MOMO";
         String redirectUrl = "https://swp-project-topic-7.vercel.app";
-        String ifnUrl = "https://swp-project-topic-7.vercel.app";
+        String ifnUrl = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/payment/momo-callback";
         String requestType = "payWithMethod";
         return MomoPaymentInfo.builder()
                 .accessKey(accessKey)
