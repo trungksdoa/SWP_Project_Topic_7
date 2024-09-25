@@ -1,12 +1,20 @@
 package com.product.server.koi_control_application.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "packages")
-public class Package {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserPackage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +38,7 @@ public class Package {
     // toString method
     @Override
     public String toString() {
-        return "Package{" +
+        return "UserPackage{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", fishSlots=" + fishSlots +

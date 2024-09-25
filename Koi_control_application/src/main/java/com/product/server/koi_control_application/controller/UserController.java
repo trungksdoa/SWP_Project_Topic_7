@@ -1,17 +1,21 @@
 package com.product.server.koi_control_application.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.custom_exception.ForbiddenException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.*;
 import com.product.server.koi_control_application.service_interface.IEmailService;
+import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
-import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +37,15 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
+
 public class UserController {
 
     private final IUserService userService;
     private final AuthenticationManager authManager;
     private final JwtTokenUtil jwtUtil;
     private final IEmailService emailService;
+    private final IPackageService packageService;
+
 
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
@@ -159,13 +165,13 @@ public class UserController {
     }
 
 
-    @PutMapping(value ="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image" , required = false) MultipartFile file) throws IOException {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Users userData = objectMapper.readValue(userJson, Users.class);
 
 
-       userService.updateUser(userId, userData, file);
+        userService.updateUser(userId, userData, file);
         BaseResponse response = BaseResponse.builder()
                 .data("Update success")
                 .statusCode(HttpStatus.OK.value())
@@ -174,5 +180,28 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    @PostMapping("/package")
+    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request) throws JSONException, JsonProcessingException {
+        int userId = jwtUtil.getUserIdFromToken(request);
+        UserPackage pack = packageService.getPackageById(req.getPackageId());
+
+        EmbedData embedData = new EmbedData();
+        String data = "{\"user_id\": " + userId + ", \"package_id\": " + pack.getId() + "}";
+
+        //If I want to get this data as Map ?
+        embedData.setMerchantinfo(data);
+
+//        zaloPayService.createServiceOrder(pack, 1, "http://localhost:8080/api/callback/service", embedData);
+        userService.addPackage(userId, pack);
+
+        BaseResponse response = BaseResponse.builder()
+                .data("Successfully changed package")
+                .statusCode(HttpStatus.CREATED.value())
+                .message("Service order created successfully")
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
 }

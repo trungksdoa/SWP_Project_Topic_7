@@ -7,6 +7,7 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*", allowedHeaders = {"Authorization", "Content-Type"})
-@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ManageUserController {
     private final IUserService userService;
     @DeleteMapping("/{userId}")
@@ -30,10 +30,12 @@ public class ManageUserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> getAllUsers() {
         BaseResponse response;
-        response = BaseResponse.builder().data(userService.getUsers(0, 10)).statusCode(HttpStatus.OK.value()).message("Success").build();
+        response = BaseResponse.builder().data(userService.getUsers()).statusCode(HttpStatus.OK.value()).message("Success").build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
