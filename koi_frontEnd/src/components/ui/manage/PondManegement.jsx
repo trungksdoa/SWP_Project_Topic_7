@@ -71,7 +71,7 @@ const PondManagement = () => {
                     >
                         <button
                             onClick={handleClose}
-                            className="absolute top-2 right-4 text-2xl font-bold"
+                            className="absolute -top-1 right-2 text-2xl font-bold"
                         >
                             &times;
                         </button>
