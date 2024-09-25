@@ -1,11 +1,13 @@
 package com.product.server.koi_control_application.service_interface;
 
+import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.UserRegister;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public interface IUserService {
@@ -23,6 +25,7 @@ public interface IUserService {
 
     Page<Users> getUsers(int page, int size);
 
+    List<Users>  getUsers();
     void deleteUser(int id);
 
     Users saveUser(UserRegister register);
@@ -36,4 +39,6 @@ public interface IUserService {
     Users updateUser(int id, Users userPatchDTO, MultipartFile file) throws IOException;
 
     Users updateUser(Users userPatchDTO);
+
+    Users addPackage(int userId, UserPackage userPackage);
 }

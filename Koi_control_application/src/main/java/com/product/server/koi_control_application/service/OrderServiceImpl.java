@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.pojo.CheckOut;
+import com.product.server.koi_control_application.pojo.OrderProductRequest;
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.custom_exception.InsufficientException;
 import com.product.server.koi_control_application.model.OrderItems;
@@ -21,6 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -29,15 +30,14 @@ public class OrderServiceImpl implements IOrderService {
 
 
     @Override
-    @Transactional
-    public Orders createOrder(int userId, CheckOut checkOut) {
+    public Orders createOrder(int userId, OrderProductRequest orderProductRequest) {
         // Create a new order
         Orders order = Orders.builder()
                 .userId(userId)
                 .status("PENDING")
-                .fullName(checkOut.getFullName())
-                .address(checkOut.getAddress())
-                .phone(checkOut.getPhone())
+                .fullName(orderProductRequest.getFullName())
+                .address(orderProductRequest.getAddress())
+                .phone(orderProductRequest.getPhone())
                 .items(new HashSet<>())
                 .build();
 
@@ -73,7 +73,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    @Transactional
     public Orders updateOrderStatus(int id, String status) {
         Orders order = getOrderById(id).builder().status(status).build();
         return orderRepository.save(order);
@@ -85,7 +84,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    @Transactional
     public void cancelPendingOrder(int userId, int orderId) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId);
         if (order == null) {
@@ -100,7 +98,6 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    @Transactional
     public void cancelOrderByAdmin(int orderId, String message) {
         Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
 

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,7 @@ import java.io.IOException;
 @RequestMapping("/api/koifishs")
 @RequiredArgsConstructor
 @Validated
-@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
+//@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
 public class KoiFishController {
 
     private final IKoiFishService iKoiFishService;
@@ -128,6 +129,7 @@ public class KoiFishController {
     }
 
     @GetMapping("/listkoi")
+    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
     public ResponseEntity<BaseResponse> getKoisByUserId() {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
 

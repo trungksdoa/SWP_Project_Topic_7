@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/feedbacks")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
+
 public class FeedbackController {
     private final IFeedbackService feedbackService;
 
@@ -39,6 +39,7 @@ public class FeedbackController {
     }
 
     @GetMapping
+    @RolesAllowed({"ROLE_MEMBER"})
     public ResponseEntity<BaseResponse> getAll() {
         return new ResponseEntity<>(BaseResponse.builder()
                 .data(feedbackService.getAll())

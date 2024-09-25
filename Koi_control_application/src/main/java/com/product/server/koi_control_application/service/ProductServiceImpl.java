@@ -21,6 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;

@@ -21,4 +21,6 @@ public interface PondRepository extends JpaRepository<Pond, Integer> {
     boolean existsByNameAndUserIdExceptId(@Param("name") String name,
                                            @Param("userId") int userId,
                                            @Param("id") int id);
+
+    long countByUserId(int userId);
 }

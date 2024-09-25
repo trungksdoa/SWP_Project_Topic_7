@@ -9,12 +9,14 @@ import com.product.server.koi_control_application.service_interface.IWaterParame
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
     @Override

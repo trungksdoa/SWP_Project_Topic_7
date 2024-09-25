@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/carts")
 @Validated
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
+//@RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
 public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
@@ -45,6 +46,7 @@ public class CartController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
     public ResponseEntity<BaseResponse> getCartByUser(@PathVariable int userId) {
         List<Cart> cartItems = cartService.getCart(userId);
         BaseResponse response = BaseResponse.builder()
