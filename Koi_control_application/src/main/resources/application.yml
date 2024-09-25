@@ -10,19 +10,6 @@
 #     database-platform: org.hibernate.dialect.MySQLDialect
 # server:
 #   port
-vnpay:
-  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url: http://localhost:8080/api/orders/payment-return
-  tmn-code: OUW9LAD4
-  hash-secret: H4KUKCD1972B96JQSTYQBDTYJEQMT8AD
-  api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
-
-
-zalopay:
-  appid: 553
-  key1: 9phuAOYhan4urywHTh0ndEXiV3pKHr5Q
-  key2: Iyz2habzyr7AG8SgvoBCbKwKi3UzlLi3
-  endpoint: https://sb-openapi.zalopay.vn/v2/create
 
 app:
   jwt:
@@ -43,8 +30,6 @@ spring:
           starttls:
             enable: true
             required: true
-  mvc:
-    throw-exception-if-no-handler-found: true
   web:
     resources:
       add-mappings: false
