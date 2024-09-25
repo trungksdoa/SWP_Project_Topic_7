@@ -8,7 +8,6 @@ const ProfileTemplage = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const { data: user, refetch } = useGetUserById(userId);
-  console.log(user);
   return (
     <div className="my-[60px] container mx-auto w-[60%]">
       <div className="flex items-center">
