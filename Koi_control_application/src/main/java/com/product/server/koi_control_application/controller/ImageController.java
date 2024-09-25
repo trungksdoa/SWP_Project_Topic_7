@@ -30,7 +30,7 @@ import java.util.List;
 @RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ImageController {
 
-    public  IImageService imageService;
+    private  IImageService imageService;
     private static final String IMAGE_DIR = "image/";
 
     @GetMapping("/{filename:.+}")

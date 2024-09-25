@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
 
 public class WaterParameterController {
-    @Autowired
+
     private final IWaterParameterService iWaterParameterService;
 
     @PostMapping("{pondId}")

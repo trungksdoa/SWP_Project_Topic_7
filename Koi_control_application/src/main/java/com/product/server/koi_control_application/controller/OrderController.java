@@ -28,7 +28,6 @@ public class OrderController {
     private final JwtTokenUtil jwtUtil;
     private final PaymentController paymentController;
     private final SSEService<BaseResponse> sseService;
-//    private final ZaloPayService zaloPayService;
 
     @PostMapping("/create-product-order")
     public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws JSONException, JsonProcessingException {
