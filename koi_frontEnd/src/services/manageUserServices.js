@@ -7,5 +7,5 @@ const api = apiInstance.create({
 export const manageUserServices = {
     login: (payload) => api.post("/api/users/auth/login", payload),
     register: (payload) => api.post("/api/users/auth/register", payload),
-    
+    forgotPassword: (payload) => api.post("/api/users/forgot-password", payload)
 }

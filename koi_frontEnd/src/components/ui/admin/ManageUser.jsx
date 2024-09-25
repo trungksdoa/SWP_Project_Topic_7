@@ -3,42 +3,57 @@ import { Button, Table } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
-import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
-import { PATH } from "../../../constant";
 import { toast } from "react-toastify";
-import { Input, Space } from "antd";
+import { Input, Spin } from "antd";
 
 const ManageUser = () => {
-  const { data: lstUser, refetch } = useGetUserAll();
+  const { data: lstUser, refetch, isFetching } = useGetUserAll();
   const mutate = useDeleteUser();
-  console.log(lstUser);
+  const [filteredName, setFilteredName] = useState([]);
+  const [loadingId, setLoadingId] = useState(null); // Thêm state để theo dõi ID đang loading
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xoá người dùng này không?")) {
+      setLoadingId(id); // Đặt ID đang loading
       mutate.mutate(id, {
         onSuccess: () => {
           toast.success("Delete User Successfully!");
           refetch();
+          setLoadingId(null); // Reset ID khi xóa thành công
         },
         onError: (error) => {
           toast.error("Delete User Failed!");
+          setLoadingId(null); // Reset ID khi xóa thất bại
         },
       });
     }
   };
+
+  if (isFetching) {
+    return (
+      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
+  }
+
   const { Search } = Input;
-  const [filteredName, setFilterdName] = useState([]);
+
+  // Lọc danh sách người dùng có role là "ROLE_MEMBER"
+  const filteredUsers = lstUser?.filter((user) =>
+    user.roles.some((role) => role.name === "ROLE_MEMBER")
+  );
 
   const onKeyUp = (e) => {
     const input = e?.target.value.toLowerCase();
-    const filtered = lstUser?.filter((user) =>
+    const filtered = filteredUsers?.filter((user) =>
       user.username.toLowerCase().includes(input)
     );
-    setFilterdName(filtered || []);
+    setFilteredName(filtered || []);
   };
 
   const columns = [
@@ -49,13 +64,12 @@ const ManageUser = () => {
         target: "full-header",
       },
       sorter: (a, b) => a.id - b.id,
-      width: "10%"
+      width: "10%",
     },
     {
       title: "User Name",
       dataIndex: "username",
-      width: "10%"
-
+      width: "10%",
     },
     {
       title: "Image",
@@ -63,21 +77,13 @@ const ManageUser = () => {
       render: (avatarUrl) => (
         <img className="w-[100px]" src={avatarUrl} alt="user" />
       ),
-      width: "10%"
-
+      width: "10%",
     },
     {
       title: "Email",
       dataIndex: "email",
-      width: "10%"
-
+      width: "10%",
     },
-
-    // {
-    //   title: "Role",
-    //   dataIndex: "roles",
-    //   render: (roles) => Array.isArray(roles) ? roles.join(', ') : roles,
-    // },
     {
       title: "Action",
       dataIndex: "",
@@ -85,44 +91,36 @@ const ManageUser = () => {
       render: (_, user) => {
         return (
           <div key={user.id}>
-            {user.roles === "ADMIN" ? (
-              <EditOutlined
-                className="mr-[15px]"
-                // onClick={() => {
-                //   navigate(`${PATH.editNguoiDung}/${nguoiDung.id}`);
-                // }}
-                style={{ color: "blue" }}
-              />
+            {user.roles.some((role) => role.name === "ADMIN") ? (
+              <EditOutlined className="mr-[15px]" style={{ color: "blue" }} />
             ) : (
-              <>
-                <Button
-                  onClick={() => handleDelete(user.id)}
-                  loading={mutate.isPending}
-                >
-                  Delete
-                </Button>
-              </>
+              <Button
+                className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
+                onClick={() => handleDelete(user.id)}
+                loading={loadingId === user.id} // Chỉ hiển thị loading cho ID đang xóa
+              >
+                Delete
+              </Button>
             )}
           </div>
         );
       },
-      width: "10%"
-
+      width: "10%",
     },
   ];
 
-  const data = filteredName.length > 0 ? filteredName : lstUser;
-
+  // Nếu có dữ liệu từ ô tìm kiếm, dùng filteredName, nếu không thì dùng filteredUsers
+  const data = filteredName.length > 0 ? filteredName : filteredUsers;
   const onChange = (pagination, filters, sorter, extra) => {
-    // console.log("params", pagination, filters, sorter, extra);
+    // Xử lý các thay đổi trong bảng
   };
+
   return (
     <div>
       <Search
         style={{ marginBottom: "20px" }}
-        placeholder="input search text"
+        placeholder="Tìm kiếm người dùng"
         allowClear
-        enterButton="Search"
         size="large"
         onKeyUp={onKeyUp}
       />

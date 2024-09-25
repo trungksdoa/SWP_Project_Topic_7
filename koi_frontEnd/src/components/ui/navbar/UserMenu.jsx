@@ -13,8 +13,9 @@ import ForgotPassword from "../auth/ForgotPassword"; // Import ForgotPassword
 import { useDispatch, useSelector } from "react-redux";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { manageUserActions } from "../../../store/manageUser/slice";
+import { manageCartActions } from "../../../store/manageCart/slice";
 
-export const UserMenu = () => {
+export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
   const dispatch = useDispatch()
@@ -26,6 +27,8 @@ export const UserMenu = () => {
   const handleLogout = () => {
     localStorage.removeItem(LOCAL_STORAGE_LOGIN_KEY);
     dispatch(manageUserActions.updateUserLogin(null))
+    dispatch(manageCartActions.setCartCount(0))
+    setIsLoggedOut(true)
     naigate(PATH.HOME);
   };
 
@@ -101,10 +104,9 @@ export const UserMenu = () => {
     // If user is logged in
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
-        console.log("a")
         return (
           <div className="flex flex-col" key="admin">
-            <NavLink to={PATH.ADMIN} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink to={PATH.DASHBOARD} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
               {t("Admin")}
             </NavLink>
             <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
@@ -116,10 +118,13 @@ export const UserMenu = () => {
       if (role.name === "ROLE_MEMBER") {
         return (
           <div className="flex flex-col" key="member">
-            <NavLink to={PATH.KOI_MANAGEMENT} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink to={PATH.KOI_MANAGEMENT} className="rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
               {t("Manage")}
             </NavLink>
-            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
+            <NavLink className="w-full bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.PROFILE}>
+              {t("Profile")}
+            </NavLink>
+            <Button onClick={handleLogout} className="w-full duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
               {t("Logout")}
             </Button>
           </div>
@@ -145,7 +150,6 @@ export const UserMenu = () => {
           </div>
         </Popover>
       </div>
-      {/* Modal được đưa ra ngoài */}
       <Modal
         title=""
         open={isModalLogin}

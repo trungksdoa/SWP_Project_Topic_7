@@ -4,8 +4,6 @@ import { manageProductServiceH } from "../../../services/admin/manageProductServ
 export const usePutProduct = () => {
     return useMutation({
         mutationFn: ({id, payload}) => {
-            console.log(id)
-            console.log(payload)
             return manageProductServiceH.editProduct(id, payload)
         }
     })

@@ -1,57 +1,59 @@
-// import React, { useState } from "react";
-// import { Radio, Tabs } from "antd";
-// import { useSelector } from "react-redux";
-// import KoiManegement from "../ui/manage/KoiManegement";
-// import PondManegement from "../ui/manage/PondManegement";
-// import { NavLink } from "react-router-dom";
+import React from "react";
+import { useGetUserById } from "../../hooks/user/useGetUserById";
+import { useSelector } from "react-redux";
+import { UserOutlined } from "@ant-design/icons";
+import FormUserUpdate from "../ui/user/FormUserUpdate";
 
-// const ProfileTemplage = () => {
-//   const { userLogin } = useSelector((state) => state.manageUser);
+const ProfileTemplage = () => {
+  const userLogin = useSelector((state) => state.manageUser.userLogin);
+  const userId = userLogin?.id;
+  const { data: user, refetch } = useGetUserById(userId);
+  return (
+    <div className="my-[60px] container mx-auto w-[60%]">
+      <div className="flex items-center">
+        <div className="mr-[30px]">
+          {!!user?.avatar ? (
+            <div style={{
+              height: "150px",
+              width: "150px",
+              borderRadius: "50%",
+              border: "1px solid #000000",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+              <img className="rounded-full" src={user?.avatar} alt="avatar" />
+            </div>
+          ) : (
+            <div
+              style={{
+                height: "150px",
+                width: "150px",
+                borderRadius: "50%",
+                border: "1px solid #000000",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <UserOutlined
+                style={{
+                  fontSize: "80px",
+                }}
+              />
+            </div>
+          )}
+        </div>
+        <div>
+          <h2 className="text-[32px]">
+            Welcome,{" "}
+            <span className="font-bold text-orange-500">{userLogin?.username}</span>
+          </h2>
+        </div>
+      </div>
+      <FormUserUpdate user={user} refetch={refetch} />
+    </div>
+  );
+};
 
-//   const [mode, setMode] = useState("top");
-//   const handleModeChange = (e) => {
-//     setMode(e.target.value);
-//   };
-
-//   const tabItems = [
-//     {
-//         label: 'Koi Management',
-//         key: 'KoiManagement',
-//         children: <KoiManegement />,
-//     },
-//     {
-//         label: 'Pond Management',
-//         key: 'PondManagement',
-//         children: <PondManegement />,
-//     },
-// ]
-
-
-//   return (
-//     <div className="container">
-//       <div className="mt-[20px]">
-//         <Radio.Group
-//           onChange={handleModeChange}
-//           value={mode}
-//           style={{
-//             marginBottom: 8,
-//           }}
-//         >
-//           <Radio.Button value="top">Horizontal</Radio.Button>
-//           <Radio.Button value="left">Vertical</Radio.Button>
-//         </Radio.Group>
-//         <Tabs
-//           defaultActiveKey="1"
-//           tabPosition={mode}
-//           style={{
-//             margin: "0 auto",
-//             width: "100%",
-//           }}
-//           items={tabItems}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProfileTemplage;
+export default ProfileTemplage;

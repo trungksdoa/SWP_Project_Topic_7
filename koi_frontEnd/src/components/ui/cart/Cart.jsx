@@ -23,13 +23,11 @@ const Cart = () => {
   const mutate = useDeleteProductsInCarts();
 
   const handleDeleteCart = (productId, quantity) => {
-    console.log("productId", productId);
     if (window.confirm("Bạn có chắc chắn muốn xoá sản phẩm này không?")) {
       mutate.mutate(
         { productId, userId: userLogin?.id, quantity },
         {
           onSuccess: (response) => {
-            console.log("API Response:", response);
             toast.success("Delete product in cart successfully!");
             refetch();
           },
@@ -70,8 +68,6 @@ const Cart = () => {
         });
     }
   }, [carts]);
-
-  console.log(lstPrd);
 
   return (
     <div className="w-[60%] my-[40px] mx-auto">
