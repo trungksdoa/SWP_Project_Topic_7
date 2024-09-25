@@ -18,6 +18,12 @@ vnpay:
   api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
 
 
+zalopay:
+  appid: 553
+  key1: 9phuAOYhan4urywHTh0ndEXiV3pKHr5Q
+  key2: Iyz2habzyr7AG8SgvoBCbKwKi3UzlLi3
+  endpoint: https://sb-openapi.zalopay.vn/v2/create
+
 app:
   jwt:
     secret: SecretKeyToGenJWTs

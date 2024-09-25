@@ -26,7 +26,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
 public class ApplicationSecurity {
 
     private final UsersRepository userRepo;
@@ -41,7 +41,9 @@ public class ApplicationSecurity {
             "/api/image/**",
             "/api/products/**",
             "/api/orders/payment-return",
-            "/api/sse/**"
+            "/api/sse/**",
+            "/api/zalopay/**",
+            "/callback",
     };
 
 
@@ -58,8 +60,11 @@ public class ApplicationSecurity {
                 }))
 
                 .formLogin(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers(AUTH_REQUEST).permitAll())
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AUTH_REQUEST).permitAll()
+                ).authorizeHttpRequests(auth -> auth
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.authenticationEntryPoint((request, response, authException) -> response.setStatus(401)))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
