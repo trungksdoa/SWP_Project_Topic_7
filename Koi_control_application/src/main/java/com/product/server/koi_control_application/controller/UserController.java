@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -175,6 +176,7 @@ public class UserController {
 
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole({'ROLE_MEMBER', 'ROLE_ADMIN','ROLE_SHOP'})")
     public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Users userData = objectMapper.readValue(userJson, Users.class);
@@ -191,6 +193,7 @@ public class UserController {
 
 
     @PostMapping("/add-package")
+    @PreAuthorize("hasRole({'ROLE_MEMBER', 'ROLE_ADMIN','ROLE_SHOP'})")
     public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);
         UserPackage pack = packageService.getPackageById(req.getPackageId());

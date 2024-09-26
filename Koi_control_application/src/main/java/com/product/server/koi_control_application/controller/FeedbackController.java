@@ -10,12 +10,14 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/feedbacks")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP'})")
 public class FeedbackController {
     private final IFeedbackService feedbackService;
 
@@ -38,7 +40,6 @@ public class FeedbackController {
     }
 
     @GetMapping
-    @RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
     public ResponseEntity<BaseResponse> getAll() {
         return new ResponseEntity<>(BaseResponse.builder()
                 .data(feedbackService.getAll())

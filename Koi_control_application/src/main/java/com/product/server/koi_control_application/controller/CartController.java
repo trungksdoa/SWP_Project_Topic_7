@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/carts")
 @Validated
 @CrossOrigin(origins = "*")
-//@RolesAllowed({"ROLE_MEMBER", "ROLE_ADMIN", "ROLE_SHOP"})
+@PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP'})")
 public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
@@ -46,7 +46,6 @@ public class CartController {
     }
 
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
     public ResponseEntity<BaseResponse> getCartByUser(@PathVariable int userId) {
         List<Cart> cartItems = cartService.getCart(userId);
         BaseResponse response = BaseResponse.builder()
