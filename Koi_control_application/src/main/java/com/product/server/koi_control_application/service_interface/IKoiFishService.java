@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.model.KoiFish;
+import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,6 @@ public interface IKoiFishService {
     void deleteKoiFish(int id);
     int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException;
-
+    KoiGrowthHistory getGrowthHistory(int koiId);
 
 }

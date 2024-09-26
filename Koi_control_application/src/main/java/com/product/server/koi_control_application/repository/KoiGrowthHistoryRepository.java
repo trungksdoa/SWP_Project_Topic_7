@@ -8,4 +8,5 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public interface KoiGrowthHistoryRepository extends JpaRepository<KoiGrowthHistory, Integer> {
+    KoiGrowthHistory findByKoiId(int koiId);
 }

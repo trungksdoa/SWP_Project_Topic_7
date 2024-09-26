@@ -52,7 +52,7 @@ public class Pond {
 
     @Positive(message = "Volume must be positive")
     @Column(precision = 10, scale = 2)
-    private int volume;
+    private BigDecimal volume;
 
     @PositiveOrZero(message = "Fish count must be zero or positive")
     @Column(name = "fish_count")
