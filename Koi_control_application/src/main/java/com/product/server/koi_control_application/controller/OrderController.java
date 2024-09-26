@@ -65,8 +65,8 @@ public class OrderController {
             momoProducts.add(momoProduct);
         });
         MomoUserInfo momoUserInfo = new MomoUserInfo();
-        momoUserInfo.setName(userOrdered.getUsername());
-        momoUserInfo.setPhoneNumber(userOrdered.getPhoneNumber());
+        momoUserInfo.setName(req.getFullName());
+        momoUserInfo.setPhoneNumber(req.getPhone());
         momoUserInfo.setEmail(userOrdered.getEmail());
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
