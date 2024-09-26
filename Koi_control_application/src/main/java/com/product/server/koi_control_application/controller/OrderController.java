@@ -34,7 +34,7 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP'})")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
 public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;
