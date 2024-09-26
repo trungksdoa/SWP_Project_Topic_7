@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.enums.OrderStatus;
 import com.product.server.koi_control_application.pojo.OrderProductRequest;
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.custom_exception.InsufficientException;
@@ -59,7 +60,7 @@ public class OrderServiceImpl implements IOrderService {
                             .build();
                     savedOrder.setTotalAmount(order.getTotalAmount() + product.getPrice() * cart.getQuantity());
                     savedOrder.getItems().add(orderItemsRepository.save(orderItems));
-                    cartRepository.deleteByProductId(cart.getProductId());
+//                    cartRepository.deleteByProductId(cart.getProductId());
                 }
         );
         orderRepository.save(savedOrder);
@@ -73,7 +74,8 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public Orders updateOrderStatus(int id, String status) {
-        Orders order = getOrderById(id).builder().status(status).build();
+        Orders order = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found"));
+        order.setStatus(status);
         return orderRepository.save(order);
     }
 

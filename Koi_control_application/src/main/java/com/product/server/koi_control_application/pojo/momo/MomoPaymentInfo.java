@@ -17,7 +17,7 @@ public class MomoPaymentInfo {
     private String redirectUrl;
     private String ipnUrl;
     private String requestType;
-    private String amount;
+    private Long amount;
     private String orderId;
     private String requestId;
     private String extraData;
@@ -29,7 +29,7 @@ public class MomoPaymentInfo {
     MomoPaymentInfo() {
     }
 
-    MomoPaymentInfo(String accessKey, String secretKey, String orderInfo, String partnerCode, String redirectUrl, String ipnUrl, String requestType, String amount, String orderId, String requestId, String extraData, String orderGroupId, List<MomoProduct> items, MomoUserInfo userInfo, String lang) {
+    MomoPaymentInfo(String accessKey, String secretKey, String orderInfo, String partnerCode, String redirectUrl, String ipnUrl, String requestType, Long amount, String orderId, String requestId, String extraData, String orderGroupId, List<MomoProduct> items, MomoUserInfo userInfo, String lang) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.orderInfo = orderInfo;

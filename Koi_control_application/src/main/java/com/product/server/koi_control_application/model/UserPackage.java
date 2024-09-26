@@ -30,7 +30,7 @@ public class UserPackage {
     private Integer pondSlots;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private Long price;
 
     @Column(nullable = false)
     private Boolean isDefault = false;

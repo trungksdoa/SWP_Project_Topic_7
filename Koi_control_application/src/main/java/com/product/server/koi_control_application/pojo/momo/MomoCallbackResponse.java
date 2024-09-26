@@ -2,9 +2,11 @@ package com.product.server.koi_control_application.pojo.momo;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class MomoCallbackResponse {
     private String orderType;      // Loại đơn hàng
     private Long amount;           // Số tiền

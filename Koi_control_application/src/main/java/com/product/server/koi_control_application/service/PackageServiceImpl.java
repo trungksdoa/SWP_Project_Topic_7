@@ -26,7 +26,7 @@ public class PackageServiceImpl implements IPackageService {
 
     @Override
     public UserPackage getPackageById(int id) {
-        return null;
+        return packageRepository.findById(id).orElseThrow(() -> new RuntimeException("Package not found"));
     }
 
     @Override

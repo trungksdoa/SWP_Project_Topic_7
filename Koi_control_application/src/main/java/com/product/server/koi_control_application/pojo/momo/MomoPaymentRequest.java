@@ -10,10 +10,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MomoPaymentRequest {
+    private String userId;
     private String orderInfo;
-    private String amount;
+    private Long amount;
     private String orderId;
     private String requestId;
+    private String orderType;
     private List<MomoProduct> momoProducts;
     private MomoUserInfo momoUserInfo;
 }

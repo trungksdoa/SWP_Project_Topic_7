@@ -1,12 +1,17 @@
 package com.product.server.koi_control_application.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.custom_exception.ForbiddenException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.*;
+import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
+import com.product.server.koi_control_application.pojo.momo.MomoProduct;
+import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
 import com.product.server.koi_control_application.service_interface.IEmailService;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IUserService;
@@ -28,7 +33,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
+import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -42,6 +54,7 @@ public class UserController {
     private final JwtTokenUtil jwtUtil;
     private final IEmailService emailService;
     private final IPackageService packageService;
+    private final PaymentController paymentController;
 
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
@@ -177,26 +190,41 @@ public class UserController {
     }
 
 
-    @PostMapping("/package")
-    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request)   {
+    @PostMapping("/add-package")
+    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);
         UserPackage pack = packageService.getPackageById(req.getPackageId());
 
-        EmbedData embedData = new EmbedData();
-        String data = "{\"user_id\": " + userId + ", \"package_id\": " + pack.getId() + "}";
-
-        //If I want to get this data as Map ?
-        embedData.setMerchantinfo(data);
-
-        userService.addPackage(userId, pack);
-
         BaseResponse response = BaseResponse.builder()
-                .data("Successfully changed package")
+                .data(handlePackage(userService.getUser(userId), pack))
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Service order created successfully")
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    private JsonNode handlePackage(Users users, UserPackage pack) throws Exception {
+        List<MomoProduct> momoProducts = new ArrayList<>();
+
+        MomoUserInfo momoUserInfo = new MomoUserInfo();
+        momoUserInfo.setName(users.getUsername());
+        momoUserInfo.setPhoneNumber(users.getPhoneNumber());
+        momoUserInfo.setEmail(users.getEmail());
+
+        MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
+                .amount(Long.parseLong(pack.getPrice() + ""))
+                .orderInfo("Payment for package " + pack.getName())
+                .requestId(UUID.randomUUID().toString())
+                .userId(String.valueOf(users.getId()))
+                .orderId(String.valueOf(pack.getId()))
+                .orderType("package")
+                .momoProducts(momoProducts)
+                .momoUserInfo(momoUserInfo)
+                .build();
+        String jsonBody = new ObjectMapper().writeValueAsString(momoPaymentRequest);
+        HttpResponse<String> response = sendHttpRequest(jsonBody,PAYMENT_URL);
+        return new ObjectMapper().readTree(response.body());
     }
 
 }

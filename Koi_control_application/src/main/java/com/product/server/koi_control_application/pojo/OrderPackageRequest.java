@@ -12,4 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderPackageRequest {
     private int packageId;
+//    private String packageName;
 }

@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
@@ -18,7 +19,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
+
+import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
+import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
+
 
 @RestController
 @RequestMapping("/api/orders")
@@ -31,7 +40,7 @@ public class OrderController {
     private final PaymentController paymentController;
 
     @PostMapping("/create-product-order")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<JsonNode> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 
@@ -40,44 +49,40 @@ public class OrderController {
         //Loop to get all products in order then add to momoProducts
         List<MomoProduct> momoProducts = new ArrayList<>();
 
-        createdOrder.getItems().forEach(item -> {
-            MomoProduct momoProduct = MomoProduct.builder()
-                    .name(item.getProductId().getName())
-                    .description(item.getProductId().getDescription())
-                    .category("Support Product")
-                    .imageUrl(item.getProductId().getImageUrl())
-                    .manufacturer("Koi Control")
-                    .price(Long.parseLong(item.getProductId().getPrice() + ""))
-                    .currency("VND")
-                    .quantity(item.getQuantity())
-                    .totalPrice(Long.parseLong(item.getProductId().getPrice() * item.getQuantity() + ""))
-                    .taxAmount(3L)
-                    .build();
+        createdOrder.getItems().stream().forEach(orderItems -> {
+            MomoProduct momoProduct = new MomoProduct();
+            momoProduct.setName(orderItems.getProductId().getName());
+            momoProduct.setQuantity(orderItems.getQuantity());
+            momoProduct.setPrice(Long.parseLong(orderItems.getProductId().getPrice() + ""));
+            momoProduct.setImageUrl(orderItems.getProductId().getImageUrl());
+            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
+            momoProduct.setCurrency("VND");
+            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
+            momoProduct.setTaxAmount(10L);
+            momoProduct.setManufacturer("KOI");
             momoProducts.add(momoProduct);
         });
-
         MomoUserInfo momoUserInfo = new MomoUserInfo();
         momoUserInfo.setName(userOrdered.getUsername());
         momoUserInfo.setPhoneNumber(userOrdered.getPhoneNumber());
         momoUserInfo.setEmail(userOrdered.getEmail());
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
-                .orderId(String.valueOf(createdOrder.getId()))
-                .amount(String.valueOf(createdOrder.getTotalAmount()))
-                .orderInfo("Thanh toán đơn hàng")
+                .amount((long) createdOrder.getTotalAmount())
+                .orderInfo("Payment for order " + createdOrder.getId())
                 .requestId(UUID.randomUUID().toString())
+                .userId(String.valueOf(userId))
+                .orderId(String.valueOf(createdOrder.getId()))
+                .orderType("product")
                 .momoProducts(momoProducts)
                 .momoUserInfo(momoUserInfo)
                 .build();
-        ResponseEntity<JsonNode> response = paymentController.createMomoPayment(momoPaymentRequest);
-
-
-        return new ResponseEntity<>(BaseResponse.builder()
-                .data(response)
-                .statusCode(HttpStatus.CREATED.value())
-                .message("Order created successfully")
-                .build(), HttpStatus.CREATED);
+        String jsonBody = new ObjectMapper().writeValueAsString(momoPaymentRequest);
+        HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
+        JsonNode responseBody = new ObjectMapper().readTree(response.body());
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
+
 
 
     @GetMapping("/{id}")
