@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -110,10 +108,11 @@ public class PaymentController {
             callbackResponse.setExtraData(extraData);
             callbackResponse.setSignature(signature);
 
-            handleMomoCallback(callbackResponse);
+          handleMomoCallback(callbackResponse);
+
             // Chuyển hướng người dùng đến trang kết quả thanh toán trên website của bạn
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create("https://swp-project-topic-7.vercel.app?orderId=" + orderId))
+                    .location(URI.create("https://swp-project-topic-7.vercel.app?orderId=" + orderId +"&resultCode=" + resultCode + "&message=" + message))
                     .build();
         } catch (Exception e) {
             // Xử lý lỗi và chuyển hướng đến trang lỗi
@@ -131,24 +130,28 @@ public class PaymentController {
         String orderType = orderIdParts[1];
         String userId = orderIdParts[2];
 
-        if (callbackResponse.getResultCode() == 0) {
-            if (orderType.equals("product")) {
-                orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PAID.getValue());
-                log.info("Order " + callbackResponse.getOrderId() + " has been paid successfully");
-            } else {
-                UserPackage userPackage = new UserPackage();
-                userPackage.setId(Integer.parseInt(orderId));
+        try{
+            if (callbackResponse.getResultCode() == 0) {
+                if (orderType.equals("product")) {
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PAID.getValue());
+                    log.info("Order " + callbackResponse.getOrderId() + " has been paid successfully");
+                } else {
+                    UserPackage userPackage = new UserPackage();
+                    userPackage.setId(Integer.parseInt(orderId));
 
-                userService.addPackage(Integer.parseInt(userId), userPackage);
-                log.info("User " + userId + " has been added package successfully");
-            }
-        } else {
-            if (orderType.equals("product")) {
-                orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.CANCELED.getValue());
-                log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
+                    userService.addPackage(Integer.parseInt(userId), userPackage);
+                    log.info("User " + userId + " has been added package successfully");
+                }
             } else {
-                log.info("User " + userId + " has not been added package yet");
+                if (orderType.equals("product")) {
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.CANCELED.getValue());
+                    log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
+                } else {
+                    log.info("User " + userId + " has not been added package yet");
+                }
             }
+        }catch (Exception ex){
+            log.error("Error while handling MoMo callback: " + ex.getMessage());
         }
     }
 

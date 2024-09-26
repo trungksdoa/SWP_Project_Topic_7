@@ -20,9 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
@@ -39,10 +36,9 @@ public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;
     private final JwtTokenUtil jwtUtil;
-    private final PaymentController paymentController;
 
     @PostMapping("/create-product-order")
-    public ResponseEntity<JsonNode> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 
@@ -82,7 +78,13 @@ public class OrderController {
         String jsonBody = new ObjectMapper().writeValueAsString(momoPaymentRequest);
         HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
         JsonNode responseBody = new ObjectMapper().readTree(response.body());
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        BaseResponse baseResponse = BaseResponse.builder()
+                .data(responseBody)
+                .statusCode(HttpStatus.OK.value())
+                .message("Order created successfully")
+                .build();
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
 
@@ -98,6 +100,16 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<BaseResponse> getAllOrders() {
+        List<Orders> orders = orderService.getAllOrders();
+        BaseResponse response = BaseResponse.builder()
+                .data(orders)
+                .statusCode(HttpStatus.OK.value())
+                .message("Orders retrieved successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     @GetMapping("/user/{userId}/")
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @RequestParam int page, @RequestParam int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
