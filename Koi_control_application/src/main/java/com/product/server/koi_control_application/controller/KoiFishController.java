@@ -23,7 +23,7 @@ import java.io.IOException;
 @RequestMapping("/api/koifishs")
 @RequiredArgsConstructor
 @Validated
-//@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
+@PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER','ROLE_SHOP'})")
 public class KoiFishController {
 
     private final IKoiFishService iKoiFishService;

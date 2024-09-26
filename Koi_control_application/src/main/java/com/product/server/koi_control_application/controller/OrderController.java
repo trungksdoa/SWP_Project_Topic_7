@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -33,6 +34,7 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP'})")
 public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;

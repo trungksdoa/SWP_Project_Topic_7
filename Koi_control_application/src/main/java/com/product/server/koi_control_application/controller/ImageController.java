@@ -27,7 +27,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/image")
 @RequiredArgsConstructor
-@RolesAllowed({"ROLE_ADMIN","ROLE_MEMBER","ROLE_SHOP"})
 public class ImageController {
 
     private  IImageService imageService;

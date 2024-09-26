@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*", allowedHeaders = {"Authorization", "Content-Type"})
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ManageUserController {
     private final IUserService userService;
     @DeleteMapping("/{userId}")

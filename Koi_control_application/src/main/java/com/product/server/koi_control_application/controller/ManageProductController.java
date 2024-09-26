@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +23,8 @@ import java.io.IOException;
 @RequestMapping("/manage/api/products")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN"})
 @Validated
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ManageProductController {
     private final IProductService productService;
     private final IImageService imageService;
