@@ -43,10 +43,10 @@ public class WaterParameterController {
         BaseResponse response = BaseResponse.builder()
                 .data(waterParameter1)
                 .message("Create WaterParameter succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("{pondId}")
@@ -56,10 +56,10 @@ public class WaterParameterController {
         BaseResponse response = BaseResponse.builder()
                 .data(waterParameter1)
                 .message("Create WaterParameter succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("{pondId}")
     public ResponseEntity<BaseResponse> deleteWaterParameterByPondId(@PathVariable("pondId") int pondId) {

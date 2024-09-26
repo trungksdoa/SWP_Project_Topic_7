@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
+import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
 
 @RestController
@@ -117,7 +118,7 @@ public class PaymentController {
         } catch (Exception e) {
             // Xử lý lỗi và chuyển hướng đến trang lỗi
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create("https://swp-project-topic-7.vercel.app/payment/error"))
+                    .location(URI.create(WEBSITE_URL+"error"))
                     .build();
         }
     }

@@ -5,7 +5,6 @@ import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -59,10 +58,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
                 .message("Get fish  successfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -76,10 +75,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file))
                 .message("Update fish successfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("{koiFishId}")
@@ -90,10 +89,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
                 .message("Delete fish successfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listkoi/bypondid/{pondId}")
@@ -105,10 +104,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
                 .message(mess)
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listkoi/byuserid/{userId}")
@@ -122,10 +121,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
                 .message(mess)
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listkoi")
@@ -140,10 +139,10 @@ public class KoiFishController {
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
                 .message(mess)
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

@@ -12,6 +12,7 @@ import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
+import com.product.server.koi_control_application.ultil.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -79,46 +80,26 @@ public class OrderController {
         HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
         JsonNode responseBody = new ObjectMapper().readTree(response.body());
 
-        BaseResponse baseResponse = BaseResponse.builder()
-                .data(responseBody)
-                .statusCode(HttpStatus.OK.value())
-                .message("Order created successfully")
-                .build();
-        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+        return ResponseUtil.createResponse(responseBody, "Order created successfully", HttpStatus.CREATED);
     }
-
 
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
-        BaseResponse response = BaseResponse.builder()
-                .data(order)
-                .statusCode(HttpStatus.OK.value())
-                .message("Order retrieved successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(order, "Order retrieved successfully");
     }
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAllOrders() {
         List<Orders> orders = orderService.getAllOrders();
-        BaseResponse response = BaseResponse.builder()
-                .data(orders)
-                .statusCode(HttpStatus.OK.value())
-                .message("Orders retrieved successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
+
     @GetMapping("/user/{userId}/")
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @RequestParam int page, @RequestParam int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
-        BaseResponse response = BaseResponse.builder()
-                .data(orders)
-                .statusCode(HttpStatus.OK.value())
-                .message("Orders retrieved successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
     @GetMapping("/status/{orderId}")
@@ -127,12 +108,7 @@ public class OrderController {
 
         Map<String, String> map = new HashMap<>();
         map.put("status", order.getStatus());
-        BaseResponse response = BaseResponse.builder()
-                .data(map)
-                .statusCode(HttpStatus.OK.value())
-                .message("Return order status successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(map, "Order status retrieved successfully");
     }
 
     @GetMapping("/user/{userId}")
@@ -140,23 +116,13 @@ public class OrderController {
                                                         @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
-        BaseResponse response = BaseResponse.builder()
-                .data(orders)
-                .statusCode(HttpStatus.OK.value())
-                .message("User orders retrieved successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }
 
     @DeleteMapping("/user/{userId}/order/{orderId}")
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
-        BaseResponse response = BaseResponse.builder()
-                .data("The order has been cancelled")
-                .statusCode(HttpStatus.OK.value())
-                .message("User orders retrieved successfully")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(null, "Order cancelled successfully");
     }
 
 
