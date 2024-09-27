@@ -7,6 +7,7 @@ import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.FeedbackRequest;
 import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "Feedback Controller", description = "APIs for managing feedbacks")
 public class FeedbackController {
     private final IFeedbackService feedbackService;
 

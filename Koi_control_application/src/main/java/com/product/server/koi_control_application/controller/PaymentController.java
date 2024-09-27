@@ -7,6 +7,7 @@ import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.*;
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.service_interface.IUserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBS
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Payment", description = "API for Payment")
 public class PaymentController {
     private static final String MOMO_TEST_ENDPOINT = "https://test-payment.momo.vn/v2/gateway/api/create";
     private static final String HMAC_SHA256 = "HmacSHA256";

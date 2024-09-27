@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.model;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class KoiFish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

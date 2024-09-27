@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Validated
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "Pond", description = "API for Pond")
 public class PondController {
     private final IPondService iPondService;
     private final IImageService iImageService;

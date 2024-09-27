@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/package")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@Tag(name = "Package", description = "API for Package")
 public class PackageController {
     private final IPackageService packageService;
 

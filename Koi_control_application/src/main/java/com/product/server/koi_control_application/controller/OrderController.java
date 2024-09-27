@@ -13,6 +13,7 @@ import com.product.server.koi_control_application.service_interface.IOrderServic
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,7 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "Order", description = "API for Order")
 public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;

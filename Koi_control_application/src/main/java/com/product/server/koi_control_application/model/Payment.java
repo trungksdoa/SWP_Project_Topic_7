@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "payment_status")
+
 public class Payment {
 
     @Id

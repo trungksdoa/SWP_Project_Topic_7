@@ -16,6 +16,7 @@ import com.product.server.koi_control_application.service_interface.IPackageServ
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBS
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
+@Tag(name = "User", description = "API for User")
 public class UserController {
 
     private final IUserService userService;

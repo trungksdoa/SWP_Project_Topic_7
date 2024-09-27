@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.io.IOException;
 @CrossOrigin(origins = "*")
 @Validated
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@Tag(name = "Admin API", description = "API for admin")
 public class ManageProductController {
     private final IProductService productService;
     private final IImageService imageService;

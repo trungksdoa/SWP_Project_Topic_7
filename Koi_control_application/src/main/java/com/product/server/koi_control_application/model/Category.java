@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

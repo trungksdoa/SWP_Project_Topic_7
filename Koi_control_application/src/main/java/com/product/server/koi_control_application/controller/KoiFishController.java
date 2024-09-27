@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Validated
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "KoiFish", description = "API for KoiFish")
 public class KoiFishController {
 
     private final IKoiFishService iKoiFishService;

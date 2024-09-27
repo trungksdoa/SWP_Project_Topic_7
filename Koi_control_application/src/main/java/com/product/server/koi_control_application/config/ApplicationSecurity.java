@@ -42,6 +42,11 @@ public class ApplicationSecurity {
             "/api/products/**",
             "/api/payment/**",
             "/api/sse/**",
+            "/swagger-ui/**",
+            "/swagger-resources/*",
+            "/v3/api-docs/**",
+            "api-docs/**",
+            "/swagger-ui.html"
     };
 
 
@@ -68,7 +73,7 @@ public class ApplicationSecurity {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-    
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepo.findByEmail(username)
