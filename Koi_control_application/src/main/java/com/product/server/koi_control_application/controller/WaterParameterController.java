@@ -8,9 +8,9 @@ import com.product.server.koi_control_application.service_interface.IWaterParame
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
-
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
 public class WaterParameterController {
-    @Autowired
+
     private final IWaterParameterService iWaterParameterService;
 
     @PostMapping("{pondId}")
@@ -44,10 +43,10 @@ public class WaterParameterController {
         BaseResponse response = BaseResponse.builder()
                 .data(waterParameter1)
                 .message("Create WaterParameter succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("{pondId}")
@@ -57,10 +56,10 @@ public class WaterParameterController {
         BaseResponse response = BaseResponse.builder()
                 .data(waterParameter1)
                 .message("Create WaterParameter succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("{pondId}")
     public ResponseEntity<BaseResponse> deleteWaterParameterByPondId(@PathVariable("pondId") int pondId) {

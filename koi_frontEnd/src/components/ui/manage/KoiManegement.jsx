@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const KoiManagement = ({ lstKoi }) => {
     const [selectedKoi, setSelectedKoi] = useState(null);
+    console.log(lstKoi)
 
     const handleClick = (koi) => {
         setSelectedKoi(koi);

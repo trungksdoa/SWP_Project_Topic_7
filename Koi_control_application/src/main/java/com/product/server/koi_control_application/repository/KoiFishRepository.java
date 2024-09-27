@@ -25,4 +25,6 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
 
     Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
     int countByPondId(int pondId);
+
+    long countByUserId(int userId);
 }

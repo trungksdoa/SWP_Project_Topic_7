@@ -10,7 +10,6 @@ import { Button } from "antd";
 
 const ProductFeedback = ({ parseID }) => {
   const { data: feedbacks, refetch } = useGetFeedbackById(parseID);
-  console.log(feedbacks)
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const mutation = usePostFeedBack();
   const { t } = useTranslation();
@@ -65,7 +64,7 @@ const ProductFeedback = ({ parseID }) => {
             htmlType="submit"
             className="bg-black mb-[30px] rounded-[6px] p-0 !w-[160px] text-white"
             style={{ display: "block" }}
-            // loading={mutation.isPending}
+            loading={mutation.isPending}
           >
             {t("Send Now")}
           </Button>

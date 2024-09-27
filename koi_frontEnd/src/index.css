@@ -138,3 +138,31 @@
   font-weight: 900;
   font-style: italic;
 }
+
+
+.star-container {
+  position: relative;
+  display: inline-block;
+  font-size: 14px; /* Tùy chỉnh kích thước ngôi sao */
+  color: #ccc; /* Màu xám cho ngôi sao trống */
+}
+
+.star-container .full-star {
+  color: #eab308; /* Màu vàng cho ngôi sao đầy */
+}
+
+.star-container .half-star {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  top: 3px
+}
+
+.star-container .half-star:before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  color: #eab308; /* Màu vàng cho nửa ngôi sao */
+  overflow: hidden;
+}

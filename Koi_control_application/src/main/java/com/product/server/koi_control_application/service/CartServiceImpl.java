@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.repository.CartRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.ICartService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

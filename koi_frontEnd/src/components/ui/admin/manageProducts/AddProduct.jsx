@@ -50,7 +50,6 @@ const AddProduct = () => {
       image: null,
     },
     onSubmit: (values) => {
-      console.log(values);
       const formData = new FormData();
       const product = {
         name: values.name,
@@ -141,7 +140,7 @@ const AddProduct = () => {
         <Form.Item label="Action">
         <Button
           htmlType="submit"
-          className="bg-rose-500 rounded-[6px] p-0 !w-[160px] text-white"
+          className="bg-black hover:!bg-gray-900 hover:!text-white hover:!border-none rounded-[6px] p-0 !w-[160px] text-white"
           style={{ display: "block" }}
           loading={mutation.isPending}
         >

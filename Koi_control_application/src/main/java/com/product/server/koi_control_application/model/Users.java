@@ -105,7 +105,7 @@ public class Users implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "package_id")
     @JsonIgnoreProperties("users")
-    private Package aPackage;
+    private UserPackage aUserPackage;
 
     // UserDetails methods "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"
 

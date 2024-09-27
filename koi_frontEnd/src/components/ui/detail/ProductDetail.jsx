@@ -1,67 +1,118 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useGetProductById } from "../../../hooks/user/UserGetProductById";
-import { InputNumber, Button } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Flex, Spin } from "antd";
-import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { InputNumber, Spin } from "antd";
+import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { StarRating } from "./StarRating";
-import { useSelector } from "react-redux";
-import { usePostFeedBack } from "../../../hooks/feedback/usePostFeedback";
-import { useGetFeedbackById } from "../../../hooks/feedback/useGetFeedbackById";
-import ProductFeedback from "./ProductFeedback";
+import { useFormik } from "formik";
+import { useGetProductById } from "../../../hooks/user/UserGetProductById";
+import { manageCartActions } from "../../../store/manageCart/slice"; // Redux slice
+import { usePostCarts } from "../../../hooks/manageCart/usePostCarts"; // Hook post carts
+import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId"; // Hook get cart
+import ProductFeedback from "./ProductFeedback"; // Component Feedback
 
 const ProductDetail = () => {
-  const [productId, setProductId] = useState(null); // New state for product ID
-  const onChange = (value) => {};
-  const { t } = useTranslation();
   const { id: prdId } = useParams();
   const parseID = parseInt(prdId);
+  const [quantity, setQuantity] = useState(1); // Mặc định là 1
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const {
-    data: product,
-    refetch,
-    isLoading,
-    isFetching,
-  } = useGetProductById(productId || parseID);
-  const formik = useFormik({
-    initialValues: {
+  const userId = userLogin?.id;
+
+  const cart = useSelector((state) => state.manageCart.cart);
+  const cartCount = useSelector((state) => state.manageCart.cartCount);
+
+  const { data: product, refetch, isFetching } = useGetProductById(parseID);
+
+  const { data: carts, refetch: refetchCart } = useGetCartByUserId(userId);
+
+  const mutate = usePostCarts();
+
+  useEffect(() => {
+    refetch();
+    refetchCart();
+
+    // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
+    const isProductInCart = carts?.find(
+      (item) => item.productId === product?.id
+    );
+
+    if (isProductInCart) {
+      setQuantity(isProductInCart.quantity); // Nếu có, thiết lập quantity từ giỏ hàng
+    } else {
+      setQuantity(1); // Nếu chưa có, mặc định là 1
+    }
+  }, [parseID, userId, product?.id, carts]);
+
+  const onChangeQuantity = (value) => {
+    setQuantity(value);
+  };
+
+  const handleAddToCart = () => {
+    if (!userLogin) {
+      toast.error("Please login to add to cart");
+      return;
+    }
+
+    const payload = {
       userId: userLogin?.id,
-      productId: product?.id || parseID,
-      rating: 0,
-      comment: "",
-    },
-    onSubmit: (values) => {
-      mutation.mutate(values, {
+      productId: product?.id,
+      quantity: quantity, 
+    };
+
+    console.log(payload);
+
+    const isProductInCart = carts?.find(
+      (item) => item.productId === product.id
+    );
+    console.log(isProductInCart);
+
+    if (isProductInCart) {
+      const updatedQuantity = quantity; 
+
+      console.log("updatedQuantity", updatedQuantity);
+
+      dispatch(
+        manageCartActions.updateCartQuantity({
+          productId: product.id,
+          quantity: updatedQuantity,
+        })
+      );
+
+      mutate.mutate(
+        { ...payload, quantity: updatedQuantity },
+        {
+          onSuccess: () => {
+            refetchCart();
+            toast.success("Product quantity updated in cart");
+          },
+          onError: () => {
+            toast.error("Failed to update product quantity in cart");
+          },
+        }
+      );
+    } else {
+      dispatch(manageCartActions.setCartCount(cartCount + 1));
+      dispatch(manageCartActions.addToCart({ ...product, quantity }));
+
+      mutate.mutate(payload, {
         onSuccess: () => {
-          formik.resetForm();
-          toast.success("Add Feedback Successfully !");
+          refetchCart();
+          toast.success("Product added to cart");
+        },
+        onError: () => {
+          toast.error("Failed to add product to cart");
         },
       });
-    },
-  });
-
-  useEffect(() => {
-    setProductId(parseID); // Set productId when prdId changes
-    refetch(); // Refetch when productId changes
-  }, [parseID]);
-
-  useEffect(() => {
-    if (product) {
-      formik.setValues({
-        userId: userLogin?.id,
-        productId: product.id,
-        rating: 0,
-        comment: "",
-      });
     }
-  }, [product]); // Update formik values when product changes
+  };
 
   if (isFetching) {
     return (
       <div className="flex justify-center fixed top-0 bottom-0 left-0 right-0 items-center">
-        <Spin tip="Loading" size="large"></Spin>
+        <Spin tip="Loading" size="large" />
       </div>
     );
   }
@@ -78,7 +129,6 @@ const ProductDetail = () => {
         </div>
         <div className="col-span-1">
           <h1 className="text-black font-semibold">{product?.name}</h1>
-
           <div className="flex">
             <p className="font-bold mr-[6px]">Price: </p>
             <p>${product?.price}</p>
@@ -87,27 +137,30 @@ const ProductDetail = () => {
             <InputNumber
               min={1}
               max={100}
-              defaultValue={1}
-              onChange={onChange}
+              value={quantity} // Thiết lập giá trị quantity từ state
+              onChange={onChangeQuantity} // Thay đổi số lượng sản phẩm
               style={{
                 width: "60px",
               }}
             />
             <span className="mx-[10px]">|</span>
-            <button className="bg-black text-white px-[20px] py-[10px] rounded-md hover:bg-black transition-all duration-300">
+            <button
+              className="bg-black text-white px-[20px] py-[10px] rounded-md hover:bg-black transition-all duration-300"
+              onClick={handleAddToCart}
+            >
               Add to cart
             </button>
           </div>
           <div className="my-[20px]">
-            <span className="font-bold  mr-[6px]">Description: </span>
+            <span className="font-bold mr-[6px]">Description: </span>
             <span>{product?.description}</span>
           </div>
         </div>
       </div>
       <hr className="border-gray-600 my-[40px]" />
 
+      {/* Component Feedback */}
       <ProductFeedback parseID={parseID} />
-
     </div>
   );
 };

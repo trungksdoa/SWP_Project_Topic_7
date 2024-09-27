@@ -6,13 +6,12 @@ import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +22,7 @@ import java.io.IOException;
 @RequestMapping("/api/ponds")
 @RequiredArgsConstructor
 @Validated
-@RolesAllowed({"ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SHOP"})
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
 public class PondController {
     private final IPondService iPondService;
     private final IImageService iImageService;
@@ -57,10 +56,10 @@ public class PondController {
         BaseResponse response = BaseResponse.builder()
                 .data(pond1)
                 .message("Get Pond succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -74,10 +73,10 @@ public class PondController {
         BaseResponse response = BaseResponse.builder()
                 .data(iPondService.updatePond(pondId, pond, file))
                 .message("Update pond succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("{pondId}")
@@ -89,10 +88,10 @@ public class PondController {
         BaseResponse response = BaseResponse.builder()
                 .data(pond1)
                 .message("Delete pond succesfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listpond/byuserid/{userId}")
@@ -104,11 +103,11 @@ public class PondController {
         BaseResponse response = BaseResponse.builder()
                 .data(Ponds)
                 .message(mess)
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listpond")
@@ -120,11 +119,11 @@ public class PondController {
         BaseResponse response = BaseResponse.builder()
                 .data(Ponds)
                 .message(mess)
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

@@ -6,34 +6,37 @@ import com.product.server.koi_control_application.custom_exception.NotFoundExcep
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import com.product.server.koi_control_application.model.Pond;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.KoiGrowthHistoryRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
+import com.product.server.koi_control_application.service_interface.IPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+
 public class IKoiFishServiceImpl implements IKoiFishService {
     private final UsersRepository usersRepository;
     private final KoiFishRepository koiFishRepository;
     private final PondRepository pondRepository;
     private final IImageService iImageService;
     private final KoiGrowthHistoryRepository koiGrowthHistoryRepository;
-
+    private final IPackageService iPackageService;
     @Override
     public KoiFish addKoiFish(KoiFish koiFish) {
-        if (!usersRepository.existsById(koiFish.getUserId()))
-            throw new NotFoundException("User not found.");
+        Users user = usersRepository.findById(koiFish.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
 
         if (!pondRepository.existsById(koiFish.getPondId()))
             throw new NotFoundException("Pond not found.");
@@ -43,6 +46,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
         if (koiFishRepository.existsByNameAndPondId(koiFish.getName(), koiFish.getPondId()))
             throw new AlreadyExistedException("KoiFish name existed.");
+
+       if( iPackageService.checkPackageLimit(koiFish.getUserId(), user.getAUserPackage()))
+              throw new NotFoundException("User package limit exceeded.");
 
         KoiFish saved = koiFishRepository.save(koiFish);
         koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()

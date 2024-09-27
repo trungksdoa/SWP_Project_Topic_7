@@ -6,7 +6,7 @@ export const PATH = {
     PRODUCT: '/product',
     NEWS: '/news',
     CONTACT: '/contact',
-    DASHBOARD: '/dashboard',
+    DASHBOARD: '/admin/dashboard',
     PROFILE: '/profile',
     ADMIN: '/admin',
     MANAGE_USER: '/admin/manage-user',

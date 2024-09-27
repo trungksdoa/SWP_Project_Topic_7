@@ -83,6 +83,10 @@ const router = [
         element: <AdminPage />,
         children: [
           {
+            path: PATH.DASHBOARD,
+            element: <DashboardPage />
+          },
+          {
             path: PATH.MANAGE_USER,
             element: <ManageUser />,
           },
