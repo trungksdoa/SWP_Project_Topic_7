@@ -62,8 +62,8 @@ const FormUserUpdate = ({ user, refetch }) => {
             );
             localStorage.setItem(LOCAL_STORAGE_LOGIN_KEY, JSON.stringify(user));
             setComponentDisabled(true);
-            toast.success("User updated successfully");
             refetch();
+            toast.success("User updated successfully");
           },
           onError: () => {
             toast.error("Error updating user");

@@ -22,6 +22,8 @@ import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import SaltCalculator from "../components/ui/manage/SaltCalculator";
 import PaymentLayout from "../components/layouts/PaymentLayout";
 import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
+import CheckoutPage from "../pages/CheckoutPage";
+import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 const router = [
   {
     element: <MainLayout />,
@@ -47,6 +49,10 @@ const router = [
       {
         path: PATH.PROFILE,
         element: <ProfilePage />
+      },
+      {
+        path: PATH.PAYMENT_SUCCESS,
+        element: <PaymentSuccessPage />
       }
     ],
   },
@@ -113,6 +119,10 @@ const router = [
         path: PATH.CART,
         element: <CartPage />,
       },
+      {
+        path: PATH.CHECKOUT,
+        element: <CheckoutPage />
+      }
     ]
   }
 ];
