@@ -23,13 +23,13 @@ public class ManageUserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<BaseResponse> removeUser(@PathVariable int userId) {
         userService.deleteUser(userId);
-        return ResponseUtil.createSuccessResponse(null, "User deleted successfully");
+        return ResponseUtil.createSuccessResponse(null, "Access granted, user deleted");
     }
 
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> fetchAllUser() {
-        return ResponseUtil.createSuccessResponse(userService.getUsers(), "Success");
+        return ResponseUtil.createSuccessResponse(userService.getUsers(), "Access granted");
     }
 }

@@ -38,7 +38,7 @@ public class ManageProductController {
         String filename = imageService.uploadImage(file);
         product.setImageUrl(filename);
         Product createdProduct = productService.createProduct(product);
-        return ResponseUtil.createResponse(createdProduct,"Create product success",HttpStatus.CREATED);
+        return ResponseUtil.createResponse(createdProduct,"Access granted, created successfully",HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
@@ -48,13 +48,13 @@ public class ManageProductController {
         @Valid Product product = objectMapper.readValue(productJson, Product.class);
 
         Product updatedProduct = productService.updateProduct(productId, product,file);
-        return ResponseUtil.createSuccessResponse(updatedProduct, "Product updated successfully");
+        return ResponseUtil.createSuccessResponse(updatedProduct, "Access granted,  updated successfully");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteProduct(@PathVariable int id) {
         productService.deleteProduct(id);
-        return ResponseUtil.createSuccessResponse(null, "Product deleted successfully");
+        return ResponseUtil.createSuccessResponse(null, "Access granted,  deleted successfully");
     }
 
 
