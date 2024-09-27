@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.model;
+package com.product.server.koi_control_application.enums;
 
 public enum UserRoleEnum {
     ROLE_MEMBER(1),

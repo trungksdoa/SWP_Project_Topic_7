@@ -3,9 +3,11 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Pond;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,14 +30,22 @@ public class IPondServiceImpl implements IPondService {
     private final IKoiFishServiceImpl  iKoiFishService;
     private final IWaterParameterService iWaterParameterService;
     private final IImageService iImageService;
+
+    private final IPackageService iPackageService;
     @Override
     public Pond addPond(Pond pond) {
 
-        if(!usersRepository.existsById(pond.getUserId()))
-            throw new NotFoundException("User not found.");
+       Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
 
         if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
             throw new AlreadyExistedException("Pond name existed.");
+
+        if(user.getAUserPackage() == null)
+            throw new NotFoundException("Server error. Please contact admin.");
+
+        if(iPackageService.checkPackageLimit(pond.getUserId(), user.getAUserPackage())){
+            throw new NotFoundException("User package limit exceeded.");
+        }
 
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
 
