@@ -111,16 +111,16 @@ public class PaymentController {
             callbackResponse.setExtraData(extraData);
             callbackResponse.setSignature(signature);
 
-          handleMomoCallback(callbackResponse);
+            handleMomoCallback(callbackResponse);
 
             // Chuyển hướng người dùng đến trang kết quả thanh toán trên website của bạn
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create("https://swp-project-topic-7.vercel.app?orderId=" + orderId +"&resultCode=" + resultCode + "&message=" + message))
+                    .location(URI.create("https://swp-project-topic-7.vercel.app/payment-success/?orderId=" + orderId + "&resultCode=" + resultCode + "&message=" + message + "&orderType=" + orderType))
                     .build();
         } catch (Exception e) {
             // Xử lý lỗi và chuyển hướng đến trang lỗi
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(WEBSITE_URL+"error"))
+                    .location(URI.create(WEBSITE_URL + "error"))
                     .build();
         }
     }
@@ -133,7 +133,7 @@ public class PaymentController {
         String orderType = orderIdParts[1];
         String userId = orderIdParts[2];
 
-        try{
+        try {
             if (callbackResponse.getResultCode() == 0) {
                 if (orderType.equals("product")) {
                     orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PAID.getValue());
@@ -153,7 +153,7 @@ public class PaymentController {
                     log.info("User " + userId + " has not been added package yet");
                 }
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error("Error while handling MoMo callback: " + ex.getMessage());
         }
     }
