@@ -25,7 +25,7 @@ openapi:
     title: Koi Control Application
     description: Koi Control Application
     server:
-      url: http://localhost:8080
+      url: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
     version: 1.0.0
     contact:
       name: Koi Control Application

@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@RepositoryRestResource(exported = false)
 @Transactional
+@RepositoryRestResource(exported = false)
 public interface PondRepository extends JpaRepository<Pond, Integer> {
     boolean existsByNameAndUserId(String name, int userId);
 

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
-@RepositoryRestResource(exported = false)
 @Transactional
+@RepositoryRestResource(exported = false)
 public interface OrderItemsRepository extends JpaRepository<OrderItems, Integer> {
 }

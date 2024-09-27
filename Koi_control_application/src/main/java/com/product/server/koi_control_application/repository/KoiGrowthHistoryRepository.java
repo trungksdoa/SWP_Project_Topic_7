@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
-@RepositoryRestResource(exported = false)
 @Transactional
+@RepositoryRestResource(exported = false)
 public interface KoiGrowthHistoryRepository extends JpaRepository<KoiGrowthHistory, Integer> {
 }

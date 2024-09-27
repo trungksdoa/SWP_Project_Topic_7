@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
-@RepositoryRestResource(exported = false)
 @Transactional
+@RepositoryRestResource(exported = false)
 public interface OrderRepository extends JpaRepository<Orders, Integer> {
     @Query("select o from Orders o where o.userId = ?1")
     Page<Orders> findOrdersByUserId(int userId, Pageable pageable);
