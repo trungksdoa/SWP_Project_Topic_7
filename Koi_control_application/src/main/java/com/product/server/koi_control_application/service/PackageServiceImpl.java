@@ -37,9 +37,10 @@ public class PackageServiceImpl implements IPackageService {
 
     @Override
     public UserPackage createPackage(UserPackage pack) {
-        if (pack.getIsDefault() && getPackageByDefault() != null) {
-            throw new IllegalStateException("Cannot create more than one default package");
+        if (getPackageByDefault() != null && Boolean.TRUE.equals(pack.getIsDefault())) {
+            throw new IllegalStateException("Cannot create another default package, please update the existing default package");
         }
+
         return packageRepository.save(pack);
     }
 
