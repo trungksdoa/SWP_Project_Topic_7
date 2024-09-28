@@ -26,6 +26,8 @@ public class MomoPaymentInfo {
     private MomoUserInfo userInfo;
     private String lang;
 
+    private int orderExpireTime;
+
     MomoPaymentInfo() {
     }
 
