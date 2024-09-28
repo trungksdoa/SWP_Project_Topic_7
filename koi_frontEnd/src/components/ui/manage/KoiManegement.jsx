@@ -1,8 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useGetAllKoi } from '../../../hooks/koi/useGetAllKoi';
 
-const KoiManagement = ({ lstKoi }) => {
+const KoiManagement = () => {
     const [selectedKoi, setSelectedKoi] = useState(null);
+    const userLogin = useSelector((state) => state.manageUser.userLogin)
+    const userId = userLogin?.id
     const [isUpdated, setIsUpdated] = useState(false);
+
+    const {data: lstKoi} = useGetAllKoi(userId)
 
     const handleClick = (koi) => {
         setSelectedKoi(koi);
@@ -11,18 +17,25 @@ const KoiManagement = ({ lstKoi }) => {
     const handleClose = () => {
         setSelectedKoi(null);
         setIsUpdated(false);
+
     };
 
     const handleOutsideClick = (e) => {
         if (e.target.id === 'modal-overlay') {
             setSelectedKoi(null);
             setIsUpdated(false);
+
         }
     };
-
+    
     const handleUpdateClick = () => {
         setIsUpdated(prevState => !prevState);
     };
+
+    
+    if (!lstKoi) {
+        return <div>Loading...</div>;
+    }
 
 
     return (
@@ -38,7 +51,7 @@ const KoiManagement = ({ lstKoi }) => {
                     <h3 className="text-lg mt-2 cursor-pointer" onClick={() => handleClick(koi)}>{koi.name}</h3>
                 </div>
             ))}
-            {selectedKoi && (
+             {selectedKoi && (
                 <div
                     id="modal-overlay"
                     className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"

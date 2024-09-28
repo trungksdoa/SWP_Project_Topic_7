@@ -8,4 +8,5 @@ const api = apiInstanceHeader.create({
 export const managePondServices = {
     getAllPond: () => api.get("/listpond"),
     getPondById: (pondId) => api.get(`/${pondId}`),
+    getPondByUserId: (id) => api.get(`/listpond/byuserid/${id}`)
 };

@@ -41,8 +41,9 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
     dispatch(manageUserActionThunks.loginThunk(data))
       .unwrap()
       .then((res) => {
+        console.log(res)
         toast.success(t('Login successfully'));
-        if (res.roles === "ROLE_USER") {
+        if (res.data.roles[0] === "ROLE_USER") {
           handleOkLogin();
         }
       })

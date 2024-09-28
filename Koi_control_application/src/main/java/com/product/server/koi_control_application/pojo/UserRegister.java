@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.pojo;
 
-import com.product.server.koi_control_application.model.UserRoleEnum;
+import com.product.server.koi_control_application.enums.UserRoleEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

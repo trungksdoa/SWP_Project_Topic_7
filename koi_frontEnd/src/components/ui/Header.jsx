@@ -52,6 +52,15 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
+              to={PATH.FOOD_CALCULATOR}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+            >
+              {t("Calculator")}
+            </NavLink>
+          </li>
+          <li className="flex text-white">
+            <NavLink
+              rel="noopener noreferrer"
               to={PATH.STORE}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { PATH } from "../../../constant";
@@ -11,7 +11,9 @@ import { Input, Space } from "antd";
 const ManageUser = () => {
   const { data: lstUser, refetch } = useGetUserAll();
   const mutate = useDeleteUser();
-  console.log(lstUser);
+  const [filteredName, setFilteredName] = useState([]);
+  const [loadingId, setLoadingId] = useState(null); 
+  console.log(lstUser)
 
   useEffect(() => {
     refetch();
@@ -19,19 +21,25 @@ const ManageUser = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xoá người dùng này không?")) {
+      setLoadingId(id); 
       mutate.mutate(id, {
         onSuccess: () => {
           toast.success("Delete User Successfully!");
           refetch();
+          setLoadingId(null);
         },
         onError: (error) => {
           toast.error("Delete User Failed!");
+          setLoadingId(null);
         },
       });
     }
   };
   const { Search } = Input;
-  const [filteredName, setFilterdName] = useState([]);
+
+  const filteredUsers = lstUser?.filter((user) =>
+    user.roles.some((role) => role.name === "ROLE_MEMBER")
+  );
 
   const onKeyUp = (e) => {
     const input = e?.target.value.toLowerCase();
@@ -94,14 +102,13 @@ const ManageUser = () => {
                 style={{ color: "blue" }}
               />
             ) : (
-              <>
-                <Button
-                  onClick={() => handleDelete(user.id)}
-                  loading={mutate.isPending}
-                >
-                  Delete
-                </Button>
-              </>
+              <Button
+                className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
+                onClick={() => handleDelete(user.id)}
+                loading={loadingId === user.id} 
+              >
+                Delete
+              </Button>
             )}
           </div>
         );

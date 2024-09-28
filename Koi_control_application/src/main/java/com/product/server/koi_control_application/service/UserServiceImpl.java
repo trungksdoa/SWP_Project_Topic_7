@@ -3,11 +3,13 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.UserRegister;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +31,8 @@ public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
-    public final IImageService imageService;
-
+    private final IImageService imageService;
+    private final IPackageService packageService;
 
     @Override
     public Users saveUser(UserRegister register) {
@@ -49,9 +52,10 @@ public class UserServiceImpl implements IUserService {
             user.getRoles().add(new UserRole(register.getRole().getValue()));
             Users savedUser = usersRepository.save(user);
 
-
             // Send email to user
             userRegisterMail(user.getEmail(), savedUser);
+
+            savedUser.setAUserPackage(packageService.getPackageByDefault());
             return savedUser;
         } catch (DataIntegrityViolationException ex) {
             if (ex.getMessage().contains("users_email_unique")) {
@@ -72,7 +76,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Users getUser(int id) {
-        return usersRepository.fetchUsersById(id).orElseThrow(() -> new NotFoundException(String.valueOf(id)));
+        return usersRepository.fetchUsersById(id).orElseThrow(() -> new NotFoundException("No user found with id: " + id));
     }
 
     @Override
@@ -94,6 +98,11 @@ public class UserServiceImpl implements IUserService {
     public Page<Users> getUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return usersRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Users> getUsers() {
+        return usersRepository.findAll();
     }
 
     @Override
@@ -158,5 +167,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Users updateUser(Users rUser) {
         return usersRepository.save(rUser);
+    }
+
+    @Override
+    public Users addPackage(int userId, UserPackage userPackage) {
+        Users user = getUser(userId);
+         user.setAUserPackage(userPackage);
+        return usersRepository.save(user);
     }
 }

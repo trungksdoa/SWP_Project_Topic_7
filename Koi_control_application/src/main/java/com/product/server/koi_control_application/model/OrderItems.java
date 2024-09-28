@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@Hidden
 public class OrderItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.*;
 
 import java.time.LocalDateTime;

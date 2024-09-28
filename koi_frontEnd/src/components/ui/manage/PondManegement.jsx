@@ -2,20 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond.js";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
 const PondManagement = () => {
-    const { data: lstPond, error: pondError } = useGetAllPond();
-    const { data: lstKoi, error: koiError } = useGetAllKoi();
     const [selectedPond, setSelectedPond] = useState(null);
     const [koiInPond, setKoiInPond] = useState([]);
+    const userLogin = useSelector((state) => state.manageUser.userLogin)
+    const userId = userLogin?.id
 
-    useEffect(() => {
-        if (pondError) {
-            console.error('Error fetching ponds:', pondError);
-        }
-        if (koiError) {
-            console.error('Error fetching koi:', koiError);
-        }
-    }, [pondError, koiError]);
+    const {data: lstKoi} = useGetAllKoi(userId);    
+    const {data: lstPond} = useGetAllPond(userId);
+
 
     const handleClick = (pond) => {
         setSelectedPond(pond);
@@ -42,7 +39,7 @@ const PondManagement = () => {
         }
     };
 
-    if (!lstPond || !lstKoi) {
+    if (!lstPond) {
         return <div>Loading...</div>;
     }
 
@@ -123,7 +120,7 @@ const PondManagement = () => {
                                     </div>
                                         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                             {koiInPond.map((koi, index) => (
-                                                <li key={index} className="flex flex-col items-center mb-4">
+                                                <li key={index} className="flex flex-col items-center">
                                                     <img
                                                         src={koi.imageUrl}
                                                         alt={koi.name}

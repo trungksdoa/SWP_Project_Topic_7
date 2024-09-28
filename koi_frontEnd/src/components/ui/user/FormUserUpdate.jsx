@@ -51,16 +51,18 @@ const FormUserUpdate = ({ user, refetch }) => {
               email: values.email,
               address: values.address,
               phoneNumber: values.phoneNumber,
-              active: "true"
-            }
-            dispatch(manageUserActions.updateUserLogin({
-              ...user
-            }))
-            localStorage.setItem(LOCAL_STORAGE_LOGIN_KEY, JSON.stringify(user))
-            setComponentDisabled(true); 
-            console.log(componentDisabled)
+              password: values.password,
+              active: "true",
+            };
+            dispatch(
+              manageUserActions.updateUserLogin({
+                ...user,
+              })
+            );
+            localStorage.setItem(LOCAL_STORAGE_LOGIN_KEY, JSON.stringify(user));
+            setComponentDisabled(true);
+            refetch();
             toast.success("User updated successfully");
-            refetch()
           },
           onError: () => {
             toast.error("Error updating user");

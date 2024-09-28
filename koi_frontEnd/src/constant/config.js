@@ -15,6 +15,8 @@ export const PATH = {
     EDIT_PRODUCT: '/admin/manage-product/edit-product',
     DETAIL_PRODUCT: '/store/detail',
     CART: '/cart',
+    CHECKOUT: '/checkout',
+    PAYMENT_SUCCESS: '/payment-success',
     KOI_MANAGEMENT: '/koi-management',
     POND_MANAGEMENT: '/pond-management',
     DETAIL_POND: '/pond-detail',

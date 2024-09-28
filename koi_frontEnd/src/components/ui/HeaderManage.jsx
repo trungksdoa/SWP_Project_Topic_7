@@ -1,17 +1,23 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
 import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
 import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
+import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
+import { manageCartActions } from "../../store/manageCart/slice";
 
 const HeaderManage = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
   const cartCount = useSelector((state) => state.manageCart.cartCount);
+  const userLogin = useSelector((state) => state.manageUser.userLogin);
+  const { data: carts } = useGetCartByUserId(userLogin?.id);
   const navigate = useNavigate();
 
   const toggleOverlay = () => {
@@ -23,6 +29,12 @@ const HeaderManage = () => {
     setIsOverlay(!isOverlay);
     setIsMenuOpen(!isMenuOpen);
   };
+
+  useEffect(() => {
+    if (!isLoggedOut) {
+      dispatch(manageCartActions.setCartCount(carts?.length || 0));
+    }
+  }, [carts, dispatch, isLoggedOut]);
 
   return (
     <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
@@ -78,6 +90,22 @@ const HeaderManage = () => {
           </li>
         </ul>
         <div className="items-center flex-shrink-0 hidden lg:flex">
+          <div className="relative">
+            <ShoppingCartOutlined
+              style={{
+                color: "white",
+                marginRight: "15px",
+                fontSize: "30px",
+                cursor: "pointer",
+              }}
+              onClick={() => navigate(PATH.CART)}
+            />
+            {cartCount > 0 && (
+              <span className="text-white text-center absolute top-[-17px] right-[0px] bg-green-400 !w-[30px] !h-[30px] leading-[30px] !rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </div>
           <UserMenu />
           <div className="ml-4">
             <LanguageSwitcher />
