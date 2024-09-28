@@ -8,6 +8,6 @@ export const useGetOrder = (id) => {
     })
     return {
         ...q, 
-        data: q?.data?.data?.data?.content
+        data: q?.data?.data?.data
     }
 }
