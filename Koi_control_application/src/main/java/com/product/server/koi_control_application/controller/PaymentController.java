@@ -181,6 +181,7 @@ public class PaymentController {
                 .items(request.getMomoProducts())
                 .userInfo(request.getMomoUserInfo())
                 .lang("en")
+                .orderExpireTime(15)
                 .build();
     }
 
