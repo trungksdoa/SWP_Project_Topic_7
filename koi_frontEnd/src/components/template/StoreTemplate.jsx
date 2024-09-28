@@ -16,22 +16,22 @@ const StoreTemplate = () => {
   // State và hook dùng chung
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
-
+  const cart = useSelector((state) => state.manageCart.cart);
+  const cartCount = useSelector((state) => state.manageCart.cartCount);
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { data: lstProducts, isFetching } = useGetAllProducts();
-
-  console.log(lstProducts);
+  const { data: carts, refetch } = useGetCartByUserId(userId);
+  const mutate = usePostCarts();
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     if (lstProducts) {
-      console.log("Product list updated:", lstProducts);
-      setFilteredProducts(lstProducts);
+      setFilteredProducts(lstProducts); 
     }
   }, [lstProducts]);
 
@@ -46,20 +46,44 @@ const StoreTemplate = () => {
       productId: product?.id,
       quantity: 1,
     };
+
+    const isProductInCart = cart.find((item) => item.id === product.id);
+
+    if (isProductInCart) {
+      const updatedQuantity = isProductInCart.quantity + 1;
+      dispatch(manageCartActions.updateCartQuantity({ productId: product.id, quantity: updatedQuantity }));
+      mutate.mutate({ ...payload, quantity: updatedQuantity }, {
+        onSuccess: () => {
+          refetch();
+          toast.success("Product quantity updated in cart");
+        },
+        onError: () => {
+          toast.error("Failed to update product quantity in cart");
+        },
+      });
+    } else {
+      dispatch(manageCartActions.setCartCount(cartCount + 1));
+      dispatch(manageCartActions.addToCart({ ...product, quantity: 1 }));
+      mutate.mutate(payload, {
+        onSuccess: () => {
+          refetch(); 
+          toast.success("Product added to cart");
+        },
+        onError: () => {
+          toast.error("Failed to add product to cart");
+        },
+      });
+    }
   };
 
   // Function lọc sản phẩm dựa trên categoryId
-  const filterProducts = (
-    products,
-    isWaterTreatmentChecked,
-    isKoiTreatmentChecked
-  ) => {
+  const filterProducts = (products, isWaterTreatmentChecked, isKoiTreatmentChecked) => {
     let filteredProducts = products;
 
     if (isWaterTreatmentChecked && !isKoiTreatmentChecked) {
-      filteredProducts = products.filter((product) => product.categoryId === 1);
+      filteredProducts = products.filter(product => product.categoryId === 1);
     } else if (!isWaterTreatmentChecked && isKoiTreatmentChecked) {
-      filteredProducts = products.filter((product) => product.categoryId === 2);
+      filteredProducts = products.filter(product => product.categoryId === 2);
     }
 
     return filteredProducts;
@@ -68,11 +92,7 @@ const StoreTemplate = () => {
   const onChange = (checkedValues) => {
     const isWaterTreatmentChecked = checkedValues.includes("A");
     const isKoiTreatmentChecked = checkedValues.includes("B");
-    const filteredProducts = filterProducts(
-      lstProducts,
-      isWaterTreatmentChecked,
-      isKoiTreatmentChecked
-    );
+    const filteredProducts = filterProducts(lstProducts, isWaterTreatmentChecked, isKoiTreatmentChecked);
     setFilteredProducts(filteredProducts);
   };
 
@@ -99,7 +119,10 @@ const StoreTemplate = () => {
           <p className="text-2xl">Filter</p>
         </div>
         <div className="border-[1px] border-gray-300 rounded-[6px] px-[15px] py-[10px]">
-          <Checkbox.Group style={{ width: "100%" }} onChange={onChange}>
+          <Checkbox.Group
+            style={{ width: "100%" }}
+            onChange={onChange}
+          >
             <Row className="flex flex-col">
               <Row className="mb-[15px] !w-full" span={8}>
                 <Checkbox value="A">Water Treatment</Checkbox>
@@ -126,92 +149,35 @@ const StoreTemplate = () => {
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-[30px]">
-          {filteredProducts?.map((prd, index) => {
-            console.log(
-              `Rendering product: ${prd?.id}, image: ${prd?.imageUrl}`
-            );
-            return (
-              <Card
-                key={prd?.id}
-                hoverable
-                style={{
-                  width: 240,
-                  border: "1px solid #ccc",
-                  overflow: "hidden",
-                }}
-                onClick={() => {
-                  navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`);
-                }}
-                cover={
-                  <img
-                    alt={prd?.name}
-                    className="relative z-0 max-h-[250px] object-contain cursor-pointer"
-                    src={`${prd?.imageUrl}?t=${new Date().getTime()}`}
-                  />
-                }
-              >
-                <div className="p-[2px]">
-                  <h2 className="font-bold min-h-[44px] mb-[5px]">
-                    {prd?.name}
-                  </h2>
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">
-                      Price:{" "}
-                      <span className="!font-normal text-[16px]">
-                        ${prd?.price}
-                      </span>
-                    </p>
-                    <div className="flex items-center">
-                      {Array.from({ length: 5 }, (_, index) => {
-                        const ratingValue = index + 1; // Tạo giá trị rating từ 1 đến 5
-                        return (
-                          <span key={index} className="star-container">
-                            {prd?.averageRating >= ratingValue ? (
-                              <span className="full-star">★</span>
-                            ) : prd?.averageRating >= ratingValue - 0.5 ? (
-                              <span className="half-star">★</span>
-                            ) : (
-                              <span className="empty-star">☆</span>
-                            )}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-              // <Card
-              //   className="flex flex-col justify-around col-span-1"
-              //   key={index}
-              //   onClick={() => {
-              //     navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`)
-              //   }}
-              //   cover={<img alt="example" className="max-h-[250px] object-contain mt-[10px] cursor-pointer" src={prd?.imageUrl} />}
-              // >
-              //   <div className="flex justify-center items-center">
-              //     <h1 className="text-[16px]">{prd?.name}</h1>
-              //   </div>
-              //   <div>
-              //     <p>Price: ${prd?.price}</p>
-              //   </div>
-              //   {/* <div className="flex justify-between items-center mt-[20px]">
-              //     <button
-              //       className="border-[1px] hover:bg-black hover:text-white transition-all duration-300 border-gray-300 rounded-[6px] px-[20px] py-[10px]"
-              //       onClick={() => navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`)}
-              //     >
-              //       View Detail
-              //     </button>
-              //     <button
-              //       className="bg-black text-white rounded-[6px] px-[20px] py-[10px]"
-              //       onClick={_}
-              //     >
-              //       Buy Now
-              //     </button>
-              //   </div> */}
-              // </Card>
-            );
-          })}
+        <div className="grid grid-cols-3 gap-[30px]">
+          {filteredProducts?.map((prd, index) => (
+            <Card
+              className="col-span-1 p-[20px]"
+              key={index}
+              cover={<img alt="example" className="min-h-[340px] object-contain mt-[10px]" src={prd?.imageUrl} />}
+            >
+              <div className="flex justify-center items-center">
+                <h1 className="text-[16px]">{prd?.name}</h1>
+              </div>
+              <div>
+                <p>Price: ${prd?.price}</p>
+              </div>
+              <div className="flex justify-between items-center mt-[20px]">
+                <button
+                  className="border-[1px] hover:bg-black hover:text-white transition-all duration-300 border-gray-300 rounded-[6px] px-[20px] py-[10px]"
+                  onClick={() => navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`)}
+                >
+                  View Detail
+                </button>
+                <button
+                  className="bg-black text-white rounded-[6px] px-[20px] py-[10px]"
+                  onClick={() => addToCart(prd)}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
