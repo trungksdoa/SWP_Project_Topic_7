@@ -83,7 +83,7 @@ const AdminTemplate = () => {
           <Header>
             <div className="container text-right">
               <Button
-                className="ms-auto bg-orange-500 text-white hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
+                className="ms-auto bg-black text-white hover:!text-white hover:!bg-black"
                 onClick={() => {
                   handleLogout();
                 }}
