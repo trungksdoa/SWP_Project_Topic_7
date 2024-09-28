@@ -16,6 +16,7 @@ public class MomoRequestBody  extends MomoPaymentInfo{
     private boolean autoCapture;
     private String signature;
     private String storeName;
+    private int orderExpireTime;
 
     //
 }
