@@ -98,7 +98,7 @@ const FormUserUpdate = ({ user, refetch }) => {
   };
 
   return (
-    <div className="w-[80%] mx-[auto]">
+    <div className="!w-[100%] mx-[auto] flex flex-col">
       <>
         <Checkbox
           checked={!componentDisabled}
@@ -109,10 +109,10 @@ const FormUserUpdate = ({ user, refetch }) => {
         </Checkbox>
         <Form
           labelCol={{ span: 4 }}
-          wrapperCol={{ span: 14 }}
+          wrapperCol={{ span: 16 }}
           layout="horizontal"
           disabled={componentDisabled}
-          style={{ maxWidth: 600, marginTop: "40px" }}
+          style={{ width: "100%", marginTop: "40px" }} // Đã thay đổi từ maxWidth thành width
           onSubmitCapture={formik.handleSubmit}
         >
           <Form.Item label="Name">

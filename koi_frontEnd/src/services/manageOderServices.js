@@ -6,5 +6,6 @@ const api = apiInstanceHeader.create({
 });
  
 export const manageOrderServices = {
-    postOrder: (payload) => api.post('/create-product-order', payload)
+    postOrder: (payload) => api.post('/create-product-order', payload),
+    getOrderByUserId: (id) => api.get(`/user/${id}`)
 }

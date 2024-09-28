@@ -68,13 +68,18 @@ const AdminTemplate = () => {
               </NavLink>
             </Menu.Item>
             <Menu.Item className="text-white" key={5} icon={<UserOutlined  style={{color: "white"}}/>}>
-              <NavLink key={1} to={PATH.MANAGE_USER} className="!text-white">
+              <NavLink key={2} to={PATH.MANAGE_USER} className="!text-white">
                 {t("Manage Users")}
               </NavLink>
             </Menu.Item>
             <Menu.Item className="text-white" key={6} icon={<ProductOutlined  style={{color: "white"}}/>}>
-              <NavLink key={1} to={PATH.MANAGE_PRODUCTS} className="!text-white">
+              <NavLink key={3} to={PATH.MANAGE_PRODUCTS} className="!text-white">
                 {t("Manage Products")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item className="text-white" key={6} icon={<ProductOutlined  style={{color: "white"}}/>}>
+              <NavLink key={4} to={PATH.MANAGE_PACKAGE} className="!text-white">
+                {t("Manage Packages")}
               </NavLink>
             </Menu.Item>
           </Menu>

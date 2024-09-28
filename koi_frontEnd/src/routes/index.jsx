@@ -24,6 +24,8 @@ import PaymentLayout from "../components/layouts/PaymentLayout";
 import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
 import CheckoutPage from "../pages/CheckoutPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
+import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
+import HistoryPage from "../pages/HistoryPage";
 const router = [
   {
     element: <MainLayout />,
@@ -53,6 +55,10 @@ const router = [
       {
         path: PATH.PAYMENT_SUCCESS,
         element: <PaymentSuccessPage />
+      },
+      {
+        path: PATH.HISTORY_ORDER,
+        element: <HistoryPage />
       }
     ],
   },
@@ -108,6 +114,10 @@ const router = [
             path: PATH.MANAGE_PRODUCTS,
             element: <ManageProducts />,
           },
+          {
+            path: PATH.MANAGE_PACKAGE,
+            element: <ManagePackage />
+          }
         ],
       },
     ],
