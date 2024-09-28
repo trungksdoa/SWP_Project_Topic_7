@@ -43,10 +43,10 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              to={PATH.HOME}
+              to={PATH.KOI_MANAGEMENT}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Home")}
+              {t("Management")}
             </NavLink>
           </li>
           <li className="flex text-white">
@@ -65,15 +65,6 @@ const Header = () => {
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
               {t("Store")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              href="#"
-              className="flex items-center px-4 -mb-1  dark:border-"
-            >
-              {t("Base")}
             </NavLink>
           </li>
           <li className="flex text-white">
