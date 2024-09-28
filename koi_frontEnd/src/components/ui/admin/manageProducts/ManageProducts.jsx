@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Spin } from "antd";
+import React, { useState } from "react";
+import { Table, Input, Button } from "antd";
 import { useGetAllProducts } from "../../../../hooks/admin/manageProducts/UseGetAllProducts";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteProduct } from "../../../../hooks/admin/manageProducts/UseDeleteProduct";
@@ -8,12 +8,9 @@ import { PATH } from "../../../../constant";
 import { toast } from "react-toastify";
 
 const ManageProducts = () => {
-  const { data: lstProducts, refetch, isFetching } = useGetAllProducts();
+  const { data: lstProducts, refetch } = useGetAllProducts();
   const mutate = useDeleteProduct();
   const navigate = useNavigate();
-  useEffect(() => {
-    refetch()
-  }, [])
 
   // State để lưu trữ ID sản phẩm đang được xóa
   const [deletingId, setDeletingId] = useState(null);
@@ -43,19 +40,19 @@ const ManageProducts = () => {
       defaultSortOrder: "ascend",
       sorter: (a, b) => a.id - b.id,
       sortDirections: ["ascend", "descend"],
-      width: "5%",
+      width: "5%"
     },
     {
       title: "Name",
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
-      width: "15%",
+      width: "15%"
     },
     {
       title: "Price",
       dataIndex: "price",
       sorter: (a, b) => a.price - b.price,
-      width: "5%",
+      width: "5%"
     },
     {
       title: "Image",
@@ -63,48 +60,37 @@ const ManageProducts = () => {
       render: (imageUrl) => (
         <img className="w-[100px]" src={imageUrl} alt="product" />
       ),
-      width: "10%",
+      width: "10%"
+
     },
     {
       title: "Description",
       dataIndex: "description",
       sorter: (a, b) => a.stock - b.stock,
-      width: "30%",
+      width: "35%"      
     },
     {
       title: "Stock",
       dataIndex: "stock",
       sorter: (a, b) => a.stock - b.stock,
-      width: "5%",
+      width: "5%"
     },
     {
       title: "categoryId",
       dataIndex: "categoryId",
-      render: (categoryId) => (
-        <span>
-          {categoryId === 1
-            ? "Water Treatment"
-            : categoryId === 2
-            ? "Koi Treatment"
-            : "Unknown"}
-        </span>
-      ),
-      width: "10%",
+      sorter: (a, b) => a.categoryId - b.categoryId,
+      width: "5%"
     },
     {
       title: "Action",
       render: (_, prd) => (
         <div key={prd.id}>
-          <Button
-            onClick={() => {
+          <Button onClick={() => {
               navigate(`${PATH.EDIT_PRODUCT}/${prd?.id}`);
-            }}
-            className="mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
-          >
+            }} className="mr-[30px]">
             Edit
           </Button>
           <Button
-          className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
             onClick={() => handleDelete(prd?.id)}
             loading={deletingId === prd?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
             disabled={deletingId === prd?.id} // Vô hiệu hóa nút nếu đang xóa
@@ -113,7 +99,7 @@ const ManageProducts = () => {
           </Button>
         </div>
       ),
-      width: "15%",
+      width: "15%" 
     },
   ];
 
@@ -129,20 +115,14 @@ const ManageProducts = () => {
   };
 
   const data = filteredName.length > 0 ? filteredName : lstProducts;
-  if (isFetching) {
-    return (
-      <div className="flex justify-center fixed top-0 bottom-0 left-0 right-0 items-center">
-        <Spin tip="Loading" size="large" />
-      </div>
-    );
-  }
 
   return (
     <div>
       <Search
-        style={{ marginBottom: "20px"}}
+        style={{ marginBottom: "20px" }}
         placeholder="input search text"
         allowClear
+        enterButton="Search"
         size="large"
         onKeyUp={onKeyUp}
       />

@@ -6,7 +6,7 @@ export const PATH = {
     PRODUCT: '/product',
     NEWS: '/news',
     CONTACT: '/contact',
-    DASHBOARD: '/admin/dashboard',
+    DASHBOARD: '/dashboard',
     PROFILE: '/profile',
     ADMIN: '/admin',
     MANAGE_USER: '/admin/manage-user',
@@ -24,6 +24,7 @@ export const PATH = {
     HISTORY_ORDER: '/history-order',
     KOI_MANAGEMENT: '/koi-management',
     POND_MANAGEMENT: '/pond-management',
+    DETAIL_POND: '/pond-detail',
     WATER_PARAMETER: '/water-parameter',
     FOOD_CALCULATOR: '/food-calculator',
     SALT_CALCULATOR: '/salt-calculator'

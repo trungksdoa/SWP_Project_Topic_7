@@ -104,6 +104,12 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
+    @GetMapping("/user/{userId}/list")
+    public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId) {
+        List<Orders> orders = orderService.getOrdersByUser(userId);
+        return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
+    }
+
     @GetMapping("/status/{orderId}")
     public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
         Orders order = orderService.getOrderById(orderId);
@@ -115,8 +121,8 @@ public class OrderController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size) {
+                                                        @RequestParam(defaultValue = "0",required = false) int page,
+                                                        @RequestParam(defaultValue = "10",required = false) int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }

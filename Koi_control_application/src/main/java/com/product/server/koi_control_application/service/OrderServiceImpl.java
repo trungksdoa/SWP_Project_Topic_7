@@ -113,4 +113,9 @@ public class OrderServiceImpl implements IOrderService {
         return orderRepository.findOrdersByUserId(userId, pageable);
     }
 
+    @Override
+    public List<Orders> getOrdersByUser(int userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
 }

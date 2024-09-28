@@ -27,6 +27,7 @@ const EditProduct = () => {
       image: null,
     },
     onSubmit: (values) => {
+      console.log(values);
       const formData = new FormData();
       const updatedProduct = {
         name: values.name,
@@ -46,7 +47,6 @@ const EditProduct = () => {
       // Gửi request PUT với formData và id
       mutation.mutate({ id: parseId, payload: formData }, {
         onSuccess: (response) => {
-          formik.resetForm()
           toast.success("Product updated successfully");
         },
         onError: (error) => {

@@ -7,7 +7,6 @@ import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +23,7 @@ public class PackageServiceImpl implements IPackageService {
         return packageRepository.findAll();
     }
 
+
     @Override
     public UserPackage getPackageById(int id) {
         return packageRepository.findById(id).orElseThrow(() -> new RuntimeException("Package not found"));
@@ -34,11 +34,13 @@ public class PackageServiceImpl implements IPackageService {
         return packageRepository.findByIsDefault(true);
     }
 
+
     @Override
     public UserPackage createPackage(UserPackage pack) {
-         if(getPackageByDefault() != null){
-            throw new IllegalStateException("Cannot create more than one default package");
-         }
+        if (getPackageByDefault() != null && Boolean.TRUE.equals(pack.getIsDefault())) {
+            throw new IllegalStateException("Cannot create another default package, please update the existing default package");
+        }
+
         return packageRepository.save(pack);
     }
 

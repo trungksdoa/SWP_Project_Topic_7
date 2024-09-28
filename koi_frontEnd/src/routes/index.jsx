@@ -26,6 +26,8 @@ import CheckoutPage from "../pages/CheckoutPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
 import HistoryPage from "../pages/HistoryPage";
+import PondDetail from "../components/ui/manage/PondDetail";
+
 const router = [
   {
     element: <MainLayout />,
@@ -74,6 +76,10 @@ const router = [
         element: <PondManegementPage />
       },
       {
+        path: `${PATH.DETAIL_POND}/:pondId`,
+        element: <PondDetail />
+      },
+      {
         path: PATH.WATER_PARAMETER,
         element: <WaterParameter />
       },
@@ -94,10 +100,6 @@ const router = [
         path: PATH.ADMIN,
         element: <AdminPage />,
         children: [
-          {
-            path: PATH.DASHBOARD,
-            element: <DashboardPage />
-          },
           {
             path: PATH.MANAGE_USER,
             element: <ManageUser />,
