@@ -10,9 +10,10 @@ import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 const FormUserUpdate = ({ user, refetch }) => {
   const mutation = useUpdateUser();
   const [imgSrc, setImgSrc] = useState("");
-  const [componentDisabled, setComponentDisabled] = useState(true);
-  const dispatch = useDispatch();
-  const userLogin = useSelector((state) => state.manageUser.userLogin);
+  const [componentDisabled, setComponentDisabled] = useState(true); 
+  const dispatch = useDispatch()
+  const userLogin = useSelector((state) => state.manageUser.userLogin)
+  console.log(userLogin)
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -21,20 +22,18 @@ const FormUserUpdate = ({ user, refetch }) => {
       email: user?.email || "",
       address: user?.address || "",
       phoneNumber: user?.phoneNumber || "",
-      password: "",
       avatar: null,
     },
     onSubmit: (values) => {
-      const accessToken = userLogin?.accessToken;
-      const roles = userLogin?.roles;
-      const id = userLogin?.id;
+      const accessToken = userLogin?.accessToken 
+      const roles = userLogin?.roles
+      const id = userLogin?.id
       const formData = new FormData();
       const updateUser = {
         username: values.username,
         email: values.email,
         address: values.address,
         phoneNumber: values.phoneNumber,
-        password: values.password
       };
       if (values.avatar) {
         formData.append("avatar", values.avatar);
@@ -47,7 +46,7 @@ const FormUserUpdate = ({ user, refetch }) => {
             const user = {
               accessToken,
               roles,
-              id,
+              id, 
               username: values.username,
               email: values.email,
               address: values.address,
@@ -91,14 +90,14 @@ const FormUserUpdate = ({ user, refetch }) => {
         setImgSrc(e.target?.result);
       };
       formik.setFieldValue("avatar", file);
-      setComponentDisabled(false);
+      setComponentDisabled(false); 
     } else {
-      setComponentDisabled(true);
+      setComponentDisabled(true); 
     }
   };
 
   return (
-    <div className="w-[80%] mx-[auto]">
+    <div className="w-[60%] mx-[auto]">
       <>
         <Checkbox
           checked={!componentDisabled}
@@ -119,22 +118,11 @@ const FormUserUpdate = ({ user, refetch }) => {
             <Input
               name="username"
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              onBlur={formik.handleBlur} 
               value={formik.values.username}
-              disabled={componentDisabled}
+              disabled={componentDisabled} 
             />
           </Form.Item>
-
-          <Form.Item label="Change Password">
-            <Input.Password
-              name="password"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.password}
-              disabled={componentDisabled}
-            />
-          </Form.Item>
-
           <Form.Item label="Address">
             <Input
               name="address"

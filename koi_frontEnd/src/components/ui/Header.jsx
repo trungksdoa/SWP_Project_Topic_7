@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
 import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
@@ -7,25 +7,19 @@ import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
-import { manageCartActions } from "../../store/manageCart/slice";
 
 const Header = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
-  const [isLoggedOut, setIsLoggedOut] = useState(false);
-  const dispatch = useDispatch();
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const userId = userLogin?.id;
+  const userId = userLogin?.id
+  console.log(userId)
   const { data: carts } = useGetCartByUserId(userId);
-  // Calculate total quantity from carts
 
-  useEffect(() => {
-    if (!isLoggedOut) {
-      dispatch(manageCartActions.setCartCount(carts?.length || 0));
-    }
-  }, [carts, dispatch, isLoggedOut]);
+  // Calculate total quantity from carts
+  const totalQuantity = carts?.reduce((acc, cart) => acc + cart.quantity, 0) || 0;
 
   const navigate = useNavigate();
 
@@ -49,10 +43,10 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              to={PATH.KOI_MANAGEMENT}
+              to={PATH.HOME}
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
-              {t("Management")}
+              {t("Home")}
             </NavLink>
           </li>
           <li className="flex text-white">
@@ -79,6 +73,15 @@ const Header = () => {
               href="#"
               className="flex items-center px-4 -mb-1  dark:border-"
             >
+              {t("Base")}
+            </NavLink>
+          </li>
+          <li className="flex text-white">
+            <NavLink
+              rel="noopener noreferrer"
+              href="#"
+              className="flex items-center px-4 -mb-1  dark:border-"
+            >
               {t("Blog")}
             </NavLink>
           </li>
@@ -94,13 +97,13 @@ const Header = () => {
               }}
               onClick={() => navigate(PATH.CART)}
             />
-            {cartCount > 0 && (
+            {totalQuantity > 0 && (
               <span className="text-white text-center absolute top-[-17px] right-[0px] bg-green-400 !w-[30px] !h-[30px] leading-[30px] !rounded-full">
-                {cartCount}
+                {totalQuantity}
               </span>
             )}
           </div>
-          <UserMenu setIsLoggedOut={setIsLoggedOut} />
+          <UserMenu />
           <div className="ml-4">
             <LanguageSwitcher />
           </div>
@@ -122,7 +125,8 @@ const Header = () => {
           </svg>
         </button>
       </div>
-      {/* 
+
+      {/* Mobile sliding menu */}
       <div
         className={`z-20 fixed top-0 left-0 w-[50%] h-full bg-orange-500 transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -148,7 +152,7 @@ const Header = () => {
             </button>
           </div>
           <ul className="space-y-2 mt-[60px]">
-            
+            {/* Mobile menu items */}
             <li>
               <NavLink
                 to={PATH.HOME}
@@ -219,7 +223,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
       <div
         className={`fixed z-10 top-0 left-0 w-full h-full bg-black opacity-50 ${
           isOverlay ? "block" : "hidden"
