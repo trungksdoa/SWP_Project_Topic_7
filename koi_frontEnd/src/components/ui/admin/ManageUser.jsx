@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
 import { toast } from "react-toastify";
 import { Input, Spin } from "antd";
@@ -10,7 +10,8 @@ const ManageUser = () => {
   const { data: lstUser, refetch, isFetching } = useGetUserAll();
   const mutate = useDeleteUser();
   const [filteredName, setFilteredName] = useState([]);
-  const [loadingId, setLoadingId] = useState(null); // Thêm state để theo dõi ID đang loading
+  const [loadingId, setLoadingId] = useState(null); 
+  console.log(lstUser)
 
   useEffect(() => {
     refetch();
@@ -18,16 +19,16 @@ const ManageUser = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xoá người dùng này không?")) {
-      setLoadingId(id); // Đặt ID đang loading
+      setLoadingId(id); 
       mutate.mutate(id, {
         onSuccess: () => {
           toast.success("Delete User Successfully!");
           refetch();
-          setLoadingId(null); // Reset ID khi xóa thành công
+          setLoadingId(null);
         },
         onError: (error) => {
           toast.error("Delete User Failed!");
-          setLoadingId(null); // Reset ID khi xóa thất bại
+          setLoadingId(null);
         },
       });
     }
@@ -43,7 +44,6 @@ const ManageUser = () => {
 
   const { Search } = Input;
 
-  // Lọc danh sách người dùng có role là "ROLE_MEMBER"
   const filteredUsers = lstUser?.filter((user) =>
     user.roles.some((role) => role.name === "ROLE_MEMBER")
   );
@@ -97,7 +97,7 @@ const ManageUser = () => {
               <Button
                 className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
                 onClick={() => handleDelete(user.id)}
-                loading={loadingId === user.id} // Chỉ hiển thị loading cho ID đang xóa
+                loading={loadingId === user.id} 
               >
                 Delete
               </Button>
