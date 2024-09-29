@@ -4,7 +4,6 @@ import com.product.server.koi_control_application.custom_exception.NotFoundExcep
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.pojo.CartDTO;
 import com.product.server.koi_control_application.repository.CartRepository;
-import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;

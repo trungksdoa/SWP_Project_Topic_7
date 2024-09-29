@@ -27,18 +27,24 @@ public class ProductServiceImpl implements IProductService {
     private final IImageService imageService;
     @Override
     @Transactional
-    public Product createProduct(Product product) {
+    public Product createProduct(Product product, MultipartFile productImage) throws IOException {
+
+        if (productImage != null && !productImage.isEmpty()) {
+            String filename = imageService.uploadImage(productImage);
+            product.setImageUrl(filename);
+        }
+
         product = productRepository.save(product);
         return product;
     }
 
     @Override
     @Transactional
-    public Product updateProduct(int id, Product product , MultipartFile file) throws IOException {
+    public Product updateProduct(int id, Product product , MultipartFile productImage) throws IOException {
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
 
-        if (file != null) {
-            String filename = imageService.updateImage(existingProduct.getImageUrl(), file);
+        if (productImage != null) {
+            String filename = imageService.updateImage(existingProduct.getImageUrl(), productImage);
             existingProduct.setImageUrl(filename);
         }else{
             existingProduct.setImageUrl(existingProduct.getImageUrl());

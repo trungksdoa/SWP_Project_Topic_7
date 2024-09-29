@@ -10,11 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeedbackRequest {
-    private int userId;
-    private int productId;
-    private Integer rating;
-    private String comment;
-
-
+public class UserDTO {
+    private String username;
+    private String phoneNumber;
+    private String address;
+    private String password;
 }

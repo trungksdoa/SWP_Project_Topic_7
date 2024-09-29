@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDTO {
     @NotNull @Email(message = "Invalid email format")
     private String email;
     @NotNull

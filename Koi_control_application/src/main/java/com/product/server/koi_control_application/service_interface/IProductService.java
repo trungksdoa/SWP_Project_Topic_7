@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IProductService {
-    Product createProduct(Product product);
-    Product updateProduct(int id, Product product, MultipartFile file) throws IOException; ;
+    Product createProduct(Product product, MultipartFile productImage) throws IOException;
+    Product updateProduct(int id, Product product, MultipartFile productImage) throws IOException;
     void deleteProduct(int productId);
     Product getProduct(int productId);
     Page<Product> getAllProducts(int page, int size);
