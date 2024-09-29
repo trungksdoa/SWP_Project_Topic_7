@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
 import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
@@ -7,11 +7,14 @@ import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
+import { manageCartActions } from "../../store/manageCart/slice";
+
 
 const Header = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id
@@ -19,7 +22,9 @@ const Header = () => {
   const { data: carts } = useGetCartByUserId(userId);
 
   // Calculate total quantity from carts
-  const totalQuantity = carts?.reduce((acc, cart) => acc + cart.quantity, 0) || 0;
+  const dispatch = useDispatch();
+
+  // const totalQuantity = carts?.reduce((acc, cart) => acc + cart.quantity, 0) || 0;
 
   const navigate = useNavigate();
 
@@ -32,7 +37,11 @@ const Header = () => {
     setIsOverlay(!isOverlay);
     setIsMenuOpen(!isMenuOpen);
   };
-
+  useEffect(() => {
+    if (!isLoggedOut) {
+      dispatch(manageCartActions.setCartCount(carts?.length || 0));
+    }
+  }, [carts, dispatch, isLoggedOut]);
   return (
     <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between h-16 mx-auto">
@@ -88,9 +97,9 @@ const Header = () => {
               }}
               onClick={() => navigate(PATH.CART)}
             />
-            {totalQuantity > 0 && (
+            {cartCount > 0 && (
               <span className="text-white text-center absolute top-[-17px] right-[0px] bg-green-400 !w-[30px] !h-[30px] leading-[30px] !rounded-full">
-                {totalQuantity}
+                {cartCount}
               </span>
             )}
           </div>

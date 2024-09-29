@@ -172,3 +172,122 @@
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
+
+.custom-button {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #ff923f, #ff6f00);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 2s;
+}
+
+.custom-button:hover {
+  background: linear-gradient(90deg, #ff9f38, #ff704d);
+  animation: wiggle 0.5s ease-in-out infinite; /* Gọi animation lắc */
+}
+
+.icon {
+  margin-right: 8px; /* Khoảng cách giữa biểu tượng và chữ */
+}
+
+/* Định nghĩa keyframes cho chuyển động lắc */
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(3deg); /* Lắc sang phải */
+  }
+  50% {
+    transform: rotate(-3deg); /* Lắc sang trái */
+  }
+  75% {
+    transform: rotate(3deg); /* Lắc sang phải */
+  }
+}
+
+.scrollable-navbar {
+  display: flex;
+  white-space: nowrap; /* Ngăn các item xuống dòng */
+  overflow-x: auto; /* Kích hoạt scroll ngang */
+  -webkit-overflow-scrolling: touch; /* Mượt mà hơn khi cuộn trên di động */
+}
+
+.scrollable-navbar li {
+  flex-shrink: 0; /* Đảm bảo các mục không bị thu nhỏ */
+  padding: 10px 15px;
+}
+
+::-webkit-scrollbar {
+  display: none; /* Ẩn thanh cuộn cho các trình duyệt Webkit */
+}
+
+
+@media (max-width: 1024px) {
+  .scrollable-navbar {
+    display: flex;
+    overflow-x: auto; /* Kích hoạt scroll ngang cho màn hình nhỏ */
+  }
+}
+.scrollable-navbar-wrapper {
+  position: relative;
+}
+
+.scrollable-navbar {
+  padding: 0.5rem;
+  overflow-x: auto; /* Cho phép cuộn ngang */
+}
+
+.scrollable-navbar::-webkit-scrollbar {
+  display: none; /* Ẩn scrollbar */
+}
+
+.scrollable-navbar li {
+  list-style-type: none;
+}
+
+.scrollable-navbar li a {
+  text-decoration: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s;
+}
+
+.scrollable-navbar li a:hover {
+  color: #ccc; /* Màu khi hover */
+}
+
+.custom-button {
+  background-color: #4caf50; /* Màu nền cho button */
+  color: white; /* Màu chữ cho button */
+  padding: 0.5rem 1rem; /* Padding cho button */
+  border: none; /* Ẩn border */
+  border-radius: 4px; /* Bo tròn góc cho button */
+  cursor: pointer; /* Hiển thị cursor pointer */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
+}
+
+.custom-button:hover {
+  background-color: #45a049; /* Màu nền khi hover */
+}
+
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent);
+}
+
+.bg-gradient-to-l {
+  background-image: linear-gradient(to left, rgba(255, 207, 159, 0.37), transparent);
+}
+
+/* Định dạng cho các icon */
+.icon-style {
+  color: white;
+  margin-right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+}

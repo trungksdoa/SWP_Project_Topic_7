@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
@@ -18,6 +18,8 @@ const HeaderManage = () => {
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const { data: carts } = useGetCartByUserId(userLogin?.id);
+  const navbarRef = useRef(null);
+  const [showGradient, setShowGradient] = useState(false);
   const navigate = useNavigate();
 
   const toggleOverlay = () => {
@@ -36,60 +38,93 @@ const HeaderManage = () => {
     }
   }, [carts, dispatch, isLoggedOut]);
 
+  useEffect(() => {
+    const checkScroll = () => {
+      if (navbarRef.current) {
+        const { scrollWidth, clientWidth } = navbarRef.current;
+        setShowGradient(scrollWidth > clientWidth);
+      }
+    };
+
+    checkScroll(); // Kiểm tra khi component được mount
+
+    window.addEventListener("resize", checkScroll); // Kiểm tra khi resize
+    return () => {
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, []);
+
   return (
     <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
-      <div className="container flex justify-between h-16 mx-auto">
-        <Link to={PATH.HOME}>
-          <img className="w-[65px]" src="../../images/logo.webp" alt="logo" />
+      <div className="container flex justify-between items-center h-16 mx-auto">
+        <Link to={PATH.HOME} className="mr-[30px]">
+          <img className="w-[80px]" src="../../images/logo.webp" alt="logo" />
         </Link>
-        <ul className="items-stretch hidden space-x-3 lg:flex">
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.KOI_MANAGEMENT}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
-            >
-              {t("Koi Management")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.POND_MANAGEMENT}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
-            >
-              {t("Pond Management")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.WATER_PARAMETER}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
-            >
-              {t("Water Parameter")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.FOOD_CALCULATOR}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
-            >
-              {t("Food Calculator")}
-            </NavLink>
-          </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.SALT_CALCULATOR}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
-            >
-              {t("Salt Calculator")}
-            </NavLink>
-          </li>
-        </ul>
-        <div className="items-center flex-shrink-0 hidden lg:flex">
+        <div className="scrollable-navbar-wrapper relative overflow-hidden">
+          <ul
+            className="scrollable-navbar flex overflow-x-auto whitespace-nowrap p-2 scrollbar-hide"
+            ref={navbarRef}
+          >
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.KOI_MANAGEMENT}
+                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+              >
+                {t("Koi Management")}
+              </NavLink>
+            </li>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.POND_MANAGEMENT}
+                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+              >
+                {t("Pond Management")}
+              </NavLink>
+            </li>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.WATER_PARAMETER}
+                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+              >
+                {t("Water Parameter")}
+              </NavLink>
+            </li>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.FOOD_CALCULATOR}
+                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+              >
+                {t("Food Calculator")}
+              </NavLink>
+            </li>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.SALT_CALCULATOR}
+                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+              >
+                {t("Salt Calculator")}
+              </NavLink>
+            </li>
+            <li>
+              <button className="custom-button">Upgrade Account</button>
+            </li>
+          </ul>
+
+          {/* Hiển thị gradient chỉ khi có scroll */}
+          {showGradient && (
+            <>
+              <div className="absolute top-0 bottom-0 left-0 w-12 pointer-events-none bg-gradient-to-r from-black/50 to-transparent z-10" />
+              <div className="absolute top-0 bottom-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-black/50 to-transparent z-10" />
+            </>
+          )}
+        </div>
+
+        <div className="items-center ml-[30px] flex-shrink-0 hidden lg:flex">
           <div className="relative">
             <ShoppingCartOutlined
               style={{
@@ -198,7 +233,7 @@ const HeaderManage = () => {
                 className="block text-white hover:text-black transition-all duration-300"
                 onClick={toggleMenu}
               >
-                {t("Blog")}
+                {t("Fish")}
               </NavLink>
             </li>
             <li className="!my-[30px]">
@@ -207,32 +242,12 @@ const HeaderManage = () => {
                 className="block text-white hover:text-black transition-all duration-300"
                 onClick={toggleMenu}
               >
-                {t("Login")}
-              </NavLink>
-            </li>
-            <li className="!my-[30px]">
-              <NavLink
-                href="#"
-                className="block text-white hover:text-black transition-all duration-300"
-                onClick={toggleMenu}
-              >
-                {t("Register")}
+                {t("Account")}
               </NavLink>
             </li>
           </ul>
-          <div className="mt-4">
-            <div className="mt-2">
-              <LanguageSwitcher />
-            </div>
-          </div>
         </div>
       </div>
-      <div
-        className={`fixed z-10 top-0 left-0 w-full h-full bg-black opacity-50 ${
-          isOverlay ? "block" : "hidden"
-        } lg:hidden`}
-        onClick={toggleOverlay}
-      ></div>
     </header>
   );
 };
