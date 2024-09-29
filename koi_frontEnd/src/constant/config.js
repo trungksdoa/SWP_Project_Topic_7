@@ -27,5 +27,6 @@ export const PATH = {
     DETAIL_POND: '/pond-detail',
     WATER_PARAMETER: '/water-parameter',
     FOOD_CALCULATOR: '/food-calculator',
-    SALT_CALCULATOR: '/salt-calculator'
+    SALT_CALCULATOR: '/salt-calculator',
+    PACKAGES: '/packages'
 }

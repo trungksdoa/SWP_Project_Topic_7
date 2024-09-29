@@ -69,7 +69,7 @@ const FormCheckout = ({ totalItems }) => {
             <span className="text-orange-500 font-bold">{totalItems}</span>{" "}
             items
           </span>
-          <Button type="primary" loading={mutation.isPending} htmlType="submit">
+          <Button className="!bg-black text-white hover:!bg-black hover:!text-white p-4" loading={mutation.isPending} htmlType="submit">
             PLACE ORDER
           </Button>
         </div>

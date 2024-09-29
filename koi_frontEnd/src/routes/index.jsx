@@ -27,6 +27,7 @@ import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
 import HistoryPage from "../pages/HistoryPage";
 import PondDetail from "../components/ui/manage/PondDetail";
+import PackagesPage from "../pages/PackagesPage";
 
 const router = [
   {
@@ -90,6 +91,10 @@ const router = [
       {
         path: PATH.SALT_CALCULATOR,
         element: <SaltCalculator />
+      },
+      {
+        path: PATH.PACKAGES,
+        element: <PackagesPage />
       }
     ],
   },

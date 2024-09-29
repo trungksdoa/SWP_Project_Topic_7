@@ -111,7 +111,9 @@ const HeaderManage = () => {
               </NavLink>
             </li>
             <li>
-              <button className="custom-button">Upgrade Account</button>
+              <NavLink to={PATH.PACKAGES}>
+                <button className="custom-button">Upgrade Account</button>
+              </NavLink>
             </li>
           </ul>
 

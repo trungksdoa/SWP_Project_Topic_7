@@ -10,6 +10,7 @@ import {
   CarFilled,
   HomeFilled,
   DesktopOutlined,
+  ProductOutlined
 } from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import {
