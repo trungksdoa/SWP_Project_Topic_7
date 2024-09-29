@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.pojo;
 
+import com.product.server.koi_control_application.model.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,4 +16,5 @@ public class BlogCreateDTO {
     @Schema(description = "Blog body content", example = "This is the main content of my blog post...")
     private String body;
 
+    private int author;
 }

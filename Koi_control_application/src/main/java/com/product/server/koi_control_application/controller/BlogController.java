@@ -2,12 +2,16 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Blogs;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.BlogCreateDTO;
 import com.product.server.koi_control_application.service_interface.IBlogService;
+import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +31,8 @@ import java.util.List;
 @Tag(name = "Blog", description = "API for blog")
 public class BlogController {
     private final IBlogService blogService;
-
+    private final JwtTokenUtil jwtUtil;
+    private final IUserService userService;
     @GetMapping
     public ResponseEntity<List<Blogs>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
@@ -46,11 +51,16 @@ public class BlogController {
     public ResponseEntity<BaseResponse> createBlog(
             @RequestPart("blog") @Schema(type = "string", format = "json", implementation = BlogCreateDTO.class) String blogJson,
             @RequestPart(value = "headerImage", required = false) MultipartFile headerImage,
-            @RequestPart(value = "bodyImage", required = false) MultipartFile bodyImage) throws IOException {
+            @RequestPart(value = "bodyImage", required = false) MultipartFile bodyImage,
+            HttpServletRequest request
+    ) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
-        @Valid Blogs blog = mapper.readValue(blogJson, Blogs.class);
 
+        int userId = jwtUtil.getUserIdFromToken(request);
+        Blogs blog = mapper.readValue(blogJson, Blogs.class);
+        Users author = userService.getUser(userId);
+        blog.setAuthor(author);
         return ResponseUtil.createResponse(blogService.createBlog(blog, headerImage, bodyImage),
                 "Created blog successfully",
                 HttpStatus.CREATED);
