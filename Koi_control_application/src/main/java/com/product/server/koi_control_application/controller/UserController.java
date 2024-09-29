@@ -72,6 +72,7 @@ public class UserController {
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
                 .avatar(user.getAvatarUrl())
+                .userPackage(user.getAUserPackage())
                 .build();
         return ResponseUtil.createSuccessResponse(userResponse, "User retrieved successfully");
     }
@@ -86,14 +87,7 @@ public class UserController {
                 savedUser
         );
 
-        UserResponse userResponse = UserResponse.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .address(savedUser.getAddress())
-                .phoneNumber(savedUser.getPhoneNumber())
-                .build();
-        return ResponseUtil.createResponse(userResponse, "User registered successfully", HttpStatus.CREATED);
+        return ResponseUtil.createResponse(null, "User registered successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/login")

@@ -25,7 +25,8 @@ public interface IUserService {
 
     Page<Users> getUsers(int page, int size);
 
-    List<Users>  getUsers();
+    List<Users> getUsers();
+
     void deleteUser(int id);
 
     Users saveUser(UserRegister register);

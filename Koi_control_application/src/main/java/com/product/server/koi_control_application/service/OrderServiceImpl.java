@@ -60,7 +60,6 @@ public class OrderServiceImpl implements IOrderService {
                             .build();
                     savedOrder.setTotalAmount(order.getTotalAmount() + product.getPrice() * cart.getQuantity());
                     savedOrder.getItems().add(orderItemsRepository.save(orderItems));
-//                    cartRepository.deleteByProductId(cart.getProductId());
                 }
         );
         orderRepository.save(savedOrder);
@@ -69,7 +68,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public Orders getOrderById(int id) {
-        return orderRepository.findById(id).orElse(null);
+        return orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found"));
     }
 
     @Override
@@ -86,10 +85,8 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public void cancelPendingOrder(int userId, int orderId) {
-        Orders order = orderRepository.findByUserIdAndId(userId, orderId);
-        if (order == null) {
-            throw new NotFoundException("Order not found");
-        }
+        Orders order = orderRepository.findByUserIdAndId(userId, orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+
         if(!order.getStatus().equals("PENDING")){
             throw new InsufficientException("Order cannot be cancelled");
         }
