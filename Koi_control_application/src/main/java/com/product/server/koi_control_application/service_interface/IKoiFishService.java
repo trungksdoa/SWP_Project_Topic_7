@@ -17,6 +17,6 @@ public interface IKoiFishService {
     void deleteKoiFish(int id);
     int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException;
-    KoiGrowthHistory getGrowthHistory(int koiId);
+    Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size);
 
 }

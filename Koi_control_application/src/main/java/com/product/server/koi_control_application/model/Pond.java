@@ -17,6 +17,7 @@ import lombok.Builder;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity
@@ -69,13 +70,24 @@ public class Pond {
 
     @PrePersist
     protected void onCreate() {
+        calculateAndSetVolume();
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
+
+    public void calculateAndSetVolume() {
+        if (length != null && width != null && depth != null) {
+            this.volume = length.multiply(width).multiply(depth)
+            .setScale(2, RoundingMode.HALF_UP);
+        } else {
+            this.volume = BigDecimal.ZERO; // Nếu có thông số nào bị thiếu, volume sẽ là 0
+        }
+    }
     @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate(){
+        calculateAndSetVolume();
+    updatedAt = LocalDateTime.now();
     }
 
 

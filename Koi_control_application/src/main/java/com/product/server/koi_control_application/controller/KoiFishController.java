@@ -129,8 +129,7 @@ public class KoiFishController {
     }
 
     @GetMapping("/listkoi")
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
-    public ResponseEntity<BaseResponse> getKoisByUserId() {
+    public ResponseEntity<BaseResponse> getKois() {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
 
         String mess = "Get all koifish succesfully";
@@ -148,14 +147,14 @@ public class KoiFishController {
 
     @GetMapping("/grhis/{koiFishId}")
     public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId) {
-        KoiGrowthHistory koiGrowthHistory1 = iKoiFishService.getGrowthHistory(koiFishId);
+        Page<KoiGrowthHistory> koiGrowthHistorys = iKoiFishService.getGrowthHistorys(koiFishId,0, 10);
         BaseResponse response = BaseResponse.builder()
-                .data(koiGrowthHistory1)
+                .data(koiGrowthHistorys)
                 .message("Get growth history successfully")
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(HttpStatus.OK.value())
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

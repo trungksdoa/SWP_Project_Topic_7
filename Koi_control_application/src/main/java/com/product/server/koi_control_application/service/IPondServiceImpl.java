@@ -3,6 +3,8 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Pond;
+import com.product.server.koi_control_application.model.WaterQualityStandard;
+import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
@@ -28,6 +30,8 @@ public class IPondServiceImpl implements IPondService {
     private final IKoiFishService iKoiFishService;
     private final IWaterParameterService iWaterParameterService;
     private final IImageService iImageService;
+    private final KoiFishRepository koiFishRepository;
+
     @Override
     public Pond addPond(Pond pond) {
 
@@ -38,8 +42,14 @@ public class IPondServiceImpl implements IPondService {
             throw new AlreadyExistedException("Pond name existed.");
 
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
-        pond.setVolume(pond.getLength().multiply(pond.getWidth()).multiply(pond.getDepth()));
+        pondRepository.save(pond);
+        WaterQualityStandard    waterQualityStandard = new WaterQualityStandard();
+
+        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
+
         return pondRepository.save(pond);
+
     }
 
     @Override
@@ -83,7 +93,7 @@ public class IPondServiceImpl implements IPondService {
             throw new AlreadyExistedException("Pond name existed.");
 
 
-        if(file != null) {
+        if(file != null && !file.isEmpty()){
             String filename = iImageService.updateImage(pond.getImageUrl(), file);
             pond.setImageUrl(filename);
         }else{
@@ -92,12 +102,14 @@ public class IPondServiceImpl implements IPondService {
 
 
         pond.setName(request.getName());
-        pond.setImageUrl(request.getImageUrl());
         pond.setWidth(request.getWidth());
         pond.setLength(request.getLength());
         pond.setDepth(request.getDepth());
-        pond.setVolume(pond.getLength().multiply(pond.getWidth()).multiply(pond.getDepth()));
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(id));
+
+        WaterQualityStandard waterQualityStandard = iWaterParameterService.getWaterQualityByPondId(pond.getId());
+        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
         return pondRepository.save(pond);
     }

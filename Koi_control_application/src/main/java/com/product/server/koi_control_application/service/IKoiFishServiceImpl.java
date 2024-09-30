@@ -141,7 +141,8 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
-    public KoiGrowthHistory getGrowthHistory(int koiId) {
-        return koiGrowthHistoryRepository.findByKoiId(koiId);
+    public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
 }

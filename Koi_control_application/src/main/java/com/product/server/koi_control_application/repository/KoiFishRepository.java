@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @Transactional
 public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
@@ -22,7 +24,7 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
                                           @Param("id") int id);
 
     Page<KoiFish> findAllByPondId(int pondId, Pageable pageable);
-
+    List<KoiFish> findAllByPondId(int pondId);
     Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
     int countByPondId(int pondId);
 
