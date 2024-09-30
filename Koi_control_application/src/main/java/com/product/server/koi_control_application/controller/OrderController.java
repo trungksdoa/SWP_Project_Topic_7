@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.model.Payment;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
@@ -29,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import java.net.http.HttpResponse;
 import java.util.*;
 
+import static com.product.server.koi_control_application.enums.PAYMENT.FAILED;
+import static com.product.server.koi_control_application.enums.PAYMENT.PAID;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
 
@@ -60,14 +61,6 @@ public class OrderController {
         momoUserInfo.setName(req.getFullName());
         momoUserInfo.setPhoneNumber(req.getPhone());
         momoUserInfo.setEmail(userOrdered.getEmail());
-
-        paymentService.createPaymentStatus(Payment.builder()
-                .referenceId(createdOrder.getId())
-                .referenceType("ORDER")
-                .paymentMethod("MOMO")
-                .paymentDescription("Payment for order " + createdOrder.getId())
-                .paymentStatus("PENDING")
-                .build());
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
                 .amount((long) createdOrder.getTotalAmount())
@@ -132,6 +125,7 @@ public class OrderController {
     @DeleteMapping("/user/{userId}/order/{orderId}")
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
+        paymentService.updatePaymentStatus(orderId, FAILED.getValue());
         return ResponseUtil.createSuccessResponse(null, "Order cancelled successfully");
     }
 

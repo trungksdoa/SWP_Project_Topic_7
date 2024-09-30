@@ -26,6 +26,12 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
+    public void updatePaymentStatus(int referenceId, String paymentStatus) {
+        Payment payment = paymentRepository.findById(referenceId).orElseThrow(() -> new RuntimeException("Payment not found"));
+        payment.setPaymentStatus(paymentStatus);
+    }
+
+    @Override
     public void clearPaymentStatusByDate(LocalDateTime fromDate, LocalDateTime toDate) {
         paymentRepository.deleteByPaymentDateRange(fromDate, toDate);
     }

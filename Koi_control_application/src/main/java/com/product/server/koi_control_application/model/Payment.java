@@ -17,12 +17,11 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int referenceId; // Có thể là orderId hoặc packageId
+    private String referenceId; // Có thể là orderId hoặc packageId
     private String referenceType; // "ORDER" hoặc "PACKAGE"
     private String paymentMethod;
     private String paymentDescription;
     private String paymentStatus;
-    private String paymentType;
 
     private LocalDateTime paymentDate;
 

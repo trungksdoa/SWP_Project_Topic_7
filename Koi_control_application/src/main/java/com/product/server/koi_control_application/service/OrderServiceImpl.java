@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.InsufficientException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.enums.OrderStatus;
+import com.product.server.koi_control_application.enums.ORDER;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.model.OrderItems;
 import com.product.server.koi_control_application.model.Orders;
@@ -65,7 +65,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelPendingOrder(int userId, int orderId) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId).orElseThrow(() -> new NotFoundException("Order not found"));
 
-        if (!order.getStatus().equals(OrderStatus.PENDING.getValue())) {
+        if (!order.getStatus().equals(ORDER.PENDING.getValue())) {
             throw new InsufficientException("Order cannot be cancelled");
         }
 
@@ -76,7 +76,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelOrderByAdmin(int orderId, String message) {
         Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
 
-        order.setStatus(OrderStatus.CANCELED.getValue());
+        order.setStatus(ORDER.CANCELED.getValue());
         order.setResponseFromAdmin(message);
         orderRepository.save(order);
     }
@@ -108,7 +108,7 @@ public class OrderServiceImpl implements IOrderService {
     private Orders createInitialOrder(int userId, OrderProductDTO orderProductDTO) {
         return Orders.builder()
                 .userId(userId)
-                .status(OrderStatus.PENDING.getValue())
+                .status(ORDER.PENDING.getValue())
                 .fullName(orderProductDTO.getFullName())
                 .address(orderProductDTO.getAddress())
                 .phone(orderProductDTO.getPhone())
@@ -140,7 +140,7 @@ public class OrderServiceImpl implements IOrderService {
             Product product = productService.getProduct(item.getProductId().getId());
             productService.increaseProductQuantity(product.getId(), item.getQuantity());
         }
-        order.setStatus(OrderStatus.CANCELED.getValue());
+        order.setStatus(ORDER.CANCELED.getValue());
         orderRepository.save(order);
     }
 }
