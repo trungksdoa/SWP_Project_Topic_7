@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.custom_exception;
 
-import com.product.server.koi_control_application.pojo.ErrorResponse;
+import com.product.server.koi_control_application.pojo.response.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -15,7 +15,6 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.stream.Collectors;
@@ -33,6 +32,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex) {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.NOT_FOUND.value(), "Resource not found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(OrderExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleOrderExpiredException(OrderExpiredException ex) {
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(AlreadyExistedException.class)
@@ -88,10 +93,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.CONFLICT.value(),  ex.getMostSpecificCause().getMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.CONFLICT.value(), ex.getMostSpecificCause().getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
-
 
 
     @ExceptionHandler(ExpiredJwtException.class)

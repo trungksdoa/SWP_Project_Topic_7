@@ -10,8 +10,7 @@ import {
   CarFilled,
   HomeFilled,
   DesktopOutlined,
-  ProductOutlined,
-  DashboardOutlined,
+  ProductOutlined
 } from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import {
@@ -62,19 +61,19 @@ const AdminTemplate = () => {
                 />
               </NavLink>
             </div>
-            <Menu.Item className="text-white" key={4} icon={<DashboardOutlined  style={{color: "white"}}/>}>
-              <NavLink key={1} to={PATH.DASHBOARD} className="!text-white">
-                {t("Dashboard")}
-              </NavLink>
-            </Menu.Item>
             <Menu.Item className="text-white" key={5} icon={<UserOutlined  style={{color: "white"}}/>}>
-              <NavLink key={1} to={PATH.MANAGE_USER} className="!text-white">
+              <NavLink key={2} to={PATH.MANAGE_USER} className="!text-white">
                 {t("Manage Users")}
               </NavLink>
             </Menu.Item>
             <Menu.Item className="text-white" key={6} icon={<ProductOutlined  style={{color: "white"}}/>}>
-              <NavLink key={1} to={PATH.MANAGE_PRODUCTS} className="!text-white">
+              <NavLink key={3} to={PATH.MANAGE_PRODUCTS} className="!text-white">
                 {t("Manage Products")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item className="text-white" key={6} icon={<ProductOutlined  style={{color: "white"}}/>}>
+              <NavLink key={4} to={PATH.MANAGE_PACKAGE} className="!text-white">
+                {t("Manage Packages")}
               </NavLink>
             </Menu.Item>
           </Menu>
@@ -83,7 +82,7 @@ const AdminTemplate = () => {
           <Header>
             <div className="container text-right">
               <Button
-                className="ms-auto bg-orange-500 text-white hover:!text-white hover:!border-orange-600 hover:!bg-orange-600"
+                className="ms-auto bg-black text-white hover:!text-white hover:!bg-black"
                 onClick={() => {
                   handleLogout();
                 }}

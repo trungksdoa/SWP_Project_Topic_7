@@ -1,11 +1,13 @@
 package com.product.server.koi_control_application.controller;
 
+
 import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.CartDTO;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,11 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "Cart Controller", description = "APIs for managing cart")
 public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
+
 
     @PostMapping
     public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
@@ -35,15 +39,19 @@ public class CartController {
         }
     }
 
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> getCartByUser(@PathVariable int userId) {
         return ResponseUtil.createSuccessResponse(cartService.getCart(userId), "Cart items retrieved successfully");
     }
 
+
     @PutMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> updateCartItem(@RequestBody CartDTO cartDTO, @PathVariable int userId) {
         return ResponseUtil.createSuccessResponse(cartService.updateCart(cartDTO, userId), "Cart item updated successfully");
     }
+
+
 
     @DeleteMapping("/remove/{productId}/user/{userId}")
     public ResponseEntity<BaseResponse> removeFromCart(@PathVariable int productId, @PathVariable int userId) {

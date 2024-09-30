@@ -25,6 +25,7 @@ public class MomoPaymentInfo {
     private List<MomoProduct> items;
     private MomoUserInfo userInfo;
     private String lang;
+    private int orderExpireTime;
 
     MomoPaymentInfo() {
     }

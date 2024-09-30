@@ -2,12 +2,12 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.model.Product;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Tag(name = "Product", description = "API for Product")
 public class ProductController {
     private final IProductService productService;
 

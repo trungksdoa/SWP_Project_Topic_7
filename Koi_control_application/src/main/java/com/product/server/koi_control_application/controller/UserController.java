@@ -7,15 +7,20 @@ import com.product.server.koi_control_application.custom_exception.ForbiddenExce
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.*;
+import com.product.server.koi_control_application.pojo.request.*;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
+import com.product.server.koi_control_application.pojo.response.AuthResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.UserResponse;
 import com.product.server.koi_control_application.service_interface.IEmailService;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +55,7 @@ import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBS
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
+@Tag(name = "User", description = "API for User")
 public class UserController {
 
     private final IUserService userService;
@@ -70,6 +76,7 @@ public class UserController {
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
                 .avatar(user.getAvatarUrl())
+                .userPackage(user.getAUserPackage())
                 .build();
         return ResponseUtil.createSuccessResponse(userResponse, "User retrieved successfully");
     }
@@ -84,22 +91,15 @@ public class UserController {
                 savedUser
         );
 
-        UserResponse userResponse = UserResponse.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .address(savedUser.getAddress())
-                .phoneNumber(savedUser.getPhoneNumber())
-                .build();
-        return ResponseUtil.createResponse(userResponse, "User registered successfully", HttpStatus.CREATED);
+        return ResponseUtil.createResponse(null, "User registered successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(), loginRequest.getPassword())
+                            loginRequestDTO.getEmail(), loginRequestDTO.getPassword())
             );
 
             Users user = (Users) authentication.getPrincipal();
@@ -129,11 +129,11 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<BaseResponse> forgotPassword(@RequestBody @Valid EmailRequest emailRequest) {
+    public ResponseEntity<BaseResponse> forgotPassword(@RequestBody @Valid EmailRequestDTO emailRequestDTO) {
         try {
             String newPassword = userService.generateNewPassword();
-            userService.updatePassword(emailRequest.getEmail(), newPassword);
-            emailService.sendPasswordToEmail(emailRequest.getEmail(), newPassword);
+            userService.updatePassword(emailRequestDTO.getEmail(), newPassword);
+            emailService.sendPasswordToEmail(emailRequestDTO.getEmail(), newPassword);
 
             return ResponseUtil.createSuccessResponse("Password sent to email successfully", "Password sent to email successfully");
         } catch (NotFoundException e) {
@@ -161,7 +161,11 @@ public class UserController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
-    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId, @RequestPart("user") String userJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+    public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId,
+                                                  @Schema(type = "string", format = "json", implementation = UserDTO.class)
+                                                  @RequestPart("user") String userJson,
+                                                  @RequestParam(value = "image",
+                                                          required = false) MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Users userData = objectMapper.readValue(userJson, Users.class);
 
@@ -173,7 +177,7 @@ public class UserController {
 
     @PostMapping("/add-package")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
-    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageDTO req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);
         UserPackage pack = packageService.getPackageById(req.getPackageId());
         return ResponseUtil.createResponse(handlePackage(userService.getUser(userId), pack), "UPGRADE PACKAGE SUCCESSFULLY", HttpStatus.CREATED);

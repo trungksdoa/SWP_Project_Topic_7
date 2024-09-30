@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.request;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderPackageRequest {
+public class OrderPackageDTO {
     private int packageId;
-//    private String packageName;
 }

@@ -2,7 +2,6 @@ package com.product.server.koi_control_application.model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,11 +20,20 @@ public class Blogs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
     private String title;
+
     @Column(columnDefinition = "TEXT")
-    @Size(min = 1, message = "Content must not be empty")
-    private String content;
+    private String headerTop;
+    @Column(columnDefinition = "TEXT")
+    private String contentTop;
+
+    @Column(columnDefinition = "TEXT")
+    private String headerMiddle;
+    @Column(columnDefinition = "TEXT")
+    private String contentMiddle;
+
+    private String headerImageUrl;
+    private String bodyImageUrl;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)

@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.request;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderProductRequest {
+public class OrderProductDTO {
 
     private String fullName;
 

@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.UserRegister;
+import com.product.server.koi_control_application.pojo.request.UserRegister;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +25,8 @@ public interface IUserService {
 
     Page<Users> getUsers(int page, int size);
 
-    List<Users>  getUsers();
+    List<Users> getUsers();
+
     void deleteUser(int id);
 
     Users saveUser(UserRegister register);

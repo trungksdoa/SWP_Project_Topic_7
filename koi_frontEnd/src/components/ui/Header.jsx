@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
@@ -9,23 +9,22 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
 import { manageCartActions } from "../../store/manageCart/slice";
 
+
 const Header = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
-  const dispatch = useDispatch();
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const userId = userLogin?.id;
+  const userId = userLogin?.id
+  console.log(userId)
   const { data: carts } = useGetCartByUserId(userId);
-  // Calculate total quantity from carts
 
-  useEffect(() => {
-    if (!isLoggedOut) {
-      dispatch(manageCartActions.setCartCount(carts?.length || 0));
-    }
-  }, [carts, dispatch, isLoggedOut]);
+  // Calculate total quantity from carts
+  const dispatch = useDispatch();
+
+  // const totalQuantity = carts?.reduce((acc, cart) => acc + cart.quantity, 0) || 0;
 
   const navigate = useNavigate();
 
@@ -38,7 +37,11 @@ const Header = () => {
     setIsOverlay(!isOverlay);
     setIsMenuOpen(!isMenuOpen);
   };
-
+  useEffect(() => {
+    if (!isLoggedOut) {
+      dispatch(manageCartActions.setCartCount(carts?.length || 0));
+    }
+  }, [carts, dispatch, isLoggedOut]);
   return (
     <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between h-16 mx-auto">
@@ -53,6 +56,15 @@ const Header = () => {
               className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
             >
               {t("Management")}
+            </NavLink>
+          </li>
+          <li className="flex text-white">
+            <NavLink
+              rel="noopener noreferrer"
+              to={PATH.FOOD_CALCULATOR}
+              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+            >
+              {t("Calculator")}
             </NavLink>
           </li>
           <li className="flex text-white">
@@ -91,7 +103,7 @@ const Header = () => {
               </span>
             )}
           </div>
-          <UserMenu setIsLoggedOut={setIsLoggedOut} />
+          <UserMenu />
           <div className="ml-4">
             <LanguageSwitcher />
           </div>
@@ -113,7 +125,8 @@ const Header = () => {
           </svg>
         </button>
       </div>
-      {/* 
+
+      {/* Mobile sliding menu */}
       <div
         className={`z-20 fixed top-0 left-0 w-[50%] h-full bg-orange-500 transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -139,7 +152,7 @@ const Header = () => {
             </button>
           </div>
           <ul className="space-y-2 mt-[60px]">
-            
+            {/* Mobile menu items */}
             <li>
               <NavLink
                 to={PATH.HOME}
@@ -210,7 +223,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
       <div
         className={`fixed z-10 top-0 left-0 w-full h-full bg-black opacity-50 ${
           isOverlay ? "block" : "hidden"

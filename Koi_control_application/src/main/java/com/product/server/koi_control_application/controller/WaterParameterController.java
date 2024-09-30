@@ -7,8 +7,9 @@ import com.product.server.koi_control_application.pojo.WaterParameterUpdateReque
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IPondService;
+
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
-import jakarta.annotation.security.RolesAllowed;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "WaterParameter", description = "API for WaterParameter")
 public class WaterParameterController {
 
     private final IWaterParameterService iWaterParameterService;

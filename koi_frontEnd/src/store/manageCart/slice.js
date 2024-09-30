@@ -14,7 +14,6 @@ export const { reducer: manageCartReducer, actions: manageCartActions } = create
             state.cart.push(action.payload)
         },
         setCartCount: (state, action) => {
-            console.log(action.payload)
             state.cartCount = action.payload
         },
         updateCartQuantity: (state, action) => {

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.OrderProductRequest;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
@@ -13,6 +13,7 @@ import com.product.server.koi_control_application.service_interface.IOrderServic
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,13 +34,14 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@Tag(name = "Order", description = "API for Order")
 public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;
     private final JwtTokenUtil jwtUtil;
 
     @PostMapping("/create-product-order")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductDTO req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 
@@ -102,6 +104,12 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
+    @GetMapping("/user/{userId}/list")
+    public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId) {
+        List<Orders> orders = orderService.getOrdersByUser(userId);
+        return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
+    }
+
     @GetMapping("/status/{orderId}")
     public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
         Orders order = orderService.getOrderById(orderId);
@@ -113,8 +121,8 @@ public class OrderController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size) {
+                                                        @RequestParam(defaultValue = "0",required = false) int page,
+                                                        @RequestParam(defaultValue = "10",required = false) int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }

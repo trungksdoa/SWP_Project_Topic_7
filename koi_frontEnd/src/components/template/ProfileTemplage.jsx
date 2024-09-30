@@ -3,25 +3,29 @@ import { useGetUserById } from "../../hooks/user/useGetUserById";
 import { useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
 import FormUserUpdate from "../ui/user/FormUserUpdate";
+import HistoryOrder from "../ui/user/HistoryOrder";
 
 const ProfileTemplage = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const { data: user, refetch } = useGetUserById(userId);
+  console.log(user);
   return (
-    <div className="my-[60px] container mx-auto w-[60%]">
+    <div className="my-[60px] container mx-auto w-[80%]">
       <div className="flex items-center">
         <div className="mr-[30px]">
           {!!user?.avatar ? (
-            <div style={{
-              height: "150px",
-              width: "150px",
-              borderRadius: "50%",
-              border: "1px solid #000000",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
+            <div
+              style={{
+                height: "150px",
+                width: "150px",
+                borderRadius: "50%",
+                border: "1px solid #000000",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <img className="rounded-full" src={user?.avatar} alt="avatar" />
             </div>
           ) : (
@@ -47,7 +51,9 @@ const ProfileTemplage = () => {
         <div>
           <h2 className="text-[32px]">
             Welcome,{" "}
-            <span className="font-bold text-orange-500">{userLogin?.username}</span>
+            <span className="font-bold text-orange-500">
+              {userLogin?.username}
+            </span>
           </h2>
         </div>
       </div>

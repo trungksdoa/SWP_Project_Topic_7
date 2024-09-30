@@ -7,3 +7,5 @@ export const MANAGE_KOI_API = import.meta.env.VITE_MANAGE_KOI_API
 export const MANAGE_PRODUCTS_ADMIN_API = import.meta.env.VITE_MANAGE_PRODUCTS_ADMIN_API
 export const MANAGE_CART_API = import.meta.env.VITE_MANAGE_CART_API
 export const MANAGE_FEEDBACK_API = import.meta.env.VITE_MANAGE_FEEDBACK_API
+export const MANAGE_ORDER_API = import.meta.env.VITE_MANAGE_ORDER_API
+export const MANAGE_PACKAGE_API = import.meta.env.VITE_MANAGE_PACKAGE_API

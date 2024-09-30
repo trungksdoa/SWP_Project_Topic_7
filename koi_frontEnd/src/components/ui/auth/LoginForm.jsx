@@ -24,7 +24,7 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
     if (userLogin) {
       const role = userLogin.roles[0]?.name; // Assuming roles is an array
       if (role === "ROLE_ADMIN") {
-        navigate(PATH.DASHBOARD);
+        navigate(PATH.ADMIN);
       } else if (role === "ROLE_MEMBER") {
         navigate(PATH.KOI_MANAGEMENT);
       }
@@ -41,8 +41,9 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
     dispatch(manageUserActionThunks.loginThunk(data))
       .unwrap()
       .then((res) => {
+        console.log(res)
         toast.success(t('Login successfully'));
-        if (res.roles === "ROLE_USER") {
+        if (res.data.roles[0] === "ROLE_USER") {
           handleOkLogin();
         }
       })

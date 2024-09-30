@@ -6,15 +6,16 @@ import { PATH } from "../constant";
 const AdminPage = () => {
   const navigate = useNavigate();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
+  console.log(userLogin?.roles);
 
   const role = userLogin?.roles?.map((role) => {
     return role?.name;
   });
   useEffect(() => {
-    if (!userLogin || !role || role[0] === "ROLE_MEMBER") {
+    if (role[0] === "ROLE_MEMBER") {
       navigate(PATH.HOME);
     }
-  }, [userLogin, role]); 
+  }, []);
 
   return (
     <div>

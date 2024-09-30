@@ -126,7 +126,7 @@ const StoreTemplate = () => {
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-[30px]">
+        <div className="grid lg:grid-cols-4 md:grid-cols-3 gap-[30px] grid-cols-2">
           {filteredProducts?.map((prd, index) => {
             console.log(
               `Rendering product: ${prd?.id}, image: ${prd?.imageUrl}`

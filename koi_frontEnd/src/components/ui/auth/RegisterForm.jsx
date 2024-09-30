@@ -32,6 +32,7 @@ const RegisterForm = ({ showModalLogin }) => {
     
     const formattedData = {
       ...formData,
+      roles: [{ name: data.roles }]
     };
 
     dispatch(manageUserActionThunks.registerThunk(formattedData))
@@ -160,7 +161,7 @@ const RegisterForm = ({ showModalLogin }) => {
         </div>
         <Controller
           control={control}
-          name="role"
+          name="roles"
           render={({ field }) => (
             <Radio.Group
               style={{
@@ -174,7 +175,7 @@ const RegisterForm = ({ showModalLogin }) => {
               }}
             >
               <Radio className="mr-[100px]" value="ROLE_MEMBER">Farmer</Radio>
-              <Radio value="ROLE_SHOP">Shop</Radio>
+              <Radio value="ROLE_SHOP">Collaborator</Radio>
             </Radio.Group>
           )}
           rules={{ required: "Please select a role" }}

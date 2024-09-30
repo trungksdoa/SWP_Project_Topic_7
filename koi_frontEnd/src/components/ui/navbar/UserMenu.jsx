@@ -13,9 +13,8 @@ import ForgotPassword from "../auth/ForgotPassword"; // Import ForgotPassword
 import { useDispatch, useSelector } from "react-redux";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { manageUserActions } from "../../../store/manageUser/slice";
-import { manageCartActions } from "../../../store/manageCart/slice";
 
-export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
+export const UserMenu = () => {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
   const dispatch = useDispatch()
@@ -27,8 +26,6 @@ export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
   const handleLogout = () => {
     localStorage.removeItem(LOCAL_STORAGE_LOGIN_KEY);
     dispatch(manageUserActions.updateUserLogin(null))
-    dispatch(manageCartActions.setCartCount(0))
-    setIsLoggedOut(true)
     naigate(PATH.HOME);
   };
 
@@ -86,13 +83,13 @@ export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
       return (
         <div className="flex flex-col">
           <Button
-            className="mb-[10px] w-full bg-black text-white hover:!text-white border-none hover:!bg-black"
+            className="mb-[10px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
             onClick={showModalLogin}
           >
             {t("login")}
           </Button>
           <Button
-            className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
+            className="!w-[100px] text-center bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
             onClick={showModalRegister}
           >
             {t("register")}
@@ -104,12 +101,13 @@ export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
     // If user is logged in
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
+        console.log("a")
         return (
           <div className="flex flex-col" key="admin">
-            <NavLink to={PATH.DASHBOARD} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink to={PATH.DASHBOARD} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black">
               {t("Admin")}
             </NavLink>
-            <Button onClick={handleLogout} className="w-full bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
+            <Button onClick={handleLogout} className=" bg-white text-black hover:!text-white !w-[100px] text-center hover:!border-black hover:!bg-black">
               {t("Logout")}
             </Button>
           </div>
@@ -118,13 +116,16 @@ export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
       if (role.name === "ROLE_MEMBER") {
         return (
           <div className="flex flex-col" key="member">
-            <NavLink to={PATH.KOI_MANAGEMENT} className="rounded-[6px] px-[15px] py-[4px] !w-full bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink to={PATH.KOI_MANAGEMENT} className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px]  bg-black text-white hover:!text-white border-none hover:!bg-black">
               {t("Manage")}
             </NavLink>
-            <NavLink className="w-full bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.PROFILE}>
+            <NavLink className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.PROFILE}>
               {t("Profile")}
             </NavLink>
-            <Button onClick={handleLogout} className="w-full duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
+            <NavLink className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.HISTORY_ORDER}>
+              {t("History")}
+            </NavLink>
+            <Button onClick={handleLogout} className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
               {t("Logout")}
             </Button>
           </div>
@@ -150,6 +151,7 @@ export const UserMenu = ({totalQuantity, setIsLoggedOut}) => {
           </div>
         </Popover>
       </div>
+      {/* Modal được đưa ra ngoài */}
       <Modal
         title=""
         open={isModalLogin}

@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.ultil;
 
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +12,11 @@ public class ResponseUtil {
     public static String WEBSITE_URL = "https://swp-project-topic-7.vercel.app/";
 
     public static ResponseEntity<BaseResponse> createResponse(Object data, String message, HttpStatus status) {
-        BaseResponse response = BaseResponse.builder()
+        return new ResponseEntity<>(BaseResponse.builder()
                 .data(data)
                 .message(message)
                 .statusCode(status.value())
-                .build();
-        return new ResponseEntity<>(response, status);
+                .build(), status);
     }
 
     public static ResponseEntity<BaseResponse> createResponse(Object data, String message, HttpStatus status, URI location) {

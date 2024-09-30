@@ -22,6 +22,13 @@ import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import SaltCalculator from "../components/ui/manage/SaltCalculator";
 import PaymentLayout from "../components/layouts/PaymentLayout";
 import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
+import CheckoutPage from "../pages/CheckoutPage";
+import PaymentSuccessPage from "../pages/PaymentSuccessPage";
+import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
+import HistoryPage from "../pages/HistoryPage";
+import PondDetail from "../components/ui/manage/PondDetail";
+import PackagesPage from "../pages/PackagesPage";
+
 const router = [
   {
     element: <MainLayout />,
@@ -47,6 +54,14 @@ const router = [
       {
         path: PATH.PROFILE,
         element: <ProfilePage />
+      },
+      {
+        path: PATH.PAYMENT_SUCCESS,
+        element: <PaymentSuccessPage />
+      },
+      {
+        path: PATH.HISTORY_ORDER,
+        element: <HistoryPage />
       }
     ],
   },
@@ -62,6 +77,10 @@ const router = [
         element: <PondManegementPage />
       },
       {
+        path: `${PATH.DETAIL_POND}/:pondId`,
+        element: <PondDetail />
+      },
+      {
         path: PATH.WATER_PARAMETER,
         element: <WaterParameter />
       },
@@ -72,6 +91,10 @@ const router = [
       {
         path: PATH.SALT_CALCULATOR,
         element: <SaltCalculator />
+      },
+      {
+        path: PATH.PACKAGES,
+        element: <PackagesPage />
       }
     ],
   },
@@ -82,10 +105,6 @@ const router = [
         path: PATH.ADMIN,
         element: <AdminPage />,
         children: [
-          {
-            path: PATH.DASHBOARD,
-            element: <DashboardPage />
-          },
           {
             path: PATH.MANAGE_USER,
             element: <ManageUser />,
@@ -102,6 +121,10 @@ const router = [
             path: PATH.MANAGE_PRODUCTS,
             element: <ManageProducts />,
           },
+          {
+            path: PATH.MANAGE_PACKAGE,
+            element: <ManagePackage />
+          }
         ],
       },
     ],
@@ -113,6 +136,10 @@ const router = [
         path: PATH.CART,
         element: <CartPage />,
       },
+      {
+        path: PATH.CHECKOUT,
+        element: <CheckoutPage />
+      }
     ]
   }
 ];

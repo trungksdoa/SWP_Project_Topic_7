@@ -15,7 +15,22 @@ app:
   jwt:
     secret: SecretKeyToGenJWTs
 
-
+springdoc:
+  api-docs:
+    path: /api-docs
+#    swagger-ui:
+#      path: /swagger-ui.html
+openapi:
+  service:
+    title: Koi Control Application
+    description: Koi Control Application
+    server:
+      url: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
+    version: 1.0.0
+    contact:
+      name: Koi Control Application
+      email: trungksdoa@gmail.com
+    api-docs: /v3/api-docs
 
 spring:
   mail:

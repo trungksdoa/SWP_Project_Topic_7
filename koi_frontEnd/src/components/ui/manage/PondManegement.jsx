@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond.js";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const PondManagement = () => {
-    const { data: lstPond, error: pondError } = useGetAllPond();
-    const { data: lstKoi, error: koiError } = useGetAllKoi();
     const [selectedPond, setSelectedPond] = useState(null);
     const [koiInPond, setKoiInPond] = useState([]);
+    const userLogin = useSelector((state) => state.manageUser.userLogin)
+    const userId = userLogin?.id
 
-    useEffect(() => {
-        if (pondError) {
-            console.error('Error fetching ponds:', pondError);
-        }
-        if (koiError) {
-            console.error('Error fetching koi:', koiError);
-        }
-    }, [pondError, koiError]);
+    const {data: lstKoi} = useGetAllKoi(userId);    
+    const {data: lstPond} = useGetAllPond(userId);
+
 
     const handleClick = (pond) => {
         setSelectedPond(pond);
@@ -23,6 +20,12 @@ const PondManagement = () => {
             const koiList = lstKoi.filter(koi => koi.pondId === pond.id);
             setKoiInPond(koiList);
         }
+    };
+
+    const navigate = useNavigate();
+
+    const handleDetailClick = (pondId) => {
+        navigate(`/pond-detail/${pondId}`);
     };
 
     const handleClose = () => {
@@ -36,7 +39,7 @@ const PondManagement = () => {
         }
     };
 
-    if (!lstPond || !lstKoi) {
+    if (!lstPond) {
         return <div>Loading...</div>;
     }
 
@@ -65,7 +68,7 @@ const PondManagement = () => {
                     >
                         <button
                             onClick={handleClose}
-                            className="absolute top-2 right-4 text-2xl font-bold"
+                            className="absolute -top-1 right-2 text-2xl font-bold"
                         >
                             &times;
                         </button>
@@ -102,27 +105,39 @@ const PondManagement = () => {
                         <div className="w-full mt-4">
                             {koiInPond.length > 0 ? (
                                 <>
-                                    <h4 className="text-lg font-bold mb-2">Koi in Pond</h4>
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                                        {koiInPond.map((koi, index) => (
-                                            <li key={index} className="flex flex-col items-center mb-4">
-                                                <img
-                                                    src={koi.imageUrl}
-                                                    alt={koi.name}
-                                                    className="w-24 h-24 object-cover mb-2"
-                                                />
-                                                <span>{koi.name}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </>
-                            ) : (
-                                <h4 className="text-lg font-bold mb-2">There is no Koi in Pond</h4>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+                                    <div className="flex justify-between">
+                                        <div className="text-left">
+                                            <h4 className="text-lg font-bold mb-2">Koi in Pond</h4>
+                                        </div>
+                                        <div className="text-right">
+                                        <h3
+                                            className="underline text-blue-500 cursor-pointer"
+                                            onClick={() => handleDetailClick(selectedPond.id)}
+                                        >
+                                            Pond Detail
+                                        </h3>
+                                        </div>
+                                    </div>
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                            {koiInPond.map((koi, index) => (
+                                                <li key={index} className="flex flex-col items-center">
+                                                    <img
+                                                        src={koi.imageUrl}
+                                                        alt={koi.name}
+                                                        className="w-24 h-24 object-cover mb-2"
+                                                    />
+                                                    <span>{koi.name}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                    ) : (
+                                    <h4 className="text-lg font-bold mb-2">There is no Koi in Pond</h4>
+                                    )}
+                                </div>
+                                </div>
+                                </div>
+                                )}
         </div>
     );
 };
