@@ -7,5 +7,6 @@ const api = apiInstanceHeader.create({
 
 export const manageUserServicesH = {
     getUserById: (id) => api.get(`/api/users/${id}`),
-    updateUser: (id, payload) => api.put(`/api/users/${id}`, payload)
+    updateUser: (id, payload) => api.put(`/api/users/${id}`, payload),
+    addPackage: (payload) => api.post('api/users/add-package', payload)
 }

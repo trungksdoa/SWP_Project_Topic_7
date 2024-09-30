@@ -6,5 +6,5 @@ const api = apiInstanceHeader.create({
 })
 
 export const managePackageServiceH = {
-    getPackage: () => api.get("")
+    getPackage: () => api.get("/list")
 }

@@ -1,73 +1,51 @@
+/* Xóa hết comment */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* body {
-    background-color: rgba(232, 71, 27, 0.08);
-} */
- /* .ant-modal-content {
-    background-color: rgba(249, 116, 22, 0.8) !important;
- } */
-
- .ant-modal-footer {
+.ant-modal-footer {
     display: none;
- }
+}
 
- .ant-popover-inner {
+.ant-popover-inner {
   padding: 13px 23px !important;
- }
+}
 
- /* Card  */
- .ant-card-body {
+.ant-card-body {
     padding: 10px !important;
- }
+}
 
- /* Tab */
- .ant-tabs-nav-wrap {
+.ant-tabs-nav-wrap {
    justify-content: center;
- }
+}
 
- .ant-tabs-content.ant-tabs-content-top {
+.ant-tabs-content.ant-tabs-content-top {
    position: inherit;
- }
+}
 
- /* layout */
+.ant-layout-sider-children, 
+.ant-menu {
+   background-color: #000000 !important; 
+}
 
- .ant-layout-sider-children, 
- .ant-menu {
-   background-color: #000000 !important; /* Changed from #fe8732 to #000000 */
- }
+.ant-layout-sider-trigger{
+   background-color: #000000 !important; 
+}
 
- .ant-layout-sider-trigger{
-   background-color: #000000 !important; /* Changed from #F97316 to #000000 */
- }
-
- .ant-layout-header  {
+.ant-layout-header  {
    background-color: white;
- }
+}
 
- /* button antd  */
- /* .ant-btn {
-  background-color: #F97316 !important;
-  color: white !important;
- }
-
- .ant-btn:hover {
-  background-color: #fb6400 !important;
-  color: white !important;
- } */
-
- *{
+*{
   padding: 0;
   margin: 0;
   box-sizing: border-box;
- }
- body {
+}
+body {
   font-family: 'Roboto', sans-serif !important;
 }
 
-
- .roboto-thin {
+.roboto-thin {
   font-family: "Roboto", sans-serif;
   font-weight: 100;
   font-style: normal;
@@ -139,16 +117,15 @@
   font-style: italic;
 }
 
-
 .star-container {
   position: relative;
   display: inline-block;
-  font-size: 14px; /* Tùy chỉnh kích thước ngôi sao */
-  color: #ccc; /* Màu xám cho ngôi sao trống */
+  font-size: 14px; 
+  color: #ccc; 
 }
 
 .star-container .full-star {
-  color: #eab308; /* Màu vàng cho ngôi sao đầy */
+  color: #eab308; 
 }
 
 .star-container .half-star {
@@ -163,7 +140,7 @@
   position: absolute;
   left: 0;
   width: 50%;
-  color: #eab308; /* Màu vàng cho nửa ngôi sao */
+  color: #eab308; 
   overflow: hidden;
 }
 
@@ -188,50 +165,48 @@
 
 .custom-button:hover {
   background: linear-gradient(90deg, #ff9f38, #ff704d);
-  animation: wiggle 0.5s ease-in-out infinite; /* Gọi animation lắc */
+  animation: wiggle 0.5s ease-in-out infinite; 
 }
 
 .icon {
-  margin-right: 8px; /* Khoảng cách giữa biểu tượng và chữ */
+  margin-right: 8px; 
 }
 
-/* Định nghĩa keyframes cho chuyển động lắc */
 @keyframes wiggle {
   0%, 100% {
     transform: rotate(0deg);
   }
   25% {
-    transform: rotate(3deg); /* Lắc sang phải */
+    transform: rotate(3deg); 
   }
   50% {
-    transform: rotate(-3deg); /* Lắc sang trái */
+    transform: rotate(-3deg); 
   }
   75% {
-    transform: rotate(3deg); /* Lắc sang phải */
+    transform: rotate(3deg); 
   }
 }
 
 .scrollable-navbar {
   display: flex;
-  white-space: nowrap; /* Ngăn các item xuống dòng */
-  overflow-x: auto; /* Kích hoạt scroll ngang */
-  -webkit-overflow-scrolling: touch; /* Mượt mà hơn khi cuộn trên di động */
+  white-space: nowrap; 
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch; 
 }
 
 .scrollable-navbar li {
-  flex-shrink: 0; /* Đảm bảo các mục không bị thu nhỏ */
+  flex-shrink: 0; 
   padding: 10px 15px;
 }
 
 ::-webkit-scrollbar {
-  display: none; /* Ẩn thanh cuộn cho các trình duyệt Webkit */
+  display: none; 
 }
-
 
 @media (max-width: 1024px) {
   .scrollable-navbar {
     display: flex;
-    overflow-x: auto; /* Kích hoạt scroll ngang cho màn hình nhỏ */
+    overflow-x: auto; 
   }
 }
 .scrollable-navbar-wrapper {
@@ -240,11 +215,11 @@
 
 .scrollable-navbar {
   padding: 0.5rem;
-  overflow-x: auto; /* Cho phép cuộn ngang */
+  overflow-x: auto; 
 }
 
 .scrollable-navbar::-webkit-scrollbar {
-  display: none; /* Ẩn scrollbar */
+  display: none; 
 }
 
 .scrollable-navbar li {
@@ -259,21 +234,21 @@
 }
 
 .scrollable-navbar li a:hover {
-  color: #ccc; /* Màu khi hover */
+  color: #ccc; 
 }
 
 .custom-button {
-  background-color: #4caf50; /* Màu nền cho button */
-  color: white; /* Màu chữ cho button */
-  padding: 0.5rem 1rem; /* Padding cho button */
-  border: none; /* Ẩn border */
-  border-radius: 4px; /* Bo tròn góc cho button */
-  cursor: pointer; /* Hiển thị cursor pointer */
-  transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
+  background-color: #4caf50; 
+  color: white; 
+  padding: 0.5rem 1rem; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  transition: background-color 0.3s; 
 }
 
 .custom-button:hover {
-  background-color: #45a049; /* Màu nền khi hover */
+  background-color: #45a049; 
 }
 
 .bg-gradient-to-r {
@@ -284,10 +259,190 @@
   background-image: linear-gradient(to left, rgba(255, 207, 159, 0.37), transparent);
 }
 
-/* Định dạng cho các icon */
 .icon-style {
   color: white;
   margin-right: 15px;
   font-size: 30px;
   cursor: pointer;
+}
+
+.pricing-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+}
+
+.pricing-card {
+  background-color: #1a1a1a;
+  border-radius: 15px;
+  width: 250px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.circle-header {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  background-color: #222;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pricing-container .pricing-card:nth-child(1) .circle-header {
+  background: linear-gradient(135deg, #00FF00, #32CD32); 
+}
+
+.pricing-container .pricing-card:nth-child(2) .circle-header {
+  background: linear-gradient(135deg, #00C6FF, #0072FF); 
+}
+
+.pricing-container .pricing-card:nth-child(3) .circle-header {
+  background: linear-gradient(135deg, #8A2BE2, #720e9e); 
+}
+
+.pricing-container .pricing-card:nth-child(4) .circle-header {
+  background: linear-gradient(135deg, #FFA500, #FF7E1B); 
+}
+
+.pricing-container .pricing-card:nth-child(5) .circle-header {
+  background: linear-gradient(135deg, #FF0000, #DC143C); 
+}
+
+.circle-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.circle-header p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.circle-header span {
+  font-size: 12px;
+  color: #ddd;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin-top: 70px;
+  margin-bottom: 20px;
+}
+
+.features li {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.buy-btn {
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pricing-container .pricing-card:nth-child(1) .buy-btn {
+  background-color: #00FF00; 
+}
+
+.pricing-container .pricing-card:nth-child(1) .buy-btn:hover {
+  background-color: #32CD32; 
+}
+
+.pricing-container .pricing-card:nth-child(2) .buy-btn {
+  background-color: #00C6FF; 
+}
+
+.pricing-container .pricing-card:nth-child(2) .buy-btn:hover {
+  background-color: #0072FF; 
+}
+
+.pricing-container .pricing-card:nth-child(3) .buy-btn {
+  background-color: #8A2BE2; 
+}
+
+.pricing-container .pricing-card:nth-child(3) .buy-btn:hover {
+  background-color: #720e9e; 
+}
+
+.pricing-container .pricing-card:nth-child(4) .buy-btn {
+  background-color: #FFA500; 
+}
+
+.pricing-container .pricing-card:nth-child(4) .buy-btn:hover {
+  background-color: #FF7E1B; 
+}
+
+.pricing-container .pricing-card:nth-child(5) .buy-btn {
+  background-color: #FF0000; 
+}
+
+.pricing-container .pricing-card:nth-child(5) .buy-btn:hover {
+  background-color: #DC143C; 
+}
+
+.wave-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  overflow: hidden;
+}
+
+.wave {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card-1 {
+  background: linear-gradient(135deg, #00FF00, #32CD32); 
+}
+
+.card-2 {
+  background: linear-gradient(135deg, #00C6FF, #0072FF); 
+}
+
+.card-3 {
+  background: linear-gradient(135deg, #8A2BE2, #720e9e); 
+}
+
+.card-4 {
+  background: linear-gradient(135deg, #FFA500, #FF7E1B); 
+}
+
+.card-5 {
+  background: linear-gradient(135deg, #FF0000, #DC143C); 
+}
+
+.buy-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buy-btn:hover {
+  background-color: rgba(255, 255, 255, 0.4);
 }
