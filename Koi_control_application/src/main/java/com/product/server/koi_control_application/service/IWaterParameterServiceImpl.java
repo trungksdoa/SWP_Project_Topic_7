@@ -2,9 +2,12 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
+import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
+import com.product.server.koi_control_application.repository.WaterQualityStandardRepository;
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -17,8 +20,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
+    private final PondRepository pondRepository;
+    private final WaterQualityStandardRepository waterQualityStandardRepository;
     @Override
     public WaterParameter saveWaterParameter(int pondId, WaterParameter waterParameter) {
+
+        if (!pondRepository.existsById(pondId))
+            throw new NotFoundException("Pond not found.");
 
         if(waterParameterRepository.existsByPondId(pondId)){
             WaterParameterUpdateRequest request = new WaterParameterUpdateRequest();
@@ -69,6 +77,17 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         waterParameterRepository.delete(waterParameter);
     }
 
+    @Override
+    public WaterQualityStandard saveWaterQualityStandard(WaterQualityStandard waterQualityStandard) {
+        return waterQualityStandardRepository.save(waterQualityStandard);
+    }
 
-
+    @Override
+    public WaterQualityStandard getWaterQualityByPondId(int pondId) {
+        WaterQualityStandard waterQualityStandard = waterQualityStandardRepository.findByPondId(pondId);
+        if (waterQualityStandard == null) {
+            throw new NotFoundException("WaterQualityStandard not found ");
+        }
+        return waterQualityStandard;
+    }
 }

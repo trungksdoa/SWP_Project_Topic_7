@@ -57,7 +57,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .isFirstMeasurement(true)
                 .weight(koiFish.getWeight())
                 .length(koiFish.getLength())
-                .pondId(koiFish.getPondId())
                 .build());
 
         return saved;
@@ -77,7 +76,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public void deleteKoiFish(int id) {
-
+        KoiFish koiFish = getKoiFish(id);
+        Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+        currPond.decreaseFishCount();
+        pondRepository.save(currPond);
         koiFishRepository.deleteById(id);
     }
 
@@ -94,7 +96,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
             throw new NotFoundException("User not found.");
 
         if (!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
-            throw new NotFoundException("This Breeder dont have this Pond!.");
+            throw new NotFoundException("Pond not found");
 
         if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
             throw new AlreadyExistedException("KoiFish name existed.");
@@ -111,21 +113,15 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         koiFish.setSex(request.getSex());
         koiFish.setPurchasePrice(request.getPurchasePrice());
 
-        Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+            koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+                    .koiId(koiFish.getId())
+                    .inPondFrom(koiFish.getCreatedAt())
+                    .isFirstMeasurement(false)
+                    .weight(koiFish.getWeight())
+                    .length(koiFish.getLength())
+                    .build());
+        koiFish.setPondId(request.getPondId());
 
-        KoiGrowthHistory koiGrowthHistory = KoiGrowthHistory.builder()
-                .koiId(koiFish.getId())
-                .isFirstMeasurement(false)
-                .weight(koiFish.getWeight())
-                .length(koiFish.getLength())
-                .pondId(currPond.getId())
-                .build();
-
-        if (request.getPondId() != 0) {
-            koiGrowthHistory.setInPondFrom(currPond.getCreatedAt());
-            koiGrowthHistory.setPondId(currPond.getId());
-            koiFish.setPondId(request.getPondId());
-        }
 
 
         koiGrowthHistoryRepository.save(koiGrowthHistory);
@@ -142,5 +138,11 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public Page<KoiFish> getKoiFishs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
 }

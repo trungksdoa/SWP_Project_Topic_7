@@ -3,11 +3,12 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Pond;
-import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.model.WaterQualityStandard;
+import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
-import com.product.server.koi_control_application.service_interface.IPackageService;
+import com.product.server.koi_control_application.service_interface.IKoiFishService;
 import com.product.server.koi_control_application.service_interface.IPondService;
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,47 +27,55 @@ import java.util.Optional;
 public class IPondServiceImpl implements IPondService {
     private final PondRepository pondRepository;
     private final UsersRepository usersRepository;
-    private final IKoiFishServiceImpl  iKoiFishService;
+    private final IKoiFishService iKoiFishService;
     private final IWaterParameterService iWaterParameterService;
     private final IImageService iImageService;
+    private final KoiFishRepository koiFishRepository;
 
-    private final IPackageService iPackageService;
     @Override
     public Pond addPond(Pond pond) {
 
-       Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
+        if(!usersRepository.existsById(pond.getUserId()))
+            throw new NotFoundException("User not found.");
 
         if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
             throw new AlreadyExistedException("Pond name existed.");
 
-        if(user.getAUserPackage() == null)
-            throw new NotFoundException("Server error. Please contact admin.");
-
-        if(iPackageService.checkPackageLimit(pond.getUserId(), user.getAUserPackage())){
-            throw new NotFoundException("User package limit exceeded.");
-        }
-
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
+        pondRepository.save(pond);
+        WaterQualityStandard    waterQualityStandard = new WaterQualityStandard();
+
+        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
         return pondRepository.save(pond);
+
     }
 
     @Override
     public Pond getPond(int id) {
-        return pondRepository.findById(id).orElseThrow(() -> new NotFoundException("Pond not found"));
+         Pond pond1 = pondRepository.findById(id).orElseThrow(() -> new NotFoundException("Pond not found"));
+        pond1.setFishCount(iKoiFishService.countKoiFishByPondId(id));
+        pondRepository.save(pond1);
+         return pond1;
     }
 
     @Override
     public Page<Pond> getPonds(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return pondRepository.findAll(pageable);
+        Page<Pond> ponds = pondRepository.findAll(pageable);
+        ponds.forEach(pond -> pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId())));
+        pondRepository.saveAll(ponds.getContent());
+        return ponds;
     }
 
     @Override
     public Page<Pond> getAllPondByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        return pondRepository.findAllByUserId(userId,pageable);
+        Page<Pond> ponds = pondRepository.findAllByUserId(userId, pageable);
+        ponds.forEach(pond -> pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId())));
+        pondRepository.saveAll(ponds.getContent());
+        return ponds;
     }
 
     @Override
@@ -85,7 +93,7 @@ public class IPondServiceImpl implements IPondService {
             throw new AlreadyExistedException("Pond name existed.");
 
 
-        if(file != null) {
+        if(file != null && !file.isEmpty()){
             String filename = iImageService.updateImage(pond.getImageUrl(), file);
             pond.setImageUrl(filename);
         }else{
@@ -94,12 +102,14 @@ public class IPondServiceImpl implements IPondService {
 
 
         pond.setName(request.getName());
-        pond.setImageUrl(request.getImageUrl());
         pond.setWidth(request.getWidth());
         pond.setLength(request.getLength());
         pond.setDepth(request.getDepth());
-        pond.setVolume(request.getVolume());
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(id));
+
+        WaterQualityStandard waterQualityStandard = iWaterParameterService.getWaterQualityByPondId(pond.getId());
+        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
         return pondRepository.save(pond);
     }

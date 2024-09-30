@@ -2,7 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.KoiFish;
-import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.model.KoiGrowthHistory;
+import com.product.server.koi_control_application.pojo.BaseResponse;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
@@ -136,8 +137,7 @@ public class KoiFishController {
     }
 
     @GetMapping("/listkoi")
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
-    public ResponseEntity<BaseResponse> getKoisByUserId() {
+    public ResponseEntity<BaseResponse> getKois() {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
 
         String mess = "Get all koifish succesfully";
@@ -152,5 +152,18 @@ public class KoiFishController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/grhis/{koiFishId}")
+    public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId) {
+        Page<KoiGrowthHistory> koiGrowthHistorys = iKoiFishService.getGrowthHistorys(koiFishId,0, 10);
+        BaseResponse response = BaseResponse.builder()
+                .data(koiGrowthHistorys)
+                .message("Get growth history successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 }

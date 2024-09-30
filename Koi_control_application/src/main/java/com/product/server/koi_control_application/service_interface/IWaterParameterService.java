@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.service_interface;
 
+import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 
@@ -9,4 +10,6 @@ public interface IWaterParameterService {
     WaterParameter getWaterParameterByPondId(int pondId);
     WaterParameter updateWaterParameter(int pondId, WaterParameterUpdateRequest request);
     void deleteWaterParameter(int pondId);
+    WaterQualityStandard saveWaterQualityStandard(WaterQualityStandard waterQualityStandard);
+    WaterQualityStandard getWaterQualityByPondId(int pondId);
 }
