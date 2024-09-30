@@ -95,14 +95,14 @@ public class WaterQualityStandard {
     @Column(name = "amount_fed", precision = 10, scale = 2)
     private BigDecimal amountFedStandard;
     // Method to calculate values based on the volume from WaterParameter
-    public void calculateValues(BigDecimal volume, int fishCount, List<KoiFish> koiFishs) {
-        BigDecimal fishC = new BigDecimal(fishCount);
+    public void calculateValues(BigDecimal volume, List<KoiFish> koiFishs) {
         BigDecimal volumeInLiters = volume;
         if (volumeInLiters != null) {
             this.salt03 = new BigDecimal("0.3").multiply(volumeInLiters).divide(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
             this.salt05 = new BigDecimal("0.5").multiply(volumeInLiters).divide(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
             this.salt07 = new BigDecimal("0.7").multiply(volumeInLiters).divide(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP);
         }
+        this.amountFedStandard = new BigDecimal("0.00");
         if (koiFishs != null) {
             for(KoiFish Koi : koiFishs){
                 BigDecimal weight = Koi.getWeight();

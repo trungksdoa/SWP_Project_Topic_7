@@ -45,7 +45,7 @@ public class IPondServiceImpl implements IPondService {
         pondRepository.save(pond);
         WaterQualityStandard    waterQualityStandard = new WaterQualityStandard();
 
-        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        waterQualityStandard.calculateValues(pond.getVolume(),koiFishRepository.findAllByPondId(pond.getId()));
         iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
         return pondRepository.save(pond);
@@ -108,7 +108,7 @@ public class IPondServiceImpl implements IPondService {
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(id));
 
         WaterQualityStandard waterQualityStandard = iWaterParameterService.getWaterQualityByPondId(pond.getId());
-        waterQualityStandard.calculateValues(pond.getVolume(),pond.getFishCount(),koiFishRepository.findAllByPondId(pond.getId()));
+        waterQualityStandard.calculateValues(pond.getVolume(),koiFishRepository.findAllByPondId(pond.getId()));
         iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
         return pondRepository.save(pond);

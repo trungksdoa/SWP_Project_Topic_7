@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.custom_exception.NotFoundExcep
 import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
+import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.WaterParameterRepository;
 import com.product.server.koi_control_application.repository.WaterQualityStandardRepository;
@@ -22,6 +23,7 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
     private final WaterParameterRepository waterParameterRepository;
     private final PondRepository pondRepository;
     private final WaterQualityStandardRepository waterQualityStandardRepository;
+    private final KoiFishRepository koiFishRepository;
     @Override
     public WaterParameter saveWaterParameter(int pondId, WaterParameter waterParameter) {
 
@@ -88,6 +90,8 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         if (waterQualityStandard == null) {
             throw new NotFoundException("WaterQualityStandard not found ");
         }
+        waterQualityStandard.calculateValues(pondRepository.findById(pondId).get().getVolume(), koiFishRepository.findAllByPondId(pondId));
+        waterQualityStandardRepository.save(waterQualityStandard);
         return waterQualityStandard;
     }
 }

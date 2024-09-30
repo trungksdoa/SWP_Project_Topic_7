@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/koifishs")
@@ -44,9 +45,18 @@ public class KoiFishController {
        @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
 
-        String filename = iImageService.uploadImage(file);
 
-        koiFish.setImageUrl(filename);
+
+
+        if(file != null && !file.isEmpty()) {
+            String filename = iImageService.uploadImage(file);
+            koiFish.setImageUrl(filename);
+        }
+
+        if(koiFish.getWeight() == null || koiFish.getLength() == null)
+            throw new IllegalArgumentException("Weight and Length must not be null");
+        if(koiFish.getWeight().compareTo(BigDecimal.valueOf(0.00)) <= 0 || koiFish.getLength().compareTo(BigDecimal.valueOf(0.00)) <= 0)
+            throw new IllegalArgumentException("Weight and Length must be greater than 0");
 
         KoiFish koiFish1 = iKoiFishService.addKoiFish(koiFish);
 
