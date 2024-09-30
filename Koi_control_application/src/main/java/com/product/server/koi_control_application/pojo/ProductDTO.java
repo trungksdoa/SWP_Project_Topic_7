@@ -8,9 +8,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class OrderPackageRequest {
-    private int packageId;
-//    private String packageName;
+@NoArgsConstructor
+public class ProductDTO {
+    private String name;
+    private int price;
+    private String description;
+    private String imageUrl;
+    private Integer stock;
+    private int categoryId;
 }

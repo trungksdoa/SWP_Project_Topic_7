@@ -2,7 +2,6 @@ package com.product.server.koi_control_application.model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,17 +15,19 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Blogs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private String title;
+    private String header;
+    private String introduction;
+
     @Column(columnDefinition = "TEXT")
-    @Size(min = 1, message = "Content must not be empty")
-    private String content;
+    private String body;
+
+    private String headerImageUrl;
+    private String bodyImageUrl;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)

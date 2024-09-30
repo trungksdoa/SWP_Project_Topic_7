@@ -33,7 +33,7 @@ public class OpenAPIConfig {
                         .version(version)
                         .contact(new Contact().name("Your Name").email("your.email@example.com"))
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
-                .servers(List.of(new Server().url(serverUrl)))
+                .servers(List.of(new Server().url(serverUrl), new Server().url("http://localhost:8080")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",

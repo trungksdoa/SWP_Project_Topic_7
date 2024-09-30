@@ -21,11 +21,15 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
     @Query("select c from Cart c where c.productId = ?1 and c.userId = ?2")
     Optional<Cart> findByProductIdAndUserId(int productId, int userId);
 
-    @Transactional
+
     @Modifying
     @Query("delete from Cart c where c.productId = ?1")
-    int deleteByProductId(int productId);
+    Integer deleteByProductId(int productId);
 
     @Query("select c from Cart c where c.productId = ?1")
-    Cart findByProductId(int productId);
+    Integer findByProductId(int productId);
+
+    @Modifying
+    @Query("delete from Cart c where c.userId = ?1")
+    Integer deleteByUserId(int userId);
 }

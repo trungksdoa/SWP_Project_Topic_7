@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.OrderProductRequest;
+import com.product.server.koi_control_application.pojo.OrderProductDTO;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
@@ -41,7 +41,7 @@ public class OrderController {
     private final JwtTokenUtil jwtUtil;
 
     @PostMapping("/create-product-order")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductDTO req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 

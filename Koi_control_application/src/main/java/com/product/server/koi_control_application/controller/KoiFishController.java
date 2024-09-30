@@ -3,8 +3,10 @@ package com.product.server.koi_control_application.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +33,14 @@ public class KoiFishController {
     private final IImageService iImageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse> createKoi(@RequestPart("fish") String koiFishJson, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<BaseResponse> createKoi(
+            @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
+            @RequestPart("fish") String koiFishJson,
+            @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
+       @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
 
         String filename = iImageService.uploadImage(file);
@@ -68,11 +73,12 @@ public class KoiFishController {
 
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
+                                                      @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
                                                       @RequestPart("fish") @Valid String koiFishJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
+      @Valid  KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
         BaseResponse response = BaseResponse.builder()
                 .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file))

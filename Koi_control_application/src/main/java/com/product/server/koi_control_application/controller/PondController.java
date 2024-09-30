@@ -4,8 +4,10 @@ package com.product.server.koi_control_application.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.PondDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +32,10 @@ public class PondController {
     private final IImageService iImageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse> createPond(@RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<BaseResponse> createPond(
+            @Schema(type = "string", format = "json", implementation = PondDTO.class)
+            @RequestPart("pond") String pondJson,
+            @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -66,7 +71,9 @@ public class PondController {
 
 
     @PutMapping(value = "{pondId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse> updatePond(@PathVariable("pondId") int pondId, @RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<BaseResponse> updatePond(@PathVariable("pondId") int pondId,
+                                                   @Schema(type = "string", format = "json", implementation = PondDTO.class)
+                                                   @RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
 

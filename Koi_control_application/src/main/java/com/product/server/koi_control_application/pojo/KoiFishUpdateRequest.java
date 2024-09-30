@@ -4,8 +4,6 @@ package com.product.server.koi_control_application.pojo;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 public class KoiFishUpdateRequest {
