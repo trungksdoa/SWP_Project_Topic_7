@@ -20,11 +20,17 @@ public class Blogs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String header;
-    private String introduction;
+    private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String body;
+    private String headerTop;
+    @Column(columnDefinition = "TEXT")
+    private String contentTop;
+
+    @Column(columnDefinition = "TEXT")
+    private String headerMiddle;
+    @Column(columnDefinition = "TEXT")
+    private String contentMiddle;
 
     private String headerImageUrl;
     private String bodyImageUrl;

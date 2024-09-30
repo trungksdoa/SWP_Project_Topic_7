@@ -2,8 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.CartDTO;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;

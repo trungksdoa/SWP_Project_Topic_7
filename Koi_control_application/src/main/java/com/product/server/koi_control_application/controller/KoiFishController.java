@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.KoiFish;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;

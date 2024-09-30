@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.pojo.OrderProductDTO;
+import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

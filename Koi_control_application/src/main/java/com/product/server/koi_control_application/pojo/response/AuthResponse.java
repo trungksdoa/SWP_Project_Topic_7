@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.response;
 
 
 import com.product.server.koi_control_application.model.UserRole;

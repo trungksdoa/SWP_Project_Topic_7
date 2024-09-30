@@ -6,7 +6,7 @@ import com.product.server.koi_control_application.custom_exception.NotFoundExcep
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.UserRegister;
+import com.product.server.koi_control_application.pojo.request.UserRegister;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPackageService;

@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.custom_exception;
 
-import com.product.server.koi_control_application.pojo.ErrorResponse;
+import com.product.server.koi_control_application.pojo.response.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;

@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

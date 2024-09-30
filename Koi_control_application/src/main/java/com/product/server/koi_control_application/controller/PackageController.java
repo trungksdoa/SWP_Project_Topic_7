@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.model.UserPackage;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,5 +45,11 @@ public class PackageController {
         } catch (Exception e) {
             return ResponseUtil.createErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse> getPackageById(@PathVariable int id) {
+        return ResponseUtil.createSuccessResponse(packageService.getPackageById(id), "Success");
     }
 }

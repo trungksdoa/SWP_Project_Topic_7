@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.request;
 
 import com.product.server.koi_control_application.enums.UserRoleEnum;
 import jakarta.validation.constraints.Email;

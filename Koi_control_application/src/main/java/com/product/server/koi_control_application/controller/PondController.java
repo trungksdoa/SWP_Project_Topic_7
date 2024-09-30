@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Pond;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.PondDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;

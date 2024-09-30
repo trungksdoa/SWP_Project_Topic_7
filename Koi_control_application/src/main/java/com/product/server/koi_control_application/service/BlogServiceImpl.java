@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -29,9 +30,12 @@ public class BlogServiceImpl implements IBlogService {
     public Blogs updateBlog(int id, Blogs blog, MultipartFile headerImage, MultipartFile bodyImage) throws IOException {
         Blogs existingBlog = repo.findById(id).orElseThrow(() -> new RuntimeException("Blog not found"));
 
-        existingBlog.setHeader(blog.getHeader());
-        existingBlog.setIntroduction(blog.getIntroduction());
-        existingBlog.setBody(blog.getBody());
+        Optional.ofNullable(blog.getTitle()).ifPresent(existingBlog::setTitle);
+        Optional.ofNullable(blog.getHeaderTop()).ifPresent(existingBlog::setHeaderTop);
+        Optional.ofNullable(blog.getContentTop()).ifPresent(existingBlog::setContentTop);
+        Optional.ofNullable(blog.getHeaderMiddle()).ifPresent(existingBlog::setHeaderMiddle);
+        Optional.ofNullable(blog.getContentMiddle()).ifPresent(existingBlog::setContentMiddle);
+
 
         return getBlogs(headerImage, bodyImage, existingBlog);
     }

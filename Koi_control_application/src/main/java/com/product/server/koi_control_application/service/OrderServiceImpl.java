@@ -1,7 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.pojo.OrderProductDTO;
+import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.custom_exception.InsufficientException;
 import com.product.server.koi_control_application.model.OrderItems;

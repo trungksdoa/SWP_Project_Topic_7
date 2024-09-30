@@ -7,13 +7,13 @@ import com.product.server.koi_control_application.custom_exception.ForbiddenExce
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.*;
-import com.product.server.koi_control_application.pojo.EmailRequestDTO;
-import com.product.server.koi_control_application.pojo.LoginRequestDTO;
-import com.product.server.koi_control_application.pojo.OrderPackageDTO;
+import com.product.server.koi_control_application.pojo.request.*;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
+import com.product.server.koi_control_application.pojo.response.AuthResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.UserResponse;
 import com.product.server.koi_control_application.service_interface.IEmailService;
 import com.product.server.koi_control_application.service_interface.IPackageService;
 import com.product.server.koi_control_application.service_interface.IUserService;
