@@ -18,5 +18,5 @@ public interface IKoiFishService {
     int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException;
     Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size);
-
+    KoiGrowthHistory addGrowthHistory(KoiGrowthHistory koiGrowthHistory);
 }

@@ -41,10 +41,13 @@ public class PondController {
 
         Pond pond = mapper.readValue(pondJson, Pond.class);
 
-        String filename = iImageService.uploadImage(file);
 
-        pond.setImageUrl(filename);
 
+
+        if(file != null && !file.isEmpty()){
+            String filename = iImageService.uploadImage(file);
+            pond.setImageUrl(filename);
+        }
         Pond pond1 = iPondService.addPond(pond);
 
         BaseResponse response = BaseResponse.builder()
