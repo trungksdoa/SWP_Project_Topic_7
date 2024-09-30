@@ -2,14 +2,18 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Orders;
+import com.product.server.koi_control_application.model.Payment;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
+import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.service_interface.ICategoryService;
 import com.product.server.koi_control_application.service_interface.IOrderService;
+import com.product.server.koi_control_application.service_interface.IPaymentService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
@@ -39,6 +43,8 @@ public class OrderController {
     private final IOrderService orderService;
     private final IUserService userService;
     private final JwtTokenUtil jwtUtil;
+    private final ICategoryService categoryService;
+    private final IPaymentService paymentService;
 
     @PostMapping("/create-product-order")
     public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductDTO req, HttpServletRequest request) throws Exception {
@@ -48,25 +54,20 @@ public class OrderController {
         Orders createdOrder = orderService.createOrder(userId, req);
         Users userOrdered = userService.getUser(userId);
         //Loop to get all products in order then add to momoProducts
-        List<MomoProduct> momoProducts = new ArrayList<>();
+        List<MomoProduct> momoProducts = createListProduct(createdOrder);
 
-        createdOrder.getItems().stream().forEach(orderItems -> {
-            MomoProduct momoProduct = new MomoProduct();
-            momoProduct.setName(orderItems.getProductId().getName());
-            momoProduct.setQuantity(orderItems.getQuantity());
-            momoProduct.setPrice(Long.parseLong(orderItems.getProductId().getPrice() + ""));
-            momoProduct.setImageUrl(orderItems.getProductId().getImageUrl());
-            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
-            momoProduct.setCurrency("VND");
-            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
-            momoProduct.setTaxAmount(10L);
-            momoProduct.setManufacturer("KOI");
-            momoProducts.add(momoProduct);
-        });
         MomoUserInfo momoUserInfo = new MomoUserInfo();
         momoUserInfo.setName(req.getFullName());
         momoUserInfo.setPhoneNumber(req.getPhone());
         momoUserInfo.setEmail(userOrdered.getEmail());
+
+        paymentService.createPaymentStatus(Payment.builder()
+                .referenceId(createdOrder.getId())
+                .referenceType("ORDER")
+                .paymentMethod("MOMO")
+                .paymentDescription("Payment for order " + createdOrder.getId())
+                .paymentStatus("PENDING")
+                .build());
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
                 .amount((long) createdOrder.getTotalAmount())
@@ -78,6 +79,7 @@ public class OrderController {
                 .momoProducts(momoProducts)
                 .momoUserInfo(momoUserInfo)
                 .build();
+
         String jsonBody = new ObjectMapper().writeValueAsString(momoPaymentRequest);
         HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
         JsonNode responseBody = new ObjectMapper().readTree(response.body());
@@ -121,8 +123,8 @@ public class OrderController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
-                                                        @RequestParam(defaultValue = "0",required = false) int page,
-                                                        @RequestParam(defaultValue = "10",required = false) int size) {
+                                                        @RequestParam(defaultValue = "0", required = false) int page,
+                                                        @RequestParam(defaultValue = "10", required = false) int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }
@@ -133,5 +135,26 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(null, "Order cancelled successfully");
     }
 
+
+    private List<MomoProduct> createListProduct(Orders orders) {
+        List<MomoProduct> momoProducts = new ArrayList<>();
+        orders.getItems().forEach(orderItems -> {
+            Category cate = categoryService.getCategoryById(orderItems.getProductId().getCategoryId());
+            MomoProduct momoProduct = new MomoProduct();
+            momoProduct.setName(orderItems.getProductId().getName());
+            momoProduct.setQuantity(orderItems.getQuantity());
+            momoProduct.setPrice(Long.parseLong(orderItems.getProductId().getPrice() + ""));
+            momoProduct.setImageUrl(orderItems.getProductId().getImageUrl());
+            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
+            momoProduct.setCurrency("VND");
+            momoProduct.setTotalPrice(Long.parseLong(orderItems.getProductId().getPrice() * orderItems.getQuantity() + ""));
+            momoProduct.setTaxAmount(10L);
+            momoProduct.setManufacturer("KOI");
+            momoProduct.setDescription(orderItems.getProductId().getDescription());
+            momoProduct.setCategory(cate.getName());
+            momoProducts.add(momoProduct);
+        });
+        return momoProducts;
+    }
 
 }

@@ -33,6 +33,11 @@ public class ProductController {
         return ResponseUtil.createSuccessResponse(products, "Products retrieved successfully");
     }
 
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<BaseResponse> getProductBySlug(@PathVariable String slug) {
+        Product product = productService.getProductBySlug(slug);
+        return ResponseUtil.createSuccessResponse(product, "Product retrieved successfully");
+    }
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<BaseResponse> getProductsByCategory(@PathVariable int categoryId,

@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.model;
 
 
+import com.product.server.koi_control_application.pojo.SlugGenerator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,6 +40,11 @@ public class Blogs {
     @JoinColumn(name = "author_id", nullable = false)
     private Users author;
 
+    private boolean status;
+
+    private String slug;
+
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -48,6 +54,13 @@ public class Blogs {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        if (this.slug == null || this.slug.isEmpty()) {
+            this.slug = SlugGenerator.toSlug(this.title);
+        }
+    }
+    @PreUpdate
+    protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 

@@ -71,6 +71,7 @@ public class CartServiceImpl implements ICartService {
         return cartRepository.findByUserId(userId);
     }
 
+
     @Override
     public void clearCart(int userId) {
         if (cartRepository.findByUserId(userId).isEmpty()) {

@@ -18,4 +18,6 @@ public interface IOrderService {
     void cancelOrderByAdmin(int orderId,String message) ;
     Page<Orders> getOrdersByUser(int userId, int page, int size);
     List<Orders> getOrdersByUser(int userId);
+
+    void deleteOrder(int id) ;
 }

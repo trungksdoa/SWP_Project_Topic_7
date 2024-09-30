@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.enums;
 
 public enum OrderStatus {
     PENDING("PENDING"),
-    PAID("PAID"),
+    SUCCESS("SUCCESS"),
     CANCELED("CANCELED");
 
     private final String value;

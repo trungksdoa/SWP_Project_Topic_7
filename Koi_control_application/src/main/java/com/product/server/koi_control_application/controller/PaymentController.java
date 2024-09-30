@@ -145,12 +145,19 @@ public class PaymentController {
             if (callbackResponse.getResultCode() == 0) {
                 if (orderType.equals("product")) {
                     // If the order is already marked as paid, return
-                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(OrderStatus.PAID.getValue())) {
+                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(OrderStatus.SUCCESS.getValue())) {
                         return;
                     }
 
-                    // Update the order status to paid and clear the user's cart
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PAID.getValue());
+                    /*
+                     * Update the order status to PAID
+                     */
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.SUCCESS.getValue());
+
+
+                    /*
+                     * Clear the cart
+                     */
                     cartService.clearCart(Integer.parseInt(userId));
                     log.info("Order " + callbackResponse.getOrderId() + " has been paid successfully");
                 } else {

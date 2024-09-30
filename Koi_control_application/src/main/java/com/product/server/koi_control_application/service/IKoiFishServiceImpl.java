@@ -122,9 +122,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                     .build());
         koiFish.setPondId(request.getPondId());
 
-
-
-        koiGrowthHistoryRepository.save(koiGrowthHistory);
         return koiFishRepository.save(koiFish);
     }
 

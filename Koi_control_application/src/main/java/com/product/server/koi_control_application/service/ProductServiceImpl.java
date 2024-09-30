@@ -9,6 +9,7 @@ import com.product.server.koi_control_application.repository.ProductRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,33 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final IImageService imageService;
+
+    @Override
+    public Product getProductBySlug(String slug) {
+        return productRepository.findBySlug(slug).orElseThrow(() -> new NotFoundException("Product not found"));
+    }
+
+    @Override
+    public void decreaseProductQuantity(int productId, int quantity) {
+        Product product = getProduct(productId);
+        if(product.getStock() < quantity) {
+            throw new NotFoundException("Not enough stock for product: " + product.getName());
+        }
+        save(product.decreaseStock(quantity));
+    }
+
+
+    @Override
+    public void increaseProductQuantity(int productId, int quantity) {
+        Product product = getProduct(productId).increaseStock(quantity);
+        save(product);
+    }
+
     @Override
     @Transactional
     public Product createProduct(Product product, MultipartFile productImage) throws IOException {
@@ -33,20 +57,18 @@ public class ProductServiceImpl implements IProductService {
             String filename = imageService.uploadImage(productImage);
             product.setImageUrl(filename);
         }
-
-        product = productRepository.save(product);
-        return product;
+        return save(product);
     }
 
     @Override
     @Transactional
-    public Product updateProduct(int id, Product product , MultipartFile productImage) throws IOException {
+    public Product updateProduct(int id, Product product, MultipartFile productImage) throws IOException {
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
 
         if (productImage != null) {
             String filename = imageService.updateImage(existingProduct.getImageUrl(), productImage);
             existingProduct.setImageUrl(filename);
-        }else{
+        } else {
             existingProduct.setImageUrl(existingProduct.getImageUrl());
         }
 
@@ -68,7 +90,7 @@ public class ProductServiceImpl implements IProductService {
             existingProduct.setStock(product.getStock());
         }
 
-        return productRepository.save(existingProduct);
+        return save(existingProduct);
     }
 
     @Override
@@ -100,5 +122,15 @@ public class ProductServiceImpl implements IProductService {
         Page<Product> products = productRepository.findByCategoryId(categoryId, PageRequest.of(page, size));
         products.getContent().forEach(Product::calculateAverageRating);
         return products;
+    }
+
+    private Product save(Product product) {
+        try {
+            log.info("Saving product: {}", product);
+            return productRepository.save(product);
+        } catch (Exception e) {
+            log.error("Error saving product: {}", product);
+            throw new RuntimeException("Error saving product");
+        }
     }
 }

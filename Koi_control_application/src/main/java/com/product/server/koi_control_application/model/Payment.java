@@ -1,13 +1,9 @@
 package com.product.server.koi_control_application.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -15,13 +11,24 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "payment_status")
-
+@Builder
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private int referenceId; // Có thể là orderId hoặc packageId
+    private String referenceType; // "ORDER" hoặc "PACKAGE"
     private String paymentMethod;
+    private String paymentDescription;
     private String paymentStatus;
-    private String paymentCode;
+    private String paymentType;
+
+    private LocalDateTime paymentDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.paymentDate = LocalDateTime.now();
+    }
+
 }

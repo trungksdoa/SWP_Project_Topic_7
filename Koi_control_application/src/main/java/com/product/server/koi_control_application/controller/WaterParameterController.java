@@ -1,11 +1,10 @@
 package com.product.server.koi_control_application.controller;
 
 
-import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IPondService;
 
 import com.product.server.koi_control_application.service_interface.IWaterParameterService;

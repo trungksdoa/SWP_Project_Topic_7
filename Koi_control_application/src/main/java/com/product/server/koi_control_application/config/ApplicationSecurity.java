@@ -43,6 +43,7 @@ public class ApplicationSecurity {
             "/api/payment/**",
             "/api/package/**",
             "/api/sse/**",
+            "/api/category/**",
             "/swagger-ui/**",
             "/swagger-resources/*",
             "/v3/api-docs/**",
