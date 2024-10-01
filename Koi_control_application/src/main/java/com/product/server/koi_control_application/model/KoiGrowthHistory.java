@@ -16,7 +16,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Entity
 @Table(name = "koi_growth_history")
@@ -51,6 +53,15 @@ public class KoiGrowthHistory {
     @Column(name = "pond_id")
     private int pondId;
 
+    @Column(name = "age_month_his")
+    private int ageMonthHis;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name= "date")
+    private LocalDate date;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -61,6 +72,16 @@ public class KoiGrowthHistory {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        countageMonth();
+    }
+    public void countageMonth() {
+        if(dateOfBirth != null) {
+            Period period = Period.between(dateOfBirth,date);
+            this.ageMonthHis = (period.getYears()*12)+ period.getMonths();
+        }else {
+            this.ageMonthHis = 0;
+        }
+
     }
 
     @PreUpdate
@@ -68,3 +89,4 @@ public class KoiGrowthHistory {
         updatedAt = LocalDateTime.now();
     }
 }
+

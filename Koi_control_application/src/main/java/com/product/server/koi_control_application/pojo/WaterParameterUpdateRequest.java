@@ -9,11 +9,9 @@ import lombok.Setter;
 public class WaterParameterUpdateRequest {
     private Integer nitriteNO2;
     private Integer nitrateNO3;
-    private Integer phosphatePO4;
     private Integer ammoniumNH4;
     private Integer hardnessGH;
     private Integer salt;
-    private Integer outdoorTemperature;
     private Integer temperature;
     private Integer pH;
     private Integer carbonateHardnessKH;

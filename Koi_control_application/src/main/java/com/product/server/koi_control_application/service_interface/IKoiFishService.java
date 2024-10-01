@@ -9,7 +9,6 @@ import java.io.IOException;
 
 public interface IKoiFishService {
     KoiFish addKoiFish( KoiFish koiFish);
-
     KoiFish getKoiFish(int id);
     Page<KoiFish> getKoiFishs(int page, int size);
     Page<KoiFish> getKoiFishsByPondId(int pondId, int page, int size);
