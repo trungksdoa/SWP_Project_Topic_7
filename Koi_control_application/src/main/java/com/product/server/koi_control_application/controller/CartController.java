@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
-@Tag(name = "Cart Controller", description = "APIs for managing cart")
+@Tag(name = "Cart", description = "APIs for managing cart")
 public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
 
 
     @PostMapping
-    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
+    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request)  {
         try {
             int userId = jwtUtil.getUserIdFromToken(request);
             Cart addedCart = cartService.createCart(cart, userId);

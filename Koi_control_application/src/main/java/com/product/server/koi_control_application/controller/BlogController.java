@@ -22,23 +22,23 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/blogs")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
+
 @Tag(name = "Blog", description = "API for blog")
 public class BlogController {
     private final IBlogService blogService;
     private final JwtTokenUtil jwtUtil;
     private final IUserService userService;
     @GetMapping
-    public ResponseEntity<List<Blogs>> getAllBlogs() {
-        return ResponseEntity.ok(blogService.getAllBlogs());
+    public ResponseEntity<BaseResponse> getAllBlogs() {
+        return ResponseUtil.createSuccessResponse(blogService.getAllBlogs(), "Success");
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP','ROLE_MEMBER')")
     public ResponseEntity<BaseResponse> getBlogById(@PathVariable int id) {
         return ResponseUtil.createSuccessResponse(blogService.getBlogById(id), "Success");
     }
@@ -46,7 +46,7 @@ public class BlogController {
 
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createBlog(
             @RequestPart("blog") @Schema(type = "string", format = "json", implementation = BlogCreateDTO.class) String blogJson,
@@ -65,20 +65,9 @@ public class BlogController {
                 "Created blog successfully",
                 HttpStatus.CREATED);
     }
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<BaseResponse> createBlog(
-//            @RequestPart("blog") String blog,
-//            @RequestPart(value = "headerImage", required = false) MultipartFile headerImage,
-//            @RequestPart(value = "bodyImage", required = false) MultipartFile bodyImage) throws IOException {
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        @Valid Blogs bs = mapper.readValue(blog, Blogs.class);
-//
-//        return ResponseUtil.createResponse(blogService.createBlog(bs, headerImage, bodyImage), "Created blog successfully", HttpStatus.CREATED);
-//    }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateBlog(
             @PathVariable int id,
@@ -90,10 +79,31 @@ public class BlogController {
         return ResponseUtil.createResponse(blogService.updateBlog(id, blog, headerImage, bodyImage), "Created blog successfully", HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteBlog(@PathVariable int id) {
         blogService.deleteBlog(id);
         return ResponseUtil.createSuccessResponse(null,"Deleted blog successfully");
     }
+
+    @GetMapping("/title/{slug}")
+    public ResponseEntity<BaseResponse> getBlogBySlug(@PathVariable String slug) {
+        return ResponseUtil.createSuccessResponse(blogService.getBlogBySlug(slug), "Get blog by slug successfully");
+    }
+
+    @GetMapping("/author/{authorId}")
+    public ResponseEntity<BaseResponse> getBlogsByAuthor(@PathVariable int authorId) {
+        return ResponseUtil.createSuccessResponse(blogService.getBlogsByAuthor(authorId), "Retrieved blogs successfully");
+    }
+
+
+    @GetMapping("/search/")
+    public ResponseEntity<BaseResponse> searchBlog(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String headerTop,
+            @RequestParam(required = false) String headerMiddle) {
+        return ResponseUtil.createSuccessResponse(blogService.searchBlogs(title, headerTop, headerMiddle), "Retrieved blogs successfully");
+    }
+
+
 }

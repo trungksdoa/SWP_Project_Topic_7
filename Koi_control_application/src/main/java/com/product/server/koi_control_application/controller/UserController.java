@@ -56,7 +56,7 @@ import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBS
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@Tag(name = "User", description = "API for User")
+@Tag(name = "User", description = "API for user")
 public class UserController {
 
     private final IUserService userService;
@@ -64,7 +64,6 @@ public class UserController {
     private final JwtTokenUtil jwtUtil;
     private final IEmailService emailService;
     private final IPackageService packageService;
-    private final PaymentController paymentController;
 
     @GetMapping("{userId}")
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {

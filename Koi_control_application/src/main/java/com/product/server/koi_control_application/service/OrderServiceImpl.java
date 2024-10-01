@@ -1,6 +1,6 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.custom_exception.InsufficientException;
+import com.product.server.koi_control_application.custom_exception.BadRequestException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.enums.ORDER;
 import com.product.server.koi_control_application.model.Cart;
@@ -28,7 +28,6 @@ import java.util.List;
 public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
     private final IProductService productService;
-    private final OrderItemsRepository orderItemsRepository;
     private final ICartService cartService;
 
 
@@ -46,7 +45,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public Orders getOrderById(int id) {
-        return orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found"));
+        return orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found by" + id));
     }
 
     @Override
@@ -63,10 +62,10 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public void cancelPendingOrder(int userId, int orderId) {
-        Orders order = orderRepository.findByUserIdAndId(userId, orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+        Orders order = orderRepository.findByUserIdAndId(userId, orderId).orElseThrow(() -> new NotFoundException("Order not found  while cancle with" + orderId));
 
         if (!order.getStatus().equals(ORDER.PENDING.getValue())) {
-            throw new InsufficientException("Order cannot be cancelled");
+            throw new BadRequestException("Order cannot be cancelled");
         }
 
         cancelOrder(order);
@@ -74,7 +73,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public void cancelOrderByAdmin(int orderId, String message) {
-        Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+        Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("(ADMIN) Order not found by " + orderId));
 
         order.setStatus(ORDER.CANCELLED.getValue());
         order.setResponseFromAdmin(message);
