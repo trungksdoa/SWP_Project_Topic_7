@@ -20,7 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Entity
 @Table(name = "koi_fish")
@@ -47,6 +49,9 @@ public class KoiFish {
     @NotNull(message = "Koi sex is required")
     @Column(nullable = false)
     private Boolean sex;
+
+    @Column(name = "age_month")
+    private int ageMonth;
 
     @NotNull(message = "Purchase price is required")
     @Positive(message = "Purchase price must be positive")
@@ -76,14 +81,30 @@ public class KoiFish {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name= "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    private LocalDate date;
+
+    public void countageMonth() {
+        if (dateOfBirth != null) {
+            Period period = Period.between(dateOfBirth, LocalDate.now());
+            this.ageMonth = (period.getYears() * 12) + period.getMonths();
+        } else {
+            this.ageMonth = 0;
+        }
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        countageMonth();
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        countageMonth();
     }
 }

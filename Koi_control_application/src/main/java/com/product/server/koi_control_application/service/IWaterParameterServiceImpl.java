@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
             return updateWaterParameter(pondId, request);
         }
             waterParameter.setPondId(pondId);
-            waterParameter.setLastCleanedAt(LocalDateTime.now());
+
         return waterParameterRepository.save(waterParameter);
     }
 
@@ -54,11 +55,9 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         WaterParameter waterParameter = getWaterParameterByPondId(pondId);
         Optional.ofNullable(request.getNitriteNO2()).ifPresent(waterParameter::setNitriteNO2);
         Optional.ofNullable(request.getNitrateNO3()).ifPresent(waterParameter::setNitrateNO3);
-        Optional.ofNullable(request.getPhosphatePO4()).ifPresent(waterParameter::setPhosphatePO4);
         Optional.ofNullable(request.getAmmoniumNH4()).ifPresent(waterParameter::setAmmoniumNH4);
         Optional.ofNullable(request.getHardnessGH()).ifPresent(waterParameter::setHardnessGH);
         Optional.ofNullable(request.getSalt()).ifPresent(waterParameter::setSalt);
-        Optional.ofNullable(request.getOutdoorTemperature()).ifPresent(waterParameter::setOutdoorTemperature);
         Optional.ofNullable(request.getTemperature()).ifPresent(waterParameter::setTemperature);
         Optional.ofNullable(request.getPH()).ifPresent(waterParameter::setPH);
         Optional.ofNullable(request.getCarbonateHardnessKH()).ifPresent(waterParameter::setCarbonateHardnessKH);
@@ -67,7 +66,7 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
         Optional.ofNullable(request.getAmountFed()).ifPresent(waterParameter::setAmountFed);
 
         if (Boolean.TRUE.equals(request.getLastCleaned())) {
-            waterParameter.setLastCleanedAt(LocalDateTime.now());
+            waterParameter.setLastCleanedAt(LocalDate.now());
         }
 
         return waterParameterRepository.save(waterParameter);

@@ -59,10 +59,13 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .weight(koiFish.getWeight())
                 .length(koiFish.getLength())
                 .pondId(koiFish.getPondId())
+                .date(koiFish.getDate())
                 .build());
 
         return saved;
     }
+
+
 
     @Override
     public KoiFish getKoiFish(int id) {
@@ -124,6 +127,8 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                     .weight(request.getWeight())
                     .length(request.getLength())
                     .pondId(koiFish.getPondId())
+
+                    .date(koiFish.getDate())
                     .build());
         koiFish.setPondId(request.getPondId());
 
