@@ -76,15 +76,17 @@ public class PaymentController {
             mapData.setMomoUserInfo(new MomoUserInfo());
         }
 
-//        Payment payment = Payment.builder()
-//                .referenceId(paymentInfo.getOrderId())
-//                .referenceType(mapData.getOrderType())
-//                .paymentMethod("MOMO")
-//                .paymentDescription("Thanh toán qua MoMo")
-//                .paymentStatus(PAYMENT.PENDING.getValue())
-//                .build();
 
-//        paymentService.createPaymentStatus(payment);
+
+        Payment payment = Payment.builder()
+                .referenceId(mapData.getOrderId())
+                .referenceType(mapData.getOrderType())
+                .paymentMethod("MOMO")
+                .paymentDescription("Thanh toán qua MoMo")
+                .paymentStatus(PAYMENT.PENDING.getValue())
+                .build();
+
+        paymentService.createPaymentStatus(payment);
         MomoRequestBody requestBody = createRequestBody(paymentInfo, signature);
         String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
 
@@ -164,9 +166,9 @@ public class PaymentController {
                     }
 
                     /*
-                        * Update the payment status to PAID
+                     * Update the payment status to PAID
                      */
-                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), PAID.getValue());
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, PAID.getValue());
 
 
                     /*
@@ -191,10 +193,11 @@ public class PaymentController {
             } else {
                 // Handle failed payment
                 if (orderType.equals("product")) {
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.CANCELED.getValue());
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.CANCELLED.getValue());
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
                     log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
                 } else {
-                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), FAILED.getValue());
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
                     log.info("User " + userId + " has not been added package yet");
                 }
             }

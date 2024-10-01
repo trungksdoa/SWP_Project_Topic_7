@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 @RepositoryRestResource(exported = false)
@@ -17,4 +18,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     @Modifying
     @Query("delete from payment_status p where p.paymentDate between ?1 and ?2")
     void deleteByPaymentDateRange(LocalDateTime fromDate, LocalDateTime toDate);
+
+    @Query("select p from payment_status p where p.referenceId = ?1 and p.referenceType = ?2")
+    Optional<Payment> findByReferenceIdAndReferenceType(int referenceId, String referenceType);
 }

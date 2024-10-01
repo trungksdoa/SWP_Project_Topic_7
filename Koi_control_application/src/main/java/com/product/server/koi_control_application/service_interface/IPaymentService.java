@@ -6,9 +6,9 @@ import java.util.List;
 
 
 public interface IPaymentService {
-    Payment createPaymentStatus(Payment paymentStatus);
+    void createPaymentStatus(Payment paymentStatus);
     List<Payment> getAllPaymentStatus();
 
-    void updatePaymentStatus(int referenceId, String paymentStatus);
+    void updatePaymentStatus(int referenceId,String referenceName, String paymentStatus);
     void clearPaymentStatusByDate(LocalDateTime fromDate, LocalDateTime toDate);
 }

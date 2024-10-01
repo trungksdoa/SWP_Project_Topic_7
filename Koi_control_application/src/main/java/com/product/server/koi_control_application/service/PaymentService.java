@@ -16,8 +16,8 @@ public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
 
     @Override
-    public Payment createPaymentStatus(Payment paymentStatus) {
-        return paymentRepository.save(paymentStatus);
+    public void createPaymentStatus(Payment paymentStatus) {
+        paymentRepository.save(paymentStatus);
     }
 
     @Override
@@ -26,9 +26,10 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public void updatePaymentStatus(int referenceId, String paymentStatus) {
-        Payment payment = paymentRepository.findById(referenceId).orElseThrow(() -> new RuntimeException("Payment not found"));
+    public void updatePaymentStatus(int referenceId, String referenceName, String paymentStatus) {
+        Payment payment = paymentRepository.findByReferenceIdAndReferenceType(referenceId, referenceName).orElseThrow(() -> new RuntimeException("Payment not found"));
         payment.setPaymentStatus(paymentStatus);
+        paymentRepository.save(payment);
     }
 
     @Override

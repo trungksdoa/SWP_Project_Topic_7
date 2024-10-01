@@ -6,7 +6,6 @@ import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.BlogsRepository;
 import com.product.server.koi_control_application.service_interface.IBlogService;
 import com.product.server.koi_control_application.service_interface.IImageService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +57,7 @@ public class BlogServiceImpl implements IBlogService {
             existingBlog.setHeaderImageUrl(headerImageUrl);
         }
         if (bodyImage != null && !bodyImage.isEmpty()) {
-            String bodyImageUrl = "";
+            String bodyImageUrl ="";
             if (existingBlog.getBodyImageUrl() == null) {
                 bodyImageUrl = imageService.uploadImage(bodyImage);
             } else {
@@ -88,6 +87,7 @@ public class BlogServiceImpl implements IBlogService {
 
     @Override
     public List<Blogs> getBlogsByAuthor(int authorId) {
+
         return repo.findByAuthor(Users.builder().id(authorId).build());
     }
 

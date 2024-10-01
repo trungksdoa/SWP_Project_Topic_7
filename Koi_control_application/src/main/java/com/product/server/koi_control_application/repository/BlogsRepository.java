@@ -17,4 +17,6 @@ public interface BlogsRepository extends JpaRepository<Blogs, Integer> {
     @Query("select b from Blogs b where b.author = ?1")
     List<Blogs> findByAuthor(Users author);
 
+    @Query("select b from Blogs b where b.title LIKE '%?1%'")
+    List<Blogs> findByTitle(String title);
 }

@@ -76,7 +76,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelOrderByAdmin(int orderId, String message) {
         Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
 
-        order.setStatus(ORDER.CANCELED.getValue());
+        order.setStatus(ORDER.CANCELLED.getValue());
         order.setResponseFromAdmin(message);
         orderRepository.save(order);
     }
@@ -140,7 +140,7 @@ public class OrderServiceImpl implements IOrderService {
             Product product = productService.getProduct(item.getProductId().getId());
             productService.increaseProductQuantity(product.getId(), item.getQuantity());
         }
-        order.setStatus(ORDER.CANCELED.getValue());
+        order.setStatus(ORDER.CANCELLED.getValue());
         orderRepository.save(order);
     }
 }
