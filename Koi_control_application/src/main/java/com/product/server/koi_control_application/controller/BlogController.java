@@ -50,8 +50,8 @@ public class BlogController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createBlog(
             @RequestPart("blog") @Schema(type = "string", format = "json", implementation = BlogCreateDTO.class) String blogJson,
-            @RequestPart(value = "headerImage", required = false) MultipartFile headerImage,
-            @RequestPart(value = "bodyImage", required = false) MultipartFile bodyImage,
+            @RequestParam(value = "headerImage", required = false) MultipartFile headerImage,
+            @RequestParam(value = "bodyImage", required = false) MultipartFile bodyImage,
             HttpServletRequest request
     ) throws IOException {
 
