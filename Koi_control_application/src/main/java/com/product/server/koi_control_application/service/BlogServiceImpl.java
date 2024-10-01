@@ -21,9 +21,19 @@ import java.util.Optional;
 public class BlogServiceImpl implements IBlogService {
     private final BlogsRepository repo;
     private final IImageService imageService;
+
     @Override
     public Blogs createBlog(Blogs blog, MultipartFile headerImage, MultipartFile bodyImage) throws IOException {
-        return getBlogs(headerImage, bodyImage, blog);
+        if (headerImage != null && !headerImage.isEmpty()) {
+            String headerImageUrl = imageService.uploadImage(headerImage);
+            blog.setHeaderImageUrl(headerImageUrl);
+        }
+        if (bodyImage != null && !bodyImage.isEmpty()) {
+            String bodyImageUrl = imageService.uploadImage(bodyImage);
+            blog.setBodyImageUrl(bodyImageUrl);
+        }
+
+        return repo.save(blog);
     }
 
     @Override
@@ -37,22 +47,29 @@ public class BlogServiceImpl implements IBlogService {
         Optional.ofNullable(blog.getContentMiddle()).ifPresent(existingBlog::setContentMiddle);
 
 
-        return getBlogs(headerImage, bodyImage, existingBlog);
-    }
-
-    @NonNull
-    private Blogs getBlogs(MultipartFile headerImage, MultipartFile bodyImage, Blogs existingBlog) throws IOException {
         if (headerImage != null && !headerImage.isEmpty()) {
-            String headerImageUrl = imageService.uploadImage(headerImage);
+            String headerImageUrl = "";
+            if (existingBlog.getHeaderImageUrl() == null) {
+                headerImageUrl = imageService.uploadImage(headerImage);
+            } else {
+                headerImageUrl = imageService.updateImage(imageService.getFileName(existingBlog.getHeaderImageUrl()), headerImage);
+            }
+
             existingBlog.setHeaderImageUrl(headerImageUrl);
         }
         if (bodyImage != null && !bodyImage.isEmpty()) {
-            String bodyImageUrl = imageService.uploadImage(bodyImage);
+            String bodyImageUrl = "";
+            if (existingBlog.getBodyImageUrl() == null) {
+                bodyImageUrl = imageService.uploadImage(bodyImage);
+            } else {
+                bodyImageUrl = imageService.updateImage(imageService.getFileName(existingBlog.getBodyImageUrl()), bodyImage);
+            }
             existingBlog.setBodyImageUrl(bodyImageUrl);
         }
 
         return repo.save(existingBlog);
     }
+
 
     @Override
     public void deleteBlog(int id) {
@@ -73,4 +90,5 @@ public class BlogServiceImpl implements IBlogService {
     public List<Blogs> getBlogsByAuthor(int authorId) {
         return repo.findByAuthor(Users.builder().id(authorId).build());
     }
+
 }
