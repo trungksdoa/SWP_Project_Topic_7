@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@Tag(name = "Catagory", description = "API for Category")
+@Tag(name = "Category", description = "API for Category")
 
 public class CategoryController {
     private final ICategoryService categoryService;
