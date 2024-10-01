@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/manage/api/category")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@Tag(name = "Category", description = "API for Category")
+@Tag(name = "Admin API", description = "API for Category")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class ManageCategoryController {
     private final ICategoryService categoryService;
