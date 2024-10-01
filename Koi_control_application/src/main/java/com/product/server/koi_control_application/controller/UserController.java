@@ -7,10 +7,10 @@ import com.product.server.koi_control_application.custom_exception.ForbiddenExce
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.request.*;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
+import com.product.server.koi_control_application.pojo.request.*;
 import com.product.server.koi_control_application.pojo.response.AuthResponse;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.response.UserResponse;
@@ -22,6 +22,7 @@ import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -95,7 +96,7 @@ public class UserController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -122,6 +123,7 @@ public class UserController {
                     .accessToken(accessToken)
                     .build();
 
+            response.setHeader("Authorization", "Bearer " + accessToken);
             return ResponseUtil.createSuccessResponse(authResponse, "Login successful");
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException("Incorrect email or password", ex);
