@@ -1,15 +1,105 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
-import { useGetPondById } from "../../../hooks/koi/useGetPondById.js"
+import { useGetPondById } from "../../../hooks/koi/useGetPondById.js";
+import { useUpdateKoi } from '../../../hooks/koi/useUpdateKoi';
+import { useFormik } from "formik";
+import { Button, Checkbox, Form, Input, Select } from "antd";
+import { toast } from "react-toastify";
+import { LOCAL_STORAGE_KOI_KEY } from '../../../constant/localStorage';
+import { manageKoiActions } from '../../../store/manageKoi/slice';
 
 const PondDetail = () => {
     const {pondId} = useParams();
-    const [isUpdated, setIsUpdated] = useState(false);
     const pondIdNumber = Number(pondId);
-    const {data: lstKoi, error: koiError} = useGetAllKoi();
+    const userLogin = useSelector((state) => state.manageUser.userLogin);
+    const userId = userLogin?.id;
+    const {data: lstKoi, error: koiError, refetch} = useGetAllKoi(userId);
     const [selectedKoi, setSelectedKoi] = useState(null);
     const {data: selectedPond, error: pondError, loading: pondLoading} = useGetPondById(pondIdNumber);
+    const koiInPond = lstKoi?.filter(koi => koi.pondId === pondIdNumber) || [];
+
+    const [componentDisabled, setComponentDisabled] = useState(true);
+    const dispatch = useDispatch();
+    const mutation = useUpdateKoi();
+    const [imgSrc, setImgSrc] = useState("");
+
+    const handleChangeFile = (e) => {
+        let file = e.target.files?.[0];
+        if (
+            file &&
+            [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+            ].includes(file.type)
+        ) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                setImgSrc(e.target?.result);
+            };
+            formik.setFieldValue("image", file);
+            setComponentDisabled(false);
+        } else {
+            setComponentDisabled(true);
+        }
+    };
+
+    const formik = useFormik({
+        enableReinitialize: true,
+        initialValues: {
+            name: selectedKoi?.name || "",
+            variety: selectedKoi?.variety || "",
+            sex: selectedKoi?.sex ? "Female" : "Male",
+            purchasePrice: selectedKoi?.purchasePrice || "",
+            pondId: selectedKoi?.pondId || "",
+            image: null,
+        },
+        onSubmit: (values) => {
+            const formData = new FormData();
+            const updateKoi = {
+                ...selectedKoi,
+                name: values.name,
+                variety: values.variety,
+                sex: values.sex === "Female",
+                purchasePrice: parseFloat(values.purchasePrice),
+                pondId: values.pondId,
+                userId: userId,
+            };
+            if (values.image) {
+                formData.append("image", values.image);
+            }
+            formData.append("fish", JSON.stringify(updateKoi));
+            mutation.mutate(
+                { id: selectedKoi.id, payload: formData },
+                {
+                    onSuccess: (updatedKoi) => {
+                        const updatedKoiWithImage = {
+                            ...updatedKoi,
+                            imageUrl: imgSrc || selectedKoi.imageUrl,
+                        };
+                        dispatch(manageKoiActions.updateKoi(updatedKoiWithImage));
+                        setSelectedKoi(updatedKoiWithImage);
+                        const updatedList = lstKoi.map(koi => 
+                            koi.id === updatedKoiWithImage.id ? updatedKoiWithImage : koi
+                        );
+                        localStorage.setItem(LOCAL_STORAGE_KOI_KEY, JSON.stringify(updatedList));
+                        setComponentDisabled(true);
+                        refetch();
+                        toast.success("Koi updated successfully");
+                    },
+                    onError: (error) => {
+                        console.error("Error updating koi:", error);
+                        toast.error(`Error updating koi: ${error.message || 'An unexpected error occurred'}`);
+                    },
+                }
+            );
+        },
+    });
 
     useEffect(() => {
         if (selectedPond) {
@@ -29,10 +119,7 @@ const PondDetail = () => {
 
     if (!lstKoi || pondLoading || !selectedPond) {
         return <div>Loading...</div>;
-    }
-
-    // Convert pondId from useParams to a number for comparison
-    const koiInPond = lstKoi.filter(koi => koi.pondId === pondIdNumber);
+    }    
 
     if (koiInPond.length === 0) {
         return <div>No koi found in this pond.</div>;
@@ -44,80 +131,23 @@ const PondDetail = () => {
 
     const handleClose = () => {
         setSelectedKoi(null);
-        setIsUpdated(false);
+        
     };
 
     const handleOutsideClick = (e) => {
         if (e.target.id === 'modal-overlay') {
             setSelectedKoi(null);
-            setIsUpdated(false);
+            
         }
     };
 
-    const handleUpdateClick = () => {
-        setIsUpdated(prevState => !prevState);
-    };
 
     return (
         <div>
             <div className="flex justify-center items-center text-bold text-3xl h-full m-8">
-                <strong>Koi in Pond ID {pondIdNumber}</strong>
+                <strong>Koi in Pond</strong>
             </div>
-            {/*<div></div>*/
-            }
-            {/*<div className="flex mb-8">*/
-            }
-            {/*    <img*/
-            }
-            {/*        src={selectedPond.image}*/
-            }
-            {/*        alt={selectedPond.name}*/
-            }
-            {/*        className="w-48 h-48 object-cover"*/
-            }
-            {/*    />*/
-            }
-            {/*</div>*/
-            }
-
-            {/*<div className="flex flex-col h-48 mt-5">*/
-            }
-            {/*    <h3 className="text-xl font-bold mb-4 text-center">{selectedPond.name}</h3>*/
-            }
-            {/*    <div className="flex justify-between">*/
-            }
-            {/*        <strong>ID:</strong> <span className="text-right">{selectedPond.id}</span>*/
-            }
-            {/*    </div>*/
-            }
-            {/*    <div className="flex justify-between">*/
-            }
-            {/*        <strong>Width:</strong> <span className="text-right">{selectedPond.width} meters</span>*/
-            }
-            {/*    </div>*/
-            }
-            {/*    <div className="flex justify-between">*/
-            }
-            {/*        <strong>Length:</strong> <span className="text-right">{selectedPond.length} meters</span>*/
-            }
-            {/*    </div>*/
-            }
-            {/*    <div className="flex justify-between">*/
-            }
-            {/*        <strong>Depth:</strong> <span className="text-right">{selectedPond.depth} meters</span>*/
-            }
-            {/*    </div>*/
-            }
-            {/*    <div className="flex justify-between">*/
-            }
-            {/*        <strong>Fish Count:</strong> <span className="text-right">{koiInPond.length}</span>*/
-            }
-            {/*    </div>*/
-            }
-            {/*</div>*/
-            }
-            {/*<div></div>*/
-            }
+           
             <div className="container grid grid-cols-4 gap-6 my-16 mx-auto">
                 <div className="col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                     {koiInPond.map((koi, index) => (
@@ -139,8 +169,8 @@ const PondDetail = () => {
                         onClick={handleOutsideClick}
                     >
                         <div
-                            className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col"
-                            style={{ width: '80%', maxWidth: '500px' }}
+                            className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col rounded-xl"
+                            style={{ width: '80%', maxWidth: '700px' }}
                         >
                             <button
                                 onClick={handleClose}
@@ -149,41 +179,116 @@ const PondDetail = () => {
                                 &times;
                             </button>
                             <div className="flex flex-row">
-                                <img
-                                    src={selectedKoi.imageUrl}
-                                    alt={selectedKoi.name}
-                                    className="w-48 h-50 object-cover mr-6"
-                                />
-                                <div className="flex flex-col justify-center w-full">
-                                    <div className="flex justify-between m-1">
-                                        <strong>Name:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>{selectedKoi.name}</span>
-                                    </div>
-                                    <div className="flex justify-between m-1">
-                                        <strong>Variety:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>{selectedKoi.variety}</span>
-                                    </div>
-                                    <div className="flex justify-between m-1">
-                                        <strong>Sex:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>{selectedKoi.sex ? 'Female' : 'Male'}</span>
-                                    </div>
-                                    <div className="flex justify-between m-1">
-                                        <strong>Purchase Price:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>${selectedKoi.purchasePrice}</span>
-                                    </div>
-                                    <div className="flex justify-between m-1">
-                                        <strong>Fish ID:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>{selectedKoi.id}</span>
-                                    </div>
-                                    <div className="flex justify-between m-1">
-                                        <strong>Pond ID:</strong> <span
-                                        className={`text-right ${isUpdated ? 'border-2 border-black rounded w-1/2 pr-2' : 'pr-2'}`}>{selectedKoi.pondId}</span>
+                                <div className="mr-6">
+                                    <img
+                                        src={imgSrc || selectedKoi.imageUrl}
+                                        alt={selectedKoi.name}
+                                        className="w-80 h-70 object-cover"
+                                    />
+                                    <div className="mt-2">
+                                        <strong>Image:</strong>
+                                        <input
+                                            disabled={componentDisabled}
+                                            type="file"
+                                            accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+                                            onChange={handleChangeFile}
+                                        />
+                                        {imgSrc && formik.values.image && (
+                                            <img
+                                                src={imgSrc}
+                                                alt="Preview"
+                                                style={{
+                                                    width: "80px",
+                                                    height: "70px",
+                                                    objectFit: "cover",
+                                                    marginTop: "10px",
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                            <div className="mt-4 text-center">
-                                <button className="bg-black text-white px-4 py-2 rounded mr-2">View Chart</button>
-                                <button className="border border-black text-black px-4 py-2 rounded" onClick={handleUpdateClick}>Update</button>
+                                <div className="flex flex-col w-full">
+                                    <Checkbox
+                                        checked={!componentDisabled}
+                                        onChange={(e) => setComponentDisabled(!e.target.checked)}
+                                        className="mb-4"
+                                    >
+                                        Update Info
+                                    </Checkbox>
+
+                                    <Form
+                                        disabled={componentDisabled}
+                                        onFinish={formik.handleSubmit}
+                                    >
+                                        <div className="flex justify-between m-1">
+                                            <strong>Name:</strong>
+                                            <Input
+                                                className="text-right w-1/2 pr-2"
+                                                style={{color: 'black'}}    
+                                                name="name"
+                                                value={formik.values.name}
+                                                onChange={formik.handleChange}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between m-1">
+                                            <strong>Variety:</strong>
+                                            <Input
+                                                className="text-right w-1/2 pr-2"
+                                                style={{color: 'black'}}   
+                                                name="variety"
+                                                value={formik.values.variety}
+                                                onChange={formik.handleChange}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between m-1">
+                                            <strong>Sex:</strong>
+                                            <Select
+                                                style={{ 
+                                                    width: '50%', 
+                                                    textAlign: 'right', 
+                                                    borderRadius: '0.25rem',
+                                                    color: 'black' 
+                                                }}
+                                                name="sex"
+                                                value={formik.values.sex}
+                                                onChange={(value) => formik.setFieldValue("sex", value)}
+                                            >
+                                                <Select.Option value="Male">Male</Select.Option>
+                                                <Select.Option value="Female">Female</Select.Option>
+                                            </Select>
+                                        </div>
+                                        <div className="flex justify-between m-1">
+                                            <strong>Purchase Price:</strong>
+                                            <Input
+                                                className="text-right w-1/2 pr-2"
+                                                style={{color: 'black'}}   
+                                                name="purchasePrice"
+                                                value={formik.values.purchasePrice}
+                                                onChange={formik.handleChange}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between m-1">
+                                            <strong>Pond ID:</strong>
+                                            <Input
+                                                className="text-right  w-1/2 pr-2"
+                                                style={{color: 'black'}}   
+                                                name="pondId"
+                                                value={formik.values.pondId}
+                                                onChange={formik.handleChange}
+                                            />
+                                        </div>
+                                        <Form.Item className="mt-4">
+                                            <Button
+                                                type="primary"
+                                                htmlType="submit"
+                                                disabled={componentDisabled}
+                                                loading={mutation.isPending}
+                                            >
+                                                Update
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
+                                </div>
                             </div>
                         </div>
                     </div>

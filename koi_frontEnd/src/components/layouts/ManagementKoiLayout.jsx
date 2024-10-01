@@ -1,5 +1,5 @@
 import React from 'react'
-import HeaderManage from '../ui/HeaderManage'
+import HeaderManage from '../../constant/HeaderManage'
 import { Outlet } from 'react-router-dom'
 import Footer from '../ui/Footer'
 
