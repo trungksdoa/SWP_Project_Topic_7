@@ -22,7 +22,7 @@ export const manageKoiFishServices = {
     addKoi: async (payload) => {
       try {
           const formData = new FormData();            
-          formData.append('pond', JSON.stringify(payload.pond));
+          formData.append('koi', JSON.stringify(payload.koi));
           if (payload.image) {
               formData.append('image', payload.image);
           }

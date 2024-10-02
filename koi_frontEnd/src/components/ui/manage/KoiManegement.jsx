@@ -21,6 +21,8 @@ const KoiManagement = () => {
     const [ showAddPopup, setShowAddPopup ] = useState(false);
     const addKoiMutation = useAddKoi();
 
+    console.log("lstKoi:", lstKoi); // Add this line to log the lstKoi value
+
     const handleAddClick = () => {
         setShowAddPopup(true);
     }
@@ -191,6 +193,9 @@ const KoiManagement = () => {
         },
     });
 
+    // if (!lstKoi) {
+    //     return <div>Loading...</div>;
+    // }
 
     return (
         <div>
