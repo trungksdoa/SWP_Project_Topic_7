@@ -18,7 +18,9 @@ const managePondSlice = createSlice({
                 state.ponds[index] = updatedPond;
             }
         },
-        // Add other pond-related actions as needed
+        addPond: (state, action) => {
+            state.ponds.push(action.payload);
+        },
     },
 });
 
