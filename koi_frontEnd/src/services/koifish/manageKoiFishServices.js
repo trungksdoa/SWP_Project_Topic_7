@@ -1,7 +1,6 @@
 import { MANAGE_KOI_API } from "../../constant/api";
 import { apiInstanceHeader } from "../../constant/apiInstanceHeader.js";
 
-
 const api = apiInstanceHeader.create({
     baseURL: MANAGE_KOI_API
 })
@@ -21,4 +20,16 @@ export const manageKoiFishServices = {
           throw error.response?.data || error.message;
         }
     },
+    addKoi: async (payload) => {
+        try {
+            const response = await api.post("/", payload, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    }
 }

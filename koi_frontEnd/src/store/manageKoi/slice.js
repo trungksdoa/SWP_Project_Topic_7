@@ -15,7 +15,9 @@ const manageKoiSlice = createSlice({
         state.kois[index] = updatedKoi;
       }
     },
-    // ... other reducers
+    addKoi: (state, action) => {
+      state.kois.push(action.payload);
+    },
   },
 });
 
