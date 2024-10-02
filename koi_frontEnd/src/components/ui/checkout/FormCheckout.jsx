@@ -24,6 +24,8 @@ const FormCheckout = ({ totalItems }) => {
       console.log(values);
       mutation.mutate(values, {
         onSuccess: (res) => {
+          
+          console.log(res?.data?.data)
             window.location.href = res?.data?.data?.shortLink   
         }
       })

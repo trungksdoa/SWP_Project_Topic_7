@@ -6,7 +6,10 @@ const api = apiInstanceHeader.create({
 });
 
 export const manageCartService = {
-  postCart: (payload) => api.post("", payload),
+  postCart: (payload) => {
+    console.log("payload service", payload) 
+    return api.post("", payload)
+  },
   getCart: (id) => api.get(`/user/${id}`),
   putCart: (id, payload) => api.put(`/user/${id}`, payload),
   deleteCarts: ({ productId, userId }) =>

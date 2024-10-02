@@ -28,6 +28,9 @@ import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
 import HistoryPage from "../pages/HistoryPage";
 import PondDetail from "../components/ui/manage/PondDetail";
 import PackagesPage from "../pages/PackagesPage";
+import EditPackages from "../components/ui/admin/managePackages/editPackages";
+import ManageCategory from "../components/ui/admin/manageCategory/ManageCategory";
+import EditCategory from "../components/ui/admin/manageCategory/EditCategory";
 
 const router = [
   {
@@ -53,16 +56,16 @@ const router = [
       },
       {
         path: PATH.PROFILE,
-        element: <ProfilePage />
+        element: <ProfilePage />,
       },
       {
         path: PATH.PAYMENT_SUCCESS,
-        element: <PaymentSuccessPage />
+        element: <PaymentSuccessPage />,
       },
       {
         path: PATH.HISTORY_ORDER,
-        element: <HistoryPage />
-      }
+        element: <HistoryPage />,
+      },
     ],
   },
   {
@@ -74,28 +77,28 @@ const router = [
       },
       {
         path: PATH.POND_MANAGEMENT,
-        element: <PondManegementPage />
+        element: <PondManegementPage />,
       },
       {
         path: `${PATH.DETAIL_POND}/:pondId`,
-        element: <PondDetail />
+        element: <PondDetail />,
       },
       {
         path: PATH.WATER_PARAMETER,
-        element: <WaterParameter />
+        element: <WaterParameter />,
       },
       {
         path: PATH.FOOD_CALCULATOR,
-        element: <FoodCalculator />
+        element: <FoodCalculator />,
       },
       {
         path: PATH.SALT_CALCULATOR,
-        element: <SaltCalculator />
+        element: <SaltCalculator />,
       },
       {
         path: PATH.PACKAGES,
-        element: <PackagesPage />
-      }
+        element: <PackagesPage />,
+      },
     ],
   },
   {
@@ -115,7 +118,7 @@ const router = [
           },
           {
             path: `${PATH.EDIT_PRODUCT}/:id`,
-            element: <EditProduct />
+            element: <EditProduct />,
           },
           {
             path: PATH.MANAGE_PRODUCTS,
@@ -123,14 +126,26 @@ const router = [
           },
           {
             path: PATH.MANAGE_PACKAGE,
-            element: <ManagePackage />
+            element: <ManagePackage />,
+          },
+          {
+            path: `${PATH.EDIT_PACKAGE}/:id`,
+            element: <EditPackages />,
+          },
+          {
+            path: PATH.MANAGE_CATEGORY,
+            element: <ManageCategory />
+          },
+          {
+            path: `${PATH.EDIT_CATEGORY}/:id`,
+            element: <EditCategory />
           }
         ],
       },
     ],
   },
   {
-    element: <PaymentLayout/>,
+    element: <PaymentLayout />,
     children: [
       {
         path: PATH.CART,
@@ -138,9 +153,9 @@ const router = [
       },
       {
         path: PATH.CHECKOUT,
-        element: <CheckoutPage />
-      }
-    ]
-  }
+        element: <CheckoutPage />,
+      },
+    ],
+  },
 ];
 export const Router = () => useRoutes(router);
