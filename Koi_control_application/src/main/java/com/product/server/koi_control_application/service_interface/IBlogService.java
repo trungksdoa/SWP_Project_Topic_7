@@ -21,5 +21,7 @@ public interface IBlogService {
 
     Blogs getBlogBySlug(String slug);
 
+    void acceptBlog(int id);
+
     List<Blogs> searchBlogs(String... params);
 }

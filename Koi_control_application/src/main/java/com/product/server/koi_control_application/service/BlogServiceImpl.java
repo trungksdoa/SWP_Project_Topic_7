@@ -76,6 +76,13 @@ public class BlogServiceImpl implements IBlogService {
     }
 
     @Override
+    public void acceptBlog(int id) {
+        Blogs blog = repo.findById(id).orElseThrow(() -> new NotFoundException("No blog found with id: " + id));
+        blog.setApproved(true);
+        repo.save(blog);
+    }
+
+    @Override
     public List<Blogs> searchBlogs(String... params) {
         String title = params.length > 0 ? params[0] : null;
         String headerTop = params.length > 1 ? params[1] : null;
