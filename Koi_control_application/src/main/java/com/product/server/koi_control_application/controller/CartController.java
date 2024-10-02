@@ -2,8 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.model.Cart;
-import com.product.server.koi_control_application.pojo.BaseResponse;
-import com.product.server.koi_control_application.pojo.CartDTO;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
-@Tag(name = "Cart Controller", description = "APIs for managing cart")
+@Tag(name = "Cart", description = "APIs for managing cart")
 public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
 
 
     @PostMapping
-    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request) throws IllegalAccessException {
+    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request)  {
         try {
             int userId = jwtUtil.getUserIdFromToken(request);
             Cart addedCart = cartService.createCart(cart, userId);

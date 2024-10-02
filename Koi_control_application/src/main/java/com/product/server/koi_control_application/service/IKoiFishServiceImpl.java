@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +59,13 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .weight(koiFish.getWeight())
                 .length(koiFish.getLength())
                 .pondId(koiFish.getPondId())
+                .date(koiFish.getDate())
                 .build());
 
         return saved;
     }
+
+
 
     @Override
     public KoiFish getKoiFish(int id) {
@@ -77,7 +81,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public void deleteKoiFish(int id) {
-
+        KoiFish koiFish = getKoiFish(id);
+        Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+        currPond.decreaseFishCount();
+        pondRepository.save(currPond);
         koiFishRepository.deleteById(id);
     }
 
@@ -94,41 +101,37 @@ public class IKoiFishServiceImpl implements IKoiFishService {
             throw new NotFoundException("User not found.");
 
         if (!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
-            throw new NotFoundException("This Breeder dont have this Pond!.");
+            throw new NotFoundException("Pond not found");
 
         if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
             throw new AlreadyExistedException("KoiFish name existed.");
 
-        if (!file.isEmpty()) {
+        if(file != null && !file.isEmpty()){
             String filename = iImageService.updateImage(koiFish.getImageUrl(), file);
             koiFish.setImageUrl(filename);
         } else {
             koiFish.setImageUrl(koiFish.getImageUrl());
         }
 
-        koiFish.setName(request.getName());
-        koiFish.setVariety(request.getVariety());
-        koiFish.setSex(request.getSex());
-        koiFish.setPurchasePrice(request.getPurchasePrice());
+        Optional.ofNullable(request.getWeight()).ifPresent(koiFish::setWeight);
+        Optional.ofNullable(request.getLength()).ifPresent(koiFish::setLength);
+        Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
+        Optional.ofNullable(request.getVariety()).ifPresent(koiFish::setVariety);
+        Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
+        Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
 
-        Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
+            koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+                    .koiId(koiFish.getId())
+                    .inPondFrom(koiFish.getCreatedAt())
+                    .isFirstMeasurement(false)
+                    .weight(request.getWeight())
+                    .length(request.getLength())
+                    .pondId(koiFish.getPondId())
 
-        KoiGrowthHistory koiGrowthHistory = KoiGrowthHistory.builder()
-                .koiId(koiFish.getId())
-                .isFirstMeasurement(false)
-                .weight(koiFish.getWeight())
-                .length(koiFish.getLength())
-                .pondId(currPond.getId())
-                .build();
+                    .date(koiFish.getDate())
+                    .build());
+        koiFish.setPondId(request.getPondId());
 
-        if (request.getPondId() != 0) {
-            koiGrowthHistory.setInPondFrom(currPond.getCreatedAt());
-            koiGrowthHistory.setPondId(currPond.getId());
-            koiFish.setPondId(request.getPondId());
-        }
-
-
-        koiGrowthHistoryRepository.save(koiGrowthHistory);
         return koiFishRepository.save(koiFish);
     }
 
@@ -142,5 +145,16 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public Page<KoiFish> getKoiFishs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAll(pageable);
+    }
+
+    @Override
+    public KoiGrowthHistory addGrowthHistory(KoiGrowthHistory koiGrowthHistory) {
+        return koiGrowthHistoryRepository.save(koiGrowthHistory);
+    }
+
+    @Override
+    public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
 }

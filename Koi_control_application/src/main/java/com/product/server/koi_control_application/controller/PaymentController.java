@@ -2,11 +2,14 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.product.server.koi_control_application.enums.OrderStatus;
+import com.product.server.koi_control_application.enums.ORDER;
+import com.product.server.koi_control_application.enums.PAYMENT;
+import com.product.server.koi_control_application.model.Payment;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.*;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.service_interface.IOrderService;
+import com.product.server.koi_control_application.service_interface.IPaymentService;
 import com.product.server.koi_control_application.service_interface.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import static com.product.server.koi_control_application.enums.PAYMENT.FAILED;
+import static com.product.server.koi_control_application.enums.PAYMENT.PAID;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
@@ -38,7 +43,7 @@ public class PaymentController {
     private final IOrderService orderService;
     private final IUserService userService;
     private final ICartService cartService;
-
+    private final IPaymentService paymentService;
 
     /*
      * Handle MoMo callback
@@ -71,6 +76,17 @@ public class PaymentController {
             mapData.setMomoUserInfo(new MomoUserInfo());
         }
 
+
+
+        Payment payment = Payment.builder()
+                .referenceId(mapData.getOrderId())
+                .referenceType(mapData.getOrderType())
+                .paymentMethod("MOMO")
+                .paymentDescription("Thanh toán qua MoMo")
+                .paymentStatus(PAYMENT.PENDING.getValue())
+                .build();
+
+        paymentService.createPaymentStatus(payment);
         MomoRequestBody requestBody = createRequestBody(paymentInfo, signature);
         String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
 
@@ -145,12 +161,25 @@ public class PaymentController {
             if (callbackResponse.getResultCode() == 0) {
                 if (orderType.equals("product")) {
                     // If the order is already marked as paid, return
-                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(OrderStatus.PAID.getValue())) {
+                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(ORDER.SUCCESS.getValue())) {
                         return;
                     }
 
-                    // Update the order status to paid and clear the user's cart
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.PAID.getValue());
+                    /*
+                     * Update the payment status to PAID
+                     */
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, PAID.getValue());
+
+
+                    /*
+                     * Update the order status to PAID
+                     */
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.SUCCESS.getValue());
+
+
+                    /*
+                     * Clear the cart
+                     */
                     cartService.clearCart(Integer.parseInt(userId));
                     log.info("Order " + callbackResponse.getOrderId() + " has been paid successfully");
                 } else {
@@ -164,9 +193,11 @@ public class PaymentController {
             } else {
                 // Handle failed payment
                 if (orderType.equals("product")) {
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderStatus.CANCELED.getValue());
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.CANCELLED.getValue());
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
                     log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
                 } else {
+                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
                     log.info("User " + userId + " has not been added package yet");
                 }
             }
@@ -182,7 +213,14 @@ public class PaymentController {
      * @return: payment info
      */
     private MomoPaymentInfo getPaymentInfo(MomoPaymentRequest request) {
-        return MomoPaymentInfo.builder().accessKey(accessKey).secretKey(secretKey).orderInfo(request.getOrderInfo()).partnerCode(partnerCode).redirectUrl(redirectUrl).ipnUrl(ifnUrl).requestType(requestType).amount(request.getAmount()).orderId(request.getOrderId() + "-" + request.getOrderType() + "-" + request.getUserId() + "-" + System.currentTimeMillis()).requestId(System.currentTimeMillis() + "").extraData("").orderGroupId("").items(request.getMomoProducts()).userInfo(request.getMomoUserInfo()).lang("en").orderExpireTime(30).build();
+        return MomoPaymentInfo.builder().accessKey(accessKey).secretKey(secretKey)
+                .orderInfo(request.getOrderInfo())
+                .partnerCode(partnerCode)
+                .redirectUrl(redirectUrl)
+                .ipnUrl(ifnUrl)
+                .requestType(requestType)
+                .amount(request.getAmount())
+                .orderId(request.getOrderId() + "-" + request.getOrderType() + "-" + request.getUserId() + "-" + System.currentTimeMillis()).requestId(System.currentTimeMillis() + "").extraData("").orderGroupId("").items(request.getMomoProducts()).userInfo(request.getMomoUserInfo()).lang("en").orderExpireTime(30).build();
     }
 
     /*

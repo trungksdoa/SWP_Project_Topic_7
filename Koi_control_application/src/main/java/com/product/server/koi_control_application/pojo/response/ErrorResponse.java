@@ -1,4 +1,4 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.response;
 
 import lombok.Builder;
 import lombok.Data;

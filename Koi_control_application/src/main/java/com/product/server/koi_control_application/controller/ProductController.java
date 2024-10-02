@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.model.Product;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +33,11 @@ public class ProductController {
         return ResponseUtil.createSuccessResponse(products, "Products retrieved successfully");
     }
 
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<BaseResponse> getProductBySlug(@PathVariable String slug) {
+        Product product = productService.getProductBySlug(slug);
+        return ResponseUtil.createSuccessResponse(product, "Product retrieved successfully");
+    }
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<BaseResponse> getProductsByCategory(@PathVariable int categoryId,

@@ -1,9 +1,12 @@
 package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.product.server.koi_control_application.model.KoiFish;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.model.KoiGrowthHistory;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
+import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IKoiFishService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/koifishs")
@@ -31,6 +35,7 @@ public class KoiFishController {
 
     private final IKoiFishService iKoiFishService;
     private final IImageService iImageService;
+    private final KoiFishRepository koiFishRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createKoi(
@@ -39,13 +44,23 @@ public class KoiFishController {
             @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
        @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
 
-        String filename = iImageService.uploadImage(file);
 
-        koiFish.setImageUrl(filename);
+
+
+        if(file != null && !file.isEmpty()) {
+            String filename = iImageService.uploadImage(file);
+            koiFish.setImageUrl(filename);
+        }
+
+        if(koiFish.getWeight() == null || koiFish.getLength() == null)
+            throw new IllegalArgumentException("Weight and Length must not be null");
+        if(koiFish.getWeight().compareTo(BigDecimal.valueOf(0.00)) <= 0 || koiFish.getLength().compareTo(BigDecimal.valueOf(0.00)) <= 0)
+            throw new IllegalArgumentException("Weight and Length must be greater than 0");
 
         KoiFish koiFish1 = iKoiFishService.addKoiFish(koiFish);
 
@@ -61,7 +76,9 @@ public class KoiFishController {
     @GetMapping("{koiFishId}")
     public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId) {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
-
+        koiFish1.countageMonth();
+        iKoiFishService.addKoiFish(koiFish1);
+        koiFishRepository.save(koiFish1);
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
                 .message("Get fish  successfully")
@@ -77,6 +94,7 @@ public class KoiFishController {
                                                       @RequestPart("fish") @Valid String koiFishJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
       @Valid  KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
@@ -106,6 +124,11 @@ public class KoiFishController {
     @GetMapping("/listkoi/bypondid/{pondId}")
     public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId) {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, 0, 10);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            iKoiFishService.addKoiFish(koiFish);
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get koifishs by pondId succesfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
@@ -121,7 +144,11 @@ public class KoiFishController {
     @GetMapping("/listkoi/byuserid/{userId}")
     public ResponseEntity<BaseResponse> getKoisByUserId(@PathVariable("userId") int userId) {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, 0, 10);
-
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            iKoiFishService.addKoiFish(koiFish);
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get fish by userId successfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
@@ -136,10 +163,13 @@ public class KoiFishController {
     }
 
     @GetMapping("/listkoi")
-    @PreAuthorize("hasRole({'ROLE_ADMIN', 'ROLE_MEMBER'})")
-    public ResponseEntity<BaseResponse> getKoisByUserId() {
+    public ResponseEntity<BaseResponse> getKois() {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
-
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            iKoiFishService.addKoiFish(koiFish);
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get all koifish succesfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
@@ -152,5 +182,18 @@ public class KoiFishController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/grhis/{koiFishId}")
+    public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId) {
+        Page<KoiGrowthHistory> koiGrowthHistorys = iKoiFishService.getGrowthHistorys(koiFishId,0, 10);
+        BaseResponse response = BaseResponse.builder()
+                .data(koiGrowthHistorys)
+                .message("Get growth history successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 }

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,9 +35,6 @@ public class WaterParameter {
     @Column(name = "nitrate_no3")
     private Integer nitrateNO3;
 
-    @Column(name = "phosphate_po4")
-    private Integer phosphatePO4;
-
     @Column(name = "ammonium_nh4")
     private Integer ammoniumNH4;
 
@@ -44,9 +42,6 @@ public class WaterParameter {
     private Integer hardnessGH;
 
     private Integer salt;
-
-    @Column(name = "outdoor_temperature")
-    private Integer outdoorTemperature;
 
     private Integer temperature;
     private Integer pH;
@@ -72,17 +67,29 @@ public class WaterParameter {
     private LocalDateTime updatedAt;
 
     @Column(name = "last_cleaned_at")
-    private LocalDateTime lastCleanedAt;
+    private LocalDate lastCleanedAt;
+
+    @Column(name= "cleaned_day_count")
+    private long cleanedDayCount;
 
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        lastCleanedAt = LocalDate.now();
+        getDaysSinceLastCleaned();
     }
+    public void getDaysSinceLastCleaned() {
+        if (lastCleanedAt != null && !lastCleanedAt.isEqual(LocalDate.now())) {
+            this.cleanedDayCount =  java.time.Duration.between(lastCleanedAt, LocalDateTime.now()).toDays();
+        }else this.cleanedDayCount = 0;
+    }
+
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        getDaysSinceLastCleaned();
     }
 }

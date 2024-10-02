@@ -1,14 +1,14 @@
 package com.product.server.koi_control_application.service_interface;
 
-import com.product.server.koi_control_application.pojo.PaymentStatus;
+import com.product.server.koi_control_application.model.Payment;
+import java.time.LocalDateTime;
+import java.util.List;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
 public interface IPaymentService {
-    String createPayment(long amount, String orderType, String orderInfo) throws UnsupportedEncodingException;
+    void createPaymentStatus(Payment paymentStatus);
+    List<Payment> getAllPaymentStatus();
 
-
-    PaymentStatus processPaymentReturn(Map<String, String> vnpayParams);
-
+    void updatePaymentStatus(int referenceId,String referenceName, String paymentStatus);
+    void clearPaymentStatusByDate(LocalDateTime fromDate, LocalDateTime toDate);
 }

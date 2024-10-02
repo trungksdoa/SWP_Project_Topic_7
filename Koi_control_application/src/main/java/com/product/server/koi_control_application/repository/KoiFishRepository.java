@@ -10,6 +10,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @Transactional
 @RepositoryRestResource(exported = false)
@@ -24,7 +26,7 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
                                           @Param("id") int id);
 
     Page<KoiFish> findAllByPondId(int pondId, Pageable pageable);
-
+    List<KoiFish> findAllByPondId(int pondId);
     Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
     int countByPondId(int pondId);
 

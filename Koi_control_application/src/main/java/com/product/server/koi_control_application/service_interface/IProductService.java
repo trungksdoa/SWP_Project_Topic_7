@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IProductService {
+    void increaseProductQuantity(int productId, int quantity);
+
     Product createProduct(Product product, MultipartFile productImage) throws IOException;
     Product updateProduct(int id, Product product, MultipartFile productImage) throws IOException;
     void deleteProduct(int productId);
@@ -16,4 +18,8 @@ public interface IProductService {
 
     List<Product> getAllProducts();
     Page<Product> getProductsByCategory(int categoryId, int page, int size);
+
+    Product getProductBySlug(String slug);
+
+    void decreaseProductQuantity(int productId, int quantity);
 }

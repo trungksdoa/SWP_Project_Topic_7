@@ -1,18 +1,11 @@
 package com.product.server.koi_control_application.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.product.server.koi_control_application.pojo.SlugGenerator;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +13,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "products")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -53,6 +47,8 @@ public class Product {
     @Column(name = "category_id")
     private int categoryId;
 
+    private String slug;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -63,6 +59,10 @@ public class Product {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        if (this.slug == null || this.slug.isEmpty()) {
+            this.slug = SlugGenerator.toSlug(this.name);
+        }
     }
 
     @PreUpdate
@@ -72,7 +72,7 @@ public class Product {
 
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"product","feedbacks"})
+    @JsonIgnoreProperties({"product", "feedbacks"})
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @Column(name = "average_rating")
@@ -86,4 +86,16 @@ public class Product {
             this.averageRating = sum / feedbacks.size();
         }
     }
+
+    public Product decreaseStock(int amount) {
+        this.stock = this.stock - amount;
+        return this;
+    }
+
+    public Product increaseStock(int amount) {
+        this.stock = this.stock + amount;
+        return this;
+    }
+
+
 }

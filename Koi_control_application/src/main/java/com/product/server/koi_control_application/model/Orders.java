@@ -39,18 +39,8 @@ public class Orders {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = true)
-    private String paymentMethod;
-
-    @Column(nullable = true)
-    private String shippingStatus;
-
-    @ManyToMany
-    @JoinTable(
-            name = "orders_items",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
+    // Trong Orders
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("order")
     private Set<OrderItems> items = new HashSet<>();
 

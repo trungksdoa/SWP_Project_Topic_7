@@ -2,8 +2,9 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.product.server.koi_control_application.model.Pond;
-import com.product.server.koi_control_application.pojo.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.PondDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
@@ -38,13 +39,16 @@ public class PondController {
             @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
-
+        mapper.registerModule(new JavaTimeModule());
         Pond pond = mapper.readValue(pondJson, Pond.class);
 
-        String filename = iImageService.uploadImage(file);
 
-        pond.setImageUrl(filename);
 
+
+        if(file != null && !file.isEmpty()){
+            String filename = iImageService.uploadImage(file);
+            pond.setImageUrl(filename);
+        }
         Pond pond1 = iPondService.addPond(pond);
 
         BaseResponse response = BaseResponse.builder()
@@ -76,7 +80,7 @@ public class PondController {
                                                    @RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
-
+        mapper.registerModule(new JavaTimeModule());
         Pond pond = mapper.readValue(pondJson, Pond.class);
 
         BaseResponse response = BaseResponse.builder()

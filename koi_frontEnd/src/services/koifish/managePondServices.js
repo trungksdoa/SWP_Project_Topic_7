@@ -7,6 +7,17 @@ const api = apiInstanceHeader.create({
 
 export const managePondServices = {
     getAllPond: () => api.get("/listpond"),
-    getPondById: (pondId) => api.get(`/${pondId}`),
-    getPondByUserId: (id) => api.get(`/listpond/byuserid/${id}`)
+    getPondByUserId: (id) => api.get(`/listpond/byuserid/${id}`),
+    updatePond: async (id, payload) => {
+        try {
+          const response = await api.put(`/${id}`, payload, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          return response.data;
+        } catch (error) {
+          throw error.response?.data || error.message;
+        }
+    },
 };

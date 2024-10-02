@@ -1,16 +1,13 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.custom_exception.InsufficientException;
+import com.product.server.koi_control_application.custom_exception.BadRequestException;
+import com.product.server.koi_control_application.custom_exception.ForbiddenException;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -58,7 +55,7 @@ public class ImageServiceImpl implements IImageService {
     }
 
     @Override
-    public List<String> getListImages() throws IOException {
+    public List<String> getListImages()  {
         List<String> imageNames = new ArrayList<>();
         Path dirPath = Paths.get(IMAGE_DIR);
 
@@ -69,7 +66,7 @@ public class ImageServiceImpl implements IImageService {
                 }
             }
         } catch (IOException e) {
-            throw new InsufficientException("Error when listing images");
+            throw new ForbiddenException("Error when listing images");
         }
         return imageNames;
     }

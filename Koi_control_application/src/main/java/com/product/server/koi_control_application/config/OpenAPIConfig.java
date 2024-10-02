@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,23 @@ public class OpenAPIConfig {
     @Bean
     public OpenAPI koiControlOpenAPI() {
         return new OpenAPI()
+                .tags(List.of(
+                        new Tag().name("User").description("API for user"),
+                        new Tag().name("Product").description("API for Product"),
+                        new Tag().name("Blog").description("API for blog"),
+                        new Tag().name("PaymentStatus").description("API for PaymentStatus"),
+                        new Tag().name("Payment").description("API for payment"),
+                        new Tag().name("WaterParameter").description("API for WaterParameter"),
+                        new Tag().name("Order").description("API for order"),
+                        new Tag().name("Cart").description("API for cart"),
+                        new Tag().name("Category").description("API for Category"),
+                        new Tag().name("Package").description("API for Package"),
+                        new Tag().name("Feedback").description("APIs for managing feedbacks"),
+                        new Tag().name("KoiFish").description("API for KoiFish"),
+                        new Tag().name("Pond").description("API for Pond"),
+                        new Tag().name("Image").description("API for image"),
+                        new Tag().name("Admin API").description("API for admin")
+                ))
                 .info(new Info().title(title)
                         .description("API for managing koi fish control system")
                         .version(version)
@@ -42,6 +60,8 @@ public class OpenAPIConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                         )
+
                 );
+
     }
 }
