@@ -2,16 +2,7 @@ package com.product.server.koi_control_application.model;
 
 
 import com.product.server.koi_control_application.pojo.SlugGenerator;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,6 +48,8 @@ public class Blogs {
 
     private String slug;
 
+    private boolean isApproved;
+
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -71,7 +64,9 @@ public class Blogs {
         if (this.slug == null || this.slug.isEmpty()) {
             this.slug = SlugGenerator.toSlug(this.title);
         }
+        isApproved = false;
     }
+
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
