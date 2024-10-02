@@ -1,7 +1,7 @@
 # Koi Care System at Home - Phần mềm quản lý chăm sóc cá Koi tại nhà
  **Website:** [swp-project-topic-7.vercel.app](https://swp-project-topic-7.vercel.app/)
  
- **Host server:** https://swp-project-topic-7.onrender.com
+ **Host server:** [https://swp-project-topic-7.onrender.com](https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/)
  
  **Role:**
  Member
