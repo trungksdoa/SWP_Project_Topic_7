@@ -100,10 +100,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException {
         KoiFish koiFish = getKoiFish(id);
 
-        if (!usersRepository.existsById(request.getUserId()))
+        if (request.getUserId()!=0 && !usersRepository.existsById(request.getUserId()))
             throw new NotFoundException("User not found.");
 
-        if (!pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+        if ((request.getPondId()!= 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
             throw new NotFoundException("Pond not found");
 
         if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
@@ -133,8 +133,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
                     .date(koiFish.getDate())
                     .build());
-        koiFish.setPondId(request.getPondId());
-
+        if ((request.getPondId()!= 0)){
+            koiFish.setPondId(request.getPondId());
+        }
         return koiFishRepository.save(koiFish);
     }
 
@@ -170,4 +171,58 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         Pageable pageable = PageRequest.of(page, size);
         return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
+
+    @Override
+    public void evaluateAndUpdateKoiGrowthStatus(int koiId) {
+        List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
+        if (koiGrowthHistories == null || koiGrowthHistories.isEmpty()) {
+            throw new IllegalArgumentException("Không có dữ liệu phát triển cho cá Koi với ID: " + koiId);
+        }
+        KoiGrowthHistory previousHistory = null;
+        for (KoiGrowthHistory currentHistory : koiGrowthHistories) {
+            if (previousHistory != null) {
+                // So sánh với bản ghi trước đó
+                int ageMonth = currentHistory.getAgeMonthHis();
+                double previousLength = previousHistory.getLength() != null ? previousHistory.getLength().doubleValue() : 0.0;
+                double currentLength = currentHistory.getLength() != null ? currentHistory.getLength().doubleValue() : 0.0;
+                // Tính sự thay đổi kích thước
+                double growth = currentLength - previousLength;
+                // Tính kích thước kỳ vọng cho khoảng thời gian giữa hai lần đo
+                double expectedGrowth = calculateExpectedGrowth(previousLength, previousHistory.getAgeMonthHis(), ageMonth);
+                // Đánh giá từng lần phát triển và cập nhật status
+                if (growth < expectedGrowth * 0.9) {
+                    currentHistory.setStatus("Tăng trưởng chậm");
+                } else if (growth > expectedGrowth * 1.1) {
+                    currentHistory.setStatus("Tăng trưởng nhanh");
+                } else {
+                    currentHistory.setStatus("Tăng trưởng bình thường");
+                }
+
+                // Lưu bản ghi đã cập nhật lại vào cơ sở dữ liệu
+                koiGrowthHistoryRepository.save(currentHistory);
+            }
+            // Cập nhật bản ghi trước đó
+            previousHistory = currentHistory;
+        }
+    }
+
+    private double calculateExpectedGrowth(double previousLength, int previousAgeMonth, int currentAgeMonth) {
+        double expectedGrowth = 0.0;
+
+        for (int ageMonth = previousAgeMonth + 1; ageMonth <= currentAgeMonth; ageMonth++) {
+            if (ageMonth <= 2) {
+                expectedGrowth += previousLength * (2 - 1) / 2;  // Tăng gấp đôi kích cỡ trong 2 tháng
+            } else if (ageMonth <= 6) {
+                expectedGrowth += 2.5;  // Tăng 2-3 cm mỗi tháng
+            } else if (ageMonth <= 12) {
+                expectedGrowth += 1.5;  // Tăng 1-2 cm mỗi tháng
+            } else {
+                expectedGrowth += 0.5;  // Sau 12 tháng: tăng trưởng chậm dần
+            }
+        }
+
+        return expectedGrowth;
+    }
+
+
 }
