@@ -106,15 +106,15 @@ const KoiManagement = () => {
                 variety: values.variety,
                 sex: values.sex === "Female",
                 purchasePrice: parseFloat(values.purchasePrice),
-                pondId: values.pondId,
+                pondId: parseInt(values.pondId),
                 userId: userId,
             };
+            formData.append("fish", JSON.stringify(updateKoi));
             if (values.image) {
                 formData.append("image", values.image);
             }
-            formData.append("fish", JSON.stringify(updateKoi));
             mutation.mutate(
-                { id: selectedKoi?.id, payload: formData },
+                { id: selectedKoi.id, payload: formData },
                 {
                     onSuccess: (updatedKoi) => {
                         const updatedKoiWithImage = {
@@ -123,7 +123,6 @@ const KoiManagement = () => {
                         };
                         dispatch(manageKoiActions.updateKoi(updatedKoiWithImage));
                         setSelectedKoi(updatedKoiWithImage);
-                        // Update the specific koi in the list instead of the entire list
                         const updatedList = lstKoi.map(koi => 
                             koi.id === updatedKoiWithImage.id ? updatedKoiWithImage : koi
                         );
@@ -158,17 +157,17 @@ const KoiManagement = () => {
             const newKoi = {
                 name: values.name,
                 variety: values.variety,
-                sex: values.sex,
+                sex: values.sex === "Female",
                 purchasePrice: parseFloat(values.purchasePrice),
                 weight: parseFloat(values.weight),
                 length: parseFloat(values.length),
                 pondId: parseInt(values.pondId),
                 userId: userId,
             };
+            formData.append("fish", JSON.stringify(newKoi));
             if (values.image) {
                 formData.append("image", values.image);
             }
-            formData.append("fish", JSON.stringify(newKoi));
             addKoiMutation.mutate(formData,
                 {
                     onSuccess: (addedKoi) => {
@@ -176,7 +175,7 @@ const KoiManagement = () => {
                             ...addedKoi,
                             imageUrl: imgSrc,
                         };
-                        dispatch(manageKoiActions.updateKoi(newKoiWithImage));
+                        dispatch(manageKoiActions.addKoi(newKoiWithImage));
                         setShowAddPopup(false);
                         setImgSrc("");
                         addKoiFormik.resetForm();
@@ -192,9 +191,6 @@ const KoiManagement = () => {
         },
     });
 
-    if (!lstKoi) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div>
@@ -223,7 +219,7 @@ const KoiManagement = () => {
                         <h3 className="text-lg mt-2 cursor-pointer" onClick={() => handleClick(koi)}>{koi.name}</h3>
                     </div>
                 ))}
-                {/* {showAddPopup && (
+                {showAddPopup && (
                     <div
                         id="modal-overlay"
                         className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
@@ -361,7 +357,7 @@ const KoiManagement = () => {
                             </div>
                         </div>
                     </div>
-                )} */}
+                )}
 
                 {selectedKoi && (
                 <div

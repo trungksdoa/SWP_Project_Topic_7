@@ -6,8 +6,8 @@ const api = apiInstanceHeader.create({
 });
 
 export const managePondServices = {
-    getAllPond: () => api.get("/"),
-    getPondByUserId: (id) => api.get(`/byuserid/${id}`),
+    getAllPond: () => api.get("/listpond"),
+    getPondByUserId: (id) => api.get(`/listpond/byuserid/${id}`),
     updatePond: async (id, payload) => {
         try {
           const response = await api.put(`/${id}`, payload, {
@@ -22,12 +22,8 @@ export const managePondServices = {
     },
     addPond: async (payload) => {
         try {
-            const formData = new FormData();
-            
-            // Add the pond data as a JSON string
+            const formData = new FormData();            
             formData.append('pond', JSON.stringify(payload.pond));
-            
-            // Add the image file
             if (payload.image) {
                 formData.append('image', payload.image);
             }
@@ -35,7 +31,6 @@ export const managePondServices = {
             const response = await api.post("", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    // The Authorization header should be handled by apiInstanceHeader
                 },
             });
             return response.data;

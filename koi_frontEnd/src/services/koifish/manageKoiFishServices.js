@@ -6,7 +6,6 @@ const api = apiInstanceHeader.create({
 })
 
 export const manageKoiFishServices = {
-    getAllKoi: () => api.get("/listkoi"),
     getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}`),
     updateKoi: async (id, payload) => {
         try {
@@ -21,15 +20,21 @@ export const manageKoiFishServices = {
         }
     },
     addKoi: async (payload) => {
-        try {
-            const response = await api.post("/", payload, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            return response.data;
-        } catch (error) {
-            throw error.response?.data || error.message;
-        }
-    }
+      try {
+          const formData = new FormData();            
+          formData.append('pond', JSON.stringify(payload.pond));
+          if (payload.image) {
+              formData.append('image', payload.image);
+          }
+
+          const response = await api.post("", formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+              },
+          });
+          return response.data;
+      } catch (error) {
+          throw error.response?.data || error.message;
+      }
+  }
 }
