@@ -77,7 +77,6 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId) {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
         koiFish1.countageMonth();
-        iKoiFishService.addKoiFish(koiFish1);
         koiFishRepository.save(koiFish1);
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
@@ -126,7 +125,6 @@ public class KoiFishController {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, 0, 10);
         for (KoiFish koiFish : koiFishs) {
             koiFish.countageMonth();
-            iKoiFishService.addKoiFish(koiFish);
             koiFishRepository.save(koiFish);
         }
         String mess = "Get koifishs by pondId succesfully";
@@ -146,7 +144,6 @@ public class KoiFishController {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, 0, 10);
         for (KoiFish koiFish : koiFishs) {
             koiFish.countageMonth();
-            iKoiFishService.addKoiFish(koiFish);
             koiFishRepository.save(koiFish);
         }
         String mess = "Get fish by userId successfully";
@@ -167,7 +164,6 @@ public class KoiFishController {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
         for (KoiFish koiFish : koiFishs) {
             koiFish.countageMonth();
-            iKoiFishService.addKoiFish(koiFish);
             koiFishRepository.save(koiFish);
         }
         String mess = "Get all koifish succesfully";
@@ -185,7 +181,10 @@ public class KoiFishController {
 
     @GetMapping("/grhis/{koiFishId}")
     public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId) {
+        iKoiFishService.evaluateAndUpdateKoiGrowthStatus(koiFishId);
         Page<KoiGrowthHistory> koiGrowthHistorys = iKoiFishService.getGrowthHistorys(koiFishId,0, 10);
+
+
         BaseResponse response = BaseResponse.builder()
                 .data(koiGrowthHistorys)
                 .message("Get growth history successfully")
