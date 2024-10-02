@@ -52,7 +52,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         if (iPackageService.checkPackageLimit(koiFish.getUserId(), user.getAUserPackage()))
             throw new NotFoundException("User package limit exceeded.");
 
+        koiFish.countageMonth();
         KoiFish saved = koiFishRepository.save(koiFish);
+
         koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
                 .koiId(saved.getId())
                 .inPondFrom(koiFish.getCreatedAt())
