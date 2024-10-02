@@ -6,9 +6,9 @@ import { LanguageSwitcher } from "../../src/components/ui/navbar/LanguageSwitche
 import { UserMenu } from "../../src/components/ui/navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
-import { manageCartActions } from "../../store/manageCart/slice";
-import "./index.css";
+import { useGetCartByUserId } from "../hooks/manageCart/useGetCartByUserId";
+import { manageCartActions } from "../store/manageCart/slice";
+
 
 const HeaderManage = () => {
   const { t } = useTranslation();
