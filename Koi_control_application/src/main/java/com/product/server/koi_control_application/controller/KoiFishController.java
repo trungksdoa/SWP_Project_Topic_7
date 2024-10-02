@@ -125,7 +125,10 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId, @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, page, size);
-
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get koifishs by pondId succesfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
@@ -161,7 +164,10 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> getKoiPageByUserId(@PathVariable("userId") int userId, @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, page, size);
-
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get fish by userId successfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
