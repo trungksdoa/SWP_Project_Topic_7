@@ -6,5 +6,8 @@ const api = apiInstanceHeader.create({
 })
 
 export const managePackageServiceH = {
-    getPackage: () => api.get("/list")
+    getPackage: () => api.get("/list"),
+    getPackageById: (id) => api.get(`/${id}`),
+    putPackage: (id, payload) => api.put(`/${id}`, payload),
+    deletePackage: (id) => api.delete(`/${id}`)
 }

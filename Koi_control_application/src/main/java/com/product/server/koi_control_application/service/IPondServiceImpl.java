@@ -3,15 +3,14 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Pond;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.service_interface.IImageService;
-import com.product.server.koi_control_application.service_interface.IKoiFishService;
-import com.product.server.koi_control_application.service_interface.IPondService;
-import com.product.server.koi_control_application.service_interface.IWaterParameterService;
+import com.product.server.koi_control_application.service_interface.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,20 +30,22 @@ public class IPondServiceImpl implements IPondService {
     private final IWaterParameterService iWaterParameterService;
     private final IImageService iImageService;
     private final KoiFishRepository koiFishRepository;
-
+    private final IPackageService iPackageService;
     @Override
     public Pond addPond(Pond pond) {
-
-        if(!usersRepository.existsById(pond.getUserId()))
-            throw new NotFoundException("User not found.");
+        Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
+//        if(!usersRepository.existsById(pond.getUserId()))
+//            throw new NotFoundException("User not found.");
 
         if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
             throw new AlreadyExistedException("Pond name existed.");
+        if (iPackageService.checkPackageLimit(pond.getUserId(), user.getAUserPackage()))
+            throw new NotFoundException("User package limit exceeded.");
 
         pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
         pondRepository.save(pond);
-        WaterQualityStandard    waterQualityStandard = new WaterQualityStandard();
-
+        WaterQualityStandard  waterQualityStandard = new WaterQualityStandard();
+        waterQualityStandard.setPondId(pond.getId());
         waterQualityStandard.calculateValues(pond.getVolume(),koiFishRepository.findAllByPondId(pond.getId()));
         iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 

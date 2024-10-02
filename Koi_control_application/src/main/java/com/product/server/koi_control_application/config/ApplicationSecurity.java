@@ -39,6 +39,7 @@ public class ApplicationSecurity {
             "/api/users/reset-password",
             "/api/users/verify/email/**",
             "/api/image/**",
+            "/api/blogs/**",
             "/api/products/**",
             "/api/payment/**",
             "/api/package/**",

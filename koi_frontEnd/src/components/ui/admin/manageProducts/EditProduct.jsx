@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetProductById } from "../../../../hooks/user/UserGetProductById";
-import { Form, Input, InputNumber, Radio } from "antd";
+import { Button, Form, Input, InputNumber, Radio } from "antd";
 import { useFormik } from "formik";
 import { usePutProduct } from "../../../../hooks/admin/manageProducts/usePutProduct";
 import { toast } from "react-toastify";
@@ -13,6 +13,7 @@ const EditProduct = () => {
   const mutation = usePutProduct();
   const { data: product, isLoading, isError } = useGetProductById(parseId);
   const [imgSrc, setImgSrc] = useState("");
+  
 
   // Khởi tạo formik sau khi dữ liệu sản phẩm được tải
   const formik = useFormik({
@@ -127,16 +128,17 @@ const EditProduct = () => {
           />
         </Form.Item>
         <Form.Item label="Action">
-          <button
+          <Button
             style={{
               backgroundColor: "#90c63f",
               padding: "10px 0",
               width: 140,
             }}
-            type="submit"
+            htmlType="submit"
+            loading={mutation.isPending}
           >
             Update Product
-          </button>
+          </Button>
         </Form.Item>
       </Form>
     </div>

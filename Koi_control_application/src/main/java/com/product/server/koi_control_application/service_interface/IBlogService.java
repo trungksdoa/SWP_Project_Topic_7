@@ -18,4 +18,8 @@ public interface IBlogService {
     Blogs getBlogById(int id);
 
     List<Blogs> getBlogsByAuthor(int authorId);
+
+    Blogs getBlogBySlug(String slug);
+
+    List<Blogs> searchBlogs(String... params);
 }

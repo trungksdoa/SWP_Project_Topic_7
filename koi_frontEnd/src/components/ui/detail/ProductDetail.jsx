@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { InputNumber, Spin } from "antd";
+import { Button, InputNumber, Spin } from "antd";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
@@ -38,6 +38,7 @@ const ProductDetail = () => {
     const isProductInCart = carts?.find(
       (item) => item.productId === product?.id
     );
+    console.log(isProductInCart)
 
     if (isProductInCart) {
       setQuantity(isProductInCart.quantity); // Nếu có, thiết lập quantity từ giỏ hàng
@@ -144,12 +145,13 @@ const ProductDetail = () => {
               }}
             />
             <span className="mx-[10px]">|</span>
-            <button
+            <Button
+              loading={mutate.isPending}
               className="bg-black text-white px-[20px] py-[10px] rounded-md hover:bg-black transition-all duration-300"
               onClick={handleAddToCart}
             >
               Add to cart
-            </button>
+            </Button>
           </div>
           <div className="my-[20px]">
             <span className="font-bold mr-[6px]">Description: </span>

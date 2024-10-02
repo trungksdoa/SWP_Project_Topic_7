@@ -29,7 +29,6 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 import static com.product.server.koi_control_application.enums.PAYMENT.FAILED;
-import static com.product.server.koi_control_application.enums.PAYMENT.PAID;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
 
@@ -125,7 +124,7 @@ public class OrderController {
     @DeleteMapping("/user/{userId}/order/{orderId}")
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
-        paymentService.updatePaymentStatus(orderId, FAILED.getValue());
+        paymentService.updatePaymentStatus(orderId,"product", FAILED.getValue());
         return ResponseUtil.createSuccessResponse(null, "Order cancelled successfully");
     }
 

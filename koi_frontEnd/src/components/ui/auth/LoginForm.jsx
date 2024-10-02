@@ -24,7 +24,7 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
     if (userLogin) {
       const role = userLogin.roles[0]?.name; // Assuming roles is an array
       if (role === "ROLE_ADMIN") {
-        navigate(PATH.ADMIN);
+        navigate(PATH.MANAGE_USER);
       } else if (role === "ROLE_MEMBER") {
         navigate(PATH.KOI_MANAGEMENT);
       }

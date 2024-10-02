@@ -124,6 +124,7 @@ public class ProductServiceImpl implements IProductService {
         return products;
     }
 
+
     private Product save(Product product) {
         try {
             log.info("Saving product: {}", product);
@@ -133,4 +134,6 @@ public class ProductServiceImpl implements IProductService {
             throw new RuntimeException("Error saving product");
         }
     }
+
+
 }

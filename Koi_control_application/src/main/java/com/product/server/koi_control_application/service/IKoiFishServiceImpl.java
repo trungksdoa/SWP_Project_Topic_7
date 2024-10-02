@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,10 +60,13 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .weight(koiFish.getWeight())
                 .length(koiFish.getLength())
                 .pondId(koiFish.getPondId())
+                .date(koiFish.getDate())
                 .build());
 
         return saved;
     }
+
+
 
     @Override
     public KoiFish getKoiFish(int id) {
@@ -124,6 +128,8 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                     .weight(request.getWeight())
                     .length(request.getLength())
                     .pondId(koiFish.getPondId())
+
+                    .date(koiFish.getDate())
                     .build());
         koiFish.setPondId(request.getPondId());
 
@@ -134,6 +140,16 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAllByUserId(userId, pageable);
+    }
+
+    @Override
+    public List<KoiFish> getKoiFishsByPondId(int pondId) {
+        return koiFishRepository.findAllByPondId(pondId);
+    }
+
+    @Override
+    public List<KoiFish> getKoiFishsByUserId(int userId) {
+        return koiFishRepository.findAllByUserId(userId);
     }
 
     @Override

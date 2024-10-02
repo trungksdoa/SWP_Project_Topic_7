@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
-@Tag(name = "Feedback Controller", description = "APIs for managing feedbacks")
+@Tag(name = "Feedback", description = "APIs for managing feedbacks")
 public class FeedbackController {
     private final IFeedbackService feedbackService;
 

@@ -6,8 +6,9 @@ import { LanguageSwitcher } from "../../src/components/ui/navbar/LanguageSwitche
 import { UserMenu } from "../../src/components/ui/navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { useGetCartByUserId} from "../../src/hooks/manageCart/useGetCartByUserId";
-import { manageCartActions } from "../../src/store/manageCart/slice";
+import { useGetCartByUserId } from "../hooks/manageCart/useGetCartByUserId";
+import { manageCartActions } from "../store/manageCart/slice";
+
 
 const HeaderManage = () => {
   const { t } = useTranslation();
@@ -60,70 +61,72 @@ const HeaderManage = () => {
         <Link to={PATH.HOME} className="mr-[30px]">
           <img className="w-[80px]" src="../../images/logo.webp" alt="logo" />
         </Link>
-        <div className="scrollable-navbar-wrapper relative overflow-hidden">
+        <div className="">
           <ul
-            className="scrollable-navbar flex overflow-x-auto whitespace-nowrap p-2 scrollbar-hide"
+            className="scrollable-navbar flex whitespace-nowrap p-2 scrollbar-hide"
             ref={navbarRef}
           >
-            <li className="flex text-white">
-              <NavLink
-                rel="noopener noreferrer"
-                to={PATH.KOI_MANAGEMENT}
-                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-              >
-                {t("Koi Management")}
-              </NavLink>
+            <li className="flex relative py-[20px] cursor-pointer items-center menu mr-[100px] text-white">
+              {t("Management")}
+              <ul className="submenu">
+                <li className="flex mb-[30px] text-white">
+                  <NavLink
+                    rel="noopener noreferrer"
+                    to={PATH.KOI_MANAGEMENT}
+                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+                  >
+                    {t("Koi Management")}
+                  </NavLink>
+                </li>
+                <li className="flex text-white mb-[15px]">
+                  <NavLink
+                    rel="noopener noreferrer"
+                    to={PATH.POND_MANAGEMENT}
+                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+                  >
+                    {t("Pond Management")}
+                  </NavLink>
+                </li>
+              </ul>
             </li>
-            <li className="flex text-white">
-              <NavLink
-                rel="noopener noreferrer"
-                to={PATH.POND_MANAGEMENT}
-                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-              >
-                {t("Pond Management")}
-              </NavLink>
+            <li className="flex menu_2 mr-[100px] cursor-pointer py-[20px] relative items-center text-white">
+              {t("Calculator")}
+              <ul className="submenu_2">
+                <li className="flex text-white">
+                  <NavLink
+                    rel="noopener noreferrer"
+                    to={PATH.WATER_PARAMETER}
+                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+                  >
+                    {t("Water Parameter")}
+                  </NavLink>
+                </li>
+                <li className="flex text-white my-[30px]">
+                  <NavLink
+                    rel="noopener noreferrer"
+                    to={PATH.FOOD_CALCULATOR}
+                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+                  >
+                    {t("Food Calculator")}
+                  </NavLink>
+                </li>
+                <li className="flex text-white mb-[15px]">
+                  <NavLink
+                    rel="noopener noreferrer"
+                    to={PATH.SALT_CALCULATOR}
+                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
+                  >
+                    {t("Salt Calculator")}
+                  </NavLink>
+                </li>
+              </ul>
             </li>
-            <li className="flex text-white">
-              <NavLink
-                rel="noopener noreferrer"
-                to={PATH.WATER_PARAMETER}
-                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-              >
-                {t("Water Parameter")}
-              </NavLink>
-            </li>
-            <li className="flex text-white">
-              <NavLink
-                rel="noopener noreferrer"
-                to={PATH.FOOD_CALCULATOR}
-                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-              >
-                {t("Food Calculator")}
-              </NavLink>
-            </li>
-            <li className="flex text-white">
-              <NavLink
-                rel="noopener noreferrer"
-                to={PATH.SALT_CALCULATOR}
-                className="flex items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-              >
-                {t("Salt Calculator")}
-              </NavLink>
-            </li>
-            <li>
+            <li className=" py-[20px]">
               <NavLink to={PATH.PACKAGES}>
                 <button className="custom-button">Upgrade Account</button>
               </NavLink>
             </li>
           </ul>
-
-          {/* Hiển thị gradient chỉ khi có scroll */}
-          {showGradient && (
-            <>
-              <div className="absolute top-0 bottom-0 left-0 w-12 pointer-events-none bg-gradient-to-r from-black/50 to-transparent z-10" />
-              <div className="absolute top-0 bottom-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-black/50 to-transparent z-10" />
-            </>
-          )}
         </div>
 
         <div className="items-center ml-[30px] flex-shrink-0 hidden lg:flex">
