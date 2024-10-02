@@ -11,15 +11,17 @@ import { manageCartActions } from "../../store/manageCart/slice";
 import { toast } from "react-toastify";
 import { usePostCarts } from "../../hooks/manageCart/usePostCarts";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
+import { useGetCategory } from "../../hooks/admin/manageCategory/useGetCategory";
 
 const StoreTemplate = () => {
   // State và hook dùng chung
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
-
+  const { data: lstCategory } = useGetCategory()
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  console.log(lstCategory)
 
   const { data: lstProducts, isFetching } = useGetAllProducts();
 
@@ -66,12 +68,10 @@ const StoreTemplate = () => {
   };
 
   const onChange = (checkedValues) => {
-    const isWaterTreatmentChecked = checkedValues.includes("A");
-    const isKoiTreatmentChecked = checkedValues.includes("B");
     const filteredProducts = filterProducts(
       lstProducts,
-      isWaterTreatmentChecked,
-      isKoiTreatmentChecked
+      checkedValues.includes(1), 
+      checkedValues.includes(2)  
     );
     setFilteredProducts(filteredProducts);
   };
@@ -101,12 +101,11 @@ const StoreTemplate = () => {
         <div className="border-[1px] border-gray-300 rounded-[6px] px-[15px] py-[10px]">
           <Checkbox.Group style={{ width: "100%" }} onChange={onChange}>
             <Row className="flex flex-col">
-              <Row className="mb-[15px] !w-full" span={8}>
-                <Checkbox value="A">Water Treatment</Checkbox>
-              </Row>
-              <Row span={8}>
-                <Checkbox value="B">Koi Treatment</Checkbox>
-              </Row>
+              {lstCategory?.map((category) => (
+                <Row key={category.id} className="mb-[15px] !w-full" span={8}>
+                  <Checkbox value={category.id}>{category.name}</Checkbox>
+                </Row>
+              ))}
             </Row>
           </Checkbox.Group>
         </div>

@@ -10,7 +10,8 @@ import {
   CarFilled,
   HomeFilled,
   DesktopOutlined,
-  ProductOutlined
+  ProductOutlined,
+  UnorderedListOutlined
 } from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import {
@@ -71,9 +72,14 @@ const AdminTemplate = () => {
                 {t("Manage Products")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={6} icon={<ProductOutlined  style={{color: "white"}}/>}>
+            <Menu.Item className="text-white" key={7} icon={<ProductOutlined  style={{color: "white"}}/>}>
               <NavLink key={4} to={PATH.MANAGE_PACKAGE} className="!text-white">
                 {t("Manage Packages")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item className="text-white" key={8} icon={<UnorderedListOutlined  style={{color: "white"}}/>}>
+              <NavLink key={5} to={PATH.MANAGE_CATEGORY} className="!text-white">
+                {t("Manage Category")}
               </NavLink>
             </Menu.Item>
           </Menu>

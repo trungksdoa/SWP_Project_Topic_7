@@ -187,56 +187,6 @@ body {
   }
 }
 
-.scrollable-navbar {
-  display: flex;
-  white-space: nowrap; 
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch; 
-}
-
-.scrollable-navbar li {
-  flex-shrink: 0; 
-  padding: 10px 15px;
-}
-
-::-webkit-scrollbar {
-  display: none; 
-}
-
-@media (max-width: 1024px) {
-  .scrollable-navbar {
-    display: flex;
-    overflow-x: auto; 
-  }
-}
-.scrollable-navbar-wrapper {
-  position: relative;
-}
-
-.scrollable-navbar {
-  padding: 0.5rem;
-  overflow-x: auto; 
-}
-
-.scrollable-navbar::-webkit-scrollbar {
-  display: none; 
-}
-
-.scrollable-navbar li {
-  list-style-type: none;
-}
-
-.scrollable-navbar li a {
-  text-decoration: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  transition: color 0.3s;
-}
-
-.scrollable-navbar li a:hover {
-  color: #ccc; 
-}
-
 .custom-button {
   background-color: #4caf50; 
   color: white; 
@@ -275,7 +225,7 @@ body {
 
 .pricing-card {
   background-color: #1a1a1a;
-  border-radius: 15px;
+  border-radius: 12px;
   width: 250px;
   padding: 20px;
   color: white;
@@ -353,7 +303,7 @@ body {
   border: none;
   padding: 10px 20px;
   color: white;
-  border-radius: 20px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -438,11 +388,58 @@ body {
   border: 2px solid white;
   padding: 10px 20px;
   color: white;
-  border-radius: 20px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .buy-btn:hover {
   background-color: rgba(255, 255, 255, 0.4);
+}
+
+.submenu {
+  padding: 12px;
+  background: #000;
+  position: absolute;
+  top: 100%;
+  left: -20%;
+  display: none;
+}
+.menu:hover .submenu {
+  display: block;
+}
+
+.submenu_2 {
+  padding: 12px;
+  background: #000;
+  position: absolute;
+  top: 100%;
+  left: -20%;
+  display: none;
+}
+.menu_2:hover .submenu_2 {
+  display: block;
+}
+
+.menu {
+  transition: all 0.3s ease-in-out;
+}
+
+.menu:hover {
+  color: rgb(255, 138, 60)
+}
+
+.submenu li .sub-menu {
+  transition: all .3s ease-in-out;
+}
+
+.submenu li:hover .sub-menu {
+  color: rgb(255, 138, 60)
+}
+
+.submenu_2 li .sub-menu {
+  transition: all .3s ease-in-out;
+}
+.submenu_2 li:hover .sub-menu {
+  color: rgb(255, 138, 60)
 }

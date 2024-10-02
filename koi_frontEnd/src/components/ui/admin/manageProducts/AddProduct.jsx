@@ -69,6 +69,7 @@ const AddProduct = () => {
       // Gửi request thông qua API
       mutation.mutate(formData, {
         onSuccess: (response) => {
+          formik.resetForm()
           toast.success("Product added successfully");
         },
         onError: (error) => {

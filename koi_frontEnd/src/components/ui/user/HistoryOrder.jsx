@@ -9,16 +9,16 @@ import OrderCancel from "../order/OrderCancel";
 const HistoryOrder = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const { data: lstOrder , refetch, isFetching} = useGetOrder(userLogin?.id);
+  console.log(lstOrder)
   const [mode, setMode] = useState("top");
 
   const [lstPaid, setLstPaid] = useState([]);
   const [lstPending, setLstPending] = useState([]);
   const [lstCancel, setLstCancel] = useState([]);
 
-  // Update logic to avoid multiple re-renders
   useEffect(() => {
     const paidOrders =
-      lstOrder?.filter((order) => order?.status === "PAID") || [];
+      lstOrder?.filter((order) => order?.status === "SUCCESS") || [];
     const pendingOrders =
       lstOrder?.filter((order) => order?.status === "PENDING") || [];
     const cancelledOrders =
@@ -27,16 +27,16 @@ const HistoryOrder = () => {
     setLstPaid(paidOrders);
     setLstPending(pendingOrders);
     setLstCancel(cancelledOrders);
-  }, [lstOrder]); // Dependency on lstOrder
+  }, [lstOrder]); 
 
   const handleModeChange = (e) => {
     setMode(e.target.value);
   };
 
-  const [activeKey, setActiveKey] = useState("paid"); // Add state for active tab
+  const [activeKey, setActiveKey] = useState("paid"); 
 
   const switchToCancelledTab = () => {
-    setActiveKey("cancel"); // Set active key to 'cancel'
+    setActiveKey("cancel");
   };
 
   return (
@@ -54,8 +54,8 @@ const HistoryOrder = () => {
           <Radio.Button value="left">Vertical</Radio.Button>
         </Radio.Group>
         <Tabs
-          activeKey={activeKey} // Use activeKey state
-          onChange={setActiveKey} // Update activeKey on tab change
+          activeKey={activeKey}
+          onChange={setActiveKey} 
           defaultActiveKey="1"
           tabPosition={mode}
           style={{}}
