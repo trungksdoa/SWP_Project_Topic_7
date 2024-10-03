@@ -19,5 +19,4 @@ public class UserRegister {
     @NotBlank(message = "Password is required")
     private String password;
     private UserRoleEnum role;
-    private String avatar;
 }

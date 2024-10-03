@@ -31,4 +31,7 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
     int countByPondId(int pondId);
 
     long countByUserId(int userId);
+
+    @Query("select k from KoiFish k where k.userId = ?1")
+    List<KoiFish> findAllByUserId(int userId);
 }

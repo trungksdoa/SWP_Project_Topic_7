@@ -146,6 +146,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
+    @ExceptionHandler(PolicyViolationException.class)
+    public ResponseEntity<ErrorResponse> handlePolicyViolationException(PolicyViolationException ex) {
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(AuthorizationDeniedException ex) {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
