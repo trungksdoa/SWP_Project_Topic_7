@@ -36,7 +36,8 @@ import DetailBlogPage from "../pages/DetailBlogPage";
 import ManageBlogShopPage from "../pages/ManageBlogShopPage";
 import EditBlogPage from "../pages/EditBlogPage";
 import EditBlog from "../components/ui/blogs/EditBlog";
-import EditPackages from "../components/ui/admin/managePackages/editPackages";
+import EditPackages from "../components/ui/admin/managePackages/EditPackages";
+
 const router = [
   {
     element: <MainLayout />,
@@ -90,15 +91,15 @@ const router = [
         element: <ManageBlogShopPage />,
       },
       {
-        path: PATH.EDIT_BLOG, 
+        path: PATH.EDIT_BLOG,
         element: <EditBlogPage />,
-        children: [ 
+        children: [
           {
             path: `${PATH.EDIT_BLOG}/:id`,
-            element: <EditBlog />
-          }
-        ]
-      }
+            element: <EditBlog />,
+          },
+        ],
+      },
     ],
   },
   {
