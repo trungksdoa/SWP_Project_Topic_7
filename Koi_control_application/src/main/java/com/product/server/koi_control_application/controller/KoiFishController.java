@@ -43,7 +43,7 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> createKoi(
             @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
             @RequestPart("fish") String koiFishJson,
-            @RequestParam("image") MultipartFile file) throws IOException {
+            @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -90,7 +90,7 @@ public class KoiFishController {
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
-                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam("image") MultipartFile file) throws IOException {
+                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
