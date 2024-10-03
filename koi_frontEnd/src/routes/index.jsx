@@ -28,7 +28,6 @@ import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
 import HistoryPage from "../pages/HistoryPage";
 import PondDetail from "../components/ui/manage/PondDetail";
 import PackagesPage from "../pages/PackagesPage";
-import EditPackages from "../components/ui/admin/managePackages/editPackages";
 import ManageCategory from "../components/ui/admin/manageCategory/ManageCategory";
 import EditCategory from "../components/ui/admin/manageCategory/EditCategory";
 import BlogsPage from "../pages/BlogsPage";
@@ -37,6 +36,7 @@ import DetailBlogPage from "../pages/DetailBlogPage";
 import ManageBlogShopPage from "../pages/ManageBlogShopPage";
 import EditBlogPage from "../pages/EditBlogPage";
 import EditBlog from "../components/ui/blogs/EditBlog";
+import EditPackages from "../components/ui/admin/managePackages/editPackages";
 const router = [
   {
     element: <MainLayout />,
