@@ -27,6 +27,8 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
         navigate(PATH.MANAGE_USER);
       } else if (role === "ROLE_MEMBER") {
         navigate(PATH.KOI_MANAGEMENT);
+      } else if (role === "ROLE_SHOP") {
+        navigate(PATH.MANAGE_BLOG)
       }
     }
   }, [userLogin, navigate]);

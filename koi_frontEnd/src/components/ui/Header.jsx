@@ -79,7 +79,7 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              href="#"
+              to={PATH.BLOGS}
               className="flex items-center px-4 -mb-1  dark:border-"
             >
               {t("Blog")}

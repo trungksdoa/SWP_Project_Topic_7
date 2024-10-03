@@ -5,15 +5,16 @@ import { Button, InputNumber, Spin } from "antd";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
-import { useGetProductById } from "../../../hooks/user/UserGetProductById";
+import { useGetProductBySlug } from '../../../hooks/product/useGetProductBySlug'
 import { manageCartActions } from "../../../store/manageCart/slice"; // Redux slice
 import { usePostCarts } from "../../../hooks/manageCart/usePostCarts"; // Hook post carts
 import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId"; // Hook get cart
 import ProductFeedback from "./ProductFeedback"; // Component Feedback
 
 const ProductDetail = () => {
-  const { id: prdId } = useParams();
-  const parseID = parseInt(prdId);
+  // const { id: prdId } = useParams();
+  // const parseID = parseInt(prdId);
+  const { slug } = useParams()
   const [quantity, setQuantity] = useState(1); // Mặc định là 1
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -24,8 +25,11 @@ const ProductDetail = () => {
   const cart = useSelector((state) => state.manageCart.cart);
   const cartCount = useSelector((state) => state.manageCart.cartCount);
 
-  const { data: product, refetch, isFetching } = useGetProductById(parseID);
+  const { data: product, refetch, isFetching } = useGetProductBySlug(slug);
+  console.log(product)
 
+  const prdId = product?.id
+  console.log(prdId)
   const { data: carts, refetch: refetchCart } = useGetCartByUserId(userId);
 
   const mutate = usePostCarts();
@@ -45,7 +49,7 @@ const ProductDetail = () => {
     } else {
       setQuantity(1); // Nếu chưa có, mặc định là 1
     }
-  }, [parseID, userId, product?.id, carts]);
+  }, [slug, userId, product?.id, carts]);
 
   const onChangeQuantity = (value) => {
     setQuantity(value);
@@ -162,7 +166,7 @@ const ProductDetail = () => {
       <hr className="border-gray-600 my-[40px]" />
 
       {/* Component Feedback */}
-      <ProductFeedback parseID={parseID} />
+      <ProductFeedback prdId={prdId} />
     </div>
   );
 };

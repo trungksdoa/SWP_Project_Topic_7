@@ -71,7 +71,7 @@ const ManageProducts = () => {
       title: "Description",
       dataIndex: "description",
       sorter: (a, b) => a.stock - b.stock,
-      width: "35%",
+      width: "30%",
     },
     {
       title: "Stock",
@@ -82,8 +82,13 @@ const ManageProducts = () => {
     {
       title: "categoryId",
       dataIndex: "categoryId",
+      render: (categoryId) => {
+        if (categoryId === 1) return "Water management";
+        if (categoryId === 2) return "Koi management";
+        return "Unknown"; // Hoặc có thể trả về giá trị khác nếu cần
+      },
       sorter: (a, b) => a.categoryId - b.categoryId,
-      width: "5%",
+      width: "10%",
     },
     {
       title: "Action",

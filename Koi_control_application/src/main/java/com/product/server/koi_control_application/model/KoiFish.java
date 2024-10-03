@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -51,7 +52,7 @@ public class KoiFish {
     private Boolean sex;
 
     @Column(name = "age_month")
-    private int ageMonth;
+    private double ageMonth;
 
     @NotNull(message = "Purchase price is required")
     @Positive(message = "Purchase price must be positive")
@@ -89,9 +90,30 @@ public class KoiFish {
     public void countageMonth() {
         if (dateOfBirth != null) {
             Period period = Period.between(dateOfBirth, LocalDate.now());
-            this.ageMonth = (period.getYears() * 12) + period.getMonths();
+            int days = period.getDays();
+            double dayFraction = (double) days / 30;
+            double totalMonths = (period.getYears() * 12) + period.getMonths() + dayFraction;
+            BigDecimal roundedMonths = BigDecimal.valueOf(totalMonths).setScale(1, RoundingMode.HALF_UP);
+            this.ageMonth = roundedMonths.doubleValue();
         } else {
             this.ageMonth = 0;
+        }
+    }
+
+    public void dateOfBirthCal() {
+        if(ageMonth != 0 ) {
+            LocalDate currentDate = LocalDate.now();
+            int fullMonths = (int) ageMonth;
+            double fractionalMonths = ageMonth - fullMonths;
+            LocalDate dateOfBirth = currentDate.minusMonths(fullMonths);
+            if (fractionalMonths > 0) {
+                int daysInMonth = dateOfBirth.lengthOfMonth();
+                int daysToSubtract = (int) Math.round(fractionalMonths * daysInMonth);
+                dateOfBirth = dateOfBirth.minusDays(daysToSubtract);
+            }
+            this.dateOfBirth = dateOfBirth;
+        }else {
+            this.dateOfBirth = createdAt.toLocalDate();
         }
     }
 
@@ -99,7 +121,11 @@ public class KoiFish {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        countageMonth();
+        if(ageMonth == 0){
+            countageMonth();
+        }else if(dateOfBirth == null){
+            dateOfBirthCal();
+        }
     }
 
     @PreUpdate

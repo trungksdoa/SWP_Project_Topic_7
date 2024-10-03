@@ -28,9 +28,15 @@ import ManagePackage from "../components/ui/admin/managePackages/ManagePackage";
 import HistoryPage from "../pages/HistoryPage";
 import PondDetail from "../components/ui/manage/PondDetail";
 import PackagesPage from "../pages/PackagesPage";
-import EditPackages from "../components/ui/admin/managePackages/editPackages";
 import ManageCategory from "../components/ui/admin/manageCategory/ManageCategory";
 import EditCategory from "../components/ui/admin/manageCategory/EditCategory";
+import BlogsPage from "../pages/BlogsPage";
+import BlogsDetail from "../components/ui/blogs/BlogsDetail";
+import DetailBlogPage from "../pages/DetailBlogPage";
+import ManageBlogShopPage from "../pages/ManageBlogShopPage";
+import EditBlogPage from "../pages/EditBlogPage";
+import EditBlog from "../components/ui/blogs/EditBlog";
+import EditPackages from "../components/ui/admin/managePackages/EditPackages";
 
 const router = [
   {
@@ -49,7 +55,7 @@ const router = [
         element: <DetailPage />,
         children: [
           {
-            path: `${PATH.DETAIL_PRODUCT}/:id`,
+            path: `${PATH.DETAIL_PRODUCT}/:slug`,
             element: <ProductDetail />,
           },
         ],
@@ -65,6 +71,34 @@ const router = [
       {
         path: PATH.HISTORY_ORDER,
         element: <HistoryPage />,
+      },
+      {
+        path: PATH.BLOGS,
+        element: <BlogsPage />,
+      },
+      {
+        path: PATH.BLOG_DETAIL,
+        element: <DetailBlogPage />,
+        children: [
+          {
+            path: `${PATH.BLOG_DETAIL}/:slug`,
+            element: <BlogsDetail />,
+          },
+        ],
+      },
+      {
+        path: PATH.MANAGE_BLOG,
+        element: <ManageBlogShopPage />,
+      },
+      {
+        path: PATH.EDIT_BLOG,
+        element: <EditBlogPage />,
+        children: [
+          {
+            path: `${PATH.EDIT_BLOG}/:id`,
+            element: <EditBlog />,
+          },
+        ],
       },
     ],
   },
@@ -134,12 +168,12 @@ const router = [
           },
           {
             path: PATH.MANAGE_CATEGORY,
-            element: <ManageCategory />
+            element: <ManageCategory />,
           },
           {
             path: `${PATH.EDIT_CATEGORY}/:id`,
-            element: <EditCategory />
-          }
+            element: <EditCategory />,
+          },
         ],
       },
     ],

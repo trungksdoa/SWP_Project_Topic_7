@@ -26,14 +26,17 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
                                           @Param("pondId") int pondId,
                                           @Param("id") int id);
 
+
     Page<KoiFish> findAllByPondId(int pondId, Pageable pageable);
     List<KoiFish> findAllByPondId(int pondId);
+
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is not null")
     Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
     int countByPondId(int pondId);
 
     long countByUserId(int userId);
 
-    @Query("select k from KoiFish k where k.userId = ?1")
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is not null")
     List<KoiFish> findAllByUserId(int userId);
 
     @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is null or k.pondId = 0")

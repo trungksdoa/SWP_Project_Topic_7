@@ -31,5 +31,9 @@ export const PATH = {
     WATER_PARAMETER: '/water-parameter',
     FOOD_CALCULATOR: '/food-calculator',
     SALT_CALCULATOR: '/salt-calculator',
-    PACKAGES: '/packages'
+    PACKAGES: '/packages',
+    BLOGS: '/blogs',
+    BLOG_DETAIL: '/blogs/detail',
+    MANAGE_BLOG: '/blogs/manage-blogs',
+    EDIT_BLOG: '/blogs/manage-blogs/edit'
 }

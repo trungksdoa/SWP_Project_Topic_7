@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { PATH } from "../constant";
-import { LanguageSwitcher } from "../../src/components/ui/navbar/LanguageSwitcher";
-import { UserMenu } from "../../src/components/ui/navbar/UserMenu";
+import { PATH } from "../../constant";
+import { LanguageSwitcher } from "./navbar/LanguageSwitcher";
+import { UserMenu } from "./navbar/UserMenu";
 import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { useGetCartByUserId } from "../hooks/manageCart/useGetCartByUserId";
-import { manageCartActions } from "../store/manageCart/slice";
-
+import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
+import { manageCartActions } from "../../store/manageCart/slice";
 
 const HeaderManage = () => {
   const { t } = useTranslation();

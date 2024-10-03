@@ -68,6 +68,9 @@ public class KoiGrowthHistory {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "status")
+    private String status;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

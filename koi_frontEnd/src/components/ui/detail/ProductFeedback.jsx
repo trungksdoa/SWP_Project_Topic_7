@@ -8,8 +8,8 @@ import { StarRating } from "./StarRating";
 import { toast } from "react-toastify";
 import { Button } from "antd";
 
-const ProductFeedback = ({ parseID }) => {
-  const { data: feedbacks, refetch } = useGetFeedbackById(parseID);
+const ProductFeedback = ({ prdId }) => {
+  const { data: feedbacks, refetch } = useGetFeedbackById(prdId);
   console.log(feedbacks)
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const mutation = usePostFeedBack();
@@ -18,7 +18,7 @@ const ProductFeedback = ({ parseID }) => {
   const formik = useFormik({
     initialValues: {
       userId: userLogin?.id,
-      productId: parseID,
+      productId: prdId,
       rating: 0,
       comment: "",
     },

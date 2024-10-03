@@ -43,12 +43,13 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> createKoi(
             @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
             @RequestPart("fish") String koiFishJson,
-            @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+            @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
+
 
         if (file != null && !file.isEmpty()) {
             String filename = iImageService.uploadImage(file);
@@ -62,31 +63,46 @@ public class KoiFishController {
 
         KoiFish koiFish1 = iKoiFishService.addKoiFish(koiFish);
 
-        return ResponseUtil.createResponse(koiFish1, "Create fish successfully", HttpStatus.CREATED);
+        BaseResponse response = BaseResponse.builder()
+                .data(koiFish1)
+                .message("Create fish successfully")
+                .statusCode(HttpStatus.CREATED.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("{koiFishId}")
     public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId) {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
+        koiFish1.countageMonth();
+        koiFishRepository.save(koiFish1);
+        BaseResponse response = BaseResponse.builder()
+                .data(koiFish1)
+                .message("Get fish  successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
 
-        return ResponseUtil.createSuccessResponse(koiFish1, "Get fish successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-    //=========
 
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
-                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam("image") MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
+        BaseResponse response = BaseResponse.builder()
+                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file))
+                .message("Update fish successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
 
-        return ResponseUtil.createSuccessResponse(iKoiFishService.updateKoiFish(koiFishId, koiFish, file), "Update fish successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("{koiFishId}")
@@ -94,75 +110,26 @@ public class KoiFishController {
         KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
         iKoiFishService.deleteKoiFish(koiFishId);
 
-        return ResponseUtil.createSuccessResponse(koiFish1, "Delete fish successfully");
+        BaseResponse response = BaseResponse.builder()
+                .data(koiFish1)
+                .message("Delete fish successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listkoi/bypondid/{pondId}/page")
     public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId, @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
         Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId, page, size);
-
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
         String mess = "Get koifishs by pondId succesfully";
         if (koiFishs.isEmpty())
             mess = "List is empty";
-
-        return ResponseUtil.createSuccessResponse(koiFishs, mess);
-    }
-
-    @GetMapping("/listkoi/bypondid/{pondId}")
-    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId) {
-        List<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId);
-
-        String mess = "Get koifishs by pondId succesfully";
-        if (koiFishs.isEmpty())
-            mess = "List is empty";
-
-        return ResponseUtil.createSuccessResponse(koiFishs, mess);
-    }
-
-    @GetMapping("/withoutPond/byUserId/{userId}")
-    public ResponseEntity<BaseResponse> getFishByUserId(@PathVariable("userId") int userId) {
-        List<KoiFish> koiFishs = iKoiFishService.getFishByUserNoPond(userId);
-
-        String mess = "Get koifishs by pondId succesfully";
-        if (koiFishs.isEmpty())
-            mess = "List is empty";
-
-        return ResponseUtil.createSuccessResponse(koiFishs, mess);
-    }
-
-
-    @GetMapping("/listkoi/byuserid/{userId}/page")
-    public ResponseEntity<BaseResponse> getKoiPageByUserId(@PathVariable("userId") int userId, @RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size) {
-        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, page, size);
-
-        String mess = "Get fish by userId successfully";
-        if (koiFishs.isEmpty())
-            mess = "List is empty";
-
-        return ResponseUtil.createSuccessResponse(koiFishs, mess);
-    }
-
-    @GetMapping("/listkoi/byuserid/{userId}")
-    public ResponseEntity<BaseResponse> getKoisByUserId(@PathVariable("userId") int userId) {
-        List<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId);
-
-        String mess = "Get fish by userId successfully";
-        if (koiFishs.isEmpty())
-            mess = "List is empty";
-        return ResponseUtil.createSuccessResponse(koiFishs, mess);
-    }
-
-    //Xóa cái này đi // mình ko có dùng
-    @GetMapping("/listkoi")
-    public ResponseEntity<BaseResponse> getKois() {
-        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
-
-        String mess = "Get all koifish succesfully";
-        if (koiFishs.isEmpty())
-            mess = "List is empty";
-
         BaseResponse response = BaseResponse.builder()
                 .data(koiFishs)
                 .message(mess)
@@ -172,23 +139,99 @@ public class KoiFishController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/listkoi/bypondid/{pondId}")
+    public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId) {
+        List<KoiFish> koiFishs = iKoiFishService.getKoiFishsByPondId(pondId);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        String mess = "Get koifishs by pondId succesfully";
+        if (koiFishs.isEmpty())
+            mess = "List is empty";
+        return ResponseUtil.createSuccessResponse(koiFishs, mess);
+    }
+
+    @GetMapping("/withoutPond/byUserId/{userId}")
+    public ResponseEntity<BaseResponse> getKoiNoPondByUserId(@PathVariable("userId") int userId) {
+        List<KoiFish> koiFishs = iKoiFishService.getFishByUserNoPond(userId);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        String mess = "Get koifishs by pondId succesfully";
+        if (koiFishs.isEmpty())
+            mess = "List is empty";
+        return ResponseUtil.createSuccessResponse(koiFishs, mess);
+    }
+
+    @GetMapping("/listkoi/byuserid/{userId}/page")
+    public ResponseEntity<BaseResponse> getKoiByUserIdPage(@PathVariable("userId") int userId, @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId, page, size);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        String mess = "Get fish by userId successfully";
+        if (koiFishs.isEmpty())
+            mess = "List is empty";
+        return ResponseUtil.createSuccessResponse(koiFishs, mess);
+    }
+
+    @GetMapping("/listkoi/byuserid/{userId}")
+    public ResponseEntity<BaseResponse> getKoisByUserId(@PathVariable("userId") int userId) {
+        List<KoiFish> koiFishs = iKoiFishService.getKoiFishsByUserId(userId);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        String mess = "Get fish by userId successfully";
+        if (koiFishs.isEmpty())
+            mess = "List is empty";
+
+        return ResponseUtil.createSuccessResponse(koiFishs, mess);
+    }
+
+    //Remove it
+    @GetMapping("/listkoi")
+    public ResponseEntity<BaseResponse> getKois() {
+        Page<KoiFish> koiFishs = iKoiFishService.getKoiFishs(0, 10);
+        for (KoiFish koiFish : koiFishs) {
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        String mess = "Get all koifish succesfully";
+        if (koiFishs.isEmpty())
+            mess = "List is empty";
+
+        return ResponseUtil.createSuccessResponse(koiFishs, mess);
+    }
+    //========================================
+
     @GetMapping("/growthUpHistory/{koiFishId}/page")
     public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId, @RequestParam(defaultValue = "0") int page,
                                                          @RequestParam(defaultValue = "10") int size) {
+        iKoiFishService.evaluateAndUpdateKoiGrowthStatus(koiFishId);
         Page<KoiGrowthHistory> koiGrowthHistorys = iKoiFishService.getGrowthHistorys(koiFishId, page, size);
-        BaseResponse response = BaseResponse.builder()
-                .data(koiGrowthHistorys)
-                .message("Get growth history successfully")
-                .statusCode(HttpStatus.OK.value())
-                .build();
+        String mess = "Get growth history successfully";
+        if (koiGrowthHistorys.isEmpty())
+            mess = "List is empty";
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(koiGrowthHistorys, mess);
+
     }
 
     @GetMapping("/growthUpHistory/{koiFishId}")
     public ResponseEntity<BaseResponse> getGrowthHistory(@PathVariable("koiFishId") int koiFishId) {
+        iKoiFishService.evaluateAndUpdateKoiGrowthStatus(koiFishId);
         List<KoiGrowthHistory> koGrowthHistory = iKoiFishService.getGrowthHistorys(koiFishId);
-        return ResponseUtil.createSuccessResponse(koGrowthHistory, "Get growth history successfully");
+        String mess = "Get growth history successfully";
+        if (koGrowthHistory.isEmpty())
+            mess = "List is empty";
+
+        return ResponseUtil.createSuccessResponse(koGrowthHistory, mess);
+
     }
 
 
