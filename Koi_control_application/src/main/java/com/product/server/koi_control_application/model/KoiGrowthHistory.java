@@ -34,7 +34,7 @@ public class KoiGrowthHistory {
     private int id;
 
     @Column(name = "in_pond_from")
-    private LocalDate inPondFrom;
+    private LocalDateTime inPondFrom;
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
