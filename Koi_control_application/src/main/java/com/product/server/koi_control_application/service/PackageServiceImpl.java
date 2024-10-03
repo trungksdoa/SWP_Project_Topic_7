@@ -66,8 +66,16 @@ public class PackageServiceImpl implements IPackageService {
         packageRepository.deleteById(id);
     }
 
+
     @Override
-    public boolean checkPackageLimit(int userId, UserPackage userPackage) {
-        return userPackage.getFishSlots() < koiFishRepository.countByUserId(userId) || userPackage.getPondSlots() < pondRepository.countByUserId(userId);
+    public boolean checkFishLimit(int userId, UserPackage userPackage) {
+        Long fishCount = koiFishRepository.countByUserId(userId);
+        return userPackage.getFishSlots() < fishCount;
+    }
+
+    @Override
+    public boolean checkPondLimit(int userId, UserPackage userPackage) {
+        int pondCount = koiFishRepository.countByPondId(userId);
+        return userPackage.getPondSlots() < pondCount;
     }
 }

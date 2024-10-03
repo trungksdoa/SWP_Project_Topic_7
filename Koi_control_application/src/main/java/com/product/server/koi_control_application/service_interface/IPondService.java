@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface IPondService {
     Pond addPond(Pond pond);
-
     Pond getPond(int id);
     Page<Pond> getPonds(int page, int size);
 
@@ -22,6 +21,4 @@ public interface IPondService {
     void deletePond(int id);
 
     Pond updatePond(int id, Pond request, MultipartFile file) throws IOException;
-
-
 }
