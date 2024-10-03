@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table } from "antd";
+import { Button, Table, Spin } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { Input, Space } from "antd";
 
 const ManageUser = () => {
-  const { data: lstUser, refetch } = useGetUserAll();
+  const { data: lstUser, refetch, isFetching } = useGetUserAll();
   const mutate = useDeleteUser();
   const [filteredName, setFilteredName] = useState([]);
   const [loadingId, setLoadingId] = useState(null); 
@@ -46,7 +46,7 @@ const ManageUser = () => {
     const filtered = lstUser?.filter((user) =>
       user.username.toLowerCase().includes(input)
     );
-    setFilterdName(filtered || []);
+    setFilteredName(filtered || []);
   };
 
   const columns = [
@@ -123,13 +123,21 @@ const ManageUser = () => {
   const onChange = (pagination, filters, sorter, extra) => {
     // console.log("params", pagination, filters, sorter, extra);
   };
+
+  // if (isFetching) {
+  //   return (
+  //     <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+  //       <Spin tip="Loading" size="large" />
+  //     </div>
+  //   );
+  // }
+
   return (
     <div>
       <Search
         style={{ marginBottom: "20px" }}
         placeholder="input search text"
         allowClear
-        enterButton="Search"
         size="large"
         onKeyUp={onKeyUp}
       />

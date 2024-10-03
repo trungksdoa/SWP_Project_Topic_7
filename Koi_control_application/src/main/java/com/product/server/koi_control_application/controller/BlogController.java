@@ -26,19 +26,17 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/blogs")
 @RequiredArgsConstructor
-
 @Tag(name = "Blog", description = "API for blog")
 public class BlogController {
     private final IBlogService blogService;
     private final JwtTokenUtil jwtUtil;
     private final IUserService userService;
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<BaseResponse> getAllBlogs() {
         return ResponseUtil.createSuccessResponse(blogService.getAllBlogs(), "Success");
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP','ROLE_MEMBER')")
     public ResponseEntity<BaseResponse> getBlogById(@PathVariable int id) {
         return ResponseUtil.createSuccessResponse(blogService.getBlogById(id), "Success");
     }
