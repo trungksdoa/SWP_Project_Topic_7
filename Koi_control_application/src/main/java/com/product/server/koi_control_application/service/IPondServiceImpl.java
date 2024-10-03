@@ -38,10 +38,9 @@ public class IPondServiceImpl implements IPondService {
 
         if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
             throw new AlreadyExistedException("Pond name existed.");
-        if (iPackageService.checkPackageLimit(pond.getUserId(), user.getAUserPackage()))
+        if (iPackageService.checkPondLimit(pond.getUserId(), user.getAUserPackage()))
             throw new NotFoundException("User package limit exceeded.");
 
-        pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
         pondRepository.save(pond);
         WaterQualityStandard  waterQualityStandard = new WaterQualityStandard();
         waterQualityStandard.setPondId(pond.getId());
@@ -127,7 +126,6 @@ public class IPondServiceImpl implements IPondService {
 
         return pondRepository.save(pond);
     }
-
 }
 
 

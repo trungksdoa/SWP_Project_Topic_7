@@ -50,8 +50,8 @@ public class KoiGrowthHistory {
     @Column(name = "koi_id")
     private int koiId;
 
-    @Column(name = "pond_id")
-    private int pondId;
+    @Column(name = "pond_id", nullable = true)
+    private Integer pondId;
 
     @Column(name = "age_month_his")
     private int ageMonthHis;
@@ -59,7 +59,7 @@ public class KoiGrowthHistory {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name= "date")
+    @Column(name= "date", nullable = true)
     private LocalDate date;
 
     @Column(name = "created_at", updatable = false)

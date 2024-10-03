@@ -12,8 +12,10 @@ public interface IPackageService {
     UserPackage updatePackage(int packId, UserPackage pack);
     void deletePackage(int id);
 
-    boolean checkPackageLimit(int userId, UserPackage packageId);
 
 
 
+    boolean checkFishLimit(int userId, UserPackage userPackage);
+
+    boolean checkPondLimit(int userId, UserPackage userPackage);
 }
