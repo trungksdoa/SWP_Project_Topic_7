@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,5 +41,9 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
     @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is null or k.pondId = 0")
     List<KoiFish> findFishByUserWithNoPond(int userId);
 
+    @Query("select (count(k) > 0) from KoiFish k where k.name = ?1 and k.userId = ?2")
+    boolean existsByNameWithUserId(String name, int userId);
 
+    @Query("select (count(k) > 0) from KoiFish k where k.userId = ?1")
+    boolean isOwnByUser(int userId);
 }

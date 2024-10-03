@@ -47,6 +47,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         if (koiFish.getPondId() != null && !pondRepository.existsByIdAndUserId(koiFish.getPondId(), koiFish.getUserId()))
             throw new NotFoundException("This Breeder dont have this Pond!.");
 
+
+        if(koiFishRepository.existsByNameWithUserId(koiFish.getName(), koiFish.getUserId()))
+            throw new AlreadyExistedException("KoiFish name existed.");
+
         if (koiFish.getPondId() != null && iPackageService.checkPondLimit(koiFish.getUserId(), user.getAUserPackage()))
             throw new BadRequestException("Pond is full. , please upgrade your package.");
 
@@ -60,7 +64,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
         koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
                 .koiId(saved.getId())
-                .inPondFrom(koiFish.getCreatedAt())
+                .inPondFrom(koiFish.getDate())
                 .isFirstMeasurement(true)
                 .weight(koiFish.getWeight())
                 .length(koiFish.getLength())
@@ -102,14 +106,19 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException {
         KoiFish koiFish = getKoiFish(id);
 
-        if (request.getUserId() != 0 && !usersRepository.existsById(request.getUserId()))
-            throw new NotFoundException("User not found.");
+        if(!koiFishRepository.isOwnByUser(request.getUserId()))
+            throw new NotFoundException("Fish is not owned by user., try again.");
 
-        if ((request.getPondId() != 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
-            throw new NotFoundException("Pond not found");
-
-        if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
+        if(koiFishRepository.existsByNameWithUserId(request.getName(), request.getUserId()))
             throw new AlreadyExistedException("KoiFish name existed.");
+
+        if (request.getPondId() != null && !pondRepository.existsById(request.getPondId()))
+            throw new NotFoundException("Pond not found.");
+
+        if ((request.getPondId() != null) && !pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+            throw new NotFoundException("This Breeder dont have this Pond!.");
+
+
 
         if (file != null && !file.isEmpty()) {
             String filename = iImageService.updateImage(koiFish.getImageUrl(), file);
@@ -127,7 +136,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
         KoiGrowthHistory growthHistory = KoiGrowthHistory.builder()
                 .koiId(koiFish.getId())
-                .inPondFrom(koiFish.getCreatedAt())
+                .inPondFrom(koiFish.getDate())
                 .isFirstMeasurement(false)
                 .weight(request.getWeight())
                 .length(request.getLength())
@@ -135,7 +144,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .build();
 
 
-        if ((request.getPondId() != 0 || koiFish.getPondId() != null)) {
+        if ((koiFish.getPondId() != null )) {
             koiFish.setPondId(request.getPondId());
             growthHistory.setPondId(request.getPondId());
             Pond pond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
