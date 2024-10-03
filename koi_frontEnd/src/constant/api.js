@@ -11,3 +11,4 @@ export const MANAGE_ORDER_API = import.meta.env.VITE_MANAGE_ORDER_API
 export const MANAGE_PACKAGE_API = import.meta.env.VITE_MANAGE_PACKAGE_API
 export const MANAGE_CATEGORY_API = import.meta.env.VITE_MANAGE_CATEGORY_API
 export const MANAGE_CATEGORY_API_ADMIN = import.meta.env.VITE_MANAGE_CATEGORY_API_ADMIN
+export const MANAGE_BLOGS_API = import.meta.env.VITE_MANAGE_BLOGS_API

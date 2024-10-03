@@ -6,5 +6,6 @@ const api = apiInstance.create({
 
 export const manageProductsServices = {
     getAllProducts: () => api.get("/fetchAll"),
-    getProductById: (id) => api.get(`/${id}`)
+    getProductById: (id) => api.get(`/${id}`),
+    getProductBySlug: (slug) => api.get(`/slug/${slug}`)
 }

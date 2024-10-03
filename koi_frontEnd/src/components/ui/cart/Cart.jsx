@@ -139,6 +139,7 @@ const Cart = () => {
             min={1}
             max={10}
             value={product?.quantity}
+            disabled={mutate.isPending}
             onChange={(value) => onChange(value, product?.id)}
             style={{ width: "15%", textAlign: "center" }}
           />

@@ -17,20 +17,19 @@ import { manageUserActions } from "../../../store/manageUser/slice";
 export const UserMenu = () => {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
-  const dispatch = useDispatch()
-  const naigate = useNavigate()
+  const dispatch = useDispatch();
+  const naigate = useNavigate();
   const handleOpenChange = (newOpen) => {
     setOpen(newOpen);
   };
 
   const handleLogout = () => {
     localStorage.removeItem(LOCAL_STORAGE_LOGIN_KEY);
-    dispatch(manageUserActions.updateUserLogin(null))
+    dispatch(manageUserActions.updateUserLogin(null));
     naigate(PATH.HOME);
   };
 
   const { userLogin } = useSelector((state) => state.manageUser);
-
 
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalRegister, setIsModalRegister] = useState(false);
@@ -101,13 +100,19 @@ export const UserMenu = () => {
     // If user is logged in
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
-        console.log("a")
+        console.log("a");
         return (
           <div className="flex flex-col" key="admin">
-            <NavLink to={PATH.MANAGE_USER} className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink
+              to={PATH.MANAGE_USER}
+              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+            >
               {t("Admin")}
             </NavLink>
-            <Button onClick={handleLogout} className=" bg-white text-black hover:!text-white !w-[100px] text-center hover:!border-black hover:!bg-black">
+            <Button
+              onClick={handleLogout}
+              className=" bg-white text-black hover:!text-white !w-[100px] text-center hover:!border-black hover:!bg-black"
+            >
               {t("Logout")}
             </Button>
           </div>
@@ -116,16 +121,52 @@ export const UserMenu = () => {
       if (role.name === "ROLE_MEMBER") {
         return (
           <div className="flex flex-col" key="member">
-            <NavLink to={PATH.KOI_MANAGEMENT} className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px]  bg-black text-white hover:!text-white border-none hover:!bg-black">
+            <NavLink
+              to={PATH.KOI_MANAGEMENT}
+              className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px]  bg-black text-white hover:!text-white border-none hover:!bg-black"
+            >
               {t("Manage")}
             </NavLink>
-            <NavLink className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.PROFILE}>
+            <NavLink
+              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.PROFILE}
+            >
               {t("Profile")}
             </NavLink>
-            <NavLink className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black" to={PATH.HISTORY_ORDER}>
+            <NavLink
+              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.HISTORY_ORDER}
+            >
               {t("History")}
             </NavLink>
-            <Button onClick={handleLogout} className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black">
+            <Button
+              onClick={handleLogout}
+              className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
+            >
+              {t("Logout")}
+            </Button>
+          </div>
+        );
+      }
+      if (role.name === "ROLE_SHOP") {
+        return (
+          <div className="flex flex-col" key="admin">
+            <NavLink
+              to={PATH.MANAGE_BLOG}
+              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[120px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+            >
+              {t("Manage Blog")}
+            </NavLink>
+            <NavLink
+              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.PROFILE}
+            >
+              {t("Profile")}
+            </NavLink>
+            <Button
+              onClick={handleLogout}
+              className=" bg-white text-black hover:!text-white !w-[120px] text-center hover:!border-black hover:!bg-black"
+            >
               {t("Logout")}
             </Button>
           </div>
@@ -158,7 +199,11 @@ export const UserMenu = () => {
         onOk={handleOkLogin}
         onCancel={handleCancelLogin}
       >
-        <LoginForm showModalRegister={showModalRegister} handleOkLogin={handleOkLogin} showModalForgotPassword={showModalForgotPassword} />
+        <LoginForm
+          showModalRegister={showModalRegister}
+          handleOkLogin={handleOkLogin}
+          showModalForgotPassword={showModalForgotPassword}
+        />
       </Modal>
       <Modal
         title=""

@@ -140,7 +140,7 @@ const StoreTemplate = () => {
                   overflow: "hidden",
                 }}
                 onClick={() => {
-                  navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`);
+                  navigate(`${PATH.DETAIL_PRODUCT}/${prd?.slug}`);
                 }}
                 cover={
                   <img
