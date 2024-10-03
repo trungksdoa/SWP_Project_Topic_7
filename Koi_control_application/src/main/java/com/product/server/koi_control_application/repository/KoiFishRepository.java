@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +26,21 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
                                           @Param("pondId") int pondId,
                                           @Param("id") int id);
 
+
     Page<KoiFish> findAllByPondId(int pondId, Pageable pageable);
     List<KoiFish> findAllByPondId(int pondId);
+
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is not null")
     Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
     int countByPondId(int pondId);
 
     long countByUserId(int userId);
 
-    @Query("select k from KoiFish k where k.userId = ?1")
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is not null")
     List<KoiFish> findAllByUserId(int userId);
+
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is null or k.pondId = 0")
+    List<KoiFish> findFishByUserWithNoPond(int userId);
+
+
 }
