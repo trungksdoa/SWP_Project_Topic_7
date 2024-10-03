@@ -86,6 +86,7 @@ public class KoiFishController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
