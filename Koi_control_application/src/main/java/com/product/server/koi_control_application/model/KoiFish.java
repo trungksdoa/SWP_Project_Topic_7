@@ -65,8 +65,11 @@ public class KoiFish {
     @Column(name = "image_url")
     private String imageUrl;
 
+    //Ở đây
     @Column(name = "pond_id", nullable = true)
-    private Integer pondId;
+    private int pondId;
+    //
+
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
