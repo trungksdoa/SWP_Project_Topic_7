@@ -155,6 +155,11 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    public List<KoiFish> getFishByUserNoPond(int userId) {
+        return koiFishRepository.findFishByUserWithNoPond(userId);
+    }
+
+    @Override
     public Page<KoiFish> getKoiFishs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAll(pageable);
@@ -169,5 +174,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
+    }
+
+    @Override
+    public List<KoiGrowthHistory> getGrowthHistorys(int koiId) {
+        return koiGrowthHistoryRepository.findAllByKoi(koiId);
     }
 }

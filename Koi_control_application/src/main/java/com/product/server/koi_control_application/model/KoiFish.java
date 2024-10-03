@@ -58,14 +58,14 @@ public class KoiFish {
     @Column(nullable = false, precision = 10, scale = 2)
     private int purchasePrice;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id")
     private int userId;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "pond_id")
-    private int pondId;
+    @Column(name = "pond_id", nullable = true)
+    private Integer pondId;
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
