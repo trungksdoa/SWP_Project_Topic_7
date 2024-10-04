@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
-import com.product.server.koi_control_application.pojo.momo.MomoProduct;
-import com.product.server.koi_control_application.pojo.momo.MomoUserInfo;
-import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
+import com.product.server.koi_control_application.pojo.momo.*;
+import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.ICategoryService;
 import com.product.server.koi_control_application.service_interface.IOrderService;
@@ -28,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.http.HttpResponse;
 import java.util.*;
 
-import static com.product.server.koi_control_application.enums.PAYMENT.FAILED;
+import static com.product.server.koi_control_application.enums.PaymentCode.FAILED;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
 
@@ -47,7 +45,7 @@ public class OrderController {
     private final IPaymentService paymentService;
 
     @PostMapping("/create-product-order")
-    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderProductDTO req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderRequestDTO req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
 
@@ -63,7 +61,7 @@ public class OrderController {
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
                 .amount((long) createdOrder.getTotalAmount())
-                .orderInfo("Payment for order " + createdOrder.getId())
+                .orderInfo("PaymentStatus for order " + createdOrder.getId())
                 .requestId(UUID.randomUUID().toString())
                 .userId(String.valueOf(userId))
                 .orderId(String.valueOf(createdOrder.getId()))
@@ -76,7 +74,16 @@ public class OrderController {
         HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
         JsonNode responseBody = new ObjectMapper().readTree(response.body());
 
-        return ResponseUtil.createResponse(responseBody, "Order created successfully", HttpStatus.CREATED);
+        if (responseBody.get("resultCode").asInt() != 0) {
+            orderService.updateOrderStatus(createdOrder.getId(), FAILED.getValue());
+            return ResponseUtil.createResponse(
+                    new ObjectMapper().readValue(response.body(), MomoResponseOrderFail.class)
+                    , "Order creation failed due to payment processing error. Please try again.", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseUtil.createResponse(
+                new ObjectMapper().readValue(response.body(), MomoResponseOrderSuccess.class),
+                "Order created successfully", HttpStatus.CREATED);
     }
 
 
@@ -124,7 +131,7 @@ public class OrderController {
     @DeleteMapping("/user/{userId}/order/{orderId}")
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
-        paymentService.updatePaymentStatus(orderId,"product", FAILED.getValue());
+        paymentService.updatePaymentStatus(orderId, "product", FAILED.getValue());
         return ResponseUtil.createSuccessResponse(null, "Order cancelled successfully");
     }
 

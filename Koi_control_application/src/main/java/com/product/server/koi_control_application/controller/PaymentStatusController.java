@@ -35,4 +35,9 @@ public class PaymentStatusController {
         paymentStatusService.clearPaymentStatusByDate(fromDate, toDate);
         return ResponseUtil.createSuccessResponse("OK","Clear payment status successfully");
     }
+
+    @GetMapping("/get-payment-status")
+    public ResponseEntity<BaseResponse> getPaymentStatus() {
+        return ResponseUtil.createSuccessResponse(paymentStatusService.getAllPaymentInfo(),"Get payment status successfully");
+    }
 }

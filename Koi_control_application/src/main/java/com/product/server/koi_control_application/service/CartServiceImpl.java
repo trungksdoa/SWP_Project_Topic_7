@@ -3,7 +3,10 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.custom_exception.BadRequestException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Cart;
+import com.product.server.koi_control_application.model.Product;
+import com.product.server.koi_control_application.pojo.OutStockProduct;
 import com.product.server.koi_control_application.pojo.request.CartDTO;
+import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.CartRepository;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.service_interface.IProductService;
@@ -31,9 +34,15 @@ public class CartServiceImpl implements ICartService {
             throw new IllegalAccessException("You are not allowed to add item to this cart");
         }
 
-        if (productService.getProduct(cart.getProductId()) == null) {
+        Product  product = productService.getProduct(cart.getProductId());
+        if (product == null) {
             throw new NotFoundException("Sorry, this item has been deleted or not exist ");
         }
+
+        if(product.getStock() < cart.getQuantity()){
+            throw new BadRequestException("Sorry, this item is out of stock");
+        }
+
 
         Optional<Cart> savedCart = cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId());
 
@@ -67,8 +76,16 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public List<Cart> getCart(int userId) {
-        return cartRepository.findByUserId(userId);
+    public List<CartProductDTO> getCart(int userId) {
+        List<CartProductDTO> cart = cartRepository.getCartByUserId(userId);
+
+        OutStockProduct outStockProduct = productService.checkProductOutStock(cart);
+
+        if (outStockProduct.getOutStockProducts() != null && !outStockProduct.getOutStockProducts().isEmpty()) {
+            productService.setDisableProduct(outStockProduct);
+        }
+
+        return cart;
     }
 
 

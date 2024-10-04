@@ -7,9 +7,15 @@ import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 
+
+
+
 public class ResponseUtil {
 
-    public static String WEBSITE_URL = "https://swp-project-topic-7.vercel.app/";
+    public static final  String WEBSITE_URL = "https://swp-project-topic-7.vercel.app/";
+
+    private ResponseUtil() {
+    }
 
     public static ResponseEntity<BaseResponse> createResponse(Object data, String message, HttpStatus status) {
         return new ResponseEntity<>(BaseResponse.builder()

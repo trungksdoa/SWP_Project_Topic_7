@@ -34,7 +34,7 @@ public class OpenAPIConfig {
                         new Tag().name("Product").description("API for Product"),
                         new Tag().name("Blog").description("API for blog"),
                         new Tag().name("PaymentStatus").description("API for PaymentStatus"),
-                        new Tag().name("Payment").description("API for payment"),
+                        new Tag().name("PaymentStatus").description("API for payment"),
                         new Tag().name("WaterParameter").description("API for WaterParameter"),
                         new Tag().name("Order").description("API for order"),
                         new Tag().name("Cart").description("API for cart"),

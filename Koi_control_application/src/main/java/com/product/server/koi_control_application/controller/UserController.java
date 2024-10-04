@@ -194,7 +194,7 @@ public class UserController {
 
         MomoPaymentRequest momoPaymentRequest = MomoPaymentRequest.builder()
                 .amount(Long.parseLong(pack.getPrice() + ""))
-                .orderInfo("Payment for package " + pack.getName())
+                .orderInfo("PaymentStatus for package " + pack.getName())
                 .requestId(UUID.randomUUID().toString())
                 .userId(String.valueOf(users.getId()))
                 .orderId(String.valueOf(pack.getId()))
