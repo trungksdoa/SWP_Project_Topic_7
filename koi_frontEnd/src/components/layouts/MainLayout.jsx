@@ -2,8 +2,12 @@ import React from "react";
 import Header from "../ui/Header";
 import { Outlet } from "react-router-dom";
 import Footer from "../ui/Footer";
-
 const MainLayout = () => {
+  const breadcrumbItems = [
+    { name: 'Home', path: '/' },
+    // Add more items based on the current page
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header className="mt-[100px]" />

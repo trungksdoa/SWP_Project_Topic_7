@@ -37,6 +37,7 @@ import ManageBlogShopPage from "../pages/ManageBlogShopPage";
 import EditBlogPage from "../pages/EditBlogPage";
 import EditBlog from "../components/ui/blogs/EditBlog";
 import EditPackages from "../components/ui/admin/managePackages/EditPackages";
+import AddBlogsPage from "../pages/AddBlogsPage";
 
 const router = [
   {
@@ -100,6 +101,10 @@ const router = [
           },
         ],
       },
+      {
+        path: PATH.ADD_BLOG,
+        element: <AddBlogsPage />
+      }
     ],
   },
   {

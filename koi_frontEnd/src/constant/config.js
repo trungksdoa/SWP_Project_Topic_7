@@ -35,5 +35,6 @@ export const PATH = {
     BLOGS: '/blogs',
     BLOG_DETAIL: '/blogs/detail',
     MANAGE_BLOG: '/blogs/manage-blogs',
-    EDIT_BLOG: '/blogs/manage-blogs/edit'
+    EDIT_BLOG: '/blogs/manage-blogs/edit',
+    ADD_BLOG: '/blogs/manage-blogs/add'
 }

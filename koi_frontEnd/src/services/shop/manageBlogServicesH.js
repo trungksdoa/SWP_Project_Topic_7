@@ -9,5 +9,6 @@ export const manageBlogsServicesH = {
     postBlog: (payload) => api.post("", payload),
     putBlog: (id,payload) => api.put(`/${id}`, payload),
     getBlogsByAuthorId: (id) => api.get(`/author/${id}`),
-    getBlogById: (id) => api.get(`${id}`)
+    getBlogById: (id) => api.get(`${id}`),
+    deleteBlogById: (id) => api.delete(`${id}`)
 }

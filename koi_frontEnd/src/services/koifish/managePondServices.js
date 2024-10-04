@@ -36,5 +36,5 @@ export const managePondServices = {
         } catch (error) {
             throw error.response?.data || error.message;
         }
-    }
+    },
 }

@@ -34,7 +34,7 @@ const BlogsDetail = () => {
           ></div>
         </div>
         <div className="flex justify-end">
-          <img className="rounded-[12px]" src={blog?.bodyImageUrl} alt="" />
+          <img className="rounded-[12px] object-contain" src={blog?.bodyImageUrl} alt="" />
         </div>
       </div>
       <div className="mb-[60px]">

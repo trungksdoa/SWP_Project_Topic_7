@@ -6,7 +6,7 @@ const api = apiInstanceHeader.create({
 })
 
 export const manageKoiFishServices = {
-    getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}`),
+    getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
     updateKoi: async (id, payload) => {
         try {
           const response = await api.put(`/${id}`, payload, {
@@ -19,22 +19,6 @@ export const manageKoiFishServices = {
           throw error.response?.data || error.message;
         }
     },
-    addKoi: async (payload) => {
-      try {
-          const formData = new FormData();            
-          formData.append('koi', JSON.stringify(payload.koi));
-          if (payload.image) {
-              formData.append('image', payload.image);
-          }
-
-          const response = await api.post("", formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data',
-              },
-          });
-          return response.data;
-      } catch (error) {
-          throw error.response?.data || error.message;
-      }
-  }
+    addKoi: (payload) => api.post("", payload),
+    deleteKoi: (id) => api.delete(`/${id}`)
 }

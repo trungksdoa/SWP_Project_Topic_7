@@ -53,7 +53,7 @@ const Header = () => {
             <NavLink
               rel="noopener noreferrer"
               to={PATH.KOI_MANAGEMENT}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
             >
               {t("Management")}
             </NavLink>
@@ -61,8 +61,8 @@ const Header = () => {
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
-              to={PATH.FOOD_CALCULATOR}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+              to={PATH.WATER_PARAMETER}
+              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
             >
               {t("Calculator")}
             </NavLink>
@@ -71,7 +71,7 @@ const Header = () => {
             <NavLink
               rel="noopener noreferrer"
               to={PATH.STORE}
-              className="flex items-center px-4 -mb-1  dark:border- dark:text-violet-600 dark:border-violet-600"
+              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
             >
               {t("Store")}
             </NavLink>
@@ -80,7 +80,7 @@ const Header = () => {
             <NavLink
               rel="noopener noreferrer"
               to={PATH.BLOGS}
-              className="flex items-center px-4 -mb-1  dark:border-"
+              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border-'}`}
             >
               {t("Blog")}
             </NavLink>

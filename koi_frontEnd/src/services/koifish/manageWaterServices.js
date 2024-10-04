@@ -7,4 +7,6 @@ const api = apiInstanceHeader.create({
 
 export const manageWaterServices = {
     getWaterByPondId: (pondId) => api.get(`/api/ponds/parameters/${pondId}`),
+    postWaterById: (id, payload) => api.post(),
+    getWaterStandard: (id) => api.get(`/api/ponds/parameters/standard/${id}`)
 };
