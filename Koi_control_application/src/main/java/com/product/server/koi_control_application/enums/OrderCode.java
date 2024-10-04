@@ -1,13 +1,14 @@
 package com.product.server.koi_control_application.enums;
 
-public enum ORDER {
+public enum OrderCode {
+    //Control in customer ui
     PENDING("PENDING"),
     SUCCESS("SUCCESS"),
     CANCELLED("CANCELLED");
 
     private final String value;
 
-    ORDER(String value) {
+    OrderCode(String value) {
         this.value = value;
     }
 

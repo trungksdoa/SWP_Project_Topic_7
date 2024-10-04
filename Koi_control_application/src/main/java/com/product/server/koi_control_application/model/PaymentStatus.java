@@ -12,16 +12,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity(name = "payment_status")
 @Builder
-public class Payment {
+public class PaymentStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String referenceId; // Có thể là orderId hoặc packageId
-    private String referenceType; // "ORDER" hoặc "PACKAGE"
+    private String referenceType; // "OrderCode" hoặc "PACKAGE"
     private String paymentMethod;
     private String paymentDescription;
     private String paymentStatus;
+    private int userId;
 
     private LocalDateTime paymentDate;
 

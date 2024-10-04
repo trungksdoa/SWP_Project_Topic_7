@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderProductDTO {
+public class OrderRequestDTO {
 
     private String fullName;
 

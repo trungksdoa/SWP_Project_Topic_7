@@ -2,9 +2,8 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.product.server.koi_control_application.enums.ORDER;
-import com.product.server.koi_control_application.enums.PAYMENT;
-import com.product.server.koi_control_application.model.Payment;
+import com.product.server.koi_control_application.enums.OrderCode;
+import com.product.server.koi_control_application.model.PaymentStatus;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.*;
 import com.product.server.koi_control_application.service_interface.ICartService;
@@ -27,8 +26,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import static com.product.server.koi_control_application.enums.PAYMENT.FAILED;
-import static com.product.server.koi_control_application.enums.PAYMENT.PAID;
+import static com.product.server.koi_control_application.enums.PaymentCode.FAILED;
+import static com.product.server.koi_control_application.enums.PaymentCode.PAID;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
@@ -37,7 +36,7 @@ import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBS
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Payment", description = "API for Payment")
+@Tag(name = "PaymentStatus", description = "API for PaymentStatus")
 public class PaymentController {
     private static final String HMAC_SHA256 = "HmacSHA256";
     private final IOrderService orderService;
@@ -77,26 +76,32 @@ public class PaymentController {
         }
 
 
-
-        Payment payment = Payment.builder()
-                .referenceId(mapData.getOrderId())
-                .referenceType(mapData.getOrderType())
-                .paymentMethod("MOMO")
-                .paymentDescription("Thanh toán qua MoMo")
-                .paymentStatus(PAYMENT.PENDING.getValue())
-                .build();
-
-        paymentService.createPaymentStatus(payment);
         MomoRequestBody requestBody = createRequestBody(paymentInfo, signature);
         String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
 
         HttpResponse<String> response = sendHttpRequest(jsonBody, MOMO_TEST_ENDPOINT);
         JsonNode responseBody = new ObjectMapper().readTree(response.body());
+        PaymentStatus paymentStatus = PaymentStatus.builder()
+                .userId(Integer.parseInt(mapData.getUserId()))
+                .referenceId(mapData.getOrderId())
+                .referenceType(mapData.getOrderType())
+                .paymentMethod("MOMO")
+                .build();
 
+        if (responseBody.get("resultCode").asInt() != 0) {
+            paymentStatus.setPaymentStatus(FAILED.getValue());
+            paymentStatus.setPaymentDescription(responseBody.get("message").asText());
+
+        } else {
+            paymentStatus.setPaymentStatus(PAID.getValue());
+            paymentStatus.setPaymentDescription("Payment using MoMo");
+        }
+        paymentService.createPaymentStatus(paymentStatus);
         logResponseDetails(response, responseBody);
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
+
 
     /*
      * Handle MoMo redirect
@@ -126,12 +131,8 @@ public class PaymentController {
             handleMomoCallback(callbackResponse);
 
             // Chuyển hướng người dùng đến trang kết quả thanh toán trên website của bạn
-            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("https://swp-project-topic-7.vercel.app/payment-success/?orderId=" + orderId + "&resultCode=" + resultCode + "&message=" + message + "&orderType=" + orderType)).build();
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(WEBSITE_URL + "/payment-success/?orderId=" + orderId + "&resultCode=" + resultCode + "&message=" + message + "&orderType=" + orderType)).build();
         } catch (Exception e) {
-            if (e.getMessage().contains("Order has been canceled, you will be refunded soon")) {
-                //Refund api
-                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(WEBSITE_URL + "error?message=Order has been canceled")).build();
-            }
             // Xử lý lỗi và chuyển hướng đến trang lỗi
             return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(WEBSITE_URL + "error")).build();
         }
@@ -161,7 +162,7 @@ public class PaymentController {
             if (callbackResponse.getResultCode() == 0) {
                 if (orderType.equals("product")) {
                     // If the order is already marked as paid, return
-                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(ORDER.SUCCESS.getValue())) {
+                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(OrderCode.SUCCESS.getValue())) {
                         return;
                     }
 
@@ -174,7 +175,7 @@ public class PaymentController {
                     /*
                      * Update the order status to PAID
                      */
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.SUCCESS.getValue());
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderCode.SUCCESS.getValue());
 
 
                     /*
@@ -193,7 +194,7 @@ public class PaymentController {
             } else {
                 // Handle failed payment
                 if (orderType.equals("product")) {
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), ORDER.CANCELLED.getValue());
+                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderCode.CANCELLED.getValue());
                     paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
                     log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
                 } else {

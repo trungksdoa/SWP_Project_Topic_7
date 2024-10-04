@@ -1,13 +1,13 @@
 package com.product.server.koi_control_application.service_interface;
 
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
+import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface IOrderService {
-    Orders createOrder(int userId, OrderProductDTO orderProductDTO) ;
+    Orders createOrder(int userId, OrderRequestDTO orderRequestDTO) ;
 
     Orders getOrderById(int id) ;
     Orders updateOrderStatus(int id, String status) ;
