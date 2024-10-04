@@ -25,13 +25,25 @@ public interface KoiFishRepository extends JpaRepository<KoiFish, Integer> {
                                           @Param("pondId") int pondId,
                                           @Param("id") int id);
 
+
     Page<KoiFish> findAllByPondId(int pondId, Pageable pageable);
     List<KoiFish> findAllByPondId(int pondId);
-    Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
+
     int countByPondId(int pondId);
 
     long countByUserId(int userId);
 
     @Query("select k from KoiFish k where k.userId = ?1")
+    Page<KoiFish> findAllByUserId(int userId, Pageable pageable);
+    @Query("select k from KoiFish k where k.userId = ?1 ")
     List<KoiFish> findAllByUserId(int userId);
+
+    @Query("select k from KoiFish k where k.userId = ?1 and k.pondId is null or k.pondId = 0")
+    List<KoiFish> findFishByUserWithNoPond(int userId);
+
+    @Query("select (count(k) > 0) from KoiFish k where k.name = ?1 and k.userId = ?2")
+    boolean existsByNameWithUserId(String name, int userId);
+
+    @Query("select (count(k) > 0) from KoiFish k where k.userId = ?1")
+    boolean isOwnByUser(int userId);
 }

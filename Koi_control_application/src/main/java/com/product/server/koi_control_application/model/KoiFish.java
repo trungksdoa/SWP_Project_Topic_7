@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -58,14 +59,17 @@ public class KoiFish {
     @Column(nullable = false, precision = 10, scale = 2)
     private int purchasePrice;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id")
     private int userId;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "pond_id")
+    //Ở đây
+    @Column(name = "pond_id", nullable = true)
     private int pondId;
+    //
+
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
@@ -92,7 +96,7 @@ public class KoiFish {
             int days = period.getDays();
             double dayFraction = (double) days / 30;
             double totalMonths = (period.getYears() * 12) + period.getMonths() + dayFraction;
-            BigDecimal roundedMonths = new BigDecimal(totalMonths).setScale(1, BigDecimal.ROUND_HALF_UP);
+            BigDecimal roundedMonths = BigDecimal.valueOf(totalMonths).setScale(1, RoundingMode.HALF_UP);
             this.ageMonth = roundedMonths.doubleValue();
         } else {
             this.ageMonth = 0;

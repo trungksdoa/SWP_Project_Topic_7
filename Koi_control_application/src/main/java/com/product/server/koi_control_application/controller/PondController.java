@@ -8,6 +8,7 @@ import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.PondDTO;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IPondService;
+import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ponds")
@@ -36,7 +38,7 @@ public class PondController {
     public ResponseEntity<BaseResponse> createPond(
             @Schema(type = "string", format = "json", implementation = PondDTO.class)
             @RequestPart("pond") String pondJson,
-            @RequestParam("image") MultipartFile file) throws IOException {
+            @RequestParam(value="image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -77,7 +79,7 @@ public class PondController {
     @PutMapping(value = "{pondId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updatePond(@PathVariable("pondId") int pondId,
                                                    @Schema(type = "string", format = "json", implementation = PondDTO.class)
-                                                   @RequestPart("pond") String pondJson, @RequestParam("image") MultipartFile file) throws IOException {
+                                                   @RequestPart("pond") String pondJson, @RequestParam(value="image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -107,37 +109,45 @@ public class PondController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //Sửa bởi trung
     @GetMapping("/listpond/byuserid/{userId}")
     public ResponseEntity<BaseResponse> getPondByUserId(@PathVariable("userId") int userId) {
-        Page<Pond> Ponds = iPondService.getAllPondByUserId(userId, 0, 10);
+        List<Pond> ponds = iPondService.getAllPondByUserId(userId);
         String mess = "Get ponds by userID succesfully";
-        if (Ponds.isEmpty())
-            mess = "List is emmty";
-        BaseResponse response = BaseResponse.builder()
-                .data(Ponds)
-                .message(mess)
-                .statusCode(HttpStatus.OK.value())
-                .build();
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        if (ponds.isEmpty())
+            mess = "List is empty";
+        return ResponseUtil.createSuccessResponse(ponds, mess);
     }
 
-    @GetMapping("/listpond")
-    public ResponseEntity<BaseResponse> getPons() {
-        Page<Pond> Ponds = iPondService.getPonds(0, 10);
-        String mess = "Get all pond succesfully";
-        if (Ponds.isEmpty())
+    @GetMapping("/listpond/byuserid/{userId}/page")
+    public ResponseEntity<BaseResponse> getPondByUserIdWithPage(@PathVariable("userId") int userId, @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size) {
+        Page<Pond> ponds = iPondService.getAllPondByUserId(userId, page, size);
+        String mess = "Get ponds by userID succesfully";
+        if (ponds.isEmpty())
             mess = "List is emmty";
-        BaseResponse response = BaseResponse.builder()
-                .data(Ponds)
-                .message(mess)
-                .statusCode(HttpStatus.OK.value())
-                .build();
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(ponds, mess);
     }
-
+//Bị  thừa rồi xóa đi nhé
+//    @GetMapping("/listpond/page")
+//    public ResponseEntity<BaseResponse> getPondWithPage(@RequestParam(defaultValue = "0") int page,
+//                                                @RequestParam(defaultValue = "10") int size) {
+//        Page<Pond> ponds = iPondService.getPonds(page, size);
+//        String mess = "Get all pond succesfully";
+//        if (ponds.isEmpty())
+//            mess = "List is emmty";
+//        return ResponseUtil.createSuccessResponse(ponds, mess);
+//    }
+//
+//    //Add by trung
+//    @GetMapping("/listpond")
+//    public ResponseEntity<BaseResponse> getPond() {
+//        List<Pond> ponds = iPondService.getPonds();
+//        String mess = "Get all pond successfully";
+//        if (ponds.isEmpty())
+//            mess = "List is empty";
+//        return ResponseUtil.createSuccessResponse(ponds, mess);
+//    }
+//    //End add by trung
 
 }

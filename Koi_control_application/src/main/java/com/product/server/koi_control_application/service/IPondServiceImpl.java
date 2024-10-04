@@ -10,7 +10,6 @@ import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 
 @Service
@@ -39,10 +38,9 @@ public class IPondServiceImpl implements IPondService {
 
         if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
             throw new AlreadyExistedException("Pond name existed.");
-        if (iPackageService.checkPackageLimit(pond.getUserId(), user.getAUserPackage()))
+        if (iPackageService.checkPondLimit(pond.getUserId(), user.getAUserPackage()))
             throw new NotFoundException("User package limit exceeded.");
 
-        pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId()));
         pondRepository.save(pond);
         WaterQualityStandard  waterQualityStandard = new WaterQualityStandard();
         waterQualityStandard.setPondId(pond.getId());
@@ -70,6 +68,13 @@ public class IPondServiceImpl implements IPondService {
         return ponds;
     }
 
+
+    //Theêm bởi trung
+    @Override
+    public List<Pond> getPonds() {
+        return pondRepository.findAll() ;
+    }
+
     @Override
     public Page<Pond> getAllPondByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -77,6 +82,13 @@ public class IPondServiceImpl implements IPondService {
         ponds.forEach(pond -> pond.setFishCount(iKoiFishService.countKoiFishByPondId(pond.getId())));
         pondRepository.saveAll(ponds.getContent());
         return ponds;
+    }
+
+
+    //Theêm bởi trung
+    @Override
+    public List<Pond> getAllPondByUserId(int userId) {
+        return pondRepository.findAllPondByUserId(userId);
     }
 
     @Override
@@ -114,7 +126,6 @@ public class IPondServiceImpl implements IPondService {
 
         return pondRepository.save(pond);
     }
-
 }
 
 

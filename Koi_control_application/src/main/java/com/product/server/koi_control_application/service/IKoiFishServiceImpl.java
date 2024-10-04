@@ -49,12 +49,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         if (koiFishRepository.existsByNameAndPondId(koiFish.getName(), koiFish.getPondId()))
             throw new AlreadyExistedException("KoiFish name existed.");
 
-        if (iPackageService.checkPackageLimit(koiFish.getUserId(), user.getAUserPackage()))
+        if (iPackageService.checkFishLimit(koiFish.getUserId(), user.getAUserPackage()))
             throw new NotFoundException("User package limit exceeded.");
 
-        koiFish.countageMonth();
         KoiFish saved = koiFishRepository.save(koiFish);
-
         koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
                 .koiId(saved.getId())
                 .inPondFrom(koiFish.getCreatedAt())
@@ -123,16 +121,16 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
         Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
 
-            koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
-                    .koiId(koiFish.getId())
-                    .inPondFrom(koiFish.getCreatedAt())
-                    .isFirstMeasurement(false)
-                    .weight(request.getWeight())
-                    .length(request.getLength())
-                    .pondId(koiFish.getPondId())
+        koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+                .koiId(koiFish.getId())
+                .inPondFrom(koiFish.getCreatedAt())
+                .isFirstMeasurement(false)
+                .weight(request.getWeight())
+                .length(request.getLength())
+                .pondId(koiFish.getPondId())
 
-                    .date(koiFish.getDate())
-                    .build());
+                .date(koiFish.getDate())
+                .build());
         if ((request.getPondId()!= 0)){
             koiFish.setPondId(request.getPondId());
         }
@@ -143,16 +141,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAllByUserId(userId, pageable);
-    }
-
-    @Override
-    public List<KoiFish> getKoiFishsByPondId(int pondId) {
-        return koiFishRepository.findAllByPondId(pondId);
-    }
-
-    @Override
-    public List<KoiFish> getKoiFishsByUserId(int userId) {
-        return koiFishRepository.findAllByUserId(userId);
     }
 
     @Override
@@ -224,5 +212,23 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         return expectedGrowth;
     }
 
+    @Override
+    public List<KoiFish> getKoiFishsByPondId(int pondId) {
+        return List.of();
+    }
 
+    @Override
+    public List<KoiFish> getKoiFishsByUserId(int userId) {
+        return List.of();
+    }
+
+    @Override
+    public List<KoiFish> getFishByUserNoPond(int userId) {
+        return List.of();
+    }
+
+    @Override
+    public List<KoiGrowthHistory> getGrowthHistorys(int koiId) {
+        return List.of();
+    }
 }
