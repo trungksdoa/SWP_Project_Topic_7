@@ -82,7 +82,7 @@ public class WaterParameter {
     }
     public void getDaysSinceLastCleaned() {
         if (lastCleanedAt != null && !lastCleanedAt.isEqual(LocalDate.now())) {
-            this.cleanedDayCount =  java.time.Duration.between(lastCleanedAt, LocalDateTime.now()).toDays();
+            this.cleanedDayCount = java.time.temporal.ChronoUnit.DAYS.between(lastCleanedAt, LocalDate.now());
         }else this.cleanedDayCount = 0;
     }
 

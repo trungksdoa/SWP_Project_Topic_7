@@ -18,6 +18,7 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -68,6 +69,7 @@ public class Pond {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    private LocalDate date;
 
     @PrePersist
     protected void onCreate() {
@@ -92,11 +94,5 @@ public class Pond {
     }
 
 
-    public void increaseFishCount() {
-        fishCount++;
-    }
 
-    public void decreaseFishCount() {
-        fishCount--;
-    }
 }

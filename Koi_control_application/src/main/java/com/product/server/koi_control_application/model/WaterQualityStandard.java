@@ -108,8 +108,12 @@ public class WaterQualityStandard {
             this.salt03 = new BigDecimal("0.003").multiply(volumeInLiters).setScale(2, RoundingMode.HALF_UP);
             this.salt05 = new BigDecimal("0.005").multiply(volumeInLiters).setScale(2, RoundingMode.HALF_UP);
             this.salt07 = new BigDecimal("0.007").multiply(volumeInLiters).setScale(2, RoundingMode.HALF_UP);
-            this.chlorineMin = new BigDecimal("0.0001").multiply(volumeInLiters).setScale(2, RoundingMode.HALF_UP);
-            this.chlorineMax = new BigDecimal("0.0003").multiply(volumeInLiters).setScale(2, RoundingMode.HALF_UP);
+            this.chlorineMin =volumeInLiters.multiply(new BigDecimal("0.1"))
+                    .multiply(BigDecimal.ONE.divide(new BigDecimal("70"), 10, RoundingMode.HALF_UP))
+                    .setScale(2, RoundingMode.HALF_UP);
+            this.chlorineMax = volumeInLiters.multiply(new BigDecimal("0.3"))
+                    .multiply(BigDecimal.ONE.divide(new BigDecimal("70"), 10, RoundingMode.HALF_UP))
+                    .setScale(2, RoundingMode.HALF_UP);
         }
         this.amountFedStandard = new BigDecimal("0.00");
         if (koiFishs != null) {

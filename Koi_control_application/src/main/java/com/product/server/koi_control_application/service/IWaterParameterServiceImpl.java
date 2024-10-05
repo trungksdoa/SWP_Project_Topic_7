@@ -47,6 +47,8 @@ public class IWaterParameterServiceImpl implements IWaterParameterService {
             if (waterParameter == null) {
                 throw new NotFoundException("WaterParameter not found for pondId: ");
             }
+            waterParameter.getDaysSinceLastCleaned();
+            waterParameterRepository.save(waterParameter);
             return waterParameter;
         }
 
