@@ -62,14 +62,18 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .pondId(koiFish.getPondId())
                 .date(koiFish.getDate())
                 .build());
-
-        return saved;
+        evaluateAndUpdateKoiGrowthStatus(saved.getId());
+        return getKoiFishsaved(saved.getId());
     }
-
-
 
     @Override
     public KoiFish getKoiFish(int id) {
+        KoiFish koiFish = koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
+        return koiFish;
+    }
+
+    @Override
+    public KoiFish getKoiFishsaved(int id) {
         KoiFish koiFish = koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
         evaluateAndUpdateKoiFishStatus(koiFish);
         koiFish.countageMonth();
@@ -83,7 +87,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         Pageable pageable = PageRequest.of(page, size);
         Page<KoiFish> koiFishs = koiFishRepository.findAllByPondId(pondId, pageable);
         for (KoiFish koiFish : koiFishs) {
-            evaluateAndUpdateKoiFishStatus(koiFish);
             koiFish.countageMonth();
             koiFishRepository.save(koiFish);
         }
@@ -138,10 +141,12 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
                 .date(koiFish.getDate())
                 .build());
+        evaluateAndUpdateKoiGrowthStatus(id);
         if ((request.getPondId()!= 0)){
             koiFish.setPondId(request.getPondId());
         }
-        return koiFishRepository.save(koiFish);
+        koiFishRepository.save(koiFish);
+        return getKoiFishsaved(id);
     }
 
     @Override
@@ -149,7 +154,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         Pageable pageable = PageRequest.of(page, size);
         Page<KoiFish> koiFishs = koiFishRepository.findAllByUserId(userId, pageable);
         for (KoiFish koiFish : koiFishs) {
-            evaluateAndUpdateKoiFishStatus(koiFish);
             koiFish.countageMonth();
             koiFishRepository.save(koiFish);
         }
@@ -170,7 +174,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     @Override
     public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        evaluateAndUpdateKoiGrowthStatus(koiId);
         return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
 
@@ -231,7 +234,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public List<KoiFish> getKoiFishsByPondId(int pondId) {
         List<KoiFish> koiFishs = koiFishRepository.findAllByPondId(pondId);
         for (KoiFish koiFish : koiFishs) {
-            evaluateAndUpdateKoiFishStatus(koiFish);
             koiFish.countageMonth();
             koiFishRepository.save(koiFish);
         }
@@ -242,7 +244,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public List<KoiFish> getKoiFishsByUserId(int userId) {
         List<KoiFish> koiFishs = koiFishRepository.findAllByUserId(userId);
         for (KoiFish koiFish : koiFishs) {
-            evaluateAndUpdateKoiFishStatus(koiFish);
             koiFish.countageMonth();
             koiFishRepository.save(koiFish);
         }
@@ -256,7 +257,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public List<KoiGrowthHistory> getGrowthHistorys(int koiId) {
-        evaluateAndUpdateKoiGrowthStatus(koiId);
         return koiGrowthHistoryRepository.findAllByKoiId(koiId);
     }
 

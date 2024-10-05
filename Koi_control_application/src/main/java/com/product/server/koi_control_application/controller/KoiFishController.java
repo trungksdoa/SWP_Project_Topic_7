@@ -74,7 +74,7 @@ public class KoiFishController {
 
     @GetMapping("{koiFishId}")
     public ResponseEntity<BaseResponse> getKoi(@PathVariable("koiFishId") int koiFishId) {
-        KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
+        KoiFish koiFish1 = iKoiFishService.getKoiFishsaved(koiFishId);
         BaseResponse response = BaseResponse.builder()
                 .data(koiFish1)
                 .message("Get fish  successfully")
@@ -106,7 +106,7 @@ public class KoiFishController {
 
     @DeleteMapping("{koiFishId}")
     public ResponseEntity<BaseResponse> deleteKoiFish(@PathVariable("koiFishId") int koiFishId) {
-        KoiFish koiFish1 = iKoiFishService.getKoiFish(koiFishId);
+        KoiFish koiFish1 = iKoiFishService.getKoiFishsaved(koiFishId);
         iKoiFishService.deleteKoiFish(koiFishId);
 
         BaseResponse response = BaseResponse.builder()

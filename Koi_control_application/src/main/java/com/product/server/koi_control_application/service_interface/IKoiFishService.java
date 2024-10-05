@@ -11,6 +11,7 @@ import java.util.List;
 public interface IKoiFishService {
     KoiFish addKoiFish( KoiFish koiFish);
     KoiFish getKoiFish(int id);
+    KoiFish getKoiFishsaved(int id);
     Page<KoiFish> getKoiFishs(int page, int size);
     Page<KoiFish> getKoiFishsByPondId(int pondId, int page, int size);
     Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size);
