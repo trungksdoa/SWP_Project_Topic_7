@@ -25,4 +25,5 @@ public interface IKoiFishService {
     List<KoiGrowthHistory> getGrowthHistorys(int koiId);
     KoiGrowthHistory addGrowthHistory(KoiGrowthHistory koiGrowthHistory);
     void evaluateAndUpdateKoiGrowthStatus(int koiId);
+    void evaluateAndUpdateKoiFishStatus(KoiFish koiFish);
 }

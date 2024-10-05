@@ -70,22 +70,29 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public KoiFish getKoiFish(int id) {
-        return koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
+        KoiFish koiFish = koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
+        evaluateAndUpdateKoiFishStatus(koiFish);
+        koiFish.countageMonth();
+        koiFishRepository.save(koiFish);
+        return koiFish;
     }
 
     @Override
     public Page<KoiFish> getKoiFishsByPondId(int pondId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return koiFishRepository.findAllByPondId(pondId, pageable);
+        Page<KoiFish> koiFishs = koiFishRepository.findAllByPondId(pondId, pageable);
+        for (KoiFish koiFish : koiFishs) {
+            evaluateAndUpdateKoiFishStatus(koiFish);
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        return koiFishs;
     }
 
     @Override
     public void deleteKoiFish(int id) {
         KoiFish koiFish = getKoiFish(id);
-        Pond currPond = pondRepository.findById(koiFish.getPondId()).orElseThrow(() -> new NotFoundException("Pond not found"));
-        currPond.decreaseFishCount();
-        pondRepository.save(currPond);
         koiFishRepository.deleteById(id);
     }
 
@@ -140,7 +147,13 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     @Override
     public Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return koiFishRepository.findAllByUserId(userId, pageable);
+        Page<KoiFish> koiFishs = koiFishRepository.findAllByUserId(userId, pageable);
+        for (KoiFish koiFish : koiFishs) {
+            evaluateAndUpdateKoiFishStatus(koiFish);
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        return koiFishs;
     }
 
     @Override
@@ -157,20 +170,23 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     @Override
     public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        evaluateAndUpdateKoiGrowthStatus(koiId);
         return koiGrowthHistoryRepository.findAllByKoiId(koiId, pageable);
     }
 
     @Override
     public void evaluateAndUpdateKoiGrowthStatus(int koiId) {
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
-        if (koiGrowthHistories == null || koiGrowthHistories.isEmpty()) {
-            throw new IllegalArgumentException("Không có dữ liệu phát triển cho cá Koi với ID: " + koiId);
+        if (koiGrowthHistories.size() == 1) {
+            koiGrowthHistories.get(0).setStatus(4);
+            koiGrowthHistoryRepository.save(koiGrowthHistories.get(0));
+            return;
         }
         KoiGrowthHistory previousHistory = null;
         for (KoiGrowthHistory currentHistory : koiGrowthHistories) {
             if (previousHistory != null) {
                 // So sánh với bản ghi trước đó
-                int ageMonth = currentHistory.getAgeMonthHis();
+                double ageMonth = currentHistory.getAgeMonthHis();
                 double previousLength = previousHistory.getLength() != null ? previousHistory.getLength().doubleValue() : 0.0;
                 double currentLength = currentHistory.getLength() != null ? currentHistory.getLength().doubleValue() : 0.0;
                 // Tính sự thay đổi kích thước
@@ -179,13 +195,12 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 double expectedGrowth = calculateExpectedGrowth(previousLength, previousHistory.getAgeMonthHis(), ageMonth);
                 // Đánh giá từng lần phát triển và cập nhật status
                 if (growth < expectedGrowth * 0.9) {
-                    currentHistory.setStatus("Tăng trưởng chậm");
+                    currentHistory.setStatus(1);
                 } else if (growth > expectedGrowth * 1.1) {
-                    currentHistory.setStatus("Tăng trưởng nhanh");
+                    currentHistory.setStatus(2);
                 } else {
-                    currentHistory.setStatus("Tăng trưởng bình thường");
+                    currentHistory.setStatus(3);
                 }
-
                 // Lưu bản ghi đã cập nhật lại vào cơ sở dữ liệu
                 koiGrowthHistoryRepository.save(currentHistory);
             }
@@ -194,10 +209,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         }
     }
 
-    private double calculateExpectedGrowth(double previousLength, int previousAgeMonth, int currentAgeMonth) {
+    private double calculateExpectedGrowth(double previousLength, double previousAgeMonth, double currentAgeMonth) {
         double expectedGrowth = 0.0;
 
-        for (int ageMonth = previousAgeMonth + 1; ageMonth <= currentAgeMonth; ageMonth++) {
+        for (double ageMonth = previousAgeMonth + 1; ageMonth <= currentAgeMonth; ageMonth++) {
             if (ageMonth <= 2) {
                 expectedGrowth += previousLength * (2 - 1) / 2;  // Tăng gấp đôi kích cỡ trong 2 tháng
             } else if (ageMonth <= 6) {
@@ -214,12 +229,24 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public List<KoiFish> getKoiFishsByPondId(int pondId) {
-        return List.of();
+        List<KoiFish> koiFishs = koiFishRepository.findAllByPondId(pondId);
+        for (KoiFish koiFish : koiFishs) {
+            evaluateAndUpdateKoiFishStatus(koiFish);
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        return koiFishs;
     }
 
     @Override
     public List<KoiFish> getKoiFishsByUserId(int userId) {
-        return List.of();
+        List<KoiFish> koiFishs = koiFishRepository.findAllByUserId(userId);
+        for (KoiFish koiFish : koiFishs) {
+            evaluateAndUpdateKoiFishStatus(koiFish);
+            koiFish.countageMonth();
+            koiFishRepository.save(koiFish);
+        }
+        return koiFishs;
     }
 
     @Override
@@ -229,6 +256,48 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public List<KoiGrowthHistory> getGrowthHistorys(int koiId) {
-        return List.of();
+        evaluateAndUpdateKoiGrowthStatus(koiId);
+        return koiGrowthHistoryRepository.findAllByKoiId(koiId);
+    }
+
+    @Override
+    public void evaluateAndUpdateKoiFishStatus(KoiFish koiFish) {
+
+        List<KoiGrowthHistory> koiGrowthHistories = getGrowthHistorys(koiFish.getId());
+        if (koiGrowthHistories.size() == 1) {
+            koiFish.setStatus(5);
+            koiFishRepository.save(koiFish);
+            return;
+        }
+        boolean hasSlowGrowth = false;
+        boolean hasFastGrowth = false;
+        boolean hasNormalGrowth = false;
+
+        for (KoiGrowthHistory history : koiGrowthHistories) {
+
+            int status = history.getStatus();
+            switch (status){
+                case 1:
+                    hasSlowGrowth = true;
+                    break;
+                case 2:
+                    hasFastGrowth = true;
+                    break;
+            }
+
+        }
+        int finalStatus;
+        if (hasSlowGrowth && hasFastGrowth) {
+            finalStatus = 1; // Ưu tiên trạng thái chậm nếu có cả nhanh và chậm
+        } else if (hasSlowGrowth) {
+            finalStatus = 2; // Tăng trưởng chậm
+        } else if (hasFastGrowth) {
+            finalStatus = 3; // Tăng trưởng nhanh
+        } else {
+            finalStatus = 4; // Tăng trưởng bình thường
+        }
+        koiFish.setStatus(finalStatus);
+        koiFishRepository.save(koiFish);
+
     }
 }

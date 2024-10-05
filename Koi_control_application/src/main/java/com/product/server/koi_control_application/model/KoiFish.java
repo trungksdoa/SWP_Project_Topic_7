@@ -52,12 +52,12 @@ public class KoiFish {
     private Boolean sex;
 
     @Column(name = "age_month")
-    private double ageMonth;
+    private Double ageMonth;
 
     @NotNull(message = "Purchase price is required")
     @Positive(message = "Purchase price must be positive")
     @Column(nullable = false, precision = 10, scale = 2)
-    private int purchasePrice;
+    private Integer purchasePrice;
 
     @Column(name = "user_id")
     private int userId;
@@ -90,6 +90,8 @@ public class KoiFish {
 
     private LocalDate date;
 
+    private Integer status;
+
     public void countageMonth() {
         if (dateOfBirth != null) {
             Period period = Period.between(dateOfBirth, LocalDate.now());
@@ -99,14 +101,14 @@ public class KoiFish {
             BigDecimal roundedMonths = BigDecimal.valueOf(totalMonths).setScale(1, RoundingMode.HALF_UP);
             this.ageMonth = roundedMonths.doubleValue();
         } else {
-            this.ageMonth = 0;
+            this.ageMonth = (double) 0;
         }
     }
 
     public void dateOfBirthCal() {
         if(ageMonth != 0 ) {
             LocalDate currentDate = LocalDate.now();
-            int fullMonths = (int) ageMonth;
+            int fullMonths = ageMonth.intValue();
             double fractionalMonths = ageMonth - fullMonths;
             LocalDate dateOfBirth = currentDate.minusMonths(fullMonths);
             if (fractionalMonths > 0) {

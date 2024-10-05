@@ -54,7 +54,7 @@ public class KoiGrowthHistory {
     private Integer pondId;
 
     @Column(name = "age_month_his")
-    private int ageMonthHis;
+    private Double ageMonthHis;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -69,7 +69,7 @@ public class KoiGrowthHistory {
     private LocalDateTime updatedAt;
 
     @Column(name = "status")
-    private String status;
+    private Integer status;
 
     @PrePersist
     protected void onCreate() {
@@ -80,11 +80,10 @@ public class KoiGrowthHistory {
     public void countageMonth() {
         if(dateOfBirth != null) {
             Period period = Period.between(dateOfBirth,date);
-            this.ageMonthHis = (period.getYears()*12)+ period.getMonths();
+            this.ageMonthHis = (double)(period.getYears()*12)+ period.getMonths();
         }else {
-            this.ageMonthHis = 0;
+            this.ageMonthHis =(double) 0;
         }
-
     }
 
     @PreUpdate
