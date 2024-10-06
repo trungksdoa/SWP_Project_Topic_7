@@ -4,7 +4,10 @@ public enum OrderCode {
     //Control in customer ui
     PENDING("PENDING"),
     SUCCESS("SUCCESS"),
-    CANCELLED("CANCELLED");
+    CANCELLED("CANCELLED"),
+    RECEIVED("RECEIVED"),  // Added status
+    CONFIRMED("CONFIRMED"); // Added status
+
 
     private final String value;
 

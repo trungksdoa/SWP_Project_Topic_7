@@ -2,11 +2,13 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.momo.*;
 import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
+import com.product.server.koi_control_application.pojo.request.OrderVerifyDTO;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.ICategoryService;
 import com.product.server.koi_control_application.service_interface.IOrderService;
@@ -156,5 +158,25 @@ public class OrderController {
         });
         return momoProducts;
     }
+
+    @PostMapping("/receive-order")
+    public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, OrderVerifyDTO data) {
+        //To confirm that the user is an admin
+        jwtUtil.getUserIdFromToken(request);
+        int orderId = data.getOrderId();
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.RECEIVED.getValue());
+        return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
+    }
+
+    @PostMapping("/confirm-order")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
+         jwtUtil.getUserIdFromToken(request);
+        int orderId = data.getOrderId();
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.CONFIRMED.getValue());
+        return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
+    }
+
+
 
 }
