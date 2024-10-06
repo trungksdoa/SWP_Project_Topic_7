@@ -75,8 +75,7 @@ const Checkout = () => {
 
   return (
     <div className="w-[60%] my-[40px] mx-auto">
-      <h2 className="text-lg font-bold">Ordered Products</h2>
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
       <FormCheckout totalItems={totalItems} />
     </div>
   );

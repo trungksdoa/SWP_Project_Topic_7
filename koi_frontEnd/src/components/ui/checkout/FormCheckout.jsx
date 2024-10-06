@@ -33,7 +33,7 @@ const FormCheckout = ({ totalItems }) => {
   });
   return (
     <div>
-      <h2 className="text-lg font-bold">Delivery Address</h2>
+      <h2 className="text-lg font-bold mb-[30px]">Delivery Address</h2>
       <Form
         layout="vertical"
         className="mb-4"

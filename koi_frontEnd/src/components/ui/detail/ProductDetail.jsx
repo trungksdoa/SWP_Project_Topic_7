@@ -19,7 +19,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1); // Mặc định là 1
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
@@ -41,9 +41,7 @@ const ProductDetail = () => {
     refetchCart();
 
     // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-    const isProductInCart = carts?.find(
-      (item) => item.productId === product?.id
-    );
+    const isProductInCart = carts?.find((item) => item.productId === product?.id);
     console.log(isProductInCart);
 
     if (isProductInCart) {
@@ -71,9 +69,7 @@ const ProductDetail = () => {
 
     console.log(payload);
 
-    const isProductInCart = carts?.find(
-      (item) => item.productId === product.id
-    );
+    const isProductInCart = carts?.find((item) => item.productId === product.id);
     console.log(isProductInCart);
 
     if (isProductInCart) {
@@ -109,8 +105,9 @@ const ProductDetail = () => {
           refetchCart();
           toast.success("Product added to cart");
         },
-        onError: () => {
-          toast.error("Failed to add product to cart");
+        onError: (error) => {
+          console.log(error);
+          toast.error(error?.response?.data?.message);
         },
       });
     }
@@ -127,22 +124,28 @@ const ProductDetail = () => {
   return (
     <div>
       <Breadcrumb className="mt-[15px]">
-        <Breadcrumb.Item className="cursor-pointer" onClick={()=>{
-          navigate(PATH.HOME)
-        }}>Home</Breadcrumb.Item>
-        <Breadcrumb.Item className="cursor-pointer" onClick={() => {
-          navigate(PATH.STORE)
-        }}>Store</Breadcrumb.Item>
+        <Breadcrumb.Item
+          className="cursor-pointer"
+          onClick={() => {
+            navigate(PATH.HOME);
+          }}
+        >
+          Home
+        </Breadcrumb.Item>
+        <Breadcrumb.Item
+          className="cursor-pointer"
+          onClick={() => {
+            navigate(PATH.STORE);
+          }}
+        >
+          Store
+        </Breadcrumb.Item>
         <Breadcrumb.Item>Product Detail</Breadcrumb.Item>
       </Breadcrumb>
       <div className="container w-[60%] mx-auto my-[60px]">
         <div className="grid grid-cols-2 gap-[60px]">
           <div className="col-span-1">
-            <img
-              src={product?.imageUrl}
-              className="w-[80%]"
-              alt={product?.name}
-            />
+            <img src={product?.imageUrl} className="w-[80%]" alt={product?.name} />
           </div>
           <div className="col-span-1">
             <h1 className="text-black font-semibold">{product?.name}</h1>
@@ -161,13 +164,19 @@ const ProductDetail = () => {
                 }}
               />
               <span className="mx-[10px]">|</span>
-              <Button
-                loading={mutate.isPending}
-                className="bg-black text-white px-[20px] py-[10px] rounded-md hover:bg-black transition-all duration-300"
-                onClick={handleAddToCart}
-              >
-                Add to cart
-              </Button>
+              {product?.disabled || product?.stock == 0 ? (
+                <Button className="bg-gray-300 text-white px-[20px] py-[10px] hover:!bg-gray-300 hover:!border-none hover:!text-white rounded-md cursor-not-allowed">
+                  Out of stock
+                </Button>
+              ) : (
+                <Button
+                  loading={mutate.isPending}
+                  className="bg-black text-white px-[20px] py-[10px] rounded-md hover:bg-black transition-all duration-300"
+                  onClick={handleAddToCart}
+                >
+                  Add to cart
+                </Button>
+              )}
             </div>
             <div className="my-[20px]">
               <span className="font-bold mr-[6px]">Description: </span>

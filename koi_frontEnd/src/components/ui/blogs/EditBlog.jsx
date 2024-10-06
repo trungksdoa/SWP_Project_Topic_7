@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Input, Button, Form } from "antd";
 import { useGetBlogById } from "../../../hooks/blogs/useGetBlogById";
@@ -8,7 +8,7 @@ import { useFormik } from "formik";
 const EditBlog = () => {
   const { id: blogId } = useParams();
   const parseId = parseInt(blogId);
-  const { data: blog } = useGetBlogById(parseId);
+  const { data: blog, refetch, isPending } = useGetBlogById(parseId);
   const [imgSrc, setImgSrc] = useState("");
   const mutation = usePutBlog();
   console.log(blog?.id);
@@ -83,6 +83,10 @@ const EditBlog = () => {
       formik.setFieldValue(fieldName, file); // Set giá trị cho field tương ứng (headerImage hoặc bodyImage)
     }
   };
+
+  useEffect(() => {
+    refetch()
+  }, [parseId])
   return (
     <div>
       <Form

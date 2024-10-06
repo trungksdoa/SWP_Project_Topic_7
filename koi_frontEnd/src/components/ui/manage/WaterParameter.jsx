@@ -363,10 +363,10 @@ const WaterParameter = () => {
                       <DatePicker
                         value={
                           formik.values.lastCleanedAt
-                            ? dayjs(formik.values.lastCleanedAt, "DD/MM/YYYY")
+                            ? dayjs(formik.values.lastCleanedAt, "YYYY-MM-DD")
                             : null
                         }
-                        format="DD/MM/YYYY"
+                        format="YYYY-MM-DD"
                         onChange={handleChangeDatePicker}
                       />
                     </Form.Item>

@@ -103,8 +103,8 @@ const router = [
       },
       {
         path: PATH.ADD_BLOG,
-        element: <AddBlogsPage />
-      }
+        element: <AddBlogsPage />,
+      },
     ],
   },
   {
