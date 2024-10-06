@@ -49,6 +49,8 @@ public class Product {
 
     private String slug;
 
+    private boolean disabled;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

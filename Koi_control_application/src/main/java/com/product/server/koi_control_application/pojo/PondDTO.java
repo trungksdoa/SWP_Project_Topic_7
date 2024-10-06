@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,10 +18,6 @@ public class PondDTO {
     private BigDecimal width;
     private BigDecimal length;
     private BigDecimal depth;
-    private int volume;
-
-
-    private int fishCount;
-
+    private LocalDate date;
     private int userId;
 }

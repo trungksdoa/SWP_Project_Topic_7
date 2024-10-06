@@ -2,13 +2,12 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.BadRequestException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.enums.ORDER;
-import com.product.server.koi_control_application.model.Cart;
+import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.OrderItems;
 import com.product.server.koi_control_application.model.Orders;
 import com.product.server.koi_control_application.model.Product;
-import com.product.server.koi_control_application.pojo.request.OrderProductDTO;
-import com.product.server.koi_control_application.repository.OrderItemsRepository;
+import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
+import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.OrderRepository;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.service_interface.IOrderService;
@@ -32,14 +31,24 @@ public class OrderServiceImpl implements IOrderService {
 
 
     @Override
-    public Orders createOrder(int userId, OrderProductDTO orderProductDTO) {
+    public Orders createOrder(int userId, OrderRequestDTO orderRequestDTO) {
         // Create a new order
-        List<Cart> cartItems = cartService.getCart(userId);
+        List<CartProductDTO> cartItems = cartService.getCart(userId);
 
+        // Check if cart is empty
         if (cartItems.isEmpty()) {
             throw new NotFoundException("Your cart may be empty, please add some products to cart, then try again");
         }
-        Orders order = createInitialOrder(userId, orderProductDTO);
+
+        // Check if any product in cart is out of stock
+        if (productService.isProductIsDisabledFromCart(cartItems)) {
+            throw new BadRequestException("Sorry, some products in your cart are invalid , please remove them and try again");
+        }
+
+        // Check if any product in cart is out of stock
+        Orders order = createInitialOrder(userId, orderRequestDTO);
+
+        // Process order items
         return orderRepository.save(processOrderItems(order, cartItems));
     }
 
@@ -64,7 +73,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelPendingOrder(int userId, int orderId) {
         Orders order = orderRepository.findByUserIdAndId(userId, orderId).orElseThrow(() -> new NotFoundException("Order not found  while cancle with" + orderId));
 
-        if (!order.getStatus().equals(ORDER.PENDING.getValue())) {
+        if (!order.getStatus().equals(OrderCode.PENDING.getValue())) {
             throw new BadRequestException("Order cannot be cancelled");
         }
 
@@ -75,7 +84,7 @@ public class OrderServiceImpl implements IOrderService {
     public void cancelOrderByAdmin(int orderId, String message) {
         Orders order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("(ADMIN) Order not found by " + orderId));
 
-        order.setStatus(ORDER.CANCELLED.getValue());
+        order.setStatus(OrderCode.CANCELLED.getValue());
         order.setResponseFromAdmin(message);
         orderRepository.save(order);
     }
@@ -104,13 +113,13 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private Orders createInitialOrder(int userId, OrderProductDTO orderProductDTO) {
+    private Orders createInitialOrder(int userId, OrderRequestDTO orderRequestDTO) {
         return Orders.builder()
                 .userId(userId)
-                .status(ORDER.PENDING.getValue())
-                .fullName(orderProductDTO.getFullName())
-                .address(orderProductDTO.getAddress())
-                .phone(orderProductDTO.getPhone())
+                .status(OrderCode.PENDING.getValue())
+                .fullName(orderRequestDTO.getFullName())
+                .address(orderRequestDTO.getAddress())
+                .phone(orderRequestDTO.getPhone())
                 .items(new HashSet<>())
                 .build();
     }
@@ -123,14 +132,15 @@ public class OrderServiceImpl implements IOrderService {
                 .build();
     }
 
-    private Orders processOrderItems(Orders order, List<Cart> cartItems) {
-        for (Cart cart : cartItems) {
+    private Orders processOrderItems(Orders order, List<CartProductDTO> cartItems) {
+        for (CartProductDTO cart : cartItems) {
             Product product = productService.getProduct(cart.getProductId());
-            productService.decreaseProductQuantity(product.getId(), cart.getQuantity());
             OrderItems orderItem = createOrderItem(order, product, cart.getQuantity());
             order.getItems().add(orderItem);
             order.setTotalAmount(order.getTotalAmount() + product.getPrice() * cart.getQuantity());
+            productService.decreaseProductQuantity(product.getId(), cart.getQuantity());
         }
+        System.out.println(order);
         return orderRepository.save(order);
     }
 
@@ -139,7 +149,7 @@ public class OrderServiceImpl implements IOrderService {
             Product product = productService.getProduct(item.getProductId().getId());
             productService.increaseProductQuantity(product.getId(), item.getQuantity());
         }
-        order.setStatus(ORDER.CANCELLED.getValue());
+        order.setStatus(OrderCode.CANCELLED.getValue());
         orderRepository.save(order);
     }
 }

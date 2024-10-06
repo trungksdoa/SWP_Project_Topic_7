@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PAYMENT {
+public enum PaymentCode {
     PENDING("PENDING"),
     PAID("PAID"),
     FAILED("FAILED");

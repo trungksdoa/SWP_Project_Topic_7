@@ -41,13 +41,13 @@ public class IPondServiceImpl implements IPondService {
         if (iPackageService.checkPondLimit(pond.getUserId(), user.getAUserPackage()))
             throw new NotFoundException("User package limit exceeded.");
 
-        pondRepository.save(pond);
+        Pond saved = pondRepository.save(pond);
         WaterQualityStandard  waterQualityStandard = new WaterQualityStandard();
         waterQualityStandard.setPondId(pond.getId());
         waterQualityStandard.calculateValues(pond.getVolume(),koiFishRepository.findAllByPondId(pond.getId()));
         iWaterParameterService.saveWaterQualityStandard(waterQualityStandard);
 
-        return pondRepository.save(pond);
+        return getPond(saved.getId());
 
     }
 

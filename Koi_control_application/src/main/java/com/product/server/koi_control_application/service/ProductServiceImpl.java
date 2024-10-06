@@ -2,8 +2,11 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Product;
+import com.product.server.koi_control_application.pojo.OutStockProduct;
+import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.CategoryRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
 import com.product.server.koi_control_application.service_interface.IImageService;
@@ -17,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -36,12 +41,38 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public void decreaseProductQuantity(int productId, int quantity) {
         Product product = getProduct(productId);
-        if(product.getStock() < quantity) {
-            throw new NotFoundException("Not enough stock for product: " + product.getName());
-        }
         save(product.decreaseStock(quantity));
     }
 
+    @Override
+    public OutStockProduct checkProductOutStock(List<CartProductDTO> cart) {
+        OutStockProduct outStockProduct = new OutStockProduct();
+        outStockProduct.setOutStockProducts(new ArrayList<>());
+        for (CartProductDTO cartItem : cart) {
+//            Product product = getProduct(cartItem.getProductId());
+            if (cartItem.getStock() < cartItem.getQuantity()) {
+                Product product = getProduct(cartItem.getProductId());
+                outStockProduct.getOutStockProducts().add(product);
+            }
+        }
+        return outStockProduct;
+    }
+
+    @Override
+    public boolean isProductIsDisabledFromCart(List<CartProductDTO> cart) {
+       return cart.stream().anyMatch(CartProductDTO::isDisabled);
+    }
+
+
+    @Override
+    public void setDisableProduct(OutStockProduct outStockProduct) {
+        List<Product> outStockProducts = outStockProduct.getOutStockProducts();
+        for (Product product : outStockProducts) {
+            Product product1 = getProduct(product.getId());
+            product1.setDisabled(true);
+            save(product1);
+        }
+    }
 
     @Override
     public void increaseProductQuantity(int productId, int quantity) {
