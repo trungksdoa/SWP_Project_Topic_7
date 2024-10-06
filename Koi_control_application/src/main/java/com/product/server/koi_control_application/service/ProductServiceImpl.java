@@ -2,7 +2,6 @@ package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
-import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.OutStockProduct;
@@ -13,15 +12,17 @@ import com.product.server.koi_control_application.service_interface.IImageServic
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -49,7 +50,6 @@ public class ProductServiceImpl implements IProductService {
         OutStockProduct outStockProduct = new OutStockProduct();
         outStockProduct.setOutStockProducts(new ArrayList<>());
         for (CartProductDTO cartItem : cart) {
-//            Product product = getProduct(cartItem.getProductId());
             if (cartItem.getStock() < cartItem.getQuantity()) {
                 Product product = getProduct(cartItem.getProductId());
                 outStockProduct.getOutStockProducts().add(product);
@@ -73,11 +73,24 @@ public class ProductServiceImpl implements IProductService {
             save(product1);
         }
     }
+    @Override
+    @Retryable(value = {OptimisticLockingFailureException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional
+    public boolean checkAndUpdateStock(int productId, int requestedQuantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+
+        if (product.getStock() >= requestedQuantity) {
+            product.setStock(product.getStock() - requestedQuantity);
+            productRepository.save(product);
+            return true;
+        }
+        return false;
+    }
 
     @Override
-    public void increaseProductQuantity(int productId, int quantity) {
-        Product product = getProduct(productId).increaseStock(quantity);
-        save(product);
+    public void increaseProductQuantity(Product product, int quantity) {
+        save(product.increaseStock(quantity));
     }
 
     @Override

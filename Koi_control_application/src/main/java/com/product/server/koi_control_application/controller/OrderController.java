@@ -168,12 +168,12 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
-    @PostMapping("/confirm-order")
+    @PostMapping("/send-order")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
          jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
-        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.CONFIRMED.getValue());
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SEND.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 

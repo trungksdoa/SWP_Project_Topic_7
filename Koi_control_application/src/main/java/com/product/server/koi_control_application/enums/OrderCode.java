@@ -3,10 +3,10 @@ package com.product.server.koi_control_application.enums;
 public enum OrderCode {
     //Control in customer ui
     PENDING("PENDING"),
-    SUCCESS("SUCCESS"),
     CANCELLED("CANCELLED"),
-    RECEIVED("RECEIVED"),  // Added status
-    CONFIRMED("CONFIRMED"); // Added status
+    SUCCESS("SUCCESS"),
+    SEND("SEND"), // Added status
+    RECEIVED("RECEIVED");  // Added status
 
 
     private final String value;

@@ -16,4 +16,8 @@ public interface IPaymentService {
     void updatePaymentStatus(int referenceId,String referenceName, String paymentStatus);
     void updatePaymentStatusFail(int referenceId, String referenceName,String paymentStatus, String description);
     void clearPaymentStatusByDate(LocalDateTime fromDate, LocalDateTime toDate);
+
+    String  getPaymentGatewayUrl(int referenceId, String referenceName);
+
+    String getPaymentGatewayUrl(int referenceId, String referenceName, int userId);
 }
