@@ -51,6 +51,9 @@ public class Product {
 
     private boolean disabled;
 
+    @Version
+    private Long version;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

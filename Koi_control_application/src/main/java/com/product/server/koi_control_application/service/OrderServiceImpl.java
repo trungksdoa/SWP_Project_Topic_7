@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.custom_exception.BadRequestException;
+import com.product.server.koi_control_application.custom_exception.InsufficientStockException;
 import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.OrderItems;
@@ -13,10 +14,14 @@ import com.product.server.koi_control_application.service_interface.ICartService
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +36,8 @@ public class OrderServiceImpl implements IOrderService {
 
 
     @Override
+    @Transactional
+    @Retryable(value = {OptimisticLockingFailureException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public Orders createOrder(int userId, OrderRequestDTO orderRequestDTO) {
         // Create a new order
         List<CartProductDTO> cartItems = cartService.getCart(userId);
@@ -112,7 +119,6 @@ public class OrderServiceImpl implements IOrderService {
         return orderRepository.findByUserId(userId);
     }
 
-
     private Orders createInitialOrder(int userId, OrderRequestDTO orderRequestDTO) {
         return Orders.builder()
                 .userId(userId)
@@ -132,22 +138,28 @@ public class OrderServiceImpl implements IOrderService {
                 .build();
     }
 
-    private Orders processOrderItems(Orders order, List<CartProductDTO> cartItems) {
+
+    @Transactional
+    public Orders processOrderItems(Orders order, List<CartProductDTO> cartItems) {
         for (CartProductDTO cart : cartItems) {
             Product product = productService.getProduct(cart.getProductId());
+
+            if (!productService.checkAndUpdateStock(cart.getProductId(), cart.getQuantity())) {
+                throw new InsufficientStockException("Not enough stock for product: " + cart.getProductId());
+            }
+
             OrderItems orderItem = createOrderItem(order, product, cart.getQuantity());
             order.getItems().add(orderItem);
             order.setTotalAmount(order.getTotalAmount() + product.getPrice() * cart.getQuantity());
-            productService.decreaseProductQuantity(product.getId(), cart.getQuantity());
         }
-        System.out.println(order);
+
         return orderRepository.save(order);
     }
 
     private void cancelOrder(Orders order) {
         for (OrderItems item : order.getItems()) {
             Product product = productService.getProduct(item.getProductId().getId());
-            productService.increaseProductQuantity(product.getId(), item.getQuantity());
+            productService.increaseProductQuantity(product, item.getQuantity());
         }
         order.setStatus(OrderCode.CANCELLED.getValue());
         orderRepository.save(order);
