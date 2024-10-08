@@ -7,7 +7,6 @@ import com.product.server.koi_control_application.repository.OrderRepository;
 import com.product.server.koi_control_application.service_helper.interfaces.IOrderHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
