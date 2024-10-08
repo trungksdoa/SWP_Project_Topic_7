@@ -38,6 +38,7 @@ import EditBlogPage from "../pages/EditBlogPage";
 import EditBlog from "../components/ui/blogs/EditBlog";
 import EditPackages from "../components/ui/admin/managePackages/EditPackages";
 import AddBlogsPage from "../pages/AddBlogsPage";
+import ManageOrder from "../components/ui/admin/ManageOrder";
 
 const router = [
   {
@@ -178,6 +179,10 @@ const router = [
           {
             path: `${PATH.EDIT_CATEGORY}/:id`,
             element: <EditCategory />,
+          },
+          {
+            path: PATH.MANAGE_ORDER,
+            element: <ManageOrder />
           },
         ],
       },

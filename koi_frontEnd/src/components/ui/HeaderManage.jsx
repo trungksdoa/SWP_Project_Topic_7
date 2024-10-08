@@ -88,9 +88,9 @@ const HeaderManage = () => {
                 </li>
               </ul>
             </li>
-            <li className="flex menu_2 mr-[100px] cursor-pointer py-[20px] relative items-center text-white">
+            <NavLink to={PATH.WATER_PARAMETER} className="flex menu_2 mr-[100px] cursor-pointer py-[20px] relative items-center text-white">
               {t("Calculator")}
-              <ul className="submenu_2">
+              {/* <ul className="submenu_2">
                 <li className="flex text-white">
                   <NavLink
                     rel="noopener noreferrer"
@@ -118,8 +118,8 @@ const HeaderManage = () => {
                     {t("Salt Calculator")}
                   </NavLink>
                 </li>
-              </ul>
-            </li>
+              </ul> */}
+            </NavLink>
             <li className=" py-[20px]">
               <NavLink to={PATH.PACKAGES}>
                 <button className="custom-button">Upgrade Account</button>

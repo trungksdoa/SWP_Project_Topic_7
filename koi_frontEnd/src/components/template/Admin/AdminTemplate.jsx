@@ -82,6 +82,11 @@ const AdminTemplate = () => {
                 {t("Manage Category")}
               </NavLink>
             </Menu.Item>
+            <Menu.Item className="text-white" key={9} icon={<UnorderedListOutlined  style={{color: "white"}}/>}>
+              <NavLink key={6} to={PATH.MANAGE_ORDER} className="!text-white">
+                {t("Manage Order")}
+              </NavLink>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout>
