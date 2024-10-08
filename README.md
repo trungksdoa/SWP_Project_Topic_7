@@ -35,22 +35,22 @@ https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/
    - Thông tin: tên, hình ảnh, vóc dáng, tuổi, kích thước, trọng lượng, giới tính, giống, nguồn gốc, giá bán, hồ hiện tại
    - Cập nhật thông tin phát triển theo thời gian
    - Hiển thị biểu đồ xu hướng phát triển (optional)
+     
+     a. Tăng trưởng kích thước: Chiều dài của cá theo thời gian, Trọng lượng của cá theo thời gian
 
-a. Tăng trưởng kích thước: Chiều dài của cá theo thời gian, Trọng lượng của cá theo thời gian
+     b. Màu sắc và hoa văn: Sự thay đổi trong màu sắc và độ sắc nét của hoa văn trên cơ thể cá
 
-b. Màu sắc và hoa văn: Sự thay đổi trong màu sắc và độ sắc nét của hoa văn trên cơ thể cá
+     c. Sức khỏe: Tần suất bệnh tật hoặc các vấn đề sức khỏe, Chỉ số sức khỏe tổng quát (nếu có)
 
-c. Sức khỏe: Tần suất bệnh tật hoặc các vấn đề sức khỏe, Chỉ số sức khỏe tổng quát (nếu có)
+     d. Chất lượng nước: Mối tương quan giữa các thông số nước và sự phát triển của cá
 
-d. Chất lượng nước: Mối tương quan giữa các thông số nước và sự phát triển của cá
+     e. Thói quen ăn uống: Lượng thức ăn tiêu thụ theo thời gian, Hiệu quả chuyển đổi thức ăn (tỷ lệ giữa lượng thức ăn và tăng trưởng)
 
-e. Thói quen ăn uống: Lượng thức ăn tiêu thụ theo thời gian, Hiệu quả chuyển đổi thức ăn (tỷ lệ giữa lượng thức ăn và tăng trưởng)
+     f. Giá trị: Sự thay đổi trong giá trị ước tính của cá theo thời gian
 
-f. Giá trị: Sự thay đổi trong giá trị ước tính của cá theo thời gian
+     g. Đặc điểm sinh sản: Số lần sinh sản (nếu áp dụng), Chất lượng và số lượng con non
 
-g. Đặc điểm sinh sản: Số lần sinh sản (nếu áp dụng), Chất lượng và số lượng con non
-
-h.Hoạt động và hành vi: Mức độ hoạt động, Thay đổi trong hành vi xã hội (tương tác với cá khác)
+     h.Hoạt động và hành vi: Mức độ hoạt động, Thay đổi trong hành vi xã hội (tương tác với cá khác)
 
    3. Quản lý thông số nước:
    - Ghi nhận thông số nước theo thời gian cho từng hồ
