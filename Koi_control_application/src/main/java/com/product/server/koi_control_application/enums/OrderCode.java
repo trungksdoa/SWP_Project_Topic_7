@@ -1,9 +1,6 @@
 package com.product.server.koi_control_application.enums;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
+import io.swagger.v3.oas.annotations.media.Schema;;
 public enum OrderCode {
-    //Control in customer ui
     @Schema(description = "Order is pending")
     PENDING("PENDING"),
 
@@ -18,6 +15,7 @@ public enum OrderCode {
 
     @Schema(description = "Order has been delivered")
     DELIVERED("DELIVERED");
+
 
     private final String value;
 

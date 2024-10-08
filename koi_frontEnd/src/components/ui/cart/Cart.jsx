@@ -2,24 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId";
 import { manageProductThunks } from "../../../store/manageProduct";
-import { InputNumber } from "antd";
+import { InputNumber, Spin } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDeleteProductsInCarts } from "../../../hooks/manageCart/useDeleteProductsInCarts";
 import { toast } from "react-toastify";
 import { usePutCarts } from "../../../hooks/manageCart/usePutCarts";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
 
 const Cart = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: carts, refetch } = useGetCartByUserId(userLogin?.id);
+  const {
+    data: carts,
+    refetch,
+    isFetching,
+  } = useGetCartByUserId(userLogin?.id);
   const dispatch = useDispatch();
   const [lstPrd, setLstPrd] = useState([]);
-  const mutationPutCart = usePutCarts()
-  const navigate = useNavigate()
+  const mutationPutCart = usePutCarts();
+  const navigate = useNavigate();
 
-
-  console.log(lstPrd)
+  console.log(lstPrd);
   const onChange = (value, productId) => {
     if (value && !isNaN(value)) {
       // Cập nhật số lượng trong lstPrd
@@ -28,20 +31,20 @@ const Cart = () => {
           prd.id === productId ? { ...prd, quantity: value } : prd
         )
       );
-  
+
       // Tìm sản phẩm với productId từ lstPrd để tạo payload
       const product = lstPrd.find((prd) => prd.id === productId);
-      
+
       if (product) {
         const payload = {
           productId: productId,
           quantity: value,
         };
-  
+
         mutationPutCart.mutate(
           {
-            id: userLogin?.id,  // Truyền userId thay vì productId
-            payload,  // Payload với productId và quantity
+            id: userLogin?.id, // Truyền userId thay vì productId
+            payload, // Payload với productId và quantity
           },
           {
             onSuccess: () => {
@@ -63,8 +66,7 @@ const Cart = () => {
       toast.error("Quantity must be a valid number.");
     }
   };
-  
-  
+
   const mutate = useDeleteProductsInCarts();
 
   const handleDeleteCart = (productId, quantity) => {
@@ -118,6 +120,34 @@ const Cart = () => {
 
   console.log(lstPrd);
 
+  // if (lstPrd.length === 0) {
+  //   return (
+  //     <div>
+  //       <div className="flex justify-center my-[60px]">
+  //         <img
+  //           src="../../../../images/cart-empty.png"
+  //           className="w-[40%]"
+  //           alt="empty"
+  //         />
+  //       </div>
+  //       <div className="mb-[60px]">
+  //         <h2 className="text-orange-500 text-center mb-[8px] text-[32px]">
+  //           There are no products in the cart, please back to the store to
+  //           select anything .
+  //         </h2>
+  //         <div className="flex justify-center">
+  //           <NavLink
+  //             className="underline hover:!text-orange-500 transition-all duration-300"
+  //             to={PATH.STORE}
+  //           >
+  //             Go To Store
+  //           </NavLink>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="w-[60%] my-[40px] mx-auto">
       <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px]">
@@ -144,7 +174,12 @@ const Cart = () => {
             style={{ width: "15%", textAlign: "center" }}
           />
           <DeleteOutlined
-            style={{ color: "red", cursor: "pointer",width: "10%", display: "inline-block" }}
+            style={{
+              color: "red",
+              cursor: "pointer",
+              width: "10%",
+              display: "inline-block",
+            }}
             onClick={() => {
               handleDeleteCart(product?.id);
             }}
@@ -163,9 +198,12 @@ const Cart = () => {
               }).format(totalPrice)}
             </span>
           </p>
-          <button className="rounded-[6px] ml-[30px] px-[30px] py-[10px] bg-black text-white" onClick={() => {
-            navigate(PATH.CHECKOUT)
-          }}>
+          <button
+            className="rounded-[6px] ml-[30px] px-[30px] py-[10px] bg-black text-white"
+            onClick={() => {
+              navigate(PATH.CHECKOUT);
+            }}
+          >
             Check Out
           </button>
         </div>

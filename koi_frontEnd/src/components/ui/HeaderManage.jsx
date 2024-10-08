@@ -65,7 +65,7 @@ const HeaderManage = () => {
             className="scrollable-navbar flex whitespace-nowrap p-2 scrollbar-hide"
             ref={navbarRef}
           >
-            <li className="flex relative py-[20px] cursor-pointer items-center menu mr-[100px] text-white">
+            <li className="flex relative py-[20px] cursor-pointer items-center menu mr-[60px] text-white">
               {t("Management")}
               <ul className="submenu">
                 <li className="flex mb-[30px] text-white">
@@ -88,9 +88,12 @@ const HeaderManage = () => {
                 </li>
               </ul>
             </li>
-            <li className="flex menu_2 mr-[100px] cursor-pointer py-[20px] relative items-center text-white">
+            <NavLink
+              to={PATH.WATER_PARAMETER}
+              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
+            >
               {t("Calculator")}
-              <ul className="submenu_2">
+              {/* <ul className="submenu_2">
                 <li className="flex text-white">
                   <NavLink
                     rel="noopener noreferrer"
@@ -118,7 +121,35 @@ const HeaderManage = () => {
                     {t("Salt Calculator")}
                   </NavLink>
                 </li>
-              </ul>
+              </ul> */}
+            </NavLink>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.STORE}
+                className={({ isActive }) =>
+                  `flex items-center -mb-1 ${
+                    isActive
+                      ? "text-orange-500"
+                      : "dark:border- dark:text-violet-600 mr-[60px] dark:border-violet-600"
+                  }`
+                }
+              >
+                {t("Store")}
+              </NavLink>
+            </li>
+            <li className="flex text-white">
+              <NavLink
+                rel="noopener noreferrer"
+                to={PATH.BLOGS}
+                className={({ isActive }) =>
+                  `flex items-center mr-[60px] -mb-1 ${
+                    isActive ? "text-orange-500" : "dark:border-"
+                  }`
+                }
+              >
+                {t("Blog")}
+              </NavLink>
             </li>
             <li className=" py-[20px]">
               <NavLink to={PATH.PACKAGES}>

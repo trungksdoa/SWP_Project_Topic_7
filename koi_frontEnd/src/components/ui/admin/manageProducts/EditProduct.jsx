@@ -5,14 +5,27 @@ import { Button, Form, Input, InputNumber, Radio } from "antd";
 import { useFormik } from "formik";
 import { usePutProduct } from "../../../../hooks/admin/manageProducts/usePutProduct";
 import { toast } from "react-toastify";
+import { manageProductServiceH } from "../../../../services/admin/manageProductServiceH";
+import { manageProductsServices } from "../../../../services/manageProducrsServices";
 
 const EditProduct = () => {
   const { TextArea } = Input;
   const { id } = useParams();
   const parseId = parseInt(id);
   const mutation = usePutProduct();
-  const { data: product, isLoading, isError } = useGetProductById(parseId);
   const [imgSrc, setImgSrc] = useState("");
+
+  const [product, setProduct] = useState(null)
+
+  useEffect(() => {
+    manageProductsServices.getProductById(parseId).then((res) => {
+      console.log(res)
+      setProduct(res?.data?.data)
+    })
+    .catch((res) => {
+      console.log(res)
+    })
+  }, [parseId])
   
 
   // Khởi tạo formik sau khi dữ liệu sản phẩm được tải

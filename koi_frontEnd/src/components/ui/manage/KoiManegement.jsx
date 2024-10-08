@@ -11,6 +11,7 @@ import {
   Input,
   InputNumber,
   Select,
+  Spin,
 } from "antd";
 import { toast } from "react-toastify";
 import { LOCAL_STORAGE_KOI_KEY } from "../../../constant/localStorage";
@@ -28,13 +29,14 @@ const KoiManagement = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const dispatch = useDispatch();
-  const { data: lstKoi, refetch } = useGetAllKoi(userId);
+  const { data: lstKoi, refetch, isFetching } = useGetAllKoi(userId);
   const { data: lstPond, refetchAllPond } = useGetAllPond(userId);
   const mutationDelete = useDeleteKoi();
   const mutation = useUpdateKoi();
   const [showAddPopup, setShowAddPopup] = useState(false);
   const addKoiMutation = useAddKoi();
   const [selectedPond, setSelectedPond] = useState(null); // Thêm state để lưu ID hồ đã chọn
+  const [isDeleting, setIsDeleting] = useState(false); // Thêm trạng thái loading cho nút Delete
 
   console.log("lstKoi:", lstKoi); // Add this line to log the lstKoi value
 
@@ -72,12 +74,15 @@ const KoiManagement = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Do you want to delete this Koi")) {
+      setIsDeleting(true); // Bắt đầu loading
       mutationDelete.mutate(id, {
         onSuccess: () => {
           toast.success("Delete Koi Successfully !");
+          setIsDeleting(false); // Kết thúc loading
         },
         onError: (err) => {
           toast.error(err);
+          setIsDeleting(false); // Kết thúc loading
         },
       });
     }
@@ -136,6 +141,41 @@ const KoiManagement = () => {
     }
   };
 
+  const handleUpdate = (values) => {
+    console.log(values);
+    const formData = new FormData();
+    const updateKoi = {
+      name: values.name || "",
+      variety: values.variety,
+      sex: values.sex === "Female",
+      purchasePrice: parseFloat(values.purchasePrice),
+      pondId: parseInt(values.pondId),
+      userId: userId,
+      weight: parseFloat(values.weight),
+      dateOfBirth: values.dateOfBirth || null,
+    };
+
+    formData.append("fish", JSON.stringify(updateKoi));
+    if (values.image) {
+      formData.append("image", values.image);
+    }
+
+    mutation.mutate(
+      { id: selectedKoi.id, payload: formData },
+      {
+        onSuccess: (updatedKoi) => {
+          dispatch(manageKoiActions.updateKoi(updatedKoi));
+          refetch();
+          toast.success("Koi updated successfully");
+        },
+        onError: (error) => {
+          console.error("Error updating koi:", error);
+          toast.error(`Error updating koi: ${error.message}`);
+        },
+      }
+    );
+  };
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -145,40 +185,10 @@ const KoiManagement = () => {
       purchasePrice: selectedKoi?.purchasePrice || "",
       dateOfBirth: selectedKoi?.dateOfBirth || "", // Check if dateOfBirth exists
       pondId: selectedKoi?.pondId || null,
+      weight: selectedKoi?.weight || null,
       image: null,
     },
-    onSubmit: (values) => {
-      const formData = new FormData();
-      const updateKoi = {
-        name: values.name || "",
-        variety: values.variety,
-        sex: values.sex === "Female",
-        purchasePrice: parseFloat(values.purchasePrice),
-        pondId: parseInt(values.pondId),
-        userId: userId,
-        dateOfBirth: values.dateOfBirth || null
-      };
-
-      formData.append("fish", JSON.stringify(updateKoi));
-      if (values.image) {
-        formData.append("image", values.image);
-      }
-
-      mutation.mutate(
-        { id: selectedKoi.id, payload: formData },
-        {
-          onSuccess: (updatedKoi) => {
-            dispatch(manageKoiActions.updateKoi(updatedKoi));
-            refetch();
-            toast.success("Koi updated successfully");
-          },
-          onError: (error) => {
-            console.error("Error updating koi:", error);
-            toast.error(`Error updating koi: ${error.message}`);
-          },
-        }
-      );
-    },
+    onSubmit: handleUpdate,
   });
 
   const addKoiFormik = useFormik({
@@ -234,7 +244,13 @@ const KoiManagement = () => {
   // if (!lstKoi) {
   //     return <div>Loading...</div>;
   // }
-
+  if (isFetching) {
+    return (
+      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex justify-center items-center text-bold text-3xl h-full m-8 mb-3">
@@ -381,7 +397,7 @@ const KoiManagement = () => {
                       />
                     </div>
                     <div className="flex justify-between my-[15px]">
-                      <strong>Pond ID:</strong>
+                      <strong>Pond:</strong>
                       {lstPond?.map((pond, index) => (
                         <div key={index} className="text-center">
                           <img
@@ -550,31 +566,61 @@ const KoiManagement = () => {
                         onChange={formik.handleChange}
                       />
                     </div>
-
                     <div className="flex justify-between my-[15px]">
-                      <strong>Pond ID:</strong>
+                      <strong>Weight:</strong>
                       <Input
-                        className="text-right  w-1/2 pr-2"
+                        className="text-right w-1/2 pr-2"
                         style={{ color: "black" }}
-                        name="pondId"
-                        value={formik.values.pondId}
+                        name="weight"
+                        type="number"
+                        value={formik.values.weight}
                         onChange={formik.handleChange}
                       />
                     </div>
-
                     <div className="flex justify-between my-[15px]">
-                      <strong>Fish ID:</strong>
+                      <strong>Age:</strong>
                       <div className="text-right w-1/2 pr-2">
-                        {selectedKoi.id}
+                        {selectedKoi?.ageMonth} Months
                       </div>
                     </div>
+                    <div className="flex justify-between my-[15px]">
+                      <strong>Pond:</strong>
+                      {lstPond?.map((pond, index) => (
+                        <div key={index} className="text-center">
+                          <img
+                            onClick={() => {
+                              formik.setFieldValue("pondId", pond.id); // Cập nhật pondId khi nhấp vào hình
+                              setSelectedPond(pond.id); // Lưu ID hồ đã chọn
+                            }}
+                            src={pond.imageUrl}
+                            alt={pond.name}
+                            className={`w-32 rounded-[8px] h-32 mx-auto object-cover cursor-pointer ${
+                              selectedPond === pond.id ||
+                              selectedKoi?.pondId === pond.id
+                                ? "border-4 border-blue-500"
+                                : "opacity-50"
+                            }`} // Thêm hiệu ứng mờ hoặc border nếu trùng với pondId đã chọn
+                          />
+                          <h3
+                            className="text-lg mt-2 cursor-pointer"
+                            onClick={() => {
+                              formik.setFieldValue("pondId", pond.id); // Cập nhật pondId khi nhấp vào tên
+                              setSelectedPond(pond.id); // Lưu ID hồ đã chọn
+                            }}
+                          >
+                            {pond.name}
+                          </h3>
+                        </div>
+                      ))}
+                    </div>
+
                     <div className="flex ">
                       <Form.Item className="mt-4">
                         <Button
                           className="mr-[15px] bg-black text-white hover:!bg-black hover:!text-white"
                           htmlType="submit"
                           disabled={componentDisabled}
-                          loading={mutation.isPending}
+                          loading={mutation.isPending} // Sử dụng trạng thái loading cho nút Update
                         >
                           Update
                         </Button>
@@ -582,9 +628,9 @@ const KoiManagement = () => {
                       <Form.Item className="mt-4">
                         <Button
                           className="mr-[15px] bg-red-500 text-white hover:!bg-red-500 hover:!text-white"
-                          htmlType="submit"
+                          htmlType="button" // Đổi thành button để không gửi form
                           disabled={componentDisabled}
-                          loading={mutation.isPending}
+                          loading={isDeleting} // Sử dụng trạng thái loading cho nút Delete
                           onClick={() => {
                             handleDelete(selectedKoi.id);
                           }}

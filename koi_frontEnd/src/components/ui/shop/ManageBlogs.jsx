@@ -94,27 +94,30 @@ const ManageBlogs = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <>
-          <Button
-            className="mr-[15px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
-            onClick={() => {
-              navigate(`${PATH.EDIT_BLOG}/${record?.id}`);
-            }}
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={() => {
-              handleDelete(record?.id);
-            }}
-            loading={deletingId === record?.id}
-            className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
-          >
-            Delete
-          </Button>
-        </>
-      ),
+      render: (_, record) => {
+        console.log(record?.id)
+        return ((
+          <>
+            <Button
+              className="mr-[15px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
+              onClick={() => {
+                navigate(`${PATH.EDIT_BLOG}/${record?.id}`);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              onClick={() => {
+                handleDelete(record?.id);
+              }}
+              loading={deletingId === record?.id}
+              className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
+            >
+              Delete
+            </Button>
+          </>
+        ))
+      },
       width: "15%",
     },
   ];

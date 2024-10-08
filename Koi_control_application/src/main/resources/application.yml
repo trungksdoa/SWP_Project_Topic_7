@@ -2,9 +2,9 @@ app:
   jwt:
     secret: SecretKeyToGenJWTs
   schedule:
-    task:
-      update-order-status:
-        cron: 0 0 1 * * ? # 1h AM
+     task:
+       update-order-status:
+         cron: 0 0 1 * * ? # 1h AM
 springdoc:
   api-docs:
     path: /api-docs
@@ -61,3 +61,4 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+

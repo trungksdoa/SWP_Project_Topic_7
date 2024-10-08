@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.custom_exception.NotFoundExcep
 import com.product.server.koi_control_application.model.Blogs;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.BlogsRepository;
+import com.product.server.koi_control_application.service_helper.interfaces.IBlogHelper;
 import com.product.server.koi_control_application.service_interface.IBlogService;
 import com.product.server.koi_control_application.service_interface.IImageService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.List;
 public class BlogServiceImpl implements IBlogService {
     private final BlogsRepository repo;
     private final IImageService imageService;
-
+    private final IBlogHelper blogHelper;
     @Override
     @Transactional
     public Blogs createBlog(Blogs blog, MultipartFile headerImage, MultipartFile bodyImage) throws IOException {
@@ -29,13 +30,13 @@ public class BlogServiceImpl implements IBlogService {
             throw new BadRequestException("A blog with this title already exists");
         }
         setImageUrls(blog, headerImage, bodyImage);
-        return repo.save(blog);
+        return blogHelper.save(blog);
     }
 
     @Override
     @Transactional
     public Blogs updateBlog(int id, Blogs updatedBlog, MultipartFile headerImage, MultipartFile bodyImage) throws IOException {
-        Blogs existingBlog = repo.findById(id).orElseThrow(() -> new NotFoundException("Blog not found with id: " + id));
+        Blogs existingBlog = blogHelper.get(id);
 
         if (!existingBlog.getTitle().equals(updatedBlog.getTitle()) && repo.existsByTitle(updatedBlog.getTitle())) {
             throw new BadRequestException("A blog with this title already exists");
@@ -44,25 +45,24 @@ public class BlogServiceImpl implements IBlogService {
         updateBlogFields(existingBlog, updatedBlog);
         updateImageUrls(existingBlog, headerImage, bodyImage);
 
-        return repo.save(existingBlog);
+        return blogHelper.save(existingBlog);
     }
 
     @Override
+    @Transactional
     public void deleteBlog(int id) {
-        if(!repo.existsById(id)) {
-            throw new NotFoundException("No blog found with id: " + id);
-        }
-        repo.deleteById(id);
+        Blogs blog = blogHelper.get(id);
+        blogHelper.delete(blog);
     }
 
     @Override
     public List<Blogs> getAllBlogs() {
-        return repo.findAll();
+        return blogHelper.findAll();
     }
 
     @Override
     public Blogs getBlogById(int id) {
-        return repo.findById(id).orElseThrow(() -> new NotFoundException("No blog found with id: " + id));
+        return blogHelper.get(id);
     }
 
     @Override
@@ -77,16 +77,13 @@ public class BlogServiceImpl implements IBlogService {
 
     @Override
     public void acceptBlog(int id) {
-        Blogs blog = repo.findById(id).orElseThrow(() -> new NotFoundException("No blog found with id: " + id));
+        Blogs blog = blogHelper.get(id);
         blog.setApproved(true);
-        repo.save(blog);
+        blogHelper.save(blog);
     }
 
     @Override
-    public List<Blogs> searchBlogs(String... params) {
-        String title = params.length > 0 ? params[0] : null;
-        String headerTop = params.length > 1 ? params[1] : null;
-        String headerMiddle = params.length > 2 ? params[2] : null;
+    public List<Blogs> searchBlogs(String title, String headerTop, String headerMiddle) {
         return repo.searchByTitleAndHeader(title, headerTop, headerMiddle);
     }
 
