@@ -14,11 +14,8 @@ import com.product.server.koi_control_application.service_interface.IImageServic
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -233,7 +230,6 @@ public class ProductServiceImpl implements IProductService {
      * it returns false.
      */
     @Override
-    @Retryable(value = {OptimisticLockingFailureException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @Transactional
     public boolean checkAndUpdateStock(int productId, int requestedQuantity) {
         Product product = productHelper.get(productId);

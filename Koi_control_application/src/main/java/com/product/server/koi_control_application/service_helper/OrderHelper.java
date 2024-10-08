@@ -7,8 +7,9 @@ import com.product.server.koi_control_application.repository.OrderRepository;
 import com.product.server.koi_control_application.service_helper.interfaces.IOrderHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -22,22 +23,20 @@ public class OrderHelper implements IOrderHelper {
     @Transactional
     public Orders save(Orders order) {
         try {
-            log.info("Saving order");
-            log.info("Order: {}", order);
+            log.info("Saving order: {}", order);
             return orderRepository.save(order);
         } catch (Exception e) {
-            throw new BadRequestException("Failed to save order");
+            log.error("Failed to save order: ", e);
+            throw new BadRequestException("Failed to save order: " + e.getMessage());
         }
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Orders get(int id) {
         return orderRepository.findById(id).orElseThrow(() -> new BadRequestException("Order not found"));
     }
 
     @Override
-    @Transactional
     public void delete(Orders order) {
         try {
             log.info("Deleting order");

@@ -13,14 +13,12 @@ import com.product.server.koi_control_application.service_interface.ICartService
 import com.product.server.koi_control_application.service_interface.IOrderService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -39,6 +37,8 @@ public class OrderServiceImpl implements IOrderService {
     private final IIProcessHelper processHelper;
     private final IOrderHelper orderHelper;
 
+
+
     /**
      * Creates a new order for a user.
      *
@@ -47,13 +47,11 @@ public class OrderServiceImpl implements IOrderService {
      * @return             The created Orders object after processing.
      * @throws NotFoundException If the cart is empty or products are out of stock.
      * @throws BadRequestException If there are invalid products in the cart.
-     * @throws OptimisticLockingFailureException If an optimistic locking failure occurs.
      * This method initializes a new order using the provided user ID and order details,
      * checks the cart for items, validates stock, and processes the order.
      */
     @Override
     @Transactional
-    @Retryable(value = {OptimisticLockingFailureException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public Orders createOrder(int userId, OrderRequestDTO orderRequestDTO) {
         // Create a new order
         List<CartProductDTO> cartItems = cartService.getCart(userId);
