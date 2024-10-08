@@ -15,6 +15,4 @@ public class FeedbackDTO {
     private int productId;
     private Integer rating;
     private String comment;
-
-
 }

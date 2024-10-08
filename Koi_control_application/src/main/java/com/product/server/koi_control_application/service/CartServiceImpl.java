@@ -8,10 +8,10 @@ import com.product.server.koi_control_application.pojo.OutStockProduct;
 import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.CartRepository;
+import com.product.server.koi_control_application.service_helper.interfaces.ICartHelper;
 import com.product.server.koi_control_application.service_interface.ICartService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,13 +23,9 @@ import java.util.Optional;
 public class CartServiceImpl implements ICartService {
     private final CartRepository cartRepository;
     private final IProductService productService;
-
+    private final ICartHelper cartHelper;
     @Override
     public Cart createCart(Cart cart, int validUserId) throws IllegalAccessException {
-        if (cart.getQuantity() == 0) {
-            throw new DataIntegrityViolationException("Quantity must be greater than 0");
-        }
-
         if (cart.getUserId() != validUserId) {
             throw new IllegalAccessException("You are not allowed to add item to this cart");
         }
@@ -50,7 +46,7 @@ public class CartServiceImpl implements ICartService {
             throw new BadRequestException("This item already exist in your cart");
         }
 
-        return cartRepository.save(cart);
+        return cartHelper.save(cart);
     }
 
     @Override
@@ -59,7 +55,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(() -> new NotFoundException("Sorry, this item has been deleted or not exist "));
 
         cart.setQuantity(cartDTO.getQuantity());
-        return cartRepository.save(cart);
+        return cartHelper.save(cart);
     }
 
     @Override
