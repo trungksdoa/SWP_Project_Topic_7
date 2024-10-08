@@ -51,6 +51,16 @@ public class PaymentService implements IPaymentService {
         paymentRepository.deleteByPaymentDateRange(fromDate, toDate);
     }
 
+    @Override
+    public String getPaymentGatewayUrl(int referenceId, String referenceName, int userId) {
+        PaymentStatus payment = getPaymentStatus(referenceId, referenceName,userId);
+        return payment.getPaymentGatewayUrl();
+    }
+
+    private PaymentStatus getPaymentStatus(int referenceId, String referenceName, int userId) {
+        return paymentRepository.findByReferenceIdAndReferenceTypeAndUserId(referenceId, referenceName, userId).orElseThrow(() -> new RuntimeException("PaymentStatus not found"));
+    }
+
     private PaymentStatus getPaymentStatus(int referenceId, String referenceName) {
         return paymentRepository.findByReferenceIdAndReferenceType(referenceId, referenceName).orElseThrow(() -> new RuntimeException("PaymentStatus not found"));
     }

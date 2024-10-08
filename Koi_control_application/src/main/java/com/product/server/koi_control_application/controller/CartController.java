@@ -9,6 +9,7 @@ import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CartController {
 
 
     @PostMapping
-    public ResponseEntity<BaseResponse> addToCart(@RequestBody Cart cart, HttpServletRequest request)  {
+    public ResponseEntity<BaseResponse> addToCart(@RequestBody @Valid Cart cart, HttpServletRequest request)  {
         try {
             int userId = jwtUtil.getUserIdFromToken(request);
             Cart addedCart = cartService.createCart(cart, userId);
@@ -47,7 +48,7 @@ public class CartController {
 
 
     @PutMapping("/user/{userId}")
-    public ResponseEntity<BaseResponse> updateCartItem(@RequestBody CartDTO cartDTO, @PathVariable int userId) {
+    public ResponseEntity<BaseResponse> updateCartItem(@RequestBody @Valid CartDTO cartDTO, @PathVariable int userId) {
         return ResponseUtil.createSuccessResponse(cartService.updateCart(cartDTO, userId), "Cart item updated successfully");
     }
 

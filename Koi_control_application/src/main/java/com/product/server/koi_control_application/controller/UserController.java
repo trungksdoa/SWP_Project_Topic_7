@@ -153,7 +153,7 @@ public class UserController {
             user.setActive(true);
             userService.updateUser(user);
             URI location = URI.create(WEBSITE_URL);
-            return ResponseUtil.createResponse("Account activated successfully", "Account activated successfully", HttpStatus.OK, location);
+            return ResponseUtil.createResponse("Account activated successfully", "Account activated successfully", HttpStatus.FOUND, location);
         } catch (NotFoundException e) {
             throw new NotFoundException("User not found");
         }

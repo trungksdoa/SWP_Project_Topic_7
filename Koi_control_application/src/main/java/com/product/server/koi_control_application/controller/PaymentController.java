@@ -26,8 +26,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import static com.product.server.koi_control_application.enums.PaymentCode.FAILED;
-import static com.product.server.koi_control_application.enums.PaymentCode.PAID;
+import static com.product.server.koi_control_application.enums.PaymentCode.*;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
@@ -91,11 +90,12 @@ public class PaymentController {
         if (responseBody.get("resultCode").asInt() != 0) {
             paymentStatus.setPaymentStatus(FAILED.getValue());
             paymentStatus.setPaymentDescription(responseBody.get("message").asText());
-
         } else {
-            paymentStatus.setPaymentStatus(PAID.getValue());
+            paymentStatus.setPaymentStatus(PENDING.getValue());
             paymentStatus.setPaymentDescription("Payment using MoMo");
+            paymentStatus.setPaymentGatewayUrl(responseBody.get("shortLink").asText());
         }
+
         paymentService.createPaymentStatus(paymentStatus);
         logResponseDetails(response, responseBody);
 

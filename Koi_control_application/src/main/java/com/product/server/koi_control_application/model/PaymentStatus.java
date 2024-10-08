@@ -22,6 +22,8 @@ public class PaymentStatus {
     private String paymentMethod;
     private String paymentDescription;
     private String paymentStatus;
+
+    private String paymentGatewayUrl;
     private int userId;
 
     private LocalDateTime paymentDate;
