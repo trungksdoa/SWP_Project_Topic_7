@@ -1,10 +1,9 @@
 package com.product.server.koi_control_application.controller;
 
-import com.product.server.koi_control_application.model.Feedback;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.model.Users;
-import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.request.FeedbackDTO;
+import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,13 +28,8 @@ public class FeedbackController {
         Product product = Product.builder().id(feedback.getProductId()).build();
 
         return ResponseUtil.createResponse(
-                feedbackService.createFeedback(Feedback.builder()
-                        .user(users)
-                        .product(product)
-                        .rating(feedback.getRating())
-                        .comment(feedback.getComment())
-                        .build())
-                , "Feedback created successfully",
+                feedbackService.createFeedback(users, product, feedback),
+                "Feedback created successfully",
                 HttpStatus.CREATED);
     }
 

@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.Optional;
 
 
 @Repository
-@Transactional
 @RepositoryRestResource(exported = false)
 public interface UsersRepository extends JpaRepository<Users, Integer> {
     @Query("select u from Users u where u.username = ?1")

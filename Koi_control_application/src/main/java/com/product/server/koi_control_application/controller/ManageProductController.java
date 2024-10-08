@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.request.ProductDTO;
-import com.product.server.koi_control_application.service_interface.IImageService;
 import com.product.server.koi_control_application.service_interface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,8 +30,6 @@ import java.io.IOException;
 @Tag(name = "Admin API", description = "API for admin")
 public class ManageProductController {
     private final IProductService productService;
-    private final IImageService imageService;
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createProduct(
             @Schema(type = "string", format = "json", implementation = ProductDTO.class)
