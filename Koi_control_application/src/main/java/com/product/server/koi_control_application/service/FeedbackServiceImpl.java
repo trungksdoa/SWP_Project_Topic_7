@@ -1,14 +1,15 @@
 package com.product.server.koi_control_application.service;
 
+import com.product.server.koi_control_application.custom_exception.NotFoundException;
 import com.product.server.koi_control_application.model.Feedback;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.model.Users;
+import com.product.server.koi_control_application.pojo.request.FeedbackDTO;
 import com.product.server.koi_control_application.repository.FeedbackRepository;
-import com.product.server.koi_control_application.repository.ProductRepository;
-import com.product.server.koi_control_application.repository.UsersRepository;
 import com.product.server.koi_control_application.service_interface.IFeedbackService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -17,32 +18,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-
+@Slf4j
 public class FeedbackServiceImpl implements IFeedbackService {
     private final FeedbackRepository feedbackRepository;
-    private final ProductRepository productRepository;
-    private final UsersRepository usersRepository;
 
     @Override
     @Transactional
-    public Feedback createFeedback(Feedback feedback) {
-        Users user = usersRepository.findById(feedback.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Product product = productRepository.findById(feedback.getProduct().getId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        feedback.setUser(user);
-        feedback.setProduct(product);
-        feedback.setCreatedAt(LocalDateTime.now());
-        feedback.setUpdatedAt(LocalDateTime.now());
-
-        if (feedback.getRating() < 1 || feedback.getRating() > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5");
-        }
-
-        product.calculateAverageRating();
-        productRepository.save(product);
-        return feedbackRepository.save(feedback);
+    public Feedback createFeedback(Users user, Product product, FeedbackDTO feedback) {
+       try{
+           log.info("Creating feedback for product with id: {}", product.getId());
+           return feedbackRepository.save(Feedback.builder()
+                   .user(user)
+                   .product(product)
+                   .rating(feedback.getRating())
+                   .comment(feedback.getComment())
+                   .build());
+       }catch (Exception e){
+           throw new NotFoundException("Product or User not found");
+       }
     }
 
     @Override
@@ -56,8 +49,8 @@ public class FeedbackServiceImpl implements IFeedbackService {
     }
 
     @Override
+    @Transactional
     public void deleteFeedback(Integer id) {
-
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

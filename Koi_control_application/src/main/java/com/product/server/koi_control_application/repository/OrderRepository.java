@@ -7,14 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 
 @Repository
-@Transactional
 @RepositoryRestResource(exported = false)
 public interface OrderRepository extends JpaRepository<Orders, Integer> {
     @Query("select o from Orders o where o.userId = ?1")
@@ -23,8 +21,6 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
     @Query("select o from Orders o where o.userId = ?1 and o.id = ?2")
     Optional<Orders> findByUserIdAndId(int userId, int id);
 
-    @Override
-    void deleteById(Integer integer);
 
     @Query("select o from Orders o where o.userId = ?1")
     List<Orders> findByUserId(int userId);
