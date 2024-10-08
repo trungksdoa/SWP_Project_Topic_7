@@ -16,6 +16,7 @@ import com.product.server.koi_control_application.service_interface.IPaymentServ
 import com.product.server.koi_control_application.service_interface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -160,20 +161,39 @@ public class OrderController {
     }
 
     @PostMapping("/receive-order")
+    @Operation(summary = "Mark an order as received", description = "From other user updates their order status to DELIVERED " + " : " +
+            "{" +
+            "PENDING," +
+            "CANCELLED, " +
+            "SUCCESS, " +
+            "SHIPPING, " +
+            "DELIVERED, " +
+            "}")
+
+
+
     public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, OrderVerifyDTO data) {
         //To confirm that the user is an admin
         jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
-        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.RECEIVED.getValue());
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
     @PostMapping("/send-order")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Mark an order as shipped", description = "From admin updates the order status to SHIPPING"+ " : " +
+            "{" +
+            "PENDING," +
+            "CANCELLED, " +
+            "SUCCESS, " +
+            "SHIPPING, " +
+            "DELIVERED, " +
+            "}")
     public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
          jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
-        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SEND.getValue());
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SHIPPING.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
