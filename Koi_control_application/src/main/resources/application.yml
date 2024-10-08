@@ -1,54 +1,32 @@
-# spring:
-#   datasource:
-#     url: ${SPRING_DATASOURCE_URL}/${SPRING_DATABASE_NAME}
-#     username: ${SPRING_DATASOURCE_USERNAME}
-#     password: ${SPRING_DATASOURCE_PASSWORD}
-#   jpa:
-#     hibernate:
-#       ddl-auto: update
-#     show-sql: true
-#     database-platform: org.hibernate.dialect.MySQLDialect
-# server:
-#   port
-
 app:
   jwt:
     secret: SecretKeyToGenJWTs
-
+  schedule:
+    task:
+      update-order-status:
+        cron: 0 0 1 * * ? # 1h AM
 springdoc:
   api-docs:
     path: /api-docs
-#    swagger-ui:
-#      path: /swagger-ui.html
+
 openapi:
   service:
-    title: Koi Control Application
+    tilte: Koi Control Application
     description: Koi Control Application
-    server:
-      url: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
     version: 1.0.0
     contact:
       name: Koi Control Application
-      email: trungksdoa@gmail.com
+      email: "trungksdoa@gmail.com"
     api-docs: /v3/api-docs
+    servers:
+      prod: http://localhost:8080
+      dev: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
 
 spring:
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: your-email@gmail.com
-    password: your-email-password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
   web:
     resources:
       add-mappings: false
@@ -83,4 +61,3 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
-
