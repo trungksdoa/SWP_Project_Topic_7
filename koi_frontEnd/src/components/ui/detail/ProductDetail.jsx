@@ -93,6 +93,7 @@ const ProductDetail = () => {
           },
           onError: () => {
             toast.error("This product existed in cart");
+            navigate(PATH.CART)
           },
         }
       );

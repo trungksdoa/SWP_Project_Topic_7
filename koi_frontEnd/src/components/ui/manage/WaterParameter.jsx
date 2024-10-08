@@ -51,6 +51,13 @@ const WaterParameter = () => {
     setIsEditEnabled(e.target.checked);
   };
   // Fetch dữ liệu thông số nước và tiêu chuẩn nước khi chọn hồ
+
+  useEffect(() => {
+    if (!userLogin) {
+      toast.warning("Let's Login or Register to use this feature !");
+      navigate(PATH.HOME);
+    }
+  }, []);
   useEffect(() => {
     const fetchWaterData = async () => {
       if (selectedPond) {

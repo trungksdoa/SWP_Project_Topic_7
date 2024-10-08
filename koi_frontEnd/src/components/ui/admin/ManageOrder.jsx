@@ -1,14 +1,22 @@
 import React from "react";
 import { useGetAllOrder } from "../../../hooks/order/useGetAllOrder";
 import { Table, Button } from "antd";
+import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
+import { toast } from "react-toastify";
 
 const ManageOrder = () => {
-  const { data: lstOrder } = useGetAllOrder();
+  const { data: lstOrder, refetch } = useGetAllOrder();
   console.log(lstOrder);
+  const mutation = usePostSendOrder()
 
   const handleSendClick = (orderId) => {
     // Thực hiện logic khi nhấn button Send, ví dụ gửi yêu cầu API.
-    console.log(`Send order with ID: ${orderId}`);
+    mutation.mutate(orderId, {
+        onSuccess: () => {
+            toast.success("Sent Order !")
+            refetch()
+        }
+    })
   };
 
   const columns = [
@@ -31,8 +39,9 @@ const ManageOrder = () => {
         if (record.status === "SUCCESS") {
           return (
             <Button
-              type="primary"
-              onClick={() => handleSendClick(record.id)}
+              className="bg-blue-500 text-white hover:!bg-blue-600 hover:!text-white border-none"
+              loading={mutation.isPending}
+              onClick={() => handleSendClick(record?.id)}
             >
               Send
             </Button>

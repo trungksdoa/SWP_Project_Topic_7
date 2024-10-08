@@ -14,5 +14,6 @@ export const manageOrderServices = {
     return api.delete(`/user/${userId}/order/${orderId}`);
   },
   getReceiptOrder: (id) => api.get(`/receive-order?orderId=${id}`),
-  getAllOrder: () => api.get('')
+  getAllOrder: () => api.get(''),
+  postSendOrder: (id) => api.post(`/send-order?orderId=${id}`)
 };
