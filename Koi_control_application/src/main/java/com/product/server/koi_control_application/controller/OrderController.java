@@ -176,7 +176,7 @@ public class OrderController {
         //To confirm that the user is an admin
         jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
-        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.COMPLETED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
