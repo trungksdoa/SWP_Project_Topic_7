@@ -14,8 +14,10 @@ public enum OrderCode {
     SHIPPING("SHIPPING"),
 
     @Schema(description = "Order has been delivered")
-    DELIVERED("DELIVERED");
+    DELIVERED("DELIVERED"),
 
+    @Schema(description = "Order completed")
+    COMPLETED("COMPLETED");
 
     private final String value;
 
