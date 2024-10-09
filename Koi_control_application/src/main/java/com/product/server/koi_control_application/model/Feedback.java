@@ -4,6 +4,7 @@ package com.product.server.koi_control_application.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class Feedback {
     private Product product;
 
     @Column(nullable = false)
+    @Size(min = 1, max = 5, message = "Rating must be between 1 and 5")
     private Integer rating;
 
     @Column(length = 1000)

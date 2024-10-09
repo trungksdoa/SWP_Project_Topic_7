@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId";
 import { manageProductThunks } from "../../../store/manageProduct";
-import { InputNumber } from "antd";
+import { InputNumber, Spin } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDeleteProductsInCarts } from "../../../hooks/manageCart/useDeleteProductsInCarts";
 import { toast } from "react-toastify";
@@ -12,7 +12,11 @@ import { PATH } from "../../../constant";
 
 const Cart = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: carts, refetch } = useGetCartByUserId(userLogin?.id);
+  const {
+    data: carts,
+    refetch,
+    isFetching,
+  } = useGetCartByUserId(userLogin?.id);
   const dispatch = useDispatch();
   const [lstPrd, setLstPrd] = useState([]);
   const mutationPutCart = usePutCarts();
@@ -116,30 +120,33 @@ const Cart = () => {
 
   console.log(lstPrd);
 
-  if (lstPrd.length === 0) {
-    return (
-      <div>
-        <div className="flex justify-center my-[60px]">
-          <img
-            src="../../../../images/cart-empty.png"
-            className="w-[40%]"
-            alt="empty"
-          />
-        </div>
-        <div className="mb-[60px]">
-          <h2 className="text-orange-500 text-center mb-[8px] text-[32px]">
-            There are no products in the cart, please back to the store to
-            select anything .
-          </h2>
-          <div className="flex justify-center">
-            <NavLink className="underline hover:!text-orange-500 transition-all duration-300" to={PATH.STORE}>
-              Go To Store
-            </NavLink>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (lstPrd.length === 0) {
+  //   return (
+  //     <div>
+  //       <div className="flex justify-center my-[60px]">
+  //         <img
+  //           src="../../../../images/cart-empty.png"
+  //           className="w-[40%]"
+  //           alt="empty"
+  //         />
+  //       </div>
+  //       <div className="mb-[60px]">
+  //         <h2 className="text-orange-500 text-center mb-[8px] text-[32px]">
+  //           There are no products in the cart, please back to the store to
+  //           select anything .
+  //         </h2>
+  //         <div className="flex justify-center">
+  //           <NavLink
+  //             className="underline hover:!text-orange-500 transition-all duration-300"
+  //             to={PATH.STORE}
+  //           >
+  //             Go To Store
+  //           </NavLink>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-[60%] my-[40px] mx-auto">

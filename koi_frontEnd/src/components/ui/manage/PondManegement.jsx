@@ -4,7 +4,7 @@ import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Checkbox, Form, Input, Spin } from "antd";
 import { toast } from "react-toastify";
 import { useUpdatePond } from "../../../hooks/koi/useUpdatePond"; // Assuming you have this hook
 import { managePondActions } from "../../../store/managePond/slice";
@@ -24,7 +24,7 @@ const PondManagement = () => {
   const [showAddPopup, setShowAddPopup] = useState(false);
 
   const { data: lstKoi } = useGetAllKoi(userId);
-  const { data: lstPond, refetch } = useGetAllPond(userId);
+  const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
   console.log(lstPond);
   const mutation = useUpdatePond();
   const addPondMutation = useAddPond();
@@ -160,7 +160,6 @@ const PondManagement = () => {
             toast.success("Pond updated successfully");
           },
           onError: (error) => {
-            console.error("Error updating pond:", error);
             toast.error(`Error updating pond: ${error.message}`);
           },
         }
@@ -217,8 +216,12 @@ const PondManagement = () => {
     },
   });
 
-  if (!lstPond) {
-    return <div>Loading...</div>;
+  if (isFetching) {
+    return (
+      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
   }
 
   return (

@@ -52,12 +52,6 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public String getPaymentGatewayUrl(int referenceId, String referenceName) {
-        PaymentStatus payment = getPaymentStatus(referenceId, referenceName);
-        return payment.getPaymentGatewayUrl();
-    }
-
-    @Override
     public String getPaymentGatewayUrl(int referenceId, String referenceName, int userId) {
         PaymentStatus payment = getPaymentStatus(referenceId, referenceName,userId);
         return payment.getPaymentGatewayUrl();
