@@ -14,7 +14,7 @@ const PaymentSuccess = () => {
           alt="image success"
         />
         <h2 className="mb-[20px] text-orange-500 text-[40px]">
-          {t("Your payment is successfully !")}
+          {t("Your payment is successful !")}
         </h2>
         <NavLink
           to={PATH.HOME}

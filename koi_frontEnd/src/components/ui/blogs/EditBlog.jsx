@@ -95,7 +95,10 @@ const EditBlog = () => {
         onSubmitCapture={formik.handleSubmit}
         className="p-4"
       >
-        <h1 className="font-bold"> Blogs Editor</h1>
+        <div className="flex justify-center items-center text-bold text-3xl h-full m-8 mb-3">
+          <strong>Blogs Editor</strong>
+        </div>
+        
         <Form.Item label="Title">
           <Input
             placeholder="Title"
