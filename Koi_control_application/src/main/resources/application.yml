@@ -19,8 +19,8 @@ openapi:
       email: "trungksdoa@gmail.com"
     api-docs: /v3/api-docs
     servers:
-      prod: http://localhost:8080
-      dev: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
+      prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
+      dev: http://localhost:8080 
 
 spring:
   servlet:
