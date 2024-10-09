@@ -24,7 +24,7 @@ openapi:
     api-docs: /v3/api-docs
     servers:
       prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
-      dev:  http://localhost:8080
+      dev:  http://localhost:8080 
 
 spring:
   servlet:
