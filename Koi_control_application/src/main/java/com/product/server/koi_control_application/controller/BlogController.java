@@ -103,11 +103,9 @@ public class BlogController {
     }
 
     @PostMapping("/accept")
-    public ResponseEntity<BaseResponse> acceptBlog(BlogRequestApprove request) {
+    public ResponseEntity<BaseResponse> acceptBlog(@RequestBody BlogRequestApprove request) {
         int blogId = request.getBlogRequestId();
         blogService.acceptBlog(blogId);
         return ResponseUtil.createSuccessResponse(null, "Accepted blog successfully");
     }
-
-
 }

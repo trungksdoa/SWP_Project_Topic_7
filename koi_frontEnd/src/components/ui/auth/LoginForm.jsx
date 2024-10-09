@@ -45,9 +45,7 @@ const LoginForm = ({ showModalRegister, handleOkLogin, showModalForgotPassword }
       .then((res) => {
         console.log(res)
         toast.success(t('Login successfully'));
-        if (res.data.roles[0] === "ROLE_USER") {
-          handleOkLogin();
-        }
+        handleOkLogin(); 
       })
       .catch((error) => {
         toast.error(error.response?.data?.message);

@@ -151,6 +151,15 @@ const HeaderManage = () => {
                 {t("Blog")}
               </NavLink>
             </li>
+            <li className="flex menu_2 mr-[100px] cursor-pointer py-[20px] relative items-center text-white">
+            <NavLink
+              rel="noopener noreferrer"
+              to={PATH.STORE}
+              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
+            >
+              {t("Store")}
+            </NavLink>
+          </li>
             <li className=" py-[20px]">
               <NavLink to={PATH.PACKAGES}>
                 <button className="custom-button">Upgrade Account</button>

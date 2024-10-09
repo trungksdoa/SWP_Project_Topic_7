@@ -153,19 +153,19 @@ export const UserMenu = () => {
           <div className="flex flex-col" key="admin">
             <NavLink
               to={PATH.MANAGE_BLOG}
-              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[120px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[120px] text-center bg-black text-white border-none hover:!text-white hover:!bg-black"
             >
               {t("Manage Blog")}
             </NavLink>
             <NavLink
-              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.PROFILE}
+              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[120px] text-center bg-white text-black border-[1px] border-black hover:!text-white hover:!bg-black"
             >
               {t("Profile")}
             </NavLink>
             <Button
               onClick={handleLogout}
-              className=" bg-white text-black hover:!text-white !w-[120px] text-center hover:!border-black hover:!bg-black"
+              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[120px] text-center bg-white text-black hover:!text-white border-black hover:!bg-black"
             >
               {t("Logout")}
             </Button>
