@@ -1,6 +1,7 @@
 package com.product.server.koi_control_application.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -98,7 +99,8 @@ public class Users implements UserDetails {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"user", "product", "feedbacks"})
+    @JsonIgnoreProperties({"user", "product"})
+    @JsonIgnore
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @ManyToOne
