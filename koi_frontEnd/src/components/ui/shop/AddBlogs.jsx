@@ -87,7 +87,9 @@ const AddBlogs = () => {
       onSubmitCapture={formik.handleSubmit}
       className="p-4"
     >
-      <h1 className="font-bold"> Blogs Editor</h1>
+      <div className="flex justify-center items-center text-bold text-3xl h-full m-2 mb-6">
+        <strong>Blogs Editors</strong>
+      </div>
       <Form.Item label="Title">
         <Input
           placeholder="Title"
@@ -148,10 +150,14 @@ const AddBlogs = () => {
         />
       </Form.Item>
 
-      <Form.Item className="justify-center">
-        <div className="">
-          <Button htmlType="submit" type="primary" className="w-full">
-            Post
+      <Form.Item className="flex justify-center items-center">
+        <div>
+          <Button 
+            htmlType="submit" 
+            type="primary" 
+            className="text-xl text-white bg-black px-40 py-4" 
+          >
+            <strong>Post</strong>
           </Button>
         </div>
       </Form.Item>
