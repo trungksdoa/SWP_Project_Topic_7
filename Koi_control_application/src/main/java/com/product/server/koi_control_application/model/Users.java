@@ -75,7 +75,6 @@ public class Users implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     //Set on delete cascade
-
     private Set<UserRole> roles = new HashSet<>();
 
 
@@ -99,7 +98,7 @@ public class Users implements UserDetails {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"user", "product"})
+    @JsonIgnoreProperties({"user", "product", "feedbacks"})
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @ManyToOne

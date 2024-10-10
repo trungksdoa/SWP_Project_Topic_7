@@ -165,8 +165,8 @@ public class UserServiceImpl implements IUserService {
      * @return A List of all User objects
      */
     @Override
-    public List<UserResponseDTO> getUsers() {
-        return usersRepository.fetchAllUsers();
+    public List<Users> getUsers() {
+        return usersRepository.findAll();
     }
 
 

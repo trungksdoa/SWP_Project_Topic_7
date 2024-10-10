@@ -72,7 +72,7 @@ public interface IUserService {
      *
      * @return A List of all Users objects.
      */
-    List<UserResponseDTO> getUsers();
+    List<Users> getUsers();
 
     /**
      * Deletes a user by their ID.

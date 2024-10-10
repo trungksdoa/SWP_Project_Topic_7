@@ -34,8 +34,8 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     @Query("select u from Users u where u.email = ?1")
     Users fetchUserByEmail(String email);
 
-    @Query("SELECT new com.product.server.koi_control_application.pojo.response.UserResponseDTO(u.id, u.username, u.password, u.email, u.phoneNumber, u.address, u.active, u.createdAt, u.updatedAt) FROM Users u")
-    List<UserResponseDTO> fetchAllUsers();
+//    @Query("SELECT new com.product.server.koi_control_application.pojo.response.UserResponseDTO(u.id, u.username, u.password, u.email, u.phoneNumber, u.address, u.active, u.createdAt, u.updatedAt) FROM Users u")
+//    List<UserResponseDTO> fetchAllUsers();
 
 
     boolean existsById(int id);
