@@ -33,4 +33,10 @@ public class ManageUserController {
     public ResponseEntity<BaseResponse> fetchAllUser() {
         return ResponseUtil.createSuccessResponse(userService.getUsers(), "Access granted");
     }
+
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse> fetchAllUser(@RequestParam int page, @RequestParam int size) {
+        return ResponseUtil.createSuccessResponse(userService.getUsers(page, size), "Access granted");
+    }
 }
