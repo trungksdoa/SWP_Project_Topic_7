@@ -183,7 +183,7 @@ const KoiManagement = () => {
       variety: selectedKoi?.variety || "",
       sex: selectedKoi?.sex ? "Female" : "Male",
       purchasePrice: selectedKoi?.purchasePrice || "",
-      dateOfBirth: selectedKoi?.dateOfBirth || "", // Check if dateOfBirth exists
+      dateOfBirth: selectedKoi?.dateOfBirth || "", 
       pondId: selectedKoi?.pondId || null,
       weight: selectedKoi?.weight || null,
       image: null,
@@ -201,10 +201,11 @@ const KoiManagement = () => {
       weight: 0,
       length: 0,
       pondId: null,
+      dateOfBirth: null,
       image: null,
     },
     onSubmit: (values) => {
-      console.log(values);
+      console.log("Submitting new koi:", values);
       const formData = new FormData();
       const newKoi = {
         name: values.name,
@@ -214,6 +215,7 @@ const KoiManagement = () => {
         weight: parseFloat(values.weight),
         length: parseFloat(values.length),
         pondId: parseInt(values.pondId),
+        dateOfBirth: values.dateOfBirth,
         userId: userId,
       };
       formData.append("fish", JSON.stringify(newKoi));
@@ -291,7 +293,7 @@ const KoiManagement = () => {
           >
             <div
               className="relative bg-white p-6 shadow-lg flex flex-col rounded-xl"
-              style={{ width: "70%" }}
+              style={{ width: "55%" }}
             >
               <h2 className="text-xl font-bold mb-4 text-center">
                 Add New Koi
@@ -393,6 +395,17 @@ const KoiManagement = () => {
                         name="length"
                         type="number"
                         value={addKoiFormik.values.length}
+                        onChange={addKoiFormik.handleChange}
+                      />
+                    </div>
+                    <div className="flex justify-between my-[15px]">
+                      <strong>Date of birth:</strong>
+                      <Input
+                        className="text-right w-1/2 pr-2"
+                        style={{ color: "black" }}
+                        name="dateOfBirth"
+                        type="date"
+                        value={addKoiFormik.values.dateOfBirth}
                         onChange={addKoiFormik.handleChange}
                       />
                     </div>

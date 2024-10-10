@@ -130,7 +130,7 @@ const StoreTemplate = () => {
               </Select>
             </div>
           </div>
-          <div className="grid lg:grid-cols-4 md:grid-cols-3 gap-[30px] grid-cols-2">
+          <div className="grid grid-cols-4 gap-6">
             {filteredProducts?.map((prd, index) => {
               console.log(
                 `Rendering product: ${prd?.id}, image: ${prd?.imageUrl}`
@@ -139,18 +139,14 @@ const StoreTemplate = () => {
                 <Card
                   key={prd?.id}
                   hoverable
-                  style={{
-                    width: 240,
-                    border: "1px solid #ccc",
-                    overflow: "hidden",
-                  }}
+                  className="w-full border-2 border-gray-200 shadow-lg" // Increased border width and used a darker shade
                   onClick={() => {
                     navigate(`${PATH.DETAIL_PRODUCT}/${prd?.slug}`);
                   }}
                   cover={
                     <img
                       alt={prd?.name}
-                      className="relative z-0 max-h-[250px] object-contain cursor-pointer"
+                      className="relative z-0 h-48 w-full object-cover cursor-pointer"
                       src={`${prd?.imageUrl}?t=${new Date().getTime()}`}
                     />
                   }

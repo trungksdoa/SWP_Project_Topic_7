@@ -75,7 +75,7 @@ const Header = () => {
             >
               {t("Store")}
             </NavLink>
-          </li>
+          </li> 
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"
