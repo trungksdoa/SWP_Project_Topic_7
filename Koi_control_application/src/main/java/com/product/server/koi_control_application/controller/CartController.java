@@ -4,7 +4,7 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.request.CartDTO;
-import com.product.server.koi_control_application.service_interface.ICartService;
+import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,9 +17,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static com.product.server.koi_control_application.mappingInterface.CartMappings.*;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/carts")
+@RequestMapping(BASE_CART)
 @Validated
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
@@ -41,20 +43,20 @@ public class CartController {
     }
 
 
-    @GetMapping("/user/{userId}")
+    @GetMapping(GET_CART_BY_USER)
     public ResponseEntity<BaseResponse> getCartByUser(@PathVariable int userId) {
         return ResponseUtil.createSuccessResponse(cartService.getCart(userId), "Cart items retrieved successfully");
     }
 
 
-    @PutMapping("/user/{userId}")
+    @PutMapping(PUT_CART)
     public ResponseEntity<BaseResponse> updateCartItem(@RequestBody @Valid CartDTO cartDTO, @PathVariable int userId) {
         return ResponseUtil.createSuccessResponse(cartService.updateCart(cartDTO, userId), "Cart item updated successfully");
     }
 
 
 
-    @DeleteMapping("/remove/{productId}/user/{userId}")
+    @DeleteMapping(REMOVE_CART_ITEM)
     public ResponseEntity<BaseResponse> removeFromCart(@PathVariable int productId, @PathVariable int userId) {
         cartService.deleteCart(productId, userId);
         return ResponseUtil.createSuccessResponse("OK", "Item removed from cart successfully");

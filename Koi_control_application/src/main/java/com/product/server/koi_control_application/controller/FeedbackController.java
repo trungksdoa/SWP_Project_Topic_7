@@ -4,7 +4,7 @@ import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.request.FeedbackDTO;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.service_interface.IFeedbackService;
+import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import static com.product.server.koi_control_application.mappingInterface.FeedbackMappings.BASE_FEEDBACK;
+import static com.product.server.koi_control_application.mappingInterface.FeedbackMappings.GET_FEEDBACKS_BY_PRODUCT;
+
 @RestController
-@RequestMapping("/api/feedbacks")
+@RequestMapping(BASE_FEEDBACK)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
@@ -38,7 +41,7 @@ public class FeedbackController {
         return ResponseUtil.createSuccessResponse(feedbackService.getAll(), "fetch data success");
     }
 
-    @GetMapping("/product/{productId}")
+    @GetMapping(GET_FEEDBACKS_BY_PRODUCT)
     public ResponseEntity<BaseResponse> getByProduct(@PathVariable int productId) {
         return ResponseUtil.createSuccessResponse(feedbackService.getFeedbacksByProductId(productId), "Feedbacks retrieved successfully by product " + productId);
     }

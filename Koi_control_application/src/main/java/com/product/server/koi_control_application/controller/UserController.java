@@ -3,8 +3,9 @@ package com.product.server.koi_control_application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.product.server.koi_control_application.custom_exception.ForbiddenException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.ForbiddenException;
+import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.mappingInterface.UserMappings;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
@@ -14,9 +15,9 @@ import com.product.server.koi_control_application.pojo.request.*;
 import com.product.server.koi_control_application.pojo.response.AuthResponse;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.response.UserResponse;
-import com.product.server.koi_control_application.service_interface.IEmailService;
-import com.product.server.koi_control_application.service_interface.IPackageService;
-import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.serviceInterface.IPackageService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,7 +53,8 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
 @RestController
-@RequestMapping("/api/users")
+//@RequestMapping("/api/users")
+@RequestMapping(UserMappings.BASE_USER)
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
@@ -65,7 +67,8 @@ public class UserController {
     private final IEmailService emailService;
     private final IPackageService packageService;
 
-    @GetMapping("{userId}")
+//    @GetMapping("{userId}")
+    @GetMapping(UserMappings.USER_GET_BY_ID)
     public ResponseEntity<BaseResponse> getUser(@PathVariable int userId) {
         Users user = userService.getUser(userId);
 
@@ -81,7 +84,8 @@ public class UserController {
         return ResponseUtil.createSuccessResponse(userResponse, "User retrieved successfully");
     }
 
-    @PostMapping("/auth/register")
+//    @PostMapping("/auth/register")
+    @PostMapping(UserMappings.USER_REGISTER)
     public ResponseEntity<BaseResponse> registerUser(@RequestBody UserRegister users) {
 
         Users savedUser = userService.saveUser(users);
@@ -94,7 +98,8 @@ public class UserController {
         return ResponseUtil.createResponse(null, "User registered successfully", HttpStatus.CREATED);
     }
 
-    @PostMapping("/auth/login")
+//    @PostMapping("/auth/login")
+    @PostMapping(UserMappings.USER_LOGIN)
     public ResponseEntity<BaseResponse> userLogin(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         try {
             Authentication authentication = authManager.authenticate(
@@ -129,7 +134,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/forgot-password")
+//    @PostMapping("/forgot-password")
+    @PostMapping(UserMappings.USER_FORGOT_PASSWORD)
     public ResponseEntity<BaseResponse> forgotPassword(@RequestBody @Valid EmailRequestDTO emailRequestDTO) {
         try {
             String newPassword = userService.generateNewPassword();
@@ -146,7 +152,8 @@ public class UserController {
         return URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8);
     }
 
-    @GetMapping("/verify/email/{email}")
+//    @GetMapping("/verify/email/{email}")
+    @GetMapping(UserMappings.USER_VERIFY_EMAIL)
     public ResponseEntity<BaseResponse> verifyEmail(@PathVariable String email) {
         try {
             Users user = userService.getUsersByEmail(decodeEmail(email));
@@ -160,7 +167,8 @@ public class UserController {
     }
 
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(UserMappings.USER_UPDATE_BY_ID)
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId,
                                                   @Schema(type = "string", format = "json", implementation = UserDTO.class)
@@ -176,7 +184,8 @@ public class UserController {
     }
 
 
-    @PostMapping("/add-package")
+//    @PostMapping("/add-package")
+    @PostMapping(UserMappings.USER_ADD_PACKAGE)
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageDTO req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);

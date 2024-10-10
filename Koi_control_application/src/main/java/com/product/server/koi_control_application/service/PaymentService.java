@@ -3,7 +3,7 @@ package com.product.server.koi_control_application.service;
 import com.product.server.koi_control_application.model.PaymentStatus;
 import com.product.server.koi_control_application.pojo.response.PaymentInfomationResponse;
 import com.product.server.koi_control_application.repository.PaymentRepository;
-import com.product.server.koi_control_application.service_interface.IPaymentService;
+import com.product.server.koi_control_application.serviceInterface.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
