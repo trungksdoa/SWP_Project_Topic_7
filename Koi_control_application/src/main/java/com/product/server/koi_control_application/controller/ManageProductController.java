@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.request.ProductDTO;
-import com.product.server.koi_control_application.service_interface.IProductService;
+import com.product.server.koi_control_application.serviceInterface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.product.server.koi_control_application.mappingInterface.ManageProductMappings.*;
+
 
 @RestController
-@RequestMapping("/manage/api/products")
+@RequestMapping(BASE_MANAGE_PRODUCT)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Validated
@@ -42,7 +44,7 @@ public class ManageProductController {
         return ResponseUtil.createResponse(createdProduct, "Access granted, created successfully", HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @PutMapping(value = UPDATE_PRODUCT, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<BaseResponse> updateProduct(
             @PathVariable("id") int productId,
             @Schema(type = "string", format = "json", implementation = ProductDTO.class)
@@ -57,7 +59,7 @@ public class ManageProductController {
         return ResponseUtil.createSuccessResponse(updatedProduct, "Access granted,  updated successfully");
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(DELETE_PRODUCT)
     public ResponseEntity<BaseResponse> deleteProduct(@PathVariable int id) {
         productService.deleteProduct(id);
         return ResponseUtil.createSuccessResponse(null, "Access granted,  deleted successfully");

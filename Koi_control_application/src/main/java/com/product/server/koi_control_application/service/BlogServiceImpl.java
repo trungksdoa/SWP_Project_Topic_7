@@ -1,13 +1,13 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.custom_exception.BadRequestException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.BadRequestException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Blogs;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.BlogsRepository;
-import com.product.server.koi_control_application.service_helper.interfaces.IBlogHelper;
-import com.product.server.koi_control_application.service_interface.IBlogService;
-import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.serviceHelper.interfaces.IBlogHelper;
+import com.product.server.koi_control_application.serviceInterface.IBlogService;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,9 +1,9 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.custom_exception.BadRequestException;
-import com.product.server.koi_control_application.custom_exception.ForbiddenException;
-import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.customException.BadRequestException;
+import com.product.server.koi_control_application.customException.ForbiddenException;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;

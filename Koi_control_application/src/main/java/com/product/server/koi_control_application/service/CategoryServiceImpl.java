@@ -1,9 +1,9 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.repository.CategoryRepository;
-import com.product.server.koi_control_application.service_interface.ICategoryService;
+import com.product.server.koi_control_application.serviceInterface.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

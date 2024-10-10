@@ -1,16 +1,17 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.AlreadyExistedException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.model.UserRole;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.request.UserRegister;
+import com.product.server.koi_control_application.pojo.response.UserResponseDTO;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.service_interface.IImageService;
-import com.product.server.koi_control_application.service_interface.IPackageService;
-import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
+import com.product.server.koi_control_application.serviceInterface.IPackageService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -164,8 +165,8 @@ public class UserServiceImpl implements IUserService {
      * @return A List of all User objects
      */
     @Override
-    public List<Users> getUsers() {
-        return usersRepository.findAll();
+    public List<UserResponseDTO> getUsers() {
+        return usersRepository.fetchAllUsers();
     }
 
 
