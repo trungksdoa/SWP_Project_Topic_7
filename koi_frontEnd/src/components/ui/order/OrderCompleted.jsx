@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import { Spin } from "antd";
-import { Button, Modal } from "antd";
+import React, { useState } from 'react';
+import { Spin, Modal } from 'antd';
 import ReceiptComponent from "../checkout/ReceiptComponent";
 
-const OrderPaid = ({ lstPaid, isFetching }) => {
+const OrderCompleted = ({ lstCompleted, isFetching }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const handleClick = (order) => {
     setSelectedOrder(order);
-    showModal(); // Mở modal ngay khi chọn order
+    showModal();
   };
 
   const showModal = () => {
@@ -26,7 +25,7 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
 
   if (isFetching) {
     return (
-      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+      <div className="flex justify-center items-center h-full">
         <Spin tip="Loading" size="large" />
       </div>
     );
@@ -34,9 +33,9 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
 
   return (
     <div className="w-[60%] mx-auto mb-[100px]">
-      {lstPaid.map((order) => (
+      {lstCompleted.map((order) => (
         <div key={order.id} className="p-[15px] shadow my-[30px] order-item">
-          <div className="text-right text-orange-500 font-semibold mb-[10px] border-b-gray-200 border-b-[1px]">
+          <div className="text-right text-blue-500 font-semibold mb-[10px] border-b-gray-200 border-b-[1px]">
             {order?.status}
           </div>
           {order?.items?.map((item) => (
@@ -45,7 +44,7 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
                 <img
                   src={item?.productId?.imageUrl}
                   className="w-[80px] h-[80px] object-contain mr-[30px]"
-                  alt={item?.productId?.name}
+                  alt=""
                 />
                 <div>
                   <h2>{item?.productId?.name}</h2>
@@ -63,17 +62,22 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
               Total Price:{" "}
               <span
                 onClick={() => handleClick(order)}
-                className="text-orange-700 cursor-pointer"
+                className="text-blue-700 cursor-pointer"
               >
                 ${order?.totalAmount}
               </span>
             </p>
             <span
-              className="font-semibold cursor-pointer hover:text-orange-500 transition-all ease-in-out duration-300"
-              onClick={() => handleClick(order)} // Gọi khi click vào Receipt
+              className="font-semibold cursor-pointer hover:text-blue-500 transition-all ease-in-out duration-300"
+              onClick={() => handleClick(order)}
             >
               Receipt
             </span>
+          </div>
+          <div className="mt-[15px] text-right">
+            <p className="text-green-600 font-semibold">
+              Order Completed on: {new Date(order?.updatedAt).toLocaleString()}
+            </p>
           </div>
         </div>
       ))}
@@ -83,7 +87,6 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        {/* Truyền selectedOrder vào ReceiptComponent */}
         {selectedOrder && (
           <ReceiptComponent selectedOrder={selectedOrder} />
         )}
@@ -92,4 +95,4 @@ const OrderPaid = ({ lstPaid, isFetching }) => {
   );
 };
 
-export default OrderPaid;
+export default OrderCompleted;
