@@ -6,6 +6,6 @@ const api = apiInstance.create({
 })
 
 export const manageBlogsServices = {
-    getAllBlogs: () => api.get(""),
+    getAllBlogs: () => api.get("/"),
     getBlogsBySlug: (slug) => api.get(`/title/${slug}`)
 }
