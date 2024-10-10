@@ -5,9 +5,9 @@ import com.product.server.koi_control_application.model.WaterQualityStandard;
 import com.product.server.koi_control_application.pojo.WaterParameterUpdateRequest;
 import com.product.server.koi_control_application.model.WaterParameter;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.service_interface.IPondService;
+import com.product.server.koi_control_application.serviceInterface.IPondService;
 
-import com.product.server.koi_control_application.service_interface.IWaterParameterService;
+import com.product.server.koi_control_application.serviceInterface.IWaterParameterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

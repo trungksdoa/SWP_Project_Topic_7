@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.service_interface.IPaymentService;
+import com.product.server.koi_control_application.serviceInterface.IPaymentService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.LocalDateTime;
 
+import static com.product.server.koi_control_application.mappingInterface.PaymentStatusMappings.*;
+
 
 @RestController
-@RequestMapping("/manage/api/paymentStatus")
+@RequestMapping(BASE_PAYMENT_STATUS)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 
@@ -34,24 +36,22 @@ public class PaymentStatusController {
     }
 
 
-    @DeleteMapping("/clear-payment-status")
+    @DeleteMapping(CLEAR_PAYMENT_STATUS + '/')
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> clearPaymentStatus(@RequestParam LocalDateTime fromDate, @RequestParam LocalDateTime toDate) {
         paymentStatusService.clearPaymentStatusByDate(fromDate, toDate);
         return ResponseUtil.createSuccessResponse("OK", "Clear payment status successfully");
     }
 
-    @GetMapping("/get-payment-status")
+    @GetMapping(GET_PAYMENT_STATUS)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> getPaymentStatus() {
         return ResponseUtil.createSuccessResponse(paymentStatusService.getAllPaymentInfo(), "Get payment status successfully");
     }
 
 
-    @GetMapping("/payment-gateway-url")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN'," +
-            "'ROLE_MEMBER'," +
-            "'ROLE_SHOP')")
+    @GetMapping(GET_PAYMENT_GATEWAY_URL + '/')
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN'," + "'ROLE_MEMBER'," + "'ROLE_SHOP')")
     public ResponseEntity<BaseResponse> getPaymentGatewayUrl(@RequestParam int orderId, HttpServletRequest request) {
         int userId = jwt.getUserIdFromToken(request);
 

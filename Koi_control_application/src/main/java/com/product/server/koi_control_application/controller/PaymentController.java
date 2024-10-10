@@ -6,10 +6,10 @@ import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.PaymentStatus;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.*;
-import com.product.server.koi_control_application.service_interface.ICartService;
-import com.product.server.koi_control_application.service_interface.IOrderService;
-import com.product.server.koi_control_application.service_interface.IPaymentService;
-import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.ICartService;
+import com.product.server.koi_control_application.serviceInterface.IOrderService;
+import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +27,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import static com.product.server.koi_control_application.enums.PaymentCode.*;
+import static com.product.server.koi_control_application.mappingInterface.PaymentMappings.*;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
 
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping(BASE_PAYMENT)
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "PaymentStatus", description = "API for PaymentStatus")
@@ -48,7 +49,7 @@ public class PaymentController {
      * @param callbackResponse: MoMo callback response
      * @return: Hello
      */
-    @PostMapping("/callback")
+    @PostMapping(MOMO_CALLBACK)
     public String callback(@RequestBody MomoCallbackResponse callbackResponse) {
         log.info("Received MoMo callback: " + callbackResponse.toString());
         handleMomoCallback(callbackResponse);
@@ -61,7 +62,7 @@ public class PaymentController {
      * @return: MoMo payment response
      * @throws Exception
      */
-    @PostMapping("/create-momo-payment")
+    @PostMapping(CREATE_MOMO_PAYMENT)
     public ResponseEntity<JsonNode> createMomoPayment(@RequestBody MomoPaymentRequest mapData) throws Exception {
         MomoPaymentInfo paymentInfo = getPaymentInfo(mapData);
         String rawSignature = createRawSignature(paymentInfo);
@@ -112,7 +113,7 @@ public class PaymentController {
      * @param orderInfo: order info
      * @param orderType: order type
      */
-    @GetMapping("/redirect-momo-callback/")
+    @GetMapping(MOMO_REDIRECT)
     public ResponseEntity<Void> handleMomoRedirect(@RequestParam("partnerCode") String partnerCode, @RequestParam("orderId") String orderId, @RequestParam("requestId") String requestId, @RequestParam("amount") String amount, @RequestParam("orderInfo") String orderInfo, @RequestParam("orderType") String orderType, @RequestParam("transId") String transId, @RequestParam("resultCode") String resultCode, @RequestParam("message") String message, @RequestParam("payType") String payType, @RequestParam("responseTime") String responseTime, @RequestParam("extraData") String extraData, @RequestParam("signature") String signature) {
         // Xử lý cập nhật trạng thái đơn hàng
         try {

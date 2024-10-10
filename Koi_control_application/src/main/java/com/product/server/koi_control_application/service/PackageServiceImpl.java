@@ -4,7 +4,7 @@ import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.PackageRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
-import com.product.server.koi_control_application.service_interface.IPackageService;
+import com.product.server.koi_control_application.serviceInterface.IPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

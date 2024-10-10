@@ -1,13 +1,13 @@
 package com.product.server.koi_control_application;
 
-import com.product.server.koi_control_application.custom_exception.BadRequestException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.BadRequestException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.repository.CartRepository;
 import com.product.server.koi_control_application.service.CartServiceImpl;
-import com.product.server.koi_control_application.service_helper.CartHelper;
-import com.product.server.koi_control_application.service_interface.IProductService;
+import com.product.server.koi_control_application.serviceHelper.CartHelper;
+import com.product.server.koi_control_application.serviceInterface.IProductService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
