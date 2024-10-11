@@ -69,6 +69,8 @@ public class KoiFish {
     @Column(name = "pond_id", nullable = true)
     private int pondId;
     //
+    @Column(name = "in_pond_from")
+    private LocalDate inPondFrom;
 
 
     @Positive(message = "Width must be positive")
@@ -126,7 +128,7 @@ public class KoiFish {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if(ageMonth == 0){
+        if(ageMonth == null){
             countageMonth();
         }else if(dateOfBirth == null){
             dateOfBirthCal();
@@ -136,6 +138,10 @@ public class KoiFish {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        countageMonth();
+        if(ageMonth == 0){
+            countageMonth();
+        }else if(dateOfBirth == null){
+            dateOfBirthCal();
+        }
     }
 }
