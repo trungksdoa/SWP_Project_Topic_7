@@ -183,7 +183,7 @@ const KoiManagement = () => {
       variety: selectedKoi?.variety || "",
       sex: selectedKoi?.sex ? "Female" : "Male",
       purchasePrice: selectedKoi?.purchasePrice || "",
-      dateOfBirth: selectedKoi?.dateOfBirth || "", // Check if dateOfBirth exists
+      dateOfBirth: selectedKoi?.dateOfBirth || "", 
       pondId: selectedKoi?.pondId || null,
       weight: selectedKoi?.weight || null,
       image: null,
@@ -191,30 +191,45 @@ const KoiManagement = () => {
     onSubmit: handleUpdate,
   });
 
+  const calculateAgeMonths = (dateOfBirth) => {
+    if (!dateOfBirth) return 0;
+    const birthDate = dayjs(dateOfBirth);
+    const currentDate = dayjs();
+    const diffMonths = currentDate.diff(birthDate, 'month');
+    return diffMonths;
+  };
+
   const addKoiFormik = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: "",
       variety: "",
-      sex: true,
+      sex: true, // true for Female, false for Male
       purchasePrice: 0,
       weight: 0,
       length: 0,
       pondId: null,
+      dateOfBirth: null,
       image: null,
     },
     onSubmit: (values) => {
-      console.log(values);
+      console.log("Submitting new koi:", values);
       const formData = new FormData();
+      const currentDate = dayjs();
+      const ageMonth = calculateAgeMonths(values.dateOfBirth);
+
       const newKoi = {
-        name: values.name,
-        variety: values.variety,
-        sex: values.sex === "Female",
-        purchasePrice: parseFloat(values.purchasePrice),
-        weight: parseFloat(values.weight),
-        length: parseFloat(values.length),
-        pondId: parseInt(values.pondId),
-        userId: userId,
+        name: values.name || "",
+        variety: values.variety || "",
+        sex: values.sex === "true", 
+        purchasePrice: parseFloat(values.purchasePrice) || 0,
+        weight: parseFloat(values.weight) || 0,
+        length: parseFloat(values.length) || 0,
+        pondId: parseInt(values.pondId) || null,
+        dateOfBirth: values.dateOfBirth,
+        userId: userId, 
+        date: currentDate.format('YYYY-MM-DD'),
+        ageMonth: ageMonth,
       };
       formData.append("fish", JSON.stringify(newKoi));
       if (values.image) {
@@ -222,6 +237,7 @@ const KoiManagement = () => {
       }
       addKoiMutation.mutate(formData, {
         onSuccess: (addedKoi) => {
+          console.log("Koi added successfully:", addedKoi);
           const newKoiWithImage = {
             ...addedKoi,
             imageUrl: imgSrc,
@@ -241,9 +257,6 @@ const KoiManagement = () => {
     },
   });
 
-  // if (!lstKoi) {
-  //     return <div>Loading...</div>;
-  // }
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -291,7 +304,7 @@ const KoiManagement = () => {
           >
             <div
               className="relative bg-white p-6 shadow-lg flex flex-col rounded-xl"
-              style={{ width: "70%" }}
+              style={{ width: "55%" }}
             >
               <h2 className="text-xl font-bold mb-4 text-center">
                 Add New Koi
@@ -397,6 +410,17 @@ const KoiManagement = () => {
                       />
                     </div>
                     <div className="flex justify-between my-[15px]">
+                      <strong>Date of birth:</strong>
+                      <Input
+                        className="text-right w-1/2 pr-2"
+                        style={{ color: "black" }}
+                        name="dateOfBirth"
+                        type="date"
+                        value={addKoiFormik.values.dateOfBirth}
+                        onChange={addKoiFormik.handleChange}
+                      />
+                    </div>
+                    <div className="flex justify-between my-[15px]">
                       <strong>Pond:</strong>
                       {lstPond?.map((pond, index) => (
                         <div key={index} className="text-center">
@@ -422,15 +446,6 @@ const KoiManagement = () => {
                           </h3>
                         </div>
                       ))}
-
-                      {/* <Input
-                                                className="text-right w-1/2 pr-2"
-                                                style={{color: 'black'}}    
-                                                name="pondId"
-                                                type="number"
-                                                value={addKoiFormik.values.pondId}
-                                                onChange={addKoiFormik.handleChange}
-                                            /> */}
                     </div>
 
                     <Form.Item className="mt-4">

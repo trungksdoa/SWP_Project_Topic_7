@@ -1,19 +1,18 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.custom_exception.AlreadyExistedException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.AlreadyExistedException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.KoiGrowthHistory;
-import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.KoiGrowthHistoryRepository;
 import com.product.server.koi_control_application.repository.PondRepository;
 import com.product.server.koi_control_application.repository.UsersRepository;
-import com.product.server.koi_control_application.service_interface.IImageService;
-import com.product.server.koi_control_application.service_interface.IKoiFishService;
-import com.product.server.koi_control_application.service_interface.IPackageService;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
+import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
+import com.product.server.koi_control_application.serviceInterface.IPackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

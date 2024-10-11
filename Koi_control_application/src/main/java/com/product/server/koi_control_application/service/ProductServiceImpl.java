@@ -1,17 +1,17 @@
 package com.product.server.koi_control_application.service;
 
 
-import com.product.server.koi_control_application.custom_exception.BadRequestException;
-import com.product.server.koi_control_application.custom_exception.NotFoundException;
+import com.product.server.koi_control_application.customException.BadRequestException;
+import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Product;
 import com.product.server.koi_control_application.pojo.OutStockProduct;
 import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.CategoryRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
-import com.product.server.koi_control_application.service_helper.interfaces.IProductHelper;
-import com.product.server.koi_control_application.service_interface.IImageService;
-import com.product.server.koi_control_application.service_interface.IProductService;
+import com.product.server.koi_control_application.serviceHelper.interfaces.IProductHelper;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
+import com.product.server.koi_control_application.serviceInterface.IProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

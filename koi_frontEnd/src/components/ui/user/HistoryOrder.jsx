@@ -5,6 +5,9 @@ import { Radio, Tabs } from "antd";
 import OrderPaid from "../order/OrderPaid";
 import OrderPending from "../order/OrderPending";
 import OrderCancel from "../order/OrderCancel";
+import OrderDelivered from "../order/OrderDelivered";
+import OrderDelivering from "../order/OrderDelivering";
+import OrderCompleted from "../order/OrderCompleted";
 
 const HistoryOrder = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -15,8 +18,11 @@ const HistoryOrder = () => {
   const [lstPaid, setLstPaid] = useState([]);
   const [lstPending, setLstPending] = useState([]);
   const [lstCancel, setLstCancel] = useState([]);
-
+  const [lstDelivered, setLstDelivered] = useState([]);
+  const [lstDelivering, setLstDelivering] = useState([]);
+  const [lstCompleted, setLstCompleted] = useState([]);
   useEffect(() => {
+    console.log("Raw lstOrder data:", lstOrder);
     const paidOrders =
       lstOrder?.filter(
         (order) =>
@@ -28,11 +34,25 @@ const HistoryOrder = () => {
       lstOrder?.filter((order) => order?.status === "PENDING") || [];
     const cancelledOrders =
       lstOrder?.filter((order) => order?.status === "CANCELLED") || [];
+    const deliveredOrders =
+      lstOrder?.filter((order) => order?.status === "DELIVERED") || [];
+     const deliveringOrders =
+       lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
+    const completedOrders =
+      lstOrder?.filter((order) => order?.status === "COMPLETED") || [];
 
-    setLstPaid(paidOrders);
-    setLstPending(pendingOrders);
-    setLstCancel(cancelledOrders);
-  }, [lstOrder]);
+  //   setLstPaid(paidOrders);
+  //   setLstPending(pendingOrders);
+  //   setLstCancel(cancelledOrders);
+  // }, [lstOrder]);
+    setLstDelivered(deliveredOrders);
+    setLstDelivering(deliveringOrders);
+    setLstCompleted(completedOrders);
+  }, [lstOrder]); 
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const handleModeChange = (e) => {
     setMode(e.target.value);
@@ -45,8 +65,10 @@ const HistoryOrder = () => {
   };
 
   return (
-    <div className="my-[60px]">
-      <h2 className="font-bold text-[24px] mb-[40px]">History Order</h2>
+    <div>
+      <div className="flex justify-center items-center text-bold text-3xl m-2 mb-2">
+        <strong>History Order</strong>
+      </div>      
       <div>
         <Radio.Group
           onChange={handleModeChange}
@@ -66,11 +88,6 @@ const HistoryOrder = () => {
           style={{}}
           items={[
             {
-              label: "Paid Orders",
-              key: "paid",
-              children: <OrderPaid lstPaid={lstPaid} isFetching={isFetching} />,
-            },
-            {
               label: "Pending Orders",
               key: "pending",
               children: (
@@ -83,12 +100,34 @@ const HistoryOrder = () => {
               ),
             },
             {
+              label: "Paid Orders",
+              key: "paid",
+              children: <OrderPaid lstPaid={lstPaid} isFetching={isFetching} />,
+            },
+            {
+              label: "Delivering Orders",
+              key: "delivering",
+              children: <OrderDelivering lstDelivering={lstDelivering} isFetching={isFetching} />,
+            },
+            {
+              label: "Delivered Orders",
+              key: "delivered",
+              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} />,
+            },
+            {
+              label: "Completed Orders",
+              key: "completed",
+              children: <OrderCompleted lstCompleted={lstCompleted} isFetching={isFetching} />,
+            },
+            {
               label: "Cancelled Orders",
               key: "cancel",
               children: (
                 <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />
               ),
             },
+            //   children: <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />,
+            // }
           ]}
         />
       </div>

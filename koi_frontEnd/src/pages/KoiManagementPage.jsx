@@ -6,6 +6,8 @@ import { PATH } from "../constant/config.js";
 import { toast } from "react-toastify";
 import KoiManagement from "../components/ui/manage/KoiManegement.jsx"
 import BreadcrumbComponent from "../components/ui/BreadcrumbCoponent.jsx";
+import { useTranslation } from 'react-i18next'
+
 
 const KoiManagementPage = () => {
     const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -13,12 +15,13 @@ const KoiManagementPage = () => {
 
     useEffect(() => {
         if (!userLogin) {
-            toast.warning("Let's Login or Register to use this feature !");
+            toast.warning(t("Please sign in or create an account to access this feature."));
             navigate(PATH.HOME);
         }
     }, []);
 
     const { data: lstKoi } = useGetAllKoi();
+    const { t } = useTranslation();
 
     const breadcrumbItems = [
         { name: 'Home', path: '/' },

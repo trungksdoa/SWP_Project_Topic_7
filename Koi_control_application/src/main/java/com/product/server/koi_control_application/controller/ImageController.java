@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.service.ImageServiceImpl;
-import com.product.server.koi_control_application.service_interface.IImageService;
+import com.product.server.koi_control_application.serviceInterface.IImageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;

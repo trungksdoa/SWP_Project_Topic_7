@@ -89,13 +89,15 @@ const EditBlog = () => {
   }, [parseId])
   return (
     <div>
+      <div className="flex justify-center items-center text-bold text-3xl h-full m-8 mb-3">
+          <strong>Blogs Editors</strong>
+      </div>
       <Form
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 16 }}
         onSubmitCapture={formik.handleSubmit}
         className="p-4"
-      >
-        <h1 className="font-bold"> Blogs Editor</h1>
+      >  
         <Form.Item label="Title">
           <Input
             placeholder="Title"
