@@ -8,8 +8,8 @@ import OrderCancel from "../order/OrderCancel";
 
 const HistoryOrder = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: lstOrder , refetch, isFetching} = useGetOrder(userLogin?.id);
-  console.log(lstOrder)
+  const { data: lstOrder, refetch, isFetching } = useGetOrder(userLogin?.id);
+  console.log(lstOrder);
   const [mode, setMode] = useState("top");
 
   const [lstPaid, setLstPaid] = useState([]);
@@ -18,7 +18,12 @@ const HistoryOrder = () => {
 
   useEffect(() => {
     const paidOrders =
-      lstOrder?.filter((order) => order?.status === "SUCCESS") || [];
+      lstOrder?.filter(
+        (order) =>
+          order?.status === "SUCCESS" ||
+          order?.status === "SEND" ||
+          order?.status === "SHIPPING"
+      ) || [];
     const pendingOrders =
       lstOrder?.filter((order) => order?.status === "PENDING") || [];
     const cancelledOrders =
@@ -27,13 +32,13 @@ const HistoryOrder = () => {
     setLstPaid(paidOrders);
     setLstPending(pendingOrders);
     setLstCancel(cancelledOrders);
-  }, [lstOrder]); 
+  }, [lstOrder]);
 
   const handleModeChange = (e) => {
     setMode(e.target.value);
   };
 
-  const [activeKey, setActiveKey] = useState("paid"); 
+  const [activeKey, setActiveKey] = useState("paid");
 
   const switchToCancelledTab = () => {
     setActiveKey("cancel");
@@ -55,7 +60,7 @@ const HistoryOrder = () => {
         </Radio.Group>
         <Tabs
           activeKey={activeKey}
-          onChange={setActiveKey} 
+          onChange={setActiveKey}
           defaultActiveKey="1"
           tabPosition={mode}
           style={{}}
@@ -68,12 +73,21 @@ const HistoryOrder = () => {
             {
               label: "Pending Orders",
               key: "pending",
-              children: <OrderPending lstPending={lstPending} isFetching={isFetching} refetch={refetch} switchToCancelledTab={switchToCancelledTab} />,
+              children: (
+                <OrderPending
+                  lstPending={lstPending}
+                  isFetching={isFetching}
+                  refetch={refetch}
+                  switchToCancelledTab={switchToCancelledTab}
+                />
+              ),
             },
             {
               label: "Cancelled Orders",
               key: "cancel",
-              children: <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />,
+              children: (
+                <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />
+              ),
             },
           ]}
         />
