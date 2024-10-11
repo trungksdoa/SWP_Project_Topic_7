@@ -162,7 +162,7 @@ const Cart = () => {
           key={index}
           className="w-full items-center justify-between px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px]"
         >
-          <img src={product?.imageUrl} className="w-[20%]" alt="" />
+          <img src={product?.imageUrl} className="w-20 h-20" alt="" />
           <h2 className="w-[40%] text-center">{product?.name}</h2>
           <p className="w-[15%] text-center">${product?.price}</p>
           <InputNumber

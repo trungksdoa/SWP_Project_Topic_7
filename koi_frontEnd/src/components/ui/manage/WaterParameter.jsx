@@ -15,8 +15,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useUpdateWaterParameter } from "../../../hooks/koi/useUpdateWaterParameter.js";
 import { toast } from "react-toastify";
 import { useGetWaterStandard } from "../../../hooks/koi/useGetWaterStandard.js";
+import { useTranslation } from 'react-i18next'
+
 
 const WaterParameter = () => {
+  const { t } = useTranslation();
   const [selectedPond, setSelectedPond] = useState(null); // Hồ được chọn
   const [showStore, setShowStore] = useState(false);
   const [waterParameters, setWaterParameters] = useState(null); // Thông số nước của hồ
@@ -54,10 +57,12 @@ const WaterParameter = () => {
 
   useEffect(() => {
     if (!userLogin) {
-      toast.warning("Let's Login or Register to use this feature !");
-      navigate(PATH.HOME);
+        toast.warning(t("Please sign in or create an account to access this feature."));
+        navigate(PATH.HOME);
     }
   }, []);
+
+  
   useEffect(() => {
     const fetchWaterData = async () => {
       if (selectedPond) {
