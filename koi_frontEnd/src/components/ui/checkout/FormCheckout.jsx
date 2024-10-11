@@ -6,12 +6,12 @@ import { usePostOrder } from "../../../hooks/order/usePostOrder";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const FormCheckout = ({ totalItems }) => {
+const FormCheckout = ({ totalItems, totalPrice }) => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   console.log(totalItems);
   const mutation = usePostOrder();
-  const navigate = useNavigate()
-  console.log(window.location.href)
+  const navigate = useNavigate();
+  console.log(window.location.href);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -24,11 +24,10 @@ const FormCheckout = ({ totalItems }) => {
       console.log(values);
       mutation.mutate(values, {
         onSuccess: (res) => {
-          
-          console.log(res?.data?.data)
-            window.location.href = res?.data?.data?.shortLink   
-        }
-      })
+          console.log(res?.data?.data);
+          window.location.href = res?.data?.data?.shortLink;
+        },
+      });
     },
   });
   return (
@@ -71,10 +70,20 @@ const FormCheckout = ({ totalItems }) => {
             <span className="text-orange-500 font-bold">{totalItems}</span>{" "}
             items
           </span>
-          <Button className="!bg-black text-white hover:!bg-black hover:!text-white p-4" loading={mutation.isPending} htmlType="submit">
-            PLACE ORDER
-          </Button>
+          <span>
+            Total Price:{" "}
+            <span className="text-orange-500 font-bold">$ {totalPrice}</span>{" "}
+          </span>
         </div>
+       <div className="text-right mt-[15px]">
+       <Button
+          className="!bg-black text-white hover:!bg-black hover:!text-white p-4"
+          loading={mutation.isPending}
+          htmlType="submit"
+        >
+          PLACE ORDER
+        </Button>
+       </div>
       </Form>
     </div>
   );
