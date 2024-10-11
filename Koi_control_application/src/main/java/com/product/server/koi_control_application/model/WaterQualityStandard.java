@@ -116,7 +116,7 @@ public class WaterQualityStandard {
                     .setScale(2, RoundingMode.HALF_UP);
         }
         this.amountFedStandard = new BigDecimal("0.00");
-        if (koiFishs != null) {
+        if (koiFishs != null) { 
             for(KoiFish Koi : koiFishs){
                 BigDecimal weight = Koi.getWeight();
                 this.amountFedStandard = this.amountFedStandard.add(new BigDecimal("0.03").multiply(weight));
