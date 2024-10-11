@@ -28,9 +28,17 @@ public class PaymentStatus {
 
     private LocalDateTime paymentDate;
 
+    private LocalDateTime updatedDate;
+
     @PrePersist
     public void prePersist() {
         this.paymentDate = LocalDateTime.now();
+    }
+
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedDate = LocalDateTime.now();
     }
 
 }

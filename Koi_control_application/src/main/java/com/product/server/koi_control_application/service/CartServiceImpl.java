@@ -13,6 +13,7 @@ import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.serviceInterface.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -86,6 +87,7 @@ public class CartServiceImpl implements ICartService {
 
 
     @Override
+    @Transactional
     public void clearCart(int userId) {
         if (cartRepository.findByUserId(userId).isEmpty()) {
             throw new NotFoundException("Cart is empty");
