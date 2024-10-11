@@ -42,8 +42,7 @@ public class OpenAPIConfig {
     private String description;
 
     private final List<Server> servers = List.of(
-            new Server().url(serverUrl).description("Production server"),
-            new Server().url(devUrl).description("Development server")
+            new Server().url(serverUrl).description("Production server")
     );
 
     private final List<Tag> tagList = List.of(
@@ -73,7 +72,7 @@ public class OpenAPIConfig {
                         .version(version)
                         .contact(new Contact().name(name).email(email))
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
-                .servers(servers)
+                .servers(List.of(new Server().url(serverUrl), new Server().url("http://localhost:8080")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",

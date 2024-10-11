@@ -10,7 +10,7 @@ const OrderCancel = ( { lstCancel, isFetching } ) => {
     );
   }
   return (
-    <div className="w-[60%] mx-auto">
+    <div className="w-[60%] mx-auto mb-[100px]">
             {lstCancel.map((order) => (
         <div key={order.id} className=" p-[15px] shadow my-[30px] order-item">
           <div className="text-right text-orange-500 font-semibold mb-[10px] border-b-gray-200 border-b-[1px]">

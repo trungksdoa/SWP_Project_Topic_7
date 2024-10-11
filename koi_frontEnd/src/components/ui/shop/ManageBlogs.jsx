@@ -99,7 +99,7 @@ const ManageBlogs = () => {
         return ((
           <>
             <Button
-              className="mr-[15px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
+              className="mr-[15px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white w-20 h-8" 
               onClick={() => {
                 navigate(`${PATH.EDIT_BLOG}/${record?.id}`);
               }}
@@ -111,7 +111,7 @@ const ManageBlogs = () => {
                 handleDelete(record?.id);
               }}
               loading={deletingId === record?.id}
-              className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
+              className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out w-20 h-8" 
             >
               Delete
             </Button>
@@ -124,7 +124,9 @@ const ManageBlogs = () => {
 
   return (
     <div className="my-[60px]">
-      <h1>{t("Manage Blog")}</h1>
+    <div className="flex justify-center items-center text-bold text-3xl h-2 mb-2">
+        <strong>Manage Blog</strong>
+      </div>      
       <button className="bg-black text-white px-[12px] py-[8px] rounded-[6px] mb-[30px]" onClick={() =>{
         navigate(PATH.ADD_BLOG)
       }}>Add Blogs</button>

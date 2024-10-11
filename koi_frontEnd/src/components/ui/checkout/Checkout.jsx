@@ -63,7 +63,7 @@ const Checkout = () => {
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="w-[100px]  mr-2"
+          className="w-20 h-20 mr-2"
         />{" "}
         {/* Added image */}
         {product.name}

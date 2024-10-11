@@ -44,7 +44,6 @@ public class Orders {
     @JsonIgnoreProperties("order")
     private Set<OrderItems> items = new HashSet<>();
 
-
     private String responseFromAdmin;
 
     @Column(name = "created_at", updatable = false)

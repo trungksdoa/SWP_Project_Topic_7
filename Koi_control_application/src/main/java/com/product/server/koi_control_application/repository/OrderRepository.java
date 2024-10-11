@@ -33,4 +33,11 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
     int updateOrderStatusForOldOrders(@Param("newStatus") String newStatus,
                                       @Param("currentStatus") String currentStatus,
                                       @Param("cutoffDate") LocalDateTime cutoffDate);
+
+    @Modifying
+    @Query("UPDATE Orders o SET o.status = :newStatus WHERE o.status = :currentStatus")
+    int updateSimulatorOrder(@Param("newStatus") String newStatus,
+                             @Param("currentStatus") String currentStatus);
+
+
 }

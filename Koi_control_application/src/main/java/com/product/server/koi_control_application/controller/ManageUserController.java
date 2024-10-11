@@ -2,7 +2,7 @@ package com.product.server.koi_control_application.controller;
 
 
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +32,11 @@ public class ManageUserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<BaseResponse> fetchAllUser() {
         return ResponseUtil.createSuccessResponse(userService.getUsers(), "Access granted");
+    }
+
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse> fetchAllUser(@RequestParam int page, @RequestParam int size) {
+        return ResponseUtil.createSuccessResponse(userService.getUsers(page, size), "Access granted");
     }
 }

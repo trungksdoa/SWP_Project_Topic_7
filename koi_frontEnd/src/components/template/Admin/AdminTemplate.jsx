@@ -87,6 +87,11 @@ const AdminTemplate = () => {
                 {t("Manage Order")}
               </NavLink>
             </Menu.Item>
+            <Menu.Item className="text-white" key={9} icon={<HomeFilled style={{color: "white"}}/>}>
+              <NavLink key={7} to={PATH.HOME} className="!text-white">
+                {t("Back to home")}
+              </NavLink>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout>

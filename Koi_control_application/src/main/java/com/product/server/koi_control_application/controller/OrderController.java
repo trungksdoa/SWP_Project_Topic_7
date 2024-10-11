@@ -10,10 +10,10 @@ import com.product.server.koi_control_application.pojo.momo.*;
 import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import com.product.server.koi_control_application.pojo.request.OrderVerifyDTO;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.service_interface.ICategoryService;
-import com.product.server.koi_control_application.service_interface.IOrderService;
-import com.product.server.koi_control_application.service_interface.IPaymentService;
-import com.product.server.koi_control_application.service_interface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.ICategoryService;
+import com.product.server.koi_control_application.serviceInterface.IOrderService;
+import com.product.server.koi_control_application.serviceInterface.IPaymentService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,12 +30,12 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 import static com.product.server.koi_control_application.enums.PaymentCode.FAILED;
+import static com.product.server.koi_control_application.mappingInterface.OrderMappings.*;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.PAYMENT_URL;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.sendHttpRequest;
 
-
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping(BASE_ORDER)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
@@ -47,7 +47,8 @@ public class OrderController {
     private final ICategoryService categoryService;
     private final IPaymentService paymentService;
 
-    @PostMapping("/create-product-order")
+    //    @PostMapping("/create-product-order")
+    @PostMapping(CREATE_ORDER)
     public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderRequestDTO req, HttpServletRequest request) throws Exception {
 
         int userId = jwtUtil.getUserIdFromToken(request);
@@ -90,7 +91,8 @@ public class OrderController {
     }
 
 
-    @GetMapping("/{id}")
+    //    @GetMapping("/{id}")
+    @GetMapping(GET_ORDER_BY_ID)
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
         return ResponseUtil.createSuccessResponse(order, "Order retrieved successfully");
@@ -102,19 +104,22 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @GetMapping("/user/{userId}/")
+    //    @GetMapping("/user/{userId}/")
+    @GetMapping(GET_ORDER_BY_USER + '/')
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @RequestParam int page, @RequestParam int size) {
         Page<Orders> orders = orderService.getOrdersByUser(userId, page, size);
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @GetMapping("/user/{userId}/list")
+    //    @GetMapping("/user/{userId}/list")
+    @GetMapping(GET_ORDER_LIST_BY_USER)
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId) {
         List<Orders> orders = orderService.getOrdersByUser(userId);
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @GetMapping("/status/{orderId}")
+    //    @GetMapping("/status/{orderId}")
+    @GetMapping(GET_ORDER_STATUS)
     public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
         Orders order = orderService.getOrderById(orderId);
 
@@ -123,7 +128,8 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(map, "Order status retrieved successfully");
     }
 
-    @GetMapping("/user/{userId}")
+    //    @GetMapping("/user/{userId}")
+    @GetMapping(GET_ORDER_BY_USER)
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
                                                         @RequestParam(defaultValue = "0", required = false) int page,
                                                         @RequestParam(defaultValue = "10", required = false) int size) {
@@ -131,7 +137,8 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }
 
-    @DeleteMapping("/user/{userId}/order/{orderId}")
+    //    @DeleteMapping("/user/{userId}/order/{orderId}")
+    @DeleteMapping(CANCEL_PENDING_ORDER)
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
         paymentService.updatePaymentStatus(orderId, "product", FAILED.getValue());
@@ -160,7 +167,8 @@ public class OrderController {
         return momoProducts;
     }
 
-    @PostMapping("/receive-order")
+    //    @PostMapping("/receive-order")
+    @PostMapping(VERIFY_ORDER)
     @Operation(summary = "Mark an order as received", description = "From other user updates their order status to DELIVERED " + " : " +
             "{" +
             "PENDING," +
@@ -169,20 +177,18 @@ public class OrderController {
             "SHIPPING, " +
             "DELIVERED, " +
             "}")
-
-
-
     public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, OrderVerifyDTO data) {
         //To confirm that the user is an admin
         jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
-        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.COMPLETED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
-    @PostMapping("/send-order")
+    //    @PostMapping("/send-order")
+    @PostMapping(SEND_ORDER)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @Operation(summary = "Mark an order as shipped", description = "From admin updates the order status to SHIPPING"+ " : " +
+    @Operation(summary = "Mark an order as shipped", description = "From admin updates the order status to SHIPPING" + " : " +
             "{" +
             "PENDING," +
             "CANCELLED, " +
@@ -191,12 +197,11 @@ public class OrderController {
             "DELIVERED, " +
             "}")
     public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
-         jwtUtil.getUserIdFromToken(request);
+        jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SHIPPING.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
-
 
 
 }

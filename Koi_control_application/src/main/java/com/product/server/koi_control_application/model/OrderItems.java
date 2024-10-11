@@ -37,6 +37,7 @@ public class OrderItems {
     @Column(nullable = false)
     private int quantity;
 
+    private int unitPrice;
 
 
     @Column(updatable = false)
