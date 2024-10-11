@@ -24,31 +24,25 @@ const HistoryOrder = () => {
   useEffect(() => {
     console.log("Raw lstOrder data:", lstOrder);
     const paidOrders =
-      lstOrder?.filter(
-        (order) =>
-          order?.status === "SUCCESS" ||
-          order?.status === "SEND" ||
-          order?.status === "SHIPPING"
-      ) || [];
+      lstOrder?.filter((order) => order?.status === "SUCCESS") || [];
     const pendingOrders =
       lstOrder?.filter((order) => order?.status === "PENDING") || [];
     const cancelledOrders =
       lstOrder?.filter((order) => order?.status === "CANCELLED") || [];
     const deliveredOrders =
       lstOrder?.filter((order) => order?.status === "DELIVERED") || [];
-     const deliveringOrders =
-       lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
+    const deliveringOrders =
+      lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
     const completedOrders =
       lstOrder?.filter((order) => order?.status === "COMPLETED") || [];
 
-  //   setLstPaid(paidOrders);
-  //   setLstPending(pendingOrders);
-  //   setLstCancel(cancelledOrders);
-  // }, [lstOrder]);
+    setLstPaid(paidOrders);
+    setLstPending(pendingOrders);
+    setLstCancel(cancelledOrders);
     setLstDelivered(deliveredOrders);
     setLstDelivering(deliveringOrders);
     setLstCompleted(completedOrders);
-  }, [lstOrder]); 
+  }, [lstOrder]);
 
   useEffect(() => {
     refetch();
@@ -58,7 +52,7 @@ const HistoryOrder = () => {
     setMode(e.target.value);
   };
 
-  const [activeKey, setActiveKey] = useState("paid");
+  const [activeKey, setActiveKey] = useState("completed");
 
   const switchToCancelledTab = () => {
     setActiveKey("cancel");
@@ -68,7 +62,7 @@ const HistoryOrder = () => {
     <div>
       <div className="flex justify-center items-center text-bold text-3xl m-2 mb-2">
         <strong>History Order</strong>
-      </div>      
+      </div>
       <div>
         <Radio.Group
           onChange={handleModeChange}
@@ -107,17 +101,32 @@ const HistoryOrder = () => {
             {
               label: "Delivering Orders",
               key: "delivering",
-              children: <OrderDelivering lstDelivering={lstDelivering} isFetching={isFetching} />,
+              children: (
+                <OrderDelivering
+                  lstDelivering={lstDelivering}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Delivered Orders",
               key: "delivered",
-              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} />,
+              children: (
+                <OrderDelivered
+                  lstDelivered={lstDelivered}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Completed Orders",
               key: "completed",
-              children: <OrderCompleted lstCompleted={lstCompleted} isFetching={isFetching} />,
+              children: (
+                <OrderCompleted
+                  lstCompleted={lstCompleted}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Cancelled Orders",

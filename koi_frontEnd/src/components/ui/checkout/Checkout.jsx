@@ -76,7 +76,7 @@ const Checkout = () => {
   }));
 
   return (
-    <div className="w-[60%] my-[40px] mx-auto">
+    <div style={{ width: '60%', margin: '40px auto', padding: '20px' }}>
       <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
       <FormCheckout totalItems={totalItems} totalPrice={totalPrice} />
     </div>

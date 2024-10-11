@@ -155,7 +155,7 @@ const ManageOrder = () => {
 
   return (
     <div>
-      <Button className="bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out" onClick={() => refetch()}>Refresh Data</Button>
+      <Button className="bg-blue-600 mb-[15px] text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out" onClick={() => refetch()}>Refresh Data</Button>
       <Table
         loading={isFetching}
         columns={columns}

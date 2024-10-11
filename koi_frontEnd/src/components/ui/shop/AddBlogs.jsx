@@ -155,6 +155,7 @@ const AddBlogs = () => {
           <Button 
             htmlType="submit" 
             type="primary" 
+            loading={mutation.isPending}
             className="text-xl text-white bg-black px-40 py-4" 
           >
             <strong>Post</strong>

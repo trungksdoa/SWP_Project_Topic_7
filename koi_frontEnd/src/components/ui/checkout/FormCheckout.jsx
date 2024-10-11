@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { usePostOrder } from "../../../hooks/order/usePostOrder";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../constant";
 
 const FormCheckout = ({ totalItems, totalPrice }) => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -30,6 +31,22 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
       });
     },
   });
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      // Kiểm tra nếu đang ở trang thanh toán của MoMo
+      if (window.location.href.includes("payment")) {
+        navigate(PATH.HISTORY_ORDER); // Điều hướng đến trang History
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
   return (
     <div>
       <h2 className="text-lg font-bold mb-[30px]">Delivery Address</h2>
@@ -79,7 +96,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
        <Button
           className="!bg-black text-white hover:!bg-black hover:!text-white p-4"
           loading={mutation.isPending}
-          htmlType="submit"
+        htmlType="submit"
         >
           PLACE ORDER
         </Button>
