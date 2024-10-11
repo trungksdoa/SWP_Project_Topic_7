@@ -306,7 +306,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 firstDateInCluster = currentHistory.getDate();
                 currentHistory.setInPondFrom(firstDateInCluster);
             }
-            // Lưu bản ghi đã cập nhật lại vào cơ sở dữ liệu
+            //Lưu bản ghi đã cập nhật lại vào cơ sở dữ liệu
             koiGrowthHistoryRepository.save(currentHistory);
             // Cập nhật bản ghi trước đó
             previousHistory = currentHistory;
