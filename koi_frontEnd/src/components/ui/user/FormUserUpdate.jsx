@@ -89,7 +89,7 @@ const FormUserUpdate = ({ user, refetch }) => {
       reader.onload = (e) => {
         setImgSrc(e.target?.result);
       };
-      formik.setFieldValue("avatar", file);
+      formik.setFieldValue("image", file);
       setComponentDisabled(false); 
     } else {
       setComponentDisabled(true); 
