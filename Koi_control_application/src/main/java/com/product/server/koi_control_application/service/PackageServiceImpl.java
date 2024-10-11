@@ -69,13 +69,13 @@ public class PackageServiceImpl implements IPackageService {
 
     @Override
     public boolean checkFishLimit(int userId, UserPackage userPackage) {
-        Long fishCount = koiFishRepository.countByUserId(userId);
-        return userPackage.getFishSlots() < fishCount;
+        long fishCount = koiFishRepository.countByUserId(userId);
+        return fishCount >= userPackage.getFishSlots();
     }
 
     @Override
     public boolean checkPondLimit(int userId, UserPackage userPackage) {
-        int pondCount = koiFishRepository.countByPondId(userId);
-        return userPackage.getPondSlots() < pondCount;
+        long pondCount = pondRepository.countByUserId(userId);
+        return pondCount >= userPackage.getPondSlots();
     }
 }

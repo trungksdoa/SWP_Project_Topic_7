@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.repository;
 
 import com.product.server.koi_control_application.model.Blogs;
 import com.product.server.koi_control_application.model.Users;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,4 +31,5 @@ public interface BlogsRepository extends JpaRepository<Blogs, Integer> {
                                        @Param("headerMiddle") String headerMiddle);
 
     boolean existsByTitle(String title);
+
 }
