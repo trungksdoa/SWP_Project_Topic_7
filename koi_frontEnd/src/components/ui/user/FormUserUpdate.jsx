@@ -36,7 +36,7 @@ const FormUserUpdate = ({ user, refetch }) => {
         phoneNumber: values.phoneNumber,
       };
       if (values.avatar) {
-        formData.append("avatar", values.avatar);
+        formData.append("image", values.avatar);
       }
       formData.append("user", JSON.stringify(updateUser));
       mutation.mutate(
