@@ -41,7 +41,7 @@ public class CartServiceImpl implements ICartService {
         }
 
 
-        Optional<Cart> savedCart = cartRepository.findByProductIdAndUserId(cart.getProductId(), cart.getUserId());
+        Optional<Cart> savedCart = cartRepository.findByProductAndUserId(cart.getProductId(), cart.getUserId());
 
         if (savedCart.isPresent()) {
             throw new BadRequestException("This item already exist in your cart");
@@ -50,9 +50,10 @@ public class CartServiceImpl implements ICartService {
         return cartHelper.save(cart);
     }
 
+
     @Override
     public Cart updateCart(CartDTO cartDTO, int userId) {
-        Cart cart = cartRepository.findByProductIdAndUserId(cartDTO.getProductId(), userId)
+        Cart cart = cartRepository.findByProductAndUserId(cartDTO.getProductId(), userId)
                 .orElseThrow(() -> new NotFoundException("Sorry, this item has been deleted or not exist "));
 
         cart.setQuantity(cartDTO.getQuantity());
@@ -62,14 +63,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     public void deleteCart(int productId, int userId) {
 
-        try {
-            if (cartRepository.findByProductIdAndUserId(productId, userId).isEmpty()) {
-                throw new NotFoundException("Sorry, this item has been deleted or not exist ");
-            }
-            cartRepository.deleteByUserIdAndProductId(userId, productId);
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
+        if (cartRepository.findByProductAndUserId(productId,userId).isEmpty()) {
+            throw new NotFoundException("Sorry, this item has been deleted or not exist ");
         }
+        cartHelper.deleteByUserIdAndProductId(userId, productId);
     }
 
     @Override
@@ -93,6 +90,6 @@ public class CartServiceImpl implements ICartService {
             throw new NotFoundException("Cart is empty");
         }
 
-        cartRepository.deleteByUserId(userId);
+        cartHelper.deleteByUserId(userId);
     }
 }
