@@ -1,10 +1,12 @@
 package com.product.server.koi_control_application.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
+import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
@@ -87,16 +89,17 @@ public class KoiFishController {
 
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
-                                                      @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
+                                                      @Schema(type = "string", format = "json", implementation = KoiFishUpdateRequest.class)
                                                       @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
-
+        JsonNode rootNode = mapper.readTree(koiFishJson);
+        Boolean isNew = rootNode.path("isNew").asBoolean();
         BaseResponse response = BaseResponse.builder()
-                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file))
+                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, isNew))
                 .message("Update fish successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
@@ -218,6 +221,25 @@ public class KoiFishController {
 
         return ResponseUtil.createSuccessResponse(koGrowthHistory, mess);
 
+    }
+
+    @PostMapping(value = "/growthUpHistory/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse> addGrowthHistory(@PathVariable("koiFishId") int koiFishId,
+                                                         @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
+                                                         @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
+
+        BaseResponse response = BaseResponse.builder()
+                .data(iKoiFishService.addGrowthHistory(koiFishId, koiFish, file))
+                .message("Update fish successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

@@ -1,7 +1,5 @@
-package com.product.server.koi_control_application.pojo;
+package com.product.server.koi_control_application.pojo.response;
 
-
-import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,16 +12,12 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class KoiFishDTO {
-    private String name;
-    private String variety;
-    private Boolean sex;
-    private Integer purchasePrice;
-    private Integer userId;
-    private LocalDate dateOfBirth;
+public class AddKoigrowthDTO {
     private LocalDate date;
-    private Double ageMonth;
     private Integer pondId;
     private BigDecimal weight;
     private BigDecimal length;
 }
+
+
+

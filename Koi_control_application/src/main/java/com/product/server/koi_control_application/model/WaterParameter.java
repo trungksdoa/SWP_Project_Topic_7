@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -29,33 +30,38 @@ public class WaterParameter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "nitrite_no2")
-    private Integer nitriteNO2;
+    @Column(name = "nitrite_no2", precision = 10, scale = 2)
+    private BigDecimal nitriteNO2;
 
-    @Column(name = "nitrate_no3")
-    private Integer nitrateNO3;
+    @Column(name = "nitrate_no3", precision = 10, scale = 2)
+    private BigDecimal nitrateNO3;
 
-    @Column(name = "ammonium_nh4")
-    private Integer ammoniumNH4;
+    @Column(name = "ammonium_nh4", precision = 10, scale = 2)
+    private BigDecimal ammoniumNH4;
 
-    @Column(name = "hardness_gh")
-    private Integer hardnessGH;
+    @Column(name = "hardness_gh", precision = 10, scale = 2)
+    private BigDecimal hardnessGH;
 
-    private Integer salt;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal salt;
 
-    private Integer temperature;
-    private Integer pH;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal temperature;
 
-    @Column(name = "carbonate_hardness_kh")
-    private Integer carbonateHardnessKH;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal pH;
 
-    private Integer co2;
+    @Column(name = "carbonate_hardness_kh", precision = 10, scale = 2)
+    private BigDecimal carbonateHardnessKH;
 
-    @Column(name = "total_chlorines")
-    private Integer totalChlorines;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal co2;
 
-    @Column(name = "amount_fed")
-    private Integer amountFed;
+    @Column(name = "total_chlorines", precision = 10, scale = 2)
+    private BigDecimal totalChlorines;
+
+    @Column(name = "amount_fed", precision = 10, scale = 2)
+    private BigDecimal amountFed;
 
     @Column(name = "pond_id")
     private int pondId;

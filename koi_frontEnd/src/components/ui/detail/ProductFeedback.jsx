@@ -46,8 +46,8 @@ const ProductFeedback = ({ prdId }) => {
         <form onSubmit={formik.handleSubmit}>
           <textarea
             onChange={formik.handleChange}
-            className="mb-[20px] w-full border-[1px] border-black pl-[10px] pt-2 rounded-[10px]"
-            placeholder="Comment here"
+            className="mb-[20px] w-full border-[1px] border-black pl-[10px] pt-2 rounded-[10px] h-20"
+            placeholder={t("Comment here")}
             name="comment" // Đổi từ 'rating' thành 'comment'
             cols="30"
             rows="7"
@@ -63,11 +63,11 @@ const ProductFeedback = ({ prdId }) => {
           </div>
           <Button
             htmlType="submit"
-            className="bg-black mb-[30px] rounded-[6px] p-0 !w-[160px] text-white"
+            className="bg-black mb-[30px] rounded-[6px] p-0 !w-[160px] text-white text-xl"
             style={{ display: "block" }}
             loading={mutation.isPending}
           >
-            {t("Send Now")}
+            <strong>{t("Send Now")}</strong>
           </Button>
         </form>
         {feedbacks?.map((fb, index) => {
