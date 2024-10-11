@@ -36,10 +36,13 @@ public class IPondServiceImpl implements IPondService {
 //        if(!usersRepository.existsById(pond.getUserId()))
 //            throw new NotFoundException("User not found.");
 
-        if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId()))
+        if(pondRepository.existsByNameAndUserId(pond.getName(), pond.getUserId())){
             throw new AlreadyExistedException("Pond name existed.");
-        if (iPackageService.checkPondLimit(pond.getUserId(), user.getAUserPackage()))
+        }
+
+        if (iPackageService.checkPondLimit(pond.getUserId(), user.getAUserPackage())){
             throw new NotFoundException("User package limit exceeded.");
+        }
 
         Pond saved = pondRepository.save(pond);
         WaterQualityStandard  waterQualityStandard = new WaterQualityStandard();

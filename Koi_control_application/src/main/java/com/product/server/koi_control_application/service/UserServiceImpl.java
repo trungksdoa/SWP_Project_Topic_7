@@ -66,13 +66,12 @@ public class UserServiceImpl implements IUserService {
             user.setPassword(passwordEncoder.encode(register.getPassword()));
 
             user.getRoles().add(new UserRole(register.getRole().getValue()));
-            Users savedUser = usersRepository.save(user);
 
             // Send email to user
-            userRegisterMail(user.getEmail(), savedUser);
+            userRegisterMail(user.getEmail(), user);
 
-            savedUser.setAUserPackage(packageService.getPackageByDefault());
-            return savedUser;
+            user.setAUserPackage(packageService.getPackageByDefault());
+            return usersRepository.save(user);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getMessage().contains("users_email_unique")) {
                 throw new AlreadyExistedException("Email already exists: " + register.getEmail());

@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.repository;
 
 import com.product.server.koi_control_application.model.Cart;
 import com.product.server.koi_control_application.pojo.response.CartProductDTO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,10 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface CartRepository extends JpaRepository<Cart, Integer> {
     List<Cart> findByUserId(int userId);
+
+
+    @Modifying
+    @Query("delete from Cart c where c.userId = ?1 and c.productId = ?2")
     void deleteByUserIdAndProductId(int userId, int productId);
 
     @Query("select c from Cart c where c.productId = ?1 and c.userId = ?2")
@@ -35,5 +40,5 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     @Modifying
     @Query("delete from Cart c where c.userId = ?1")
-    Integer deleteByUserId(int userId);
+    void deleteByUserId(int userId);
 }
