@@ -146,10 +146,10 @@ const ProductDetail = () => {
       <div className="container w-[60%] mx-auto my-[60px]">
         <div className="grid grid-cols-2 gap-[60px]">
           <div className="col-span-1">
-            <img src={product?.imageUrl} className="w-[80%]" alt={product?.name} />
+            <img src={product?.imageUrl} className="w-full" alt={product?.name} />
           </div>
           <div className="col-span-1">
-            <h1 className="text-black font-semibold">{product?.name}</h1>
+            <h1 className="text-black font-bold text-3xl">{product?.name}</h1>
             <div className="flex">
               <p className="font-bold mr-[6px]">Price: </p>
               <p>${product?.price}</p>

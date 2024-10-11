@@ -11,7 +11,10 @@ const ProfileTemplage = () => {
   const { data: user, refetch } = useGetUserById(userId);
   console.log(user);
   return (
-    <div className="my-[60px] container mx-auto w-[80%]">
+    <div className="container mx-auto w-[80%]">
+       <div className="flex justify-center items-center text-bold text-3xl h-full m-2 mb-3">
+          <strong>Profile</strong>
+        </div>
       <div className="flex items-center">
         <div className="mr-[30px]">
           {!!user?.avatar ? (
