@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -34,7 +35,7 @@ public class KoiGrowthHistory {
     private int id;
 
     @Column(name = "in_pond_from")
-    private LocalDateTime inPondFrom;
+    private LocalDate inPondFrom;
 
     @Positive(message = "Width must be positive")
     @Column(precision = 10, scale = 2)
@@ -78,17 +79,22 @@ public class KoiGrowthHistory {
         countageMonth();
     }
     public void countageMonth() {
-        if(dateOfBirth != null) {
-            Period period = Period.between(dateOfBirth,date);
-            this.ageMonthHis = (double)(period.getYears()*12)+ period.getMonths();
-        }else {
-            this.ageMonthHis =(double) 0;
+        if (dateOfBirth != null) {
+            Period period = Period.between(dateOfBirth, date);
+            int days = period.getDays();
+            double dayFraction = (double) days / 30;
+            double totalMonths = (period.getYears() * 12) + period.getMonths() + dayFraction;
+            BigDecimal roundedMonths = BigDecimal.valueOf(totalMonths).setScale(1, RoundingMode.HALF_UP);
+            this.ageMonthHis = roundedMonths.doubleValue();
+        } else {
+            this.ageMonthHis = (double) 0;
         }
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    protected void onUpdate()    {
         updatedAt = LocalDateTime.now();
+        countageMonth();
     }
 }
 

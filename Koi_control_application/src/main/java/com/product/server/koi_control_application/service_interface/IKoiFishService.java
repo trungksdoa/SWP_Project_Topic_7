@@ -20,11 +20,13 @@ public interface IKoiFishService {
     List<KoiFish>   getKoiFishsByUserId(int userId);
     List<KoiFish> getFishByUserNoPond(int userId);
     void deleteKoiFish(int id);
+    int getLastestKoigrownId(int koiId);
     int countKoiFishByPondId(int pondId);
-    KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file) throws IOException;
+    KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file, boolean isNew) throws IOException;
     Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size);
     List<KoiGrowthHistory> getGrowthHistorys(int koiId);
-    KoiGrowthHistory addGrowthHistory(KoiGrowthHistory koiGrowthHistory);
+    KoiFish addGrowthHistory(int id, KoiFish request, MultipartFile file) throws IOException;
     void evaluateAndUpdateKoiGrowthStatus(int koiId);
     void evaluateAndUpdateKoiFishStatus(KoiFish koiFish);
+    void UpdateKoiFishGrowth(int koiId);
 }
