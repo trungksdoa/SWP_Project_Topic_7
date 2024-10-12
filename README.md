@@ -1,8 +1,11 @@
-# Koi Care System at Home - Phần mềm quản lý chăm sóc cá Koi tại nhà
+![image](https://github.com/user-attachments/assets/f4e0cef2-7d3f-4a2a-bd96-09eab40a4058)# Koi Care System at Home - Phần mềm quản lý chăm sóc cá Koi tại nhà
  **Website:** [Link](https://swp-project-topic-7.vercel.app/)
  
  **Host server:** [Link](https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/)
- 
+
+ Architechture diagram 
+  ![image](https://github.com/user-attachments/assets/f8d15c09-d5e4-43a3-b190-669863a34c0a)
+
  **Role:**
  Member
  Admin
