@@ -1,22 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond.js";
 import { useSelector } from "react-redux";
-import { Button, Form, Input, DatePicker, Spin, Modal, Checkbox } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  DatePicker,
+  Spin,
+  Modal,
+  Checkbox,
+  message,
+  Select,
+} from "antd";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
 import { manageWaterServices } from "../../../services/koifish/manageWaterServices.js";
 import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import AddWaterPara from "./AddWaterPara.jsx";
 import Draggable from "react-draggable";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant/config.js";
 import StoreTemplate from "../../template/StoreTemplate.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { useUpdateWaterParameter } from "../../../hooks/koi/useUpdateWaterParameter.js";
 import { toast } from "react-toastify";
 import { useGetWaterStandard } from "../../../hooks/koi/useGetWaterStandard.js";
-import { useTranslation } from 'react-i18next'
-
+import { useTranslation } from "react-i18next";
+import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 
 const WaterParameter = () => {
   const { t } = useTranslation();
@@ -30,16 +40,31 @@ const WaterParameter = () => {
   const [isEditEnabled, setIsEditEnabled] = useState(false);
   const [visible, setVisible] = useState(false);
   const [disabled, setDisabled] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const mutation = useUpdateWaterParameter();
   const draggleRef = useRef(null);
+  const { data: lstKoi } = useGetAllKoi(userLogin?.id);
   const { data: waterStandards, refetchStandard } = useGetWaterStandard(
     selectedPond?.id
   );
+  const [saltMessage, setSaltMessage] = useState(""); // Thêm state để lưu thông báo muối
   const handleGoToStore = () => {
     setShowStore(true);
+  };
+
+  const handleClickSalt = (value) => {
+    let newError = "";
+    if (value === "salt03") {
+      newError = "Salt: must be equal to 5.18";
+    } else if (value === "salt05") {
+      newError = "Salt: must be equal to 8.64";
+    } else if (value === "salt07") {
+      newError = "Salt: must be equal to 12.1";
+    }
+    setError(newError);
   };
 
   const { data: lstPond, refetch } = useGetAllPond(userId); // Lấy danh sách hồ
@@ -57,12 +82,17 @@ const WaterParameter = () => {
 
   useEffect(() => {
     if (!userLogin) {
-        toast.warning(t("Please sign in or create an account to access this feature."));
-        navigate(PATH.HOME);
+      toast.warning(
+        t("Please sign in or create an account to access this feature.")
+      );
+      navigate(PATH.HOME);
+    }
+    if (userLogin.roles[0].name === "ROLE_SHOP") {
+      message.warning("Please register account Member to access this feature.");
+      navigate(PATH.MANAGE_BLOG);
     }
   }, []);
 
-  
   useEffect(() => {
     const fetchWaterData = async () => {
       if (selectedPond) {
@@ -110,6 +140,32 @@ const WaterParameter = () => {
   const handleClick = (pond) => {
     setSelectedPond(pond);
     setIsModalVisible(true);
+  };
+
+  // Add this function to check if koi exists in the selected pond
+  const checkKoiExistence = () => {
+    if (!lstKoi || lstKoi.length === 0) {
+      return (
+        <div>
+          <p className="mb-[10px]">
+            Let add Koi in pond to calculate food and salt for this pond,
+            <span className="text-orange-500">
+              <NavLink to={PATH.KOI_MANAGEMENT}>Add Koi</NavLink>
+            </span>
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Modify the modal button click handler to show parameters that do not meet standards
+  const handleShowParameters = () => {
+    if (validationErrors.length > 0) {
+      showModal();
+    } else {
+      message.info("All parameters meet the standards.");
+    }
   };
 
   // Đóng Modal
@@ -178,12 +234,12 @@ const WaterParameter = () => {
       const errors = [];
       if (waterParameters.nitriteNO2 > waterStandard.no2Standard) {
         errors.push(
-          `Nitrite NO2: must be less than or equal to ${waterStandard.no2Standard}`
+          `Nitrite NO2: must be less than or equal to ${waterStandard.no2Standard} mg/L`
         );
       }
       if (waterParameters.nitrateNO3 > waterStandard.no3Standard) {
         errors.push(
-          `Nitrate NO3: must be less than or equal to ${waterStandard.no3Standard}`
+          `Nitrate NO3: must be less than or equal to ${waterStandard.no3Standard} mg/L`
         );
       }
       if (
@@ -191,7 +247,7 @@ const WaterParameter = () => {
         waterParameters.ammoniumNH4 > waterStandard.nh4Standard
       ) {
         errors.push(
-          `Ammonium NH4: must be in the range from ${waterStandard.nh4StandardMin} to ${waterStandard.nh4Standard}`
+          `Ammonium NH4: must be in the range from ${waterStandard.nh4StandardMin}mg/L to ${waterStandard.nh4Standard} mg/L`
         );
       }
       if (
@@ -207,7 +263,7 @@ const WaterParameter = () => {
         waterParameters.temperature > waterStandard.temperatureMax
       ) {
         errors.push(
-          `Temperature: must be in the range from ${waterStandard.temperatureMin} to ${waterStandard.temperatureMax}`
+          `Temperature: must be in the range from ${waterStandard.temperatureMin} C to ${waterStandard.temperatureMax} C `
         );
       }
       if (
@@ -215,7 +271,7 @@ const WaterParameter = () => {
         waterParameters.hardnessGH > waterStandard.generalHardnessGhMax
       ) {
         errors.push(
-          `Hardness GH: must be in the range from ${waterStandard.generalHardnessGhMin} to ${waterStandard.generalHardnessGhMax}`
+          `Hardness GH: must be in the range from ${waterStandard.generalHardnessGhMin}ppm to ${waterStandard.generalHardnessGhMax}ppm`
         );
       }
       if (
@@ -225,7 +281,7 @@ const WaterParameter = () => {
           waterStandard.carbonateHardnessKhMax
       ) {
         errors.push(
-          `Carbonate Hardness KH: must be in the range from ${waterStandard.carbonateHardnessKhMin} to ${waterStandard.carbonateHardnessKhMax}`
+          `Carbonate Hardness KH: must be in the range from ${waterStandard.carbonateHardnessKhMin}ppm to ${waterStandard.carbonateHardnessKhMax}ppm`
         );
       }
       if (
@@ -233,7 +289,7 @@ const WaterParameter = () => {
         waterParameters.co2 > waterStandard.oxygenMax
       ) {
         errors.push(
-          `CO2: must be in the range from ${waterStandard.oxygenMin} to ${waterStandard.oxygenMax}`
+          `CO2: must be in the range from ${waterStandard.oxygenMin}mg/L to ${waterStandard.oxygenMax}mg/L`
         );
       }
       if (
@@ -241,20 +297,14 @@ const WaterParameter = () => {
         waterParameters.totalChlorines > waterStandard.chlorineMax
       ) {
         errors.push(
-          `Total Chlorines: must be in the range from ${waterStandard.chlorineMin} to ${waterStandard.chlorineMax}`
+          `Total Chlorines: must be in the range from ${waterStandard.chlorineMin}g to ${waterStandard.chlorineMax}g`
         );
       }
-      if (waterParameters.amountFed > waterStandard.amountFedStandard) {
+      if (waterParameters.amountFed != waterStandard.amountFedStandard) {
         errors.push(
-          `Amount: Fed must be less than or equal to ${waterStandard.amountFedStandard}`
+          `Amount: Fed must be equal to ${waterStandard.amountFedStandard}g`
         );
       }
-      if (waterParameters.salt > waterStandard.salt05) {
-        errors.push(
-          `Salt: must be less than or equal to ${waterStandard.salt05}`
-        );
-      }
-      console.log(errors);
       setValidationErrors(errors);
     }
   }, [waterParameters, waterStandard]);
@@ -297,7 +347,8 @@ const WaterParameter = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
-        width="70%"
+        width="80%" // Increased width for better layout
+        className="custom-modal" // Added custom class for styling
       >
         {loading ? (
           <Spin />
@@ -305,268 +356,246 @@ const WaterParameter = () => {
           waterParameters === null ||
           Object.keys(waterParameters).length === 0 ? (
           <div className="flex justify-between">
-            <div className="mr-6  basis-1/3">
+            <div className="mr-6 basis-1/3">
               <img
                 src={selectedPond?.imageUrl}
                 alt={selectedPond?.name}
-                className="w-80 rounded-[8px] h-70 object-cover"
+                className="w-full rounded-[8px] h-70 object-cover shadow-lg" // Added shadow for depth
               />
             </div>
-            <div className=" basis-2/3">
-              <div className="font-bold text-[24px]">Chưa có thông số nước</div>
+            <div className="basis-2/3">
+              <div className="font-bold text-[24px] text-center">No water parameters available</div>
               <AddWaterPara selectedPond={selectedPond} />
             </div>
           </div>
         ) : (
-          <div className="flex justify-between">
-            <div className="mr-6">
-              <img
-                src={selectedPond.imageUrl}
-                alt={selectedPond.name}
-                className="w-80 rounded-[8px] h-70 object-cover"
-              />
-            </div>
-            <Form
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-              layout="horizontal"
-              style={{ width: "100%" }}
-              onFinish={formik.handleSubmit}
-            >
-              <Form.Item label="Edit Parameter">
-                <Checkbox onChange={handleEditToggle}>Edit Parameter</Checkbox>
-              </Form.Item>
-
-              <Form.Item label="Nitrite NO2">
-                <Input
-                  name="nitriteNO2"
-                  value={formik.values.nitriteNO2}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
+          <div className="">
+            <div className="flex justify-around">
+              <div className="mr-6">
+                <img
+                  src={selectedPond.imageUrl}
+                  alt={selectedPond.name}
+                  className="w-full rounded-[8px] h-70 object-cover shadow-lg" // Added shadow for depth
                 />
-              </Form.Item>
+              </div>
+              <Form
+                layout="vertical" // Changed layout to vertical for better readability
+                style={{ width: "100%" }}
+                onFinish={formik.handleSubmit}
+              >
+                <Form.Item className="text-bold" label="Edit Parameter">
+                  <Checkbox onChange={handleEditToggle}></Checkbox>
+                </Form.Item>
 
-              <Form.Item label="Nitrate NO3">
-                <Input
-                  name="nitrateNO3"
-                  value={formik.values.nitrateNO3}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
+                {/* Form Items */}
+                {["nitriteNO2", "nitrateNO3", "ammoniumNH4", "hardnessGH", "salt", "temperature", "carbonateHardnessKH", "co2", "totalChlorines", "amountFed", "pondId", "lastCleanedAt", "cleanedDayCount", "ph"].map((field, index) => (
+                  <Form.Item
+                    key={index}
+                    label={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')} // Capitalize and format label
+                    style={{ display: isEditEnabled ? "block" : "none" }}
+                  >
+                    <Input
+                      name={field}
+                      value={formik.values[field]}
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" // Added styling for input
+                    />
+                  </Form.Item>
+                ))}
 
-              <Form.Item label="Ammonium NH4">
-                <Input
-                  name="ammoniumNH4"
-                  value={formik.values.ammoniumNH4}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Hardness GH">
-                <Input
-                  name="hardnessGH"
-                  value={formik.values.hardnessGH}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Salt">
-                <Input
-                  name="salt"
-                  value={formik.values.salt}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Temperature">
-                <Input
-                  name="temperature"
-                  value={formik.values.temperature}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Carbonate Hardness KH">
-                <Input
-                  name="carbonateHardnessKH"
-                  value={formik.values.carbonateHardnessKH}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="CO2">
-                <Input
-                  name="co2"
-                  value={formik.values.co2}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Total Chlorines">
-                <Input
-                  name="totalChlorines"
-                  value={formik.values.totalChlorines}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Amount Fed">
-                <Input
-                  name="amountFed"
-                  value={formik.values.amountFed}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Pond ID">
-                <Input
-                  name="pondId"
-                  value={formik.values.pondId}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Last Cleaned At">
-                <DatePicker
-                  value={
-                    formik.values.lastCleanedAt
-                      ? dayjs(formik.values.lastCleanedAt, "YYYY-MM-DD")
-                      : null
-                  }
-                  format="YYYY-MM-DD"
-                  onChange={handleChangeDatePicker}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="Cleaned Day Count">
-                <Input
-                  name="cleanedDayCount"
-                  value={formik.values.cleanedDayCount}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item label="pH">
-                <Input
-                  name="ph"
-                  value={formik.values.ph}
-                  onChange={formik.handleChange}
-                  disabled={!isEditEnabled}
-                />
-              </Form.Item>
-
-              <Form.Item>
+                <Form.Item style={{ display: isEditEnabled ? "block" : "none" }}>
+                  <Button
+                    className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200" // Updated button styling
+                    type="primary"
+                    disabled={!isEditEnabled}
+                    htmlType="submit"
+                    loading={mutation.isPending}
+                  >
+                    Update
+                  </Button>
+                </Form.Item>
                 <Button
-                  className=" bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
-                  type="primary"
-                  disabled={!isEditEnabled}
-                  htmlType="submit"
-                  loading={mutation.isPending}
+                  className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200" // Updated button styling
+                  onClick={handleShowParameters}
                 >
-                  Update
+                  Show Parameters do not meet the standards.
                 </Button>
-              </Form.Item>
-              <Button
-                className="mt-[15px] bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
-                onClick={showModal}
-              >
-                Show Parameters do not meet the standards.
-              </Button>
-              <Modal
-                title={
-                  <div
-                    style={{
-                      width: "100%",
-                      cursor: "move",
-                    }}
-                    onMouseOver={() => {
-                      if (disabled) {
-                        setDisabled(false);
-                      }
-                    }}
-                    onMouseOut={() => {
-                      setDisabled(true);
-                    }}
-                  >
-                    Parameters do not meet the standards.
-                  </div>
-                }
-                visible={visible}
-                onOk={handleOk}
-                onCancel={handleCancelModal}
-                modalRender={(modal) => (
-                  <Draggable disabled={disabled} bounds={draggleRef.current}>
-                    <div ref={draggleRef}>{modal}</div>
-                  </Draggable>
-                )}
-              >
-                {validationErrors.length > 0 && (
-                  <div
-                    style={{
-                      padding: "10px",
-                      background: "#fff6f6",
-                      borderRadius: "8px",
-                      border: "1px solid #ffa39e",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    <ul
+                <Modal
+                  title={
+                    <div
                       style={{
-                        listStyleType: "none",
-                        padding: "0",
-                        margin: "0",
+                        width: "100%",
+                        cursor: "move",
+                      }}
+                      onMouseOver={() => {
+                        if (disabled) {
+                          setDisabled(false);
+                        }
+                      }}
+                      onMouseOut={() => {
+                        setDisabled(true);
                       }}
                     >
-                      {validationErrors.map((error, index) => (
-                        <li
-                          key={index}
-                          style={{
-                            color: "#ff4d4f",
-                            fontSize: "14px",
-                            marginBottom: "8px",
-                            lineHeight: "1.5",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          <span
-                            style={{ fontWeight: "700", marginRight: "5px" }}
-                          >
-                            •
-                          </span>{" "}
-                          {error}
-                        </li>
-                      ))}
+                      Parameters do not meet the standards.
+                    </div>
+                  }
+                  visible={visible}
+                  onOk={handleOk}
+                  onCancel={handleCancelModal}
+                  modalRender={(modal) => (
+                    <Draggable disabled={disabled} bounds={draggleRef.current}>
+                      <div ref={draggleRef}>{modal}</div>
+                    </Draggable>
+                  )}
+                >
+                  <div
+                    className="note-container"
+                    style={{
+                      padding: "20px",
+                      borderRadius: "8px",
+                      backgroundColor: "#f9f9f9",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <h3 style={{ marginBottom: "10px", fontWeight: "bold" }}>
+                      Note: Choose the appropriate salt concentration for your
+                      pond to calculate:
+                    </h3>
+                    <ul style={{ listStyleType: "none", padding: "0" }}>
+                      <li
+                        onClick={() => handleClickSalt("salt03")}
+                        style={{
+                          marginBottom: "10px",
+                          padding: "10px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <strong>Salt 03:</strong> The ideal salt concentration for
+                        fish to thrive. If koi fish go through a high-stress
+                        period, this salt concentration helps stabilize them.
+                      </li>
+                      <li
+                        onClick={() => handleClickSalt("salt05")}
+                        style={{
+                          marginBottom: "10px",
+                          padding: "10px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <strong>Salt 05:</strong> The salt concentration helps
+                        balance pressure when transferring fish from muddy river
+                        ponds to clean water ponds and eliminates harmful
+                        bacteria.
+                      </li>
+                      <li
+                        onClick={() => handleClickSalt("salt07")}
+                        style={{
+                          marginBottom: "10px",
+                          padding: "10px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "4px",
+                          backgroundColor: "#fff",
+                        }}
+                      >
+                        <strong>Salt 07:</strong> The salt concentration will help
+                        eliminate bacteria, fungi, and parasites, removing
+                        pathogens that can harm the fish.
+                      </li>
                     </ul>
                   </div>
-                )}
-                <div>
-                  <p>
-                    Let to the store to check out products that can improve your
-                    pond.{" "}
-                  </p>
-                  <Button
-                    onClick={() => {
-                      window.open(PATH.STORE, "_blank"); // Mở tab mới
-                    }}
-                    className="mt-[15px] bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
-                  >
-                    Go To Store
-                  </Button>
-                </div>
-              </Modal>
-            </Form>
+                  {/* Add Select for salt options */}
+                  <Form.Item label="Select Salt Standard">
+                    <Select
+                      defaultValue="0" // Set default value
+                      onChange={(value) => {
+                        // Cập nhật thông báo tương ứng với giá trị muối
+                        let newError = "";
+                        if (value === "salt03") {
+                          newError = "Salt: must be equal to 5.18g";
+                        } else if (value === "salt05") {
+                          newError = "Salt: must be equal to 8.64g";
+                        } else if (value === "salt07") {
+                          newError = "Salt: must be equal to 12.1g";
+                        }
+
+                        // Cập nhật lỗi validation
+                        setValidationErrors((prevErrors) => {
+                          // Lọc ra các lỗi không liên quan đến muối
+                          const filteredErrors = prevErrors.filter(
+                            (error) => !error.startsWith("Salt:")
+                          );
+                          return [...filteredErrors, newError]; // Thêm lỗi mới vào danh sách
+                        });
+                      }}
+                    >
+                      <Select.Option value="salt03">salt 03</Select.Option>
+                      <Select.Option value="salt05">salt 05</Select.Option>
+                      <Select.Option value="salt07">salt 07</Select.Option>
+                    </Select>
+                  </Form.Item>
+                  {validationErrors.length > 0 && (
+                    <div
+                      style={{
+                        padding: "10px",
+                        background: "#fff6f6",
+                        borderRadius: "8px",
+                        border: "1px solid #ffa39e",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      <ul
+                        style={{
+                          listStyleType: "none",
+                          padding: "0",
+                          margin: "0",
+                        }}
+                      >
+                        {validationErrors.map((error, index) => (
+                          <li
+                            key={index}
+                            style={{
+                              color: "#ff4d4f",
+                              fontSize: "14px",
+                              marginBottom: "8px",
+                              lineHeight: "1.5",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            <span
+                              style={{ fontWeight: "700", marginRight: "5px" }}
+                            >
+                              •
+                            </span>{" "}
+                            {error}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {checkKoiExistence() && <div>{checkKoiExistence()}</div>}
+                  <div>
+                    <p>
+                      Let to the store to check out products that can improve your
+                      pond.{" "}
+                    </p>
+                    <Button
+                      onClick={() => {
+                        window.open(PATH.STORE, "_blank"); // Mở tab mới
+                      }}
+                      className="mt-[15px] bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
+                    >
+                      Go To Store
+                    </Button>
+                  </div>
+                </Modal>
+              </Form>
+            </div>
           </div>
         )}
       </Modal>

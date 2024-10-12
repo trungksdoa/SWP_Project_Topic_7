@@ -22,7 +22,7 @@ const Cart = () => {
   const mutationPutCart = usePutCarts();
   const navigate = useNavigate();
 
-  console.log(lstPrd);
+  console.log(carts);
   const onChange = (value, productId) => {
     if (value && !isNaN(value)) {
       // Cập nhật số lượng trong lstPrd
@@ -76,12 +76,11 @@ const Cart = () => {
         { productId, userId: userLogin?.id, quantity },
         {
           onSuccess: (response) => {
-            console.log("API Response:", response);
             toast.success("Delete product in cart successfully!");
             refetch();
           },
           onError: (error) => {
-            console.error("API Error:", error);
+            console.error("API delete Error:", error);
             toast.error("Failed to delete product from cart.");
           },
         }
@@ -149,10 +148,11 @@ const Cart = () => {
   // }
 
   return (
-    <div className="w-[60%] my-[40px] mx-auto">
-      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px]">
-        <h2 className="text-center w-[20%]">Image</h2>
-        <h2 className="text-center w-[40%]">Name</h2>
+    <div className="w-[80%] my-[40px] mx-auto rounded-lg p-5">
+      <h1 className="text-2xl font-bold text-center mb-5">Shopping Cart</h1>
+      <div className="w-full justify-between items-center px-[20px] flex p-[15px] bg-white mb-[20px] rounded-lg shadow-sm">
+        <h2 className="text-center w-[10%]">Image</h2>
+        <h2 className="text-center w-[35%]">Name</h2>
         <h2 className="text-center w-[15%]">Price</h2>
         <h2 className="text-center w-[15%]">Quantity</h2>
         <h2 className="text-center w-[10%]">Action</h2>
@@ -160,11 +160,11 @@ const Cart = () => {
       {lstPrd?.map((product, index) => (
         <div
           key={index}
-          className="w-full items-center justify-between px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px]"
+          className="w-full items-center justify-between px-[20px] flex p-[15px] bg-white mb-[20px] rounded-lg shadow-sm"
         >
-          <img src={product?.imageUrl} className="w-20 h-20" alt="" />
-          <h2 className="w-[40%] text-center">{product?.name}</h2>
-          <p className="w-[15%] text-center">${product?.price}</p>
+          <img src={product?.imageUrl} className="w-20 h-20 rounded" alt="" />
+          <h2 className="w-[40%] text-center font-semibold">{product?.name}</h2>
+          <p className="w-[15%] text-center text-lg font-medium">${product?.price}</p>
           <InputNumber
             min={1}
             max={10}
@@ -172,6 +172,7 @@ const Cart = () => {
             disabled={mutate.isPending}
             onChange={(value) => onChange(value, product?.id)}
             style={{ width: "15%", textAlign: "center" }}
+            className="border border-gray-300 rounded"
           />
           <DeleteOutlined
             style={{
@@ -186,10 +187,10 @@ const Cart = () => {
           />
         </div>
       ))}
-      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px]">
-        <p>Total: {totalItems} items</p>
+      <div className="w-full justify-between items-center px-[20px] flex p-[15px] bg-white mb-[20px] rounded-lg shadow-sm">
+        <p className="font-bold">Total: {totalItems} items</p>
         <div className="flex items-center">
-          <p>
+          <p className="font-bold">
             Total Price:{" "}
             <span className="text-orange-600">
               $
@@ -199,7 +200,7 @@ const Cart = () => {
             </span>
           </p>
           <button
-            className="rounded-[6px] ml-[30px] px-[30px] py-[10px] bg-black text-white"
+            className="rounded-lg ml-[30px] px-[30px] py-[10px] bg-black text-white hover:bg-gray-800 transition duration-300"
             onClick={() => {
               navigate(PATH.CHECKOUT);
             }}

@@ -26,4 +26,16 @@ public class CartHelper implements ICartHelper {
           throw new BadRequestException("Failed to save cart");
       }
     }
+
+    @Override
+    @Transactional
+    public void deleteByUserIdAndProductId(int userId, int productId) {
+        cartRepository.deleteByUserIdAndProductId(userId, productId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserId(int userId) {
+        cartRepository.deleteByUserId(userId);
+    }
 }

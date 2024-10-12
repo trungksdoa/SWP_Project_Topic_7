@@ -16,6 +16,7 @@ export const manageOrderServices = {
   getReceiptOrder: (id) => api.get(`/receive-order?orderId=${id}`),
   getAllOrder: () => api.get(''),
   postSendOrder: (id) => api.post(`/send-order?orderId=${id}`),
-  receiveOrder: (id) => api.post(`/receive-order?orderId=${id}`)
+  receiveOrder: (id) => api.post(`/receive-order?orderId=${id}`),
+  getOrderById: (id) => api.get(`/${id}`)
 };
 

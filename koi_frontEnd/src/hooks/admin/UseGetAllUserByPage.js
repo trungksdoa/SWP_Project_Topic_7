@@ -6,7 +6,6 @@ export const useGetAllUserByPage = (page, size) => {
     queryFn: () => ManageUserAll.getAllUserPage(page, size),
   });
 
-  console.log("q.data?.data?.data:", q.data?.data);
   const processedData = q.data?.data;
 
   return {

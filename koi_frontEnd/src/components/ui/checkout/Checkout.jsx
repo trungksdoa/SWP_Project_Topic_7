@@ -11,8 +11,10 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const [lstPrd, setLstPrd] = useState([]);
   let totalItems = 0;
+  let totalPrice = 0;
   lstPrd?.map((prd) => {
     totalItems += prd?.quantity;
+    totalPrice += prd?.quantity * prd?.price;
   });
 
   console.log(lstPrd);
@@ -74,9 +76,9 @@ const Checkout = () => {
   }));
 
   return (
-    <div className="w-[60%] my-[40px] mx-auto">
+    <div style={{ width: '60%', margin: '40px auto', padding: '20px' }}>
       <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
-      <FormCheckout totalItems={totalItems} />
+      <FormCheckout totalItems={totalItems} totalPrice={totalPrice} />
     </div>
   );
 };

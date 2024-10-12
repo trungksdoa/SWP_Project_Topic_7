@@ -5,13 +5,14 @@ import { useSelector } from "react-redux";
 import { usePostOrder } from "../../../hooks/order/usePostOrder";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { PATH } from "../../../constant";
 
-const FormCheckout = ({ totalItems }) => {
+const FormCheckout = ({ totalItems, totalPrice }) => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   console.log(totalItems);
   const mutation = usePostOrder();
-  const navigate = useNavigate()
-  console.log(window.location.href)
+  const navigate = useNavigate();
+  console.log(window.location.href);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -24,13 +25,28 @@ const FormCheckout = ({ totalItems }) => {
       console.log(values);
       mutation.mutate(values, {
         onSuccess: (res) => {
-          
-          console.log(res?.data?.data)
-            window.location.href = res?.data?.data?.shortLink   
-        }
-      })
+          console.log(res?.data?.data);
+          window.location.href = res?.data?.data?.shortLink;
+        },
+      });
     },
   });
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      // Kiểm tra nếu đang ở trang thanh toán của MoMo
+      if (window.location.href.includes("payment")) {
+        navigate(PATH.HISTORY_ORDER); // Điều hướng đến trang History
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
   return (
     <div>
       <h2 className="text-lg font-bold mb-[30px]">Delivery Address</h2>
@@ -71,10 +87,20 @@ const FormCheckout = ({ totalItems }) => {
             <span className="text-orange-500 font-bold">{totalItems}</span>{" "}
             items
           </span>
-          <Button className="!bg-black text-white hover:!bg-black hover:!text-white p-4" loading={mutation.isPending} htmlType="submit">
-            PLACE ORDER
-          </Button>
+          <span>
+            Total Price:{" "}
+            <span className="text-orange-500 font-bold">$ {totalPrice}</span>{" "}
+          </span>
         </div>
+       <div className="text-right mt-[15px]">
+       <Button
+          className="!bg-black text-white hover:!bg-black hover:!text-white p-4"
+          loading={mutation.isPending}
+        htmlType="submit"
+        >
+          PLACE ORDER
+        </Button>
+       </div>
       </Form>
     </div>
   );

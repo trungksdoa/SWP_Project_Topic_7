@@ -11,8 +11,8 @@ import OrderCompleted from "../order/OrderCompleted";
 
 const HistoryOrder = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: lstOrder , refetch, isFetching} = useGetOrder(userLogin?.id);
-  console.log(lstOrder)
+  const { data: lstOrder, refetch, isFetching } = useGetOrder(userLogin?.id);
+  console.log(lstOrder);
   const [mode, setMode] = useState("top");
 
   const [lstPaid, setLstPaid] = useState([]);
@@ -31,8 +31,8 @@ const HistoryOrder = () => {
       lstOrder?.filter((order) => order?.status === "CANCELLED") || [];
     const deliveredOrders =
       lstOrder?.filter((order) => order?.status === "DELIVERED") || [];
-     const deliveringOrders =
-       lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
+    const deliveringOrders =
+      lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
     const completedOrders =
       lstOrder?.filter((order) => order?.status === "COMPLETED") || [];
 
@@ -42,7 +42,7 @@ const HistoryOrder = () => {
     setLstDelivered(deliveredOrders);
     setLstDelivering(deliveringOrders);
     setLstCompleted(completedOrders);
-  }, [lstOrder]); 
+  }, [lstOrder]);
 
   useEffect(() => {
     refetch();
@@ -52,7 +52,7 @@ const HistoryOrder = () => {
     setMode(e.target.value);
   };
 
-  const [activeKey, setActiveKey] = useState("paid"); 
+  const [activeKey, setActiveKey] = useState("completed");
 
   const switchToCancelledTab = () => {
     setActiveKey("cancel");
@@ -62,7 +62,7 @@ const HistoryOrder = () => {
     <div>
       <div className="flex justify-center items-center text-bold text-3xl m-2 mb-2">
         <strong>History Order</strong>
-      </div>      
+      </div>
       <div>
         <Radio.Group
           onChange={handleModeChange}
@@ -76,7 +76,7 @@ const HistoryOrder = () => {
         </Radio.Group>
         <Tabs
           activeKey={activeKey}
-          onChange={setActiveKey} 
+          onChange={setActiveKey}
           defaultActiveKey="1"
           tabPosition={mode}
           style={{}}
@@ -84,7 +84,14 @@ const HistoryOrder = () => {
             {
               label: "Pending Orders",
               key: "pending",
-              children: <OrderPending lstPending={lstPending} isFetching={isFetching} refetch={refetch} switchToCancelledTab={switchToCancelledTab} />,
+              children: (
+                <OrderPending
+                  lstPending={lstPending}
+                  isFetching={isFetching}
+                  refetch={refetch}
+                  switchToCancelledTab={switchToCancelledTab}
+                />
+              ),
             },
             {
               label: "Paid Orders",
@@ -94,23 +101,42 @@ const HistoryOrder = () => {
             {
               label: "Delivering Orders",
               key: "delivering",
-              children: <OrderDelivering lstDelivering={lstDelivering} isFetching={isFetching} />,
+              children: (
+                <OrderDelivering
+                  lstDelivering={lstDelivering}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Delivered Orders",
               key: "delivered",
-              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} />,
+              children: (
+                <OrderDelivered
+                  lstDelivered={lstDelivered}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Completed Orders",
               key: "completed",
-              children: <OrderCompleted lstCompleted={lstCompleted} isFetching={isFetching} />,
+              children: (
+                <OrderCompleted
+                  lstCompleted={lstCompleted}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Cancelled Orders",
               key: "cancel",
-              children: <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />,
-            }
+              children: (
+                <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />
+              ),
+            },
+            //   children: <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />,
+            // }
           ]}
         />
       </div>
