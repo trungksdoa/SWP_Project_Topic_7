@@ -37,4 +37,12 @@ export const managePondServices = {
             throw error.response?.data || error.message;
         }
     },
+    deletePond: async (id) => {
+        try {
+            const response = await api.delete(`/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    }
 }
