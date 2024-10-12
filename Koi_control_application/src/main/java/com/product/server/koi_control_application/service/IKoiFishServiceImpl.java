@@ -5,6 +5,7 @@ import com.product.server.koi_control_application.customException.AlreadyExisted
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.KoiGrowthHistory;
+import com.product.server.koi_control_application.model.Pond;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.repository.KoiGrowthHistoryRepository;
@@ -159,14 +160,18 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
         if (request.getDateOfBirth()!= null && request.getDateOfBirth()!= koiFish.getDateOfBirth()){
             koiFish.setDateOfBirth(request.getDateOfBirth());
+            koiFish.setAgeMonth(null);
+            koiFishRepository.save(koiFish);
             List<KoiGrowthHistory> koiGrowthHistories = getGrowthHistorys(koiFish.getId());
             for(KoiGrowthHistory koifishgrowth : koiGrowthHistories){
                 koifishgrowth.setDateOfBirth(koiFish.getDateOfBirth());
                 koiGrowthHistoryRepository.save(koifishgrowth);
             }
+
         }
         else if(request.getAgeMonth()   != null && koiFish.getAgeMonth().equals(request.getAgeMonth())){
             koiFish.setAgeMonth(request.getAgeMonth());
+            koiFish.setDateOfBirth(null);
             koiFishRepository.save(koiFish);
             List<KoiGrowthHistory> koiGrowthHistories = getGrowthHistorys(koiFish.getId());
             for(KoiGrowthHistory koifishgrowth : koiGrowthHistories) {
@@ -177,7 +182,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
 
         evaluateAndUpdateKoiGrowthStatus(id);
-        koiFishRepository.save(koiFish);
+
         return getKoiFishsaved(id);
     }
 
@@ -408,5 +413,40 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
         koiGrowthHistories.sort(Comparator.comparing(KoiGrowthHistory::getDate));
         return koiGrowthHistories.get(koiGrowthHistories.size() - 1).getId();
+    }
+
+    @Override
+    public List<KoiFish> swapPondIdListKoi(int pondId, List<Integer> koiFishId) {
+        Pond pond   =  pondRepository.findById(pondId).orElseThrow(() -> new NotFoundException("Pond not found."));
+        Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
+        int slot = iPackageService.getFishLimit(user.getId(), user.getAUserPackage());
+
+        int fishcount  = pond.getFishCount();
+        List<KoiFish> koiFishList = null;
+        if(slot-fishcount >= koiFishId.size()){
+            for (Integer id : koiFishId) {
+                KoiFish koiFish1 = getKoiFish(id);
+                koiFish1.setPondId(pondId);
+                koiFish1.setInPondFrom(LocalDate.now());
+                koiFish1.setDate(LocalDate.now());
+                KoiGrowthHistory.KoiGrowthHistoryBuilder builder = KoiGrowthHistory.builder()
+                        .koiId(koiFish1.getId())
+                        .isFirstMeasurement(false)
+                        .dateOfBirth(koiFish1.getDateOfBirth())
+                        .inPondFrom(koiFish1.getInPondFrom())
+                        .weight(koiFish1.getWeight())
+                        .length(koiFish1.getLength())
+                        .pondId(koiFish1.getPondId())
+                        .date(koiFish1.getDate());
+                koiGrowthHistoryRepository.save(builder.build());
+
+                koiFishRepository.save(koiFish1);
+                koiFishList.add(getKoiFish(koiFish1.getId()));
+            }
+        }else {
+            throw new NotFoundException("User package limit exceeded.(Fish)");
+        }
+
+        return koiFishList;
     }
 }

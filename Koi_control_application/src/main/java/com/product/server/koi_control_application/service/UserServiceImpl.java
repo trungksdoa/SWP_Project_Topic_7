@@ -61,7 +61,7 @@ public class UserServiceImpl implements IUserService {
                     .build();
 
 
-            user.setAvatarUrl(imageService.getDefaultImage());
+            user.setAvatarUrl(imageService.getDefaultImage("DefaultAvatar.png"));
             //Create user
             user.setPassword(passwordEncoder.encode(register.getPassword()));
 

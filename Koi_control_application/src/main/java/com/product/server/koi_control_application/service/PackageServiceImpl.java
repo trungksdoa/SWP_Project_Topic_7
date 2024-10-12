@@ -78,4 +78,19 @@ public class PackageServiceImpl implements IPackageService {
         long pondCount = pondRepository.countByUserId(userId);
         return pondCount >= userPackage.getPondSlots();
     }
+
+    @Override
+    public int getFishLimit(int userId, UserPackage userPackage) {
+        return userPackage.getFishSlots();
+    }
+
+    @Override
+    public int getPondLimit(int userId, UserPackage userPackage) {
+        return userPackage.getPondSlots();
+    }
+
+    @Override
+    public int getFishCount(int userId) {
+        return 0;
+    }
 }

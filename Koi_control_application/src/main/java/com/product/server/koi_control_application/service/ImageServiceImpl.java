@@ -50,8 +50,8 @@ public class ImageServiceImpl implements IImageService {
 
 
     @Override
-    public String getDefaultImage(){
-        return HOST + "DefaultAvatar.png";
+    public String getDefaultImage(String resourcesFile){
+        return HOST + resourcesFile;
     }
 
     @Override

@@ -52,7 +52,7 @@ public interface IImageService {
      *
      * @return The filename of the default image.
      */
-    String getDefaultImage();
+    String getDefaultImage(String fileName);
 
     /**
      * Retrieves a list of all image filenames.

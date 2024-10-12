@@ -138,7 +138,7 @@ public class KoiFish {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        if(ageMonth == 0){
+        if(ageMonth == null){
             countageMonth();
         }else if(dateOfBirth == null){
             dateOfBirthCal();

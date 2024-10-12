@@ -74,4 +74,10 @@ public interface IPackageService {
      * @return           true if the pond limit is not exceeded; false otherwise.
      */
     boolean checkPondLimit(int userId, UserPackage userPackage);
+
+    int getFishLimit(int userId, UserPackage userPackage);
+
+    int getPondLimit(int userId, UserPackage userPackage);
+
+    int getFishCount(int userId);
 }
