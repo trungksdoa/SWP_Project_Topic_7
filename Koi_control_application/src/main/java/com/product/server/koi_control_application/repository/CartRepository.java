@@ -23,7 +23,11 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
 
 
-    @Query(value = "SELECT new com.product.server.koi_control_application.pojo.response.CartProductDTO(c.id,p.id, p.imageUrl,p.name,p.price,p.stock,c.quantity,p.disabled) " +
+    @Query(value = "SELECT new com.product.server.koi_control_application.pojo.response." +
+            "CartProductDTO" +
+            "(" +
+            "c.id,p.id, p.imageUrl,p.name,p.price,p.stock,c.quantity,p.disabled" +
+            ") " +
             "FROM Cart c " +
             "INNER JOIN Product p ON c.productId = p.id " +
             "WHERE c.userId = ?1")

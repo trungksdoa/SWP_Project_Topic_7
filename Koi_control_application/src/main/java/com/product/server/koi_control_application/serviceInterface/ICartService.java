@@ -29,7 +29,7 @@ public interface ICartService {
      * @param userId  The ID of the user whose cart is being updated.
      * @return        The updated Cart object.
      */
-    Cart updateCart(CartDTO cartDTO, int userId);
+    CartProductDTO updateCart(CartDTO cartDTO, int userId);
 
     /**
      * Deletes a product from the user's cart.

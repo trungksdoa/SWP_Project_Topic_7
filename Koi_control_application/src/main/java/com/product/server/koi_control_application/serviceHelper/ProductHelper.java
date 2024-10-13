@@ -31,7 +31,6 @@ public class ProductHelper implements IProductHelper {
      *
      * This method persists the provided product to the database and returns the saved instance.
      */
-    @Transactional
     @Override
     public Product save(Product product) {
         try {
@@ -52,7 +51,6 @@ public class ProductHelper implements IProductHelper {
      *
      * This method fetches the product from the database using the provided ID.
      */
-    @Transactional(readOnly = true)
     @Override
     public Product get(int productId) {
         return productRepository.findById(productId)
@@ -66,7 +64,6 @@ public class ProductHelper implements IProductHelper {
      *
      * This method fetches all products from the database and returns them as a list.
      */
-    @Transactional(readOnly = true)
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -81,7 +78,6 @@ public class ProductHelper implements IProductHelper {
      *
      * This method removes the specified product from the database.
      */
-    @Transactional
     @Override
     public boolean delete(Product product) {
         try {
