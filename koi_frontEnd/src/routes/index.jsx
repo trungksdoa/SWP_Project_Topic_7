@@ -39,6 +39,9 @@ import EditBlog from "../components/ui/blogs/EditBlog";
 import EditPackages from "../components/ui/admin/managePackages/EditPackages";
 import AddBlogsPage from "../pages/AddBlogsPage";
 import ManageOrder from "../components/ui/admin/ManageOrder";
+import KoiAdd from "../components/ui/manage/KoiAdd";
+import KoiUpdate from "../components/ui/manage/KoiUpdate";
+import KoiMove from "../components/ui/manage/KoiMove";
 
 const router = [
   {
@@ -120,7 +123,7 @@ const router = [
         element: <PondManegementPage />,
       },
       {
-        path: `${PATH.DETAIL_POND}/:pondId`,
+        path: `/pond-detail/:pondId`,
         element: <PondDetail />,
       },
       {
@@ -138,6 +141,18 @@ const router = [
       {
         path: PATH.PACKAGES,
         element: <PackagesPage />,
+      },
+      {
+        path: "/move-koi",
+        element: <KoiMove />,
+      },
+      {
+        path: "/add-koi",
+        element: <KoiAdd />,
+      },
+      {
+        path: "/update-koi/:id",
+        element: <KoiUpdate />,
       },
     ],
   },
