@@ -31,7 +31,12 @@ const OrderDelivering = ({ lstDelivering, isFetching }) => {
                     <p>x {item?.quantity}</p>
                   </div>
                   <div className="ml-auto">
-                    <p>Price: ${item?.productId?.price} </p>
+                    <p>Price:
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item?.productId?.price)}
+                    </p>
                   </div>
                 </div>
                 <hr className="my-[10px]" />
@@ -41,7 +46,12 @@ const OrderDelivering = ({ lstDelivering, isFetching }) => {
           <div className="text-right">
             <p>
               Total Price:{" "}
-              <span className="text-blue-700">${order?.totalAmount}</span>
+              <span className="text-blue-700">
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(order?.totalAmount)}
+              </span>
             </p>
           </div>
         </div>

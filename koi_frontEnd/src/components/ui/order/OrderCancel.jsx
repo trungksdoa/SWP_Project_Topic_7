@@ -1,7 +1,7 @@
-import React from 'react'
-import { Spin } from 'antd';
+import React from "react";
+import { Spin } from "antd";
 
-const OrderCancel = ( { lstCancel, isFetching } ) => {
+const OrderCancel = ({ lstCancel, isFetching }) => {
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -11,7 +11,7 @@ const OrderCancel = ( { lstCancel, isFetching } ) => {
   }
   return (
     <div className="w-[60%] mx-auto mb-[100px]">
-            {lstCancel.map((order) => (
+      {lstCancel.map((order) => (
         <div key={order.id} className=" p-[15px] shadow my-[30px] order-item">
           <div className="text-right text-orange-500 font-semibold mb-[10px] border-b-gray-200 border-b-[1px]">
             {order?.status}
@@ -30,7 +30,13 @@ const OrderCancel = ( { lstCancel, isFetching } ) => {
                     <p>x {item?.quantity}</p>
                   </div>
                   <div className="ml-auto">
-                  <p>Price: ${item?.productId?.price} </p>
+                    <p>
+                      Price:
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item?.productId?.price)}
+                    </p>
                   </div>
                 </div>
                 <hr className="my-[10px]" />
@@ -40,13 +46,18 @@ const OrderCancel = ( { lstCancel, isFetching } ) => {
           <div className="text-right">
             <p>
               Total Price:{" "}
-              <span className="text-orange-700">${order?.totalAmount}</span>
+              <span className="text-orange-700">
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(order?.totalAmount)}
+              </span>
             </p>
           </div>
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default OrderCancel
+export default OrderCancel;
