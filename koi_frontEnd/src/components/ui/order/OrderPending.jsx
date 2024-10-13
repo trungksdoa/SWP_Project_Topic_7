@@ -68,7 +68,7 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(item?.productId?.price)}
+                      }).format(item?.unitPrice)}
                     </p>
                   </div>
                 </div>

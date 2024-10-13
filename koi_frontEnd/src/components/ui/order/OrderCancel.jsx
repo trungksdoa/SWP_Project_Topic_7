@@ -35,7 +35,7 @@ const OrderCancel = ({ lstCancel, isFetching }) => {
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(item?.productId?.price)}
+                      }).format(item?.unitPrice)}
                     </p>
                   </div>
                 </div>
