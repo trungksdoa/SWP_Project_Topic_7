@@ -19,7 +19,6 @@ public class OrderHelper implements IOrderHelper {
     private final OrderRepository orderRepository;
 
     @Override
-    @Transactional
     public Orders save(Orders order) {
         try {
             log.info("Saving order: {}", order);

@@ -4,6 +4,7 @@ import com.product.server.koi_control_application.customException.BadRequestExce
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.Orders;
+import com.product.server.koi_control_application.pojo.OutStockProduct;
 import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.OrderRepository;
@@ -19,8 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * OrderServiceImpl is a service implementation class that handles various operations related to orders.
@@ -38,17 +39,16 @@ public class OrderServiceImpl implements IOrderService {
     private final IOrderHelper orderHelper;
 
 
-
     /**
      * Creates a new order for a user.
      *
-     * @param userId        The ID of the user placing the order.
+     * @param userId          The ID of the user placing the order.
      * @param orderRequestDTO The OrderRequestDTO object containing order details.
-     * @return             The created Orders object after processing.
-     * @throws NotFoundException If the cart is empty or products are out of stock.
+     * @return The created Orders object after processing.
+     * @throws NotFoundException   If the cart is empty or products are out of stock.
      * @throws BadRequestException If there are invalid products in the cart.
-     * This method initializes a new order using the provided user ID and order details,
-     * checks the cart for items, validates stock, and processes the order.
+     *                             This method initializes a new order using the provided user ID and order details,
+     *                             checks the cart for items, validates stock, and processes the order.
      */
     @Override
     @Transactional
@@ -61,12 +61,17 @@ public class OrderServiceImpl implements IOrderService {
             throw new NotFoundException("Your cart may be empty, please add some products to cart, then try again");
         }
 
-        // Check if any product in cart is out of stock
-        if (productService.isProductIsDisabledFromCart(cartItems)) {
-            throw new BadRequestException("Sorry, some products in your cart are invalid, please remove them and try again");
+        if(cartItems.stream().anyMatch(CartProductDTO::isDisabled)) {
+            throw new BadRequestException("Some items in your cart are disabled, please remove it from your cart");
+        }
+
+        // Check if products are out of stock
+        if(cartItems.stream().anyMatch(CartProductDTO::isQuantityChanged)){
+            throw new BadRequestException("Please updated your quantity of products in cart to continue");
         }
 
         Orders order = processHelper.processOrder(userId, orderRequestDTO, cartItems);
+
         // Process order items
         return orderHelper.save(order);
     }
@@ -75,9 +80,10 @@ public class OrderServiceImpl implements IOrderService {
      * Retrieves an order by its ID.
      *
      * @param id The ID of the order to retrieve.
-     * @return   The Orders object corresponding to the provided ID.
+     * @return The Orders object corresponding to the provided ID.
      */
     @Override
+    @Transactional(readOnly = true)
     public Orders getOrderById(int id) {
         return orderHelper.get(id);
     }
@@ -87,9 +93,10 @@ public class OrderServiceImpl implements IOrderService {
      *
      * @param id     The ID of the order to update.
      * @param status The new status to set for the order.
-     * @return      The updated Orders object.
+     * @return The updated Orders object.
      */
     @Override
+    @Transactional
     public Orders updateOrderStatus(int id, String status) {
         Orders order = orderHelper.get(id);
         order.setStatus(status);
@@ -102,6 +109,7 @@ public class OrderServiceImpl implements IOrderService {
      * @return A List of all Orders objects.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Orders> getAllOrders() {
         return orderHelper.findAll();
     }
@@ -111,11 +119,11 @@ public class OrderServiceImpl implements IOrderService {
      *
      * @param userId  The ID of the user who placed the order.
      * @param orderId The ID of the order to cancel.
-     * @throws NotFoundException If the order is not found.
+     * @throws NotFoundException   If the order is not found.
      * @throws BadRequestException If the order cannot be cancelled.
-     *
-     * This method checks if the order is in a pending state and cancels it,
-     * updating the stock of the associated products.
+     *                             <p>
+     *                             This method checks if the order is in a pending state and cancels it,
+     *                             updating the stock of the associated products.
      */
     @Override
     public void cancelPendingOrder(int userId, int orderId) {
@@ -136,6 +144,7 @@ public class OrderServiceImpl implements IOrderService {
      * @param message The message from the admin regarding the cancellation.
      */
     @Override
+    @Transactional
     public void cancelOrderByAdmin(int orderId, String message) {
         Orders order = orderHelper.get(orderId);
 
@@ -148,10 +157,11 @@ public class OrderServiceImpl implements IOrderService {
      * Deletes an order by its ID.
      *
      * @param id The ID of the order to delete.
-     *
-     * This method removes the order and all associated order items from the database.
+     *           <p>
+     *           This method removes the order and all associated order items from the database.
      */
     @Override
+    @Transactional
     public void deleteOrder(int id) {
         Orders order = orderHelper.get(id);
 
@@ -168,9 +178,10 @@ public class OrderServiceImpl implements IOrderService {
      * @param userId The ID of the user whose orders to retrieve.
      * @param page   The page number to retrieve.
      * @param size   The number of orders per page.
-     * @return      A Page containing the list of Orders objects.
+     * @return A Page containing the list of Orders objects.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<Orders> getOrdersByUser(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return orderRepository.findOrdersByUserId(userId, pageable);
@@ -180,9 +191,10 @@ public class OrderServiceImpl implements IOrderService {
      * Retrieves all orders for a user.
      *
      * @param userId The ID of the user whose orders to retrieve.
-     * @return      A List of Orders objects for the specified user.
+     * @return A List of Orders objects for the specified user.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Orders> getOrdersByUser(int userId) {
         return orderRepository.findByUserId(userId);
     }

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Spin, Button, message } from 'antd';
-import { manageOrderServices } from '../../../services/manageOderServices';
+import React from "react";
+import { Spin, Button, message } from "antd";
+import { manageOrderServices } from "../../../services/manageOderServices";
 
-const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
+const OrderDelivered = ({ lstDelivered, isFetching, refetch }) => {
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -11,16 +11,16 @@ const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
     );
   }
 
-  const handleConfirmDelivery =  (orderId) => {
+  const handleConfirmDelivery = (orderId) => {
     try {
       manageOrderServices.receiveOrder(orderId);
-      message.success('Order marked as completed');
+      message.success("Order marked as completed");
       refetch();
     } catch (error) {
-      console.error('Error completing order:', error);
-      message.error('Failed to complete order');
+      // console.error('Error completing order:', error);
+      // message.error('Failed to complete order');
     }
-  }
+  };
 
   return (
     <div className="w-[60%] mx-auto mb-[100px]">
@@ -43,7 +43,13 @@ const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
                     <p>x {item?.quantity}</p>
                   </div>
                   <div className="ml-auto">
-                    <p>Price: ${item?.productId?.price} </p>
+                    <p>
+                      Price:{" "}
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item?.unitPrice)}
+                    </p>
                   </div>
                 </div>
                 <hr className="my-[10px]" />
@@ -53,7 +59,12 @@ const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
           <div className="text-right">
             <p>
               Total Price:{" "}
-              <span className="text-green-700">${order?.totalAmount}</span>
+              <span className="text-green-700">
+                {new Intl.NumberFormat("vi-VN", { 
+                  style: "currency",
+                  currency: "VND",
+                }).format(order?.totalAmount)}
+              </span>
             </p>
           </div>
           <div className="mt-[15px] text-right">
@@ -67,7 +78,7 @@ const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 export default OrderDelivered;

@@ -19,11 +19,10 @@ public class BlogHelper implements IBlogHelper {
     private final BlogsRepository blogRepository;
 
     @Override
-    @Transactional
     public Blogs save(Blogs blog) {
         try {
             log.info("Saving blog");
-            log.info("Blog: {}", blog);
+            logging(blog.toString());
             return blogRepository.save(blog);
         } catch (Exception e) {
             throw new BadRequestException("Failed to save blog");
@@ -31,7 +30,6 @@ public class BlogHelper implements IBlogHelper {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Blogs> findAll() {
         return blogRepository.findAll();
     }
@@ -43,15 +41,18 @@ public class BlogHelper implements IBlogHelper {
     }
 
     @Override
-    @Transactional
     public void delete(Blogs blog) {
         try {
             log.info("Deleting blog");
-            log.info("Blog: {}", blog);
+            logging(blog.toString());
             blogRepository.delete(blog);
         } catch (Exception e) {
             throw new BadRequestException("Failed to delete blog");
         }
+    }
+
+    void logging(String message) {
+        log.info("message {}", message);
     }
     // Add methods as needed
 }

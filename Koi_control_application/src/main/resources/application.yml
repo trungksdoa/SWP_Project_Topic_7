@@ -27,6 +27,8 @@ openapi:
       dev:  http://localhost:8080 
 
 spring:
+  jackson:
+    time-zone= Asia/Ho_Chi_Minh
   servlet:
     multipart:
       max-file-size: 5MB

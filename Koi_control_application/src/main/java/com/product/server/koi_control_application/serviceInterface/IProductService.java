@@ -9,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This interface defines the contract for product-related operations.
@@ -86,13 +88,6 @@ public interface IProductService {
      */
     Product getProductBySlug(String slug);
 
-    /**
-     * Checks the stock status of products in the provided cart.
-     *
-     * @param cart A list of CartProductDTO objects representing the items in the cart.
-     * @return     An OutStockProduct object containing the list of products that are out of stock.
-     */
-    OutStockProduct checkProductOutStock(List<CartProductDTO> cart);
 
     /**
      * Checks if any product in the cart is disabled.
@@ -101,13 +96,6 @@ public interface IProductService {
      * @return     true if any product is disabled; false otherwise.
      */
     boolean isProductIsDisabledFromCart(List<CartProductDTO> cart);
-
-    /**
-     * Disables products that are out of stock.
-     *
-     * @param outStockProduct An OutStockProduct object containing the list of products to disable.
-     */
-    void setDisableProduct(OutStockProduct outStockProduct);
 
     /**
      * Checks if there is enough stock for a product and updates the stock if possible.
@@ -126,4 +114,8 @@ public interface IProductService {
      * @param quantity The amount to increase the product's stock by.
      */
     void increaseProductQuantity(Product product, int quantity);
+
+     Map<Integer, Integer> getProductStocks(List<Integer> productIds) ;
+
+//     void disableOutOfStockProducts(List<CartProductDTO> cart) ;
 }
