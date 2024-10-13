@@ -11,9 +11,9 @@ const OrderDelivered = ({ lstDelivered, isFetching, refetch }) => {
     );
   }
 
-  const handleConfirmDelivery = async (orderId) => {
+  const handleConfirmDelivery =  (orderId) => {
     try {
-      await manageOrderServices.receiveOrder(orderId);
+      manageOrderServices.receiveOrder(orderId);
       message.success('Order marked as completed');
       refetch();
     } catch (error) {

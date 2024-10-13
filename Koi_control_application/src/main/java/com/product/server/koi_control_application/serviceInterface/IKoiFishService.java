@@ -29,4 +29,6 @@ public interface IKoiFishService {
     void evaluateAndUpdateKoiGrowthStatus(int koiId);
     void evaluateAndUpdateKoiFishStatus(KoiFish koiFish);
     void UpdateKoiFishGrowth(int koiId);
+    List<KoiFish>swapPondIdListKoi(int pondId, List<Integer> koiFishId);
+
 }

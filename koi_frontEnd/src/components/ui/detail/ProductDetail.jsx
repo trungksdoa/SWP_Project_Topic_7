@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, InputNumber, Spin, Breadcrumb } from "antd";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { useFormik } from "formik";
 import { useGetProductBySlug } from "../../../hooks/product/useGetProductBySlug";
 import { manageCartActions } from "../../../store/manageCart/slice"; // Redux slice
 import { usePostCarts } from "../../../hooks/manageCart/usePostCarts"; // Hook post carts
@@ -13,8 +12,6 @@ import ProductFeedback from "./ProductFeedback"; // Component Feedback
 import { PATH } from "../../../constant";
 
 const ProductDetail = () => {
-  // const { id: prdId } = useParams();
-  // const parseID = parseInt(prdId);
   const { slug } = useParams();
   const [quantity, setQuantity] = useState(1); // Mặc định là 1
   const dispatch = useDispatch();
@@ -24,32 +21,37 @@ const ProductDetail = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
 
-  const cart = useSelector((state) => state.manageCart.cart);
   const cartCount = useSelector((state) => state.manageCart.cartCount);
 
-  const { data: product, refetch, isFetching } = useGetProductBySlug(slug);
-  console.log(product);
+  // Lấy sản phẩm dựa trên slug và sử dụng staleTime để tránh gọi lại API không cần thiết
+  const { data: product, refetch, isFetching } = useGetProductBySlug(slug, {
+    staleTime: 60000, // Dữ liệu không stale trong 60 giây
+    cacheTime: 300000, // Giữ dữ liệu trong cache 5 phút
+  });
 
   const prdId = product?.id;
-  console.log(prdId);
-  const { data: carts, refetch: refetchCart } = useGetCartByUserId(userId);
+
+  // Lấy giỏ hàng dựa trên userId và cache lại
+  const { data: carts, refetch: refetchCart } = useGetCartByUserId(userId, {
+    staleTime: 60000,
+    cacheTime: 300000,
+  });
 
   const mutate = usePostCarts();
 
   useEffect(() => {
+    // Gọi refetch chỉ khi cần thiết (slug hoặc userId thay đổi)
     refetch();
     refetchCart();
 
     // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
     const isProductInCart = carts?.find((item) => item.productId === product?.id);
-    console.log(isProductInCart);
-
     if (isProductInCart) {
       setQuantity(isProductInCart.quantity); // Nếu có, thiết lập quantity từ giỏ hàng
     } else {
       setQuantity(1); // Nếu chưa có, mặc định là 1
     }
-  }, [slug, userId, product?.id, carts]);
+  }, [slug, userId]); // Chỉ phụ thuộc vào slug và userId
 
   const onChangeQuantity = (value) => {
     setQuantity(value);
@@ -67,15 +69,10 @@ const ProductDetail = () => {
       quantity: quantity,
     };
 
-    console.log(payload);
-
     const isProductInCart = carts?.find((item) => item.productId === product.id);
-    console.log(isProductInCart);
 
     if (isProductInCart) {
       const updatedQuantity = quantity;
-
-      console.log("updatedQuantity", updatedQuantity);
 
       dispatch(
         manageCartActions.updateCartQuantity({
@@ -93,7 +90,7 @@ const ProductDetail = () => {
           },
           onError: () => {
             toast.error("This product existed in cart");
-            navigate(PATH.CART)
+            navigate(PATH.CART);
           },
         }
       );
@@ -158,8 +155,8 @@ const ProductDetail = () => {
               <InputNumber
                 min={1}
                 max={100}
-                value={quantity} // Thiết lập giá trị quantity từ state
-                onChange={onChangeQuantity} // Thay đổi số lượng sản phẩm
+                value={quantity}
+                onChange={onChangeQuantity}
                 style={{
                   width: "60px",
                 }}

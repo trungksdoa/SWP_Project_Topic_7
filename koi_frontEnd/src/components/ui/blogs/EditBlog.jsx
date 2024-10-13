@@ -52,15 +52,18 @@ const EditBlog = () => {
       }
 
       // Gửi mutation hoặc gọi API tại đây
-      mutation.mutate({ id: parseId, payload: formData }, {
-        onSuccess: (response) => {
-          formik.resetForm();
-          toast.success("Product added successfully");
-        },
-        onError: (error) => {
-          toast.error("Error adding product");
-        },
-      });
+      mutation.mutate(
+        { id: parseId, payload: formData },
+        {
+          onSuccess: (response) => {
+            formik.resetForm();
+            toast.success("Product added successfully");
+          },
+          onError: (error) => {
+            toast.error("Error adding product");
+          },
+        }
+      );
     },
   });
   const handleChangeFile = (e, fieldName) => {
@@ -85,19 +88,19 @@ const EditBlog = () => {
   };
 
   useEffect(() => {
-    refetch()
-  }, [parseId])
+    refetch();
+  }, [parseId]);
   return (
     <div>
       <div className="flex justify-center items-center text-bold text-3xl h-full m-8 mb-3">
-          <strong>Blogs Editors</strong>
+        <strong>Blogs Editors</strong>
       </div>
       <Form
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 16 }}
         onSubmitCapture={formik.handleSubmit}
         className="p-4"
-      >  
+      >
         <Form.Item label="Title">
           <Input
             placeholder="Title"
@@ -158,9 +161,14 @@ const EditBlog = () => {
           />
         </Form.Item>
 
-        <Form.Item className="justify-center">
+        <Form.Item className="flex justify-center items-center">
           <div className="">
-            <Button htmlType="submit" type="primary" loading={mutation.isPending} className="w-full">
+            <Button
+              htmlType="submit"
+              type="primary"
+              loading={mutation.isPending}
+              className="text-xl text-white bg-black px-40 py-4"
+            >
               Update
             </Button>
           </div>

@@ -6,15 +6,8 @@ const ReceiptComponent = ({ selectedOrder }) => {
   console.log(selectedOrder);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   useEffect(() => {
-    manageOrderServices.getReceiptOrder();
+    manageOrderServices.getOrderById(selectedOrder?.id);
   });
-  const items = [
-    { name: "Item 1", price: 10.99 },
-    { name: "Item 2", price: 15.5 },
-    { name: "Item 3", price: 5.99 },
-  ];
-
-  const total = items.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <div>

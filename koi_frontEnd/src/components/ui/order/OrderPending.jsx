@@ -80,7 +80,7 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
           <div className="mt-[15px] text-right">
             <Button
               className="w-[120px] bg-red-500 border-none text-white hover:!bg-red-500 hover:!text-white mr-2"
-              
+              loading={mutation.isPending}
               onClick={() => {
                handleCancel(userLogin?.id, order?.id)
               }}

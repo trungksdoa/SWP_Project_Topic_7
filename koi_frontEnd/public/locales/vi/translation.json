@@ -1,7 +1,7 @@
 {
-  "login": "Đăng Nhập",
+  "Login": "Đăng Nhập",
   "Please sign in or create an account to access this feature." : "Đăng nhập hoặc đăng ký để sử dụng tính năng này.",
-  "register": "Đăng Ký",
+  "Register": "Đăng Ký",
   "INTRODUCTION": "GIỚI THIỆU",
   "Operational Approaching": "Phương thức hoạt động",
   "Investors": "Nhà đầu tư",
@@ -30,8 +30,6 @@
   "Base": "Cơ sở",
   "Blog": "Blog",
   "Store": "Cửa hàng",
-  "Register": "Đăng ký",
-  "Login": "Đăng nhập",
   "Email": "Email",
   "Forgot Password?": "Quên mật khẩu?",
   "Password": "Mật khẩu",
