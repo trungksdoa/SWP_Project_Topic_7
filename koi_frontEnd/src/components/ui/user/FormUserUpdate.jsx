@@ -22,7 +22,7 @@ const FormUserUpdate = ({ user, refetch }) => {
       email: user?.email || "",
       address: user?.address || "",
       phoneNumber: user?.phoneNumber || "",
-      avatar: null,
+      image: null,
     },
     onSubmit: (values) => {
       const accessToken = userLogin?.accessToken 
@@ -36,7 +36,7 @@ const FormUserUpdate = ({ user, refetch }) => {
         phoneNumber: values.phoneNumber,
       };
       if (values.avatar) {
-        formData.append("avatar", values.avatar);
+        formData.append("image", values.avatar);
       }
       formData.append("user", JSON.stringify(updateUser));
       mutation.mutate(
@@ -89,7 +89,7 @@ const FormUserUpdate = ({ user, refetch }) => {
       reader.onload = (e) => {
         setImgSrc(e.target?.result);
       };
-      formik.setFieldValue("avatar", file);
+      formik.setFieldValue("image", file);
       setComponentDisabled(false); 
     } else {
       setComponentDisabled(true); 

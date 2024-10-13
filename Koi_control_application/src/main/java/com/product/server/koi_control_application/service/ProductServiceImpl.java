@@ -23,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * ProductServiceImpl is a service implementation that provides methods for managing Product entities.
@@ -78,7 +80,7 @@ public class ProductServiceImpl implements IProductService {
      */
     @Override
     @Transactional
-    public Product updateProduct(int id, Product product, MultipartFile productImage)  {
+    public Product updateProduct(int id, Product product, MultipartFile productImage) {
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
 
         Optional.ofNullable(productImage).ifPresentOrElse(image -> {
@@ -217,6 +219,14 @@ public class ProductServiceImpl implements IProductService {
         productHelper.save(getProduct);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Integer, Integer> getProductStocks(List<Integer> productIds) {
+        List<Product> products = productRepository.findAllById(productIds);
+        return products.stream()
+                .collect(Collectors.toMap(Product::getId, Product::getStock));
+    }
+
     /*
      * Checks if there is enough stock for a product and updates the stock if possible.
      *
@@ -247,29 +257,6 @@ public class ProductServiceImpl implements IProductService {
     //region Cart Operations
 
     /*
-     * Checks the stock status of products in the provided cart.
-     *
-     * @param cart A list of CartProductDTO objects representing the items in the cart.
-     * @return     An OutStockProduct object containing the list of products that are out of stock.
-     *
-     * This method iterates through the cart items and checks if the stock of each item
-     * is less than the quantity requested. If so, it retrieves the corresponding Product
-     * and adds it to the OutStockProduct list.
-     */
-    @Override
-    public OutStockProduct checkProductOutStock(List<CartProductDTO> cart) {
-        OutStockProduct outStockProduct = new OutStockProduct();
-        outStockProduct.setOutStockProducts(new ArrayList<>());
-        for (CartProductDTO cartItem : cart) {
-            if (cartItem.getStock() < cartItem.getQuantity()) {
-                Product product = productHelper.get(cartItem.getProductId());
-                outStockProduct.getOutStockProducts().add(product);
-            }
-        }
-        return outStockProduct;
-    }
-
-    /*
      * Checks if any product in the cart is disabled.
      *
      * @param cart A list of CartProductDTO objects representing the items in the cart.
@@ -279,26 +266,10 @@ public class ProductServiceImpl implements IProductService {
      * as disabled. It returns true if at least one product is disabled.
      */
     @Override
+    @Transactional(readOnly = true)
     public boolean isProductIsDisabledFromCart(List<CartProductDTO> cart) {
         return cart.stream().anyMatch(CartProductDTO::isDisabled);
     }
 
-    /*
-     * Disables products that are out of stock.
-     *
-     * @param outStockProduct An OutStockProduct object containing the list of products to disable.
-     *
-     * This method iterates through the list of out-of-stock products and sets each product's
-     * disabled status to true. It then saves the updated product using the productHelper.
-     */
-    @Override
-    public void setDisableProduct(OutStockProduct outStockProduct) {
-        List<Product> outStockProducts = outStockProduct.getOutStockProducts();
-        for (Product product : outStockProducts) {
-            Product product1 = productHelper.get(product.getId());
-            product1.setDisabled(true);
-            productHelper.save(product1);
-        }
-    }
     //endregion
 }

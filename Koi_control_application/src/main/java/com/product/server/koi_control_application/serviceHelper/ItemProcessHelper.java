@@ -40,35 +40,33 @@ public class ItemProcessHelper implements IIProcessHelper {
      * This method initializes a new order using the provided user ID and order details,
      * adds items from the cart to the order, and saves the order to the repository.
      */
-    @Override
-    @Transactional
-    public Orders processOrder(int userId, OrderRequestDTO orderRequestDTO, List<CartProductDTO> cartItems) {
+        @Override
+        public Orders processOrder(int userId, OrderRequestDTO orderRequestDTO, List<CartProductDTO> cartItems) {
 
-        Users user = userService.getUser(userId);
+            Users user = userService.getUser(userId);
 
 
-        Optional.ofNullable(orderRequestDTO.getFullName()).ifPresentOrElse(
-                orderRequestDTO::setFullName,
-                () -> orderRequestDTO.setFullName(user.getUsername())
-        );
+            Optional.ofNullable(orderRequestDTO.getFullName()).ifPresentOrElse(
+                    orderRequestDTO::setFullName,
+                    () -> orderRequestDTO.setFullName(user.getUsername())
+            );
 
-        Optional.ofNullable(orderRequestDTO.getAddress()).ifPresentOrElse(
-                orderRequestDTO::setAddress,
-                () -> orderRequestDTO.setAddress(user.getAddress())
-        );
+            Optional.ofNullable(orderRequestDTO.getAddress()).ifPresentOrElse(
+                    orderRequestDTO::setAddress,
+                    () -> orderRequestDTO.setAddress(user.getAddress())
+            );
 
-        Optional.ofNullable(orderRequestDTO.getPhone()).ifPresentOrElse(
-                orderRequestDTO::setPhone,
-                () -> orderRequestDTO.setPhone(user.getPhoneNumber())
-        );
-        // Create a new order
-        Orders order = initService.initOrder(userId, orderRequestDTO);
+            Optional.ofNullable(orderRequestDTO.getPhone()).ifPresentOrElse(
+                    orderRequestDTO::setPhone,
+                    () -> orderRequestDTO.setPhone(user.getPhoneNumber())
+            );
+            // Create a new order
+            Orders order = initService.initOrder(userId, orderRequestDTO);
 
-        // Add item to order
-        Orders orderWithItem = addItemsToOrder(order, cartItems);
+            // Add item to order
 
-        return orderRepository.save(orderWithItem);
-    }
+            return addItemsToOrder(order, cartItems);
+        }
 
     /*
      * Cancels an order and updates the stock of the associated products.
@@ -80,7 +78,6 @@ public class ItemProcessHelper implements IIProcessHelper {
      * Finally, it saves the updated order to the repository.
      */
     @Override
-    @Transactional
     public void cancelOrderAndUpdateProductItem(Orders order) {
         for (OrderItems item : order.getItems()) {
             Product product = productService.getProduct(item.getProductId().getId());
@@ -105,11 +102,6 @@ public class ItemProcessHelper implements IIProcessHelper {
     private Orders addItemsToOrder(Orders initOrder, List<CartProductDTO> cartItems) {
         for (CartProductDTO cart : cartItems) {
             Product product = productService.getProduct(cart.getProductId());
-
-            if (!productService.checkAndUpdateStock(cart.getProductId(), cart.getQuantity())) {
-                throw new InsufficientStockException("Not enough stock for product: " + cart.getProductId());
-            }
-
             OrderItems orderItem = initService.initOrderItems(initOrder, product, cart.getQuantity());
             orderItem.setUnitPrice(product.getPrice());
             initOrder.getItems().add(orderItem);

@@ -23,6 +23,7 @@ public class BlogServiceImpl implements IBlogService {
     private final BlogsRepository repo;
     private final IImageService imageService;
     private final IBlogHelper blogHelper;
+
     @Override
     @Transactional
     public Blogs createBlog(Blogs blog, MultipartFile headerImage, MultipartFile bodyImage) throws IOException {
@@ -56,26 +57,31 @@ public class BlogServiceImpl implements IBlogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Blogs> getAllBlogs() {
         return blogHelper.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Blogs getBlogById(int id) {
         return blogHelper.get(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Blogs> getBlogsByAuthor(int authorId) {
         return repo.findByAuthor(Users.builder().id(authorId).build());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Blogs getBlogBySlug(String slug) {
         return repo.findBySlug(slug).orElseThrow(() -> new NotFoundException("No blog found with slug: " + slug));
     }
 
     @Override
+    @Transactional
     public void acceptBlog(int id) {
         Blogs blog = blogHelper.get(id);
         blog.setApproved(true);
@@ -83,6 +89,7 @@ public class BlogServiceImpl implements IBlogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Blogs> searchBlogs(String title, String headerTop, String headerMiddle) {
         return repo.searchByTitleAndHeader(title, headerTop, headerMiddle);
     }
