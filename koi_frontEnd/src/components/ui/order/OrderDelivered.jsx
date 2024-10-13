@@ -2,7 +2,7 @@ import React from 'react';
 import { Spin, Button, message } from 'antd';
 import { manageOrderServices } from '../../../services/manageOderServices';
 
-const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
+const OrderDelivered = ({ lstDelivered, isFetching, refetch }) => {
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -17,8 +17,8 @@ const OrderDelivered = ({ lstDelivered, isFetching, fetchOrders }) => {
       message.success('Order marked as completed');
       refetch();
     } catch (error) {
-      console.error('Error completing order:', error);
-      message.error('Failed to complete order');
+      // console.error('Error completing order:', error);
+      // message.error('Failed to complete order');
     }
   }
 

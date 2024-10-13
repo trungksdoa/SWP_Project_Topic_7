@@ -99,7 +99,7 @@ const HistoryOrder = () => {
             {
               label: "Delivered Orders",
               key: "delivered",
-              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} />,
+              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} refetch={refetch} />,
             },
             {
               label: "Completed Orders",

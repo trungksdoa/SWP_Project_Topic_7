@@ -47,6 +47,12 @@ const Checkout = () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
+      render: (price) => (
+        `${new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(price)}`
+      ),
     },
     {
       title: "Amount",
@@ -69,13 +75,26 @@ const Checkout = () => {
         {product.name}
       </div>
     ),
-    price: `${product.price}$`, // Format price
+    price: `${product.price}`, // Format price
     amount: product.quantity,
   }));
 
-  return (
+  const totalPrice =
+    carts?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
+  
+    return (
     <div className="w-[60%] my-[40px] mx-auto">
       <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
+      <div className="text-right text-xl font-bold">
+        Shipping fee: FREE
+        <br />
+        <br />
+        Total: {new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(totalPrice)}
+      </div>
+
       <FormCheckout totalItems={totalItems} />
     </div>
   );

@@ -1,6 +1,15 @@
 import React, { useEffect } from "react";
 import { useGetAllOrder } from "../../../hooks/order/useGetAllOrder";
-import { Table, Button, Tag, Modal,List, Typography, Divider,Space } from "antd";
+import {
+  Table,
+  Button,
+  Tag,
+  Modal,
+  List,
+  Typography,
+  Divider,
+  Space,
+} from "antd";
 import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
 
 import { toast } from "react-toastify";
@@ -10,11 +19,10 @@ const ManageOrder = () => {
   const { data: lstOrder, refetch, isFetching } = useGetAllOrder();
 
   const mutation = usePostSendOrder();
-  
+
   useEffect(() => {
     refetch();
   }, []);
-
 
   const handleSendClick = (orderId) => {
     // Thực hiện logic khi nhấn button Send, ví dụ gửi yêu cầu API.
@@ -25,50 +33,76 @@ const ManageOrder = () => {
       },
       onError: (error) => {
         toast.error("Error: " + error.message);
-      }
+      },
     });
   };
 
   const handleViewClick = (orderId) => {
-    let order = lstOrder.find(obj => {
-      return obj.id === orderId
-    })
+    let order = lstOrder.find((obj) => {
+      return obj.id === orderId;
+    });
     Modal.info({
-      title: 'Order Details',
+      title: "Order Details",
       content: (
-        <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
+        <div style={{ maxHeight: "60vh", overflow: "auto" }}>
           <Title level={4}>Order #{order.id}</Title>
           <Divider />
           <Text strong>Customer: </Text>
           <Text>{order.fullName}</Text>
           <br />
           <Text strong>Total Amount: </Text>
-          <Text>{order.totalAmount} VNĐ</Text>
+          <Text>
+            {new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(order.totalAmount)}
+          </Text>
           <Divider orientation="left">Items</Divider>
           <List
             itemLayout="horizontal"
             dataSource={order.items}
             renderItem={(item, index) => {
-              const {name,imageUrl} = item.productId;
+              const { name, imageUrl } = item.productId;
               return (
                 <List.Item>
                   <List.Item.Meta
                     title={name}
                     description={
                       <div>
-                        <Tag color="blue" className="!bg-blue-500 !text-white">Quantity: <Text className="!text-white">{item.quantity}</Text></Tag>
-                        <Tag color="blue" className="!bg-blue-500 !text-white">Price: <Text className="!text-white">{item.unitPrice}</Text></Tag>
+                        <Tag color="blue" className="!bg-blue-500 !text-white">
+                          Quantity:{" "}
+                          <Text className="!text-white">{item.quantity}</Text>
+                        </Tag>
+                        <Tag color="blue" className="!bg-blue-500 !text-white">
+                          Price:{" "}
+                          <Text className="!text-white">
+                            {new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(item.unitPrice)}
+                          </Text>
+                        </Tag>
                       </div>
                     }
-                    avatar={<img src={imageUrl} alt={name} style={{ width: '50px', height: '50px' }} />}
+                    avatar={
+                      <img
+                        src={imageUrl}
+                        alt={name}
+                        style={{ width: "50px", height: "50px" }}
+                      />
+                    }
                     key={index}
-                   
                   />
                   <div>
-                    <Text strong>${(item.quantity * item.unitPrice).toFixed(2)}</Text>
+                    <Text strong>
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item.quantity * item.unitPrice)}
+                    </Text>
                   </div>
                 </List.Item>
-              )
+              );
             }}
           />
         </div>
@@ -90,28 +124,69 @@ const ManageOrder = () => {
       dataIndex: "address",
     },
     {
+      title: "Total Amount",
+      dataIndex: "totalAmount",
+      render: (totalAmount) => (
+        `${new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(totalAmount)}`
+      ),
+    },
+    {
+      title: "Date order",
+      dataIndex: "createdAt",
+      render: (createdAt) => {
+        return new Date(createdAt).toLocaleString();
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => {
         //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
-          return <Tag color="gray" className="!bg-gray-500 !text-white">PENDING</Tag>;
+          return (
+            <Tag color="gray" className="!bg-gray-500 !text-white">
+              PENDING
+            </Tag>
+          );
         }
         if (record.status === "CANCELLED") {
-          return <Tag color="red" className="!bg-red-500 !text-white">CANCELLED</Tag>;
+          return (
+            <Tag color="red" className="!bg-red-500 !text-white">
+              CANCELLED
+            </Tag>
+          );
         }
         if (record.status === "SUCCESS") {
-          return <Tag color="green" className="!bg-green-500 !text-white">WAIT FOR SHIPPING</Tag>;
+          return (
+            <Tag color="green" className="!bg-green-500 !text-white">
+              WAIT FOR SHIPPING
+            </Tag>
+          );
         }
         if (record.status === "SHIPPING") {
-          return <Tag color="blue" className="!bg-blue-500 !text-white">ON DELIVERY</Tag>;
+          return (
+            <Tag color="blue" className="!bg-blue-500 !text-white">
+              ON DELIVERY
+            </Tag>
+          );
         }
         if (record.status === "DELIVERED") {
-          return <Tag color="purple" className="!bg-purple-500 !text-white">DELIVERED</Tag>;
+          return (
+            <Tag color="purple" className="!bg-purple-500 !text-white">
+              DELIVERED
+            </Tag>
+          );
         }
         //COMPLETED
         if (record.status === "COMPLETED") {
-          return <Tag color="orange" className="!bg-orange-500 !text-white">COMPLETED</Tag>;
+          return (
+            <Tag color="orange" className="!bg-orange-500 !text-white">
+              COMPLETED
+            </Tag>
+          );
         }
       },
     },
@@ -131,18 +206,22 @@ const ManageOrder = () => {
           );
         }
 
-        if (record.status === "SHIPPING" || record.status === "DELIVERED" || record.status === "COMPLETED") {
-          return <Button onClick={() => handleViewClick(record?.id)}>View</Button>;
+        if (
+          record.status === "SHIPPING" ||
+          record.status === "DELIVERED" ||
+          record.status === "COMPLETED"
+        ) {
+          return (
+            <Button onClick={() => handleViewClick(record?.id)}>View</Button>
+          );
         }
 
-        if(record.status === "PENDING") {
-          return <Button>Cancel</Button>
+        if (record.status === "PENDING") {
+          return <Button>Cancel</Button>;
         }
 
-        
         return null;
         // Nếu không phải SUCCESS, sẽ không hiện button
-
       },
     },
   ];
@@ -155,7 +234,12 @@ const ManageOrder = () => {
 
   return (
     <div>
-      <Button className="bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out" onClick={() => refetch()}>Refresh Data</Button>
+      <Button
+        className="bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
+        onClick={() => refetch()}
+      >
+        Refresh Data
+      </Button>
       <Table
         loading={isFetching}
         columns={columns}
