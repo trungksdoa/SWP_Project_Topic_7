@@ -107,9 +107,18 @@ const AdminTemplate = () => {
                 {t("Manage Order")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={9} icon={<HomeFilled style={{color: selectedKeys.includes(PATH.HOME) ? "orange" : "white"}} />}>
+            <Menu.Item className="text-white" key={10} icon={<UnorderedListOutlined style={{color: selectedKeys.includes(PATH.MANAGE_ORDER) ? "orange" : "white"}} />}>
               <NavLink 
                 key={7} 
+                to={PATH.MANAGE_PAYMENT_STATUS} 
+                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+              >
+                {t("Manage Payment Status")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item className="text-white" key={10} icon={<HomeFilled style={{color: selectedKeys.includes(PATH.HOME) ? "orange" : "white"}} />}>
+              <NavLink 
+                key={8} 
                 to={PATH.HOME} 
                 className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
               >

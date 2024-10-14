@@ -105,9 +105,15 @@ export const UserMenu = () => {
           <div className="flex flex-col" key="admin">
             <NavLink
               to={PATH.MANAGE_USER}
-              className="!mb-[10px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+              className="!mb-[15px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
             >
               {t("Admin")}
+            </NavLink>
+            <NavLink
+              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.PROFILE}
+            >
+              {t("Profile")}
             </NavLink>
             <Button
               onClick={handleLogout}

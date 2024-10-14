@@ -29,7 +29,7 @@ const ProfileTemplage = () => {
                 alignItems: "center",
               }}
             >
-              <img className="rounded-full" src={user?.avatar} alt="avatar" />
+              <img className="rounded-full h-full w-full object-center" src={user?.avatar} alt="avatar" />
             </div>
           ) : (
             <div

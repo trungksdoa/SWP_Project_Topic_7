@@ -3,6 +3,7 @@ import { useGetPackage } from "../../../hooks/admin/managePackages/useGetPackage
 import { useGetUserById } from "../../../hooks/user/useGetUserById";
 import { useSelector } from "react-redux";
 import { usePostPackage } from "../../../hooks/user/usePostPackage";
+import { Button } from "antd";
 
 const PackagesComponent = () => {
   const { data: lstPackage, refetch, isFetching } = useGetPackage();
@@ -69,7 +70,8 @@ const PackagesComponent = () => {
                 <li>Fish Slot: {packages?.fishSlots}</li>
                 <li>Pond Slot: {packages?.pondSlots}</li>
               </ul>
-              <button
+              <Button
+              loading={mutation.isPending}
                 className={`buy-btn ${
                   isDisabled ? "!bg-gray-500 !cursor-no-drop" : "cursor-pointer"
                 } ${isUserPackage ? "!bg-gray-500 !cursor-no-drop" : ""}`}
@@ -80,7 +82,7 @@ const PackagesComponent = () => {
                 }} 
               >
                 {index === 0 ? "Default" : isUserPackage ? "In Use" : "Buy Now"}
-              </button>
+              </Button>
             </div>
           );
         })}

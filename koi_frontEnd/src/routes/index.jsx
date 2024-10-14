@@ -39,6 +39,7 @@ import EditBlog from "../components/ui/blogs/EditBlog";
 import EditPackages from "../components/ui/admin/managePackages/EditPackages";
 import AddBlogsPage from "../pages/AddBlogsPage";
 import ManageOrder from "../components/ui/admin/ManageOrder";
+import ManagePayment from "../components/ui/admin/ManagePayment";
 
 const router = [
   {
@@ -184,6 +185,10 @@ const router = [
             path: PATH.MANAGE_ORDER,
             element: <ManageOrder />
           },
+          {
+            path: PATH.MANAGE_PAYMENT_STATUS,
+            element: <ManagePayment />
+          }
         ],
       },
     ],

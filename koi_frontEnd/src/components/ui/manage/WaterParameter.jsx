@@ -55,6 +55,8 @@ const WaterParameter = () => {
     setShowStore(true);
   };
 
+  console.log(waterParameters);
+
   const handleClickSalt = (value) => {
     let newError = "";
     if (value === "salt03") {
@@ -176,20 +178,20 @@ const WaterParameter = () => {
   // Formik để xử lý form nhập liệu water parameters
   const formik = useFormik({
     initialValues: {
-      nitriteNO2: 0,
-      nitrateNO3: 0,
-      ammoniumNH4: 0,
-      hardnessGH: 0,
-      salt: 0,
-      temperature: 0,
-      carbonateHardnessKH: 0,
-      co2: 0,
-      totalChlorines: 0,
-      amountFed: 0,
-      pondId: 0,
+      nitriteNO2: "",
+      nitrateNO3: "",
+      ammoniumNH4: "",
+      hardnessGH: "",
+      salt: "",
+      temperature: "",
+      carbonateHardnessKH: "",
+      co2: "",
+      totalChlorines: "",
+      amountFed: "",
+      pondId: "",
       lastCleanedAt: "2024-10-03",
-      cleanedDayCount: 0,
-      ph: 0,
+      cleanedDayCount: "",
+      ph: "",
     },
     onSubmit: (values) => {
       console.log(values);
@@ -364,7 +366,9 @@ const WaterParameter = () => {
               />
             </div>
             <div className="basis-2/3">
-              <div className="font-bold text-[24px] text-center">No water parameters available</div>
+              <div className="font-bold text-[24px] text-center">
+                No water parameters available
+              </div>
               <AddWaterPara selectedPond={selectedPond} />
             </div>
           </div>
@@ -388,23 +392,254 @@ const WaterParameter = () => {
                 </Form.Item>
 
                 {/* Form Items */}
-                {["nitriteNO2", "nitrateNO3", "ammoniumNH4", "hardnessGH", "salt", "temperature", "carbonateHardnessKH", "co2", "totalChlorines", "amountFed", "pondId", "lastCleanedAt", "cleanedDayCount", "ph"].map((field, index) => (
-                  <Form.Item
-                    key={index}
-                    label={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')} // Capitalize and format label
-                    style={{ display: isEditEnabled ? "block" : "none" }}
-                  >
+                <Form.Item
+                  label="Nitrite NO2"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
                     <Input
-                      name={field}
-                      value={formik.values[field]}
+                      name="nitriteNO2"
+                      value={formik.values.nitriteNO2 || ""} // Đảm bảo giá trị là chuỗi
                       onChange={formik.handleChange}
                       disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" // Added styling for input
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.nitriteNO2 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
                     />
-                  </Form.Item>
-                ))}
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.nitriteNO2 ? "mg/L" : "mg/L"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Nitrite NO2"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="nitriteNO2"
+                      value={formik.values.nitriteNO2 || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.nitriteNO2 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.nitriteNO2 ? "mg/L" : "mg/L"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Nitrate NO3"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="nitrateNO3"
+                      value={formik.values.nitrateNO3 || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.nitrateNO3 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.nitrateNO3 ? "mg/L" : "mg/L"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Ammonium NH4"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="ammoniumNH4"
+                      value={formik.values.ammoniumNH4 || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.ammoniumNH4 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.ammoniumNH4 ? "mg/L" : "mg/L"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Hardness GH"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="hardnessGH"
+                      value={formik.values.hardnessGH || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.hardnessGH ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.hardnessGH ? "ppm" : "ppm"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Salt"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="salt"
+                      value={formik.values.salt || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.salt ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.salt ? "ppm" : "ppm"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Temperature"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="temperature"
+                      value={formik.values.temperature || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.temperature ? "°C" : "°C"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.temperature ? "°C" : "°C"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Carbonate Hardness KH"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="carbonateHardnessKH"
+                      value={formik.values.carbonateHardnessKH || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={
+                        formik.values.carbonateHardnessKH ? "ppm" : "ppm"
+                      } // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.carbonateHardnessKH ? "ppm" : "ppm"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="CO2"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="co2"
+                      value={formik.values.co2 || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.co2 ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.co2 ? "ppm" : "ppm"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Total Chlorines"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="totalChlorines"
+                      value={formik.values.totalChlorines || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.totalChlorines ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.totalChlorines ? "ppm" : "ppm"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Amount Fed"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="amountFed"
+                      value={formik.values.amountFed || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={formik.values.amountFed ? "kg" : "kg"} // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.amountFed ? "g" : "g"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="Last Cleaned At"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <Input
+                    name="lastCleanedAt"
+                    value={formik.values.lastCleanedAt}
+                    onChange={formik.handleChange}
+                    disabled={!isEditEnabled}
+                    className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="Cleaned Day Count"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <div className="flex items-center">
+                    <Input
+                      name="cleanedDayCount"
+                      value={formik.values.cleanedDayCount || ""} // Đảm bảo giá trị là chuỗi
+                      onChange={formik.handleChange}
+                      disabled={!isEditEnabled}
+                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      placeholder={
+                        formik.values.cleanedDayCount ? "days" : "days"
+                      } // Hiển thị placeholder nếu không có giá trị
+                    />
+                    <span className="ml-2 text-gray-500">
+                      {formik.values.cleanedDayCount ? "days" : "days"}
+                    </span>
+                  </div>
+                </Form.Item>
+                <Form.Item
+                  label="pH"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <Input
+                    name="ph"
+                    value={formik.values.ph}
+                    onChange={formik.handleChange}
+                    disabled={!isEditEnabled}
+                    className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                  />
+                </Form.Item>
 
-                <Form.Item style={{ display: isEditEnabled ? "block" : "none" }}>
+                <Form.Item
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
                   <Button
                     className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200" // Updated button styling
                     type="primary"
@@ -474,8 +709,8 @@ const WaterParameter = () => {
                           backgroundColor: "#fff",
                         }}
                       >
-                        <strong>Salt 03:</strong> The ideal salt concentration for
-                        fish to thrive. If koi fish go through a high-stress
+                        <strong>Salt 03:</strong> The ideal salt concentration
+                        for fish to thrive. If koi fish go through a high-stress
                         period, this salt concentration helps stabilize them.
                       </li>
                       <li
@@ -503,8 +738,8 @@ const WaterParameter = () => {
                           backgroundColor: "#fff",
                         }}
                       >
-                        <strong>Salt 07:</strong> The salt concentration will help
-                        eliminate bacteria, fungi, and parasites, removing
+                        <strong>Salt 07:</strong> The salt concentration will
+                        help eliminate bacteria, fungi, and parasites, removing
                         pathogens that can harm the fish.
                       </li>
                     </ul>
@@ -512,7 +747,7 @@ const WaterParameter = () => {
                   {/* Add Select for salt options */}
                   <Form.Item label="Select Salt Standard">
                     <Select
-                      defaultValue="0" // Set default value
+                      defaultValue="salt" // Set default value
                       onChange={(value) => {
                         // Cập nhật thông báo tương ứng với giá trị muối
                         let newError = "";
@@ -581,8 +816,8 @@ const WaterParameter = () => {
                   {checkKoiExistence() && <div>{checkKoiExistence()}</div>}
                   <div>
                     <p>
-                      Let to the store to check out products that can improve your
-                      pond.{" "}
+                      Let to the store to check out products that can improve
+                      your pond.{" "}
                     </p>
                     <Button
                       onClick={() => {
