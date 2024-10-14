@@ -22,18 +22,15 @@ const StoreTemplate = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(lstCategory);
 
   const { data: lstProducts, isFetching } = useGetAllProducts();
 
-  console.log(lstProducts);
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     if (lstProducts) {
-      console.log("Product list updated:", lstProducts);
       setFilteredProducts(lstProducts);
     }
   }, [lstProducts]);
@@ -132,9 +129,6 @@ const StoreTemplate = () => {
           </div>
           <div className="grid grid-cols-4 gap-6">
             {filteredProducts?.map((prd, index) => {
-              console.log(
-                `Rendering product: ${prd?.id}, image: ${prd?.imageUrl}`
-              );
               return (
                 <Card
                   key={prd?.id}

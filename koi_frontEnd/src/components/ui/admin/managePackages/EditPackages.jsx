@@ -11,7 +11,6 @@ import { managePackageServiceH } from "../../../../services/admin/managePackageS
 const EditPackages = () => {
   const { id: packageId } = useParams();
   const parseId = parseInt(packageId);
-  console.log(parseId);
   // const { data: packages } = useGetPackageById(parseId);
   const [packages, setPackages] = useState(null);
   const mutation = usePutPackage();
@@ -28,7 +27,6 @@ const EditPackages = () => {
       });
   }, [parseId]);
 
-  console.log(packages);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -40,7 +38,6 @@ const EditPackages = () => {
       isDefault: true,
     },
     onSubmit: (values) => {
-      console.log(values);
       mutation.mutate(
         { id: parseId, payload: values },
         {

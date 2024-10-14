@@ -69,7 +69,6 @@ const LoginForm = ({
     dispatch(manageUserActionThunks.loginThunk(data))
       .unwrap()
       .then((res) => {
-        console.log(res);
         message.success(t("Login successfully"));
         handleOkLogin();
       })

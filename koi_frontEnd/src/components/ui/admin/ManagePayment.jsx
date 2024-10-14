@@ -4,7 +4,6 @@ import { useGetPaymentStatus } from "../../../hooks/admin/managePaymentStatus/us
 
 const ManagePayment = () => {
   const { data: lstStatus } = useGetPaymentStatus();
-  console.log(lstStatus);
   const columns = [
     {
       title: "Id",
@@ -16,7 +15,6 @@ const ManagePayment = () => {
       key: "referenceType",
       dataIndex: "referenceType",
       render: (_, payment) => {
-        console.log(payment);
         let color; // Declare the color variable
         if (payment.referenceType === "product") {
           color = "green";

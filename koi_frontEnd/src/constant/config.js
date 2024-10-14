@@ -34,9 +34,9 @@ export const PATH = {
   PACKAGES: "/packages",
   BLOGS: "/blogs",
   BLOG_DETAIL: "/blogs/detail",
-  MANAGE_BLOG: "/blogs/manage-blogs",
-  EDIT_BLOG: "/blogs/manage-blogs/edit",
-  ADD_BLOG: "/blogs/manage-blogs/add",
+  MANAGE_BLOG: '/blogs/manageblogs',
+  EDIT_BLOG: '/blogs/edit',
+  ADD_BLOG: '/blogs/add',
   MANAGE_ORDER: "/admin/manage-order",
   MANAGE_PAYMENT_STATUS: '/admin/manage-payment-status'
 };

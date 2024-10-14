@@ -40,7 +40,7 @@ import EditPackages from "../components/ui/admin/managePackages/EditPackages";
 import AddBlogsPage from "../pages/AddBlogsPage";
 import ManageOrder from "../components/ui/admin/ManageOrder";
 import ManagePayment from "../components/ui/admin/ManagePayment";
-
+import WaterParameterPage from "../pages/WaterParameterPage";
 const router = [
   {
     element: <MainLayout />,
@@ -126,7 +126,7 @@ const router = [
       },
       {
         path: PATH.WATER_PARAMETER,
-        element: <WaterParameter />,
+        element: <WaterParameterPage />,
       },
       {
         path: PATH.FOOD_CALCULATOR,

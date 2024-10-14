@@ -19,11 +19,9 @@ const EditProduct = () => {
 
   useEffect(() => {
     manageProductsServices.getProductById(parseId).then((res) => {
-      console.log(res)
       setProduct(res?.data?.data)
     })
     .catch((res) => {
-      console.log(res)
     })
   }, [parseId])
   
@@ -41,7 +39,6 @@ const EditProduct = () => {
       image: null,
     },
     onSubmit: (values) => {
-      console.log(values);
       const formData = new FormData();
       const updatedProduct = {
         name: values.name,

@@ -19,7 +19,6 @@ const ManageBlogs = () => {
   useEffect(() => {
     refetch();
   }, []);
-  console.log(lstBlogs);
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       setDeletingId(id); // Set ID sản phẩm đang được xóa
@@ -95,7 +94,6 @@ const ManageBlogs = () => {
       title: "Actions",
       key: "actions",
       render: (_, record) => {
-        console.log(record?.id)
         return ((
           <>
             <Button

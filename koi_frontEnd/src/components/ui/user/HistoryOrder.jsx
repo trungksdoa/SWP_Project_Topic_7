@@ -12,7 +12,6 @@ import OrderCompleted from "../order/OrderCompleted";
 const HistoryOrder = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const { data: lstOrder, refetch, isFetching } = useGetOrder(userLogin?.id);
-  console.log(lstOrder);
   const [mode, setMode] = useState("top");
 
   const [lstPaid, setLstPaid] = useState([]);
@@ -22,7 +21,6 @@ const HistoryOrder = () => {
   const [lstDelivering, setLstDelivering] = useState([]);
   const [lstCompleted, setLstCompleted] = useState([]);
   useEffect(() => {
-    console.log("Raw lstOrder data:", lstOrder);
     const paidOrders =
       lstOrder?.filter((order) => order?.status === "SUCCESS") || [];
     const pendingOrders =

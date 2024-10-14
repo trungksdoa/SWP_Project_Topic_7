@@ -13,7 +13,6 @@ const FormUserUpdate = ({ user, refetch }) => {
   const [componentDisabled, setComponentDisabled] = useState(true); 
   const dispatch = useDispatch()
   const userLogin = useSelector((state) => state.manageUser.userLogin)
-  console.log(userLogin)
 
   const formik = useFormik({
     enableReinitialize: true,

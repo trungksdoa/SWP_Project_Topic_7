@@ -58,7 +58,6 @@ const AddBlogs = () => {
       });
     },
   });
-
   const handleChangeFile = (e, fieldName) => {
     let file = e.target.files?.[0];
     if (
@@ -149,7 +148,6 @@ const AddBlogs = () => {
           onChange={(e) => handleChangeFile(e, "bodyImage")} // Truyền thêm tên field
         />
       </Form.Item>
-
       <Form.Item className="flex justify-center items-center">
         <div>
           <Button 

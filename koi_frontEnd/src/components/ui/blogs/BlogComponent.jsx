@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 const BlogComponent = () => {
   const { data: lstBlogs } = useGetAllBlogs();
   const navigate = useNavigate()
-  console.log(lstBlogs);
   return (
     <div className="my-[60px] container mx-auto">
       <div className="grid lg:grid-cols-4 md:grid-cols-3 gap-[30px] grid-cols-2">

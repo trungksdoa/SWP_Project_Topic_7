@@ -55,8 +55,6 @@ const WaterParameter = () => {
     setShowStore(true);
   };
 
-  console.log(waterParameters);
-
   const handleClickSalt = (value) => {
     let newError = "";
     if (value === "salt03") {
@@ -81,19 +79,6 @@ const WaterParameter = () => {
     setIsEditEnabled(e.target.checked);
   };
   // Fetch dữ liệu thông số nước và tiêu chuẩn nước khi chọn hồ
-
-  useEffect(() => {
-    if (!userLogin) {
-      toast.warning(
-        t("Please sign in or create an account to access this feature.")
-      );
-      navigate(PATH.HOME);
-    }
-    if (userLogin.roles[0].name === "ROLE_SHOP") {
-      message.warning("Please register account Member to access this feature.");
-      navigate(PATH.MANAGE_BLOG);
-    }
-  }, []);
 
   useEffect(() => {
     const fetchWaterData = async () => {
@@ -178,20 +163,21 @@ const WaterParameter = () => {
   // Formik để xử lý form nhập liệu water parameters
   const formik = useFormik({
     initialValues: {
-      nitriteNO2: "",
-      nitrateNO3: "",
-      ammoniumNH4: "",
-      hardnessGH: "",
-      salt: "",
-      temperature: "",
-      carbonateHardnessKH: "",
-      co2: "",
-      totalChlorines: "",
-      amountFed: "",
-      pondId: "",
+      nitriteNO2: 0,
+      nitrateNO3: 0,
+      ammoniumNH4: 0,
+      hardnessGH: 0,
+      salt: 0,
+      temperature: 0,
+      carbonateHardnessKH: 0,
+      co2: 0,
+      totalChlorines: 0,
+      amountFed: 0,
+      pondId: 0,
       lastCleanedAt: "2024-10-03",
-      cleanedDayCount: "",
-      ph: "",
+      cleanedDayCount: 0,
+      ph: 0,
+      lastCleaned: false,
     },
     onSubmit: (values) => {
       console.log(values);
@@ -611,7 +597,7 @@ const WaterParameter = () => {
                   <div className="flex items-center">
                     <Input
                       name="cleanedDayCount"
-                      value={formik.values.cleanedDayCount || ""} // Đảm bảo giá trị là chuỗi
+                      value={formik.values.cleanedDayCount || 0} // Đảm bảo giá trị là chuỗi
                       onChange={formik.handleChange}
                       disabled={!isEditEnabled}
                       className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
@@ -636,7 +622,21 @@ const WaterParameter = () => {
                     className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                   />
                 </Form.Item>
-
+                <Form.Item
+                  label="Last Cleaned"
+                  style={{ display: isEditEnabled ? "block" : "none" }}
+                >
+                  <Checkbox
+                    name="lastCleaned"
+                    checked={formik.values.lastCleaned}
+                    onChange={(e) =>
+                      formik.setFieldValue("lastCleaned", e.target.checked)
+                    }
+                    disabled={!isEditEnabled}
+                  >
+                    Mark as last cleaned
+                  </Checkbox>
+                </Form.Item>
                 <Form.Item
                   style={{ display: isEditEnabled ? "block" : "none" }}
                 >

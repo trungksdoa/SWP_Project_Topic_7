@@ -30,9 +30,7 @@ const ManageUser = () => {
     refetch();
   }, []);
 
-  console.log(lstUser?.data?.content);
 
-  // console.log(users)
   useEffect(() => {
     if (lstUser) {
       setTotalElements(lstUser?.data?.totalElements);

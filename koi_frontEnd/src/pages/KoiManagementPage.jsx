@@ -20,7 +20,6 @@ const KoiManagementPage = () => {
       );
       navigate(PATH.HOME);
     } else if (userLogin.roles && userLogin.roles[0].name === "ROLE_SHOP") {
-      // Kiểm tra userLogin.roles
       message.warning("Please register account Member to access this feature.");
       navigate(PATH.MANAGE_BLOG);
     }

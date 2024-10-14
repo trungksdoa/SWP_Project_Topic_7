@@ -11,7 +11,6 @@ const EditBlog = () => {
   const { data: blog, refetch, isPending } = useGetBlogById(parseId);
   const [imgSrc, setImgSrc] = useState("");
   const mutation = usePutBlog();
-  console.log(blog?.id);
   const formik = useFormik({
     initialValues: {
       title: blog?.title || "",
@@ -19,8 +18,8 @@ const EditBlog = () => {
       contentTop: blog?.contentTop || "",
       headerMiddle: blog?.headerMiddle || "",
       contentMiddle: blog?.contentMiddle || "",
-      headerImage: blog?.headerImage || null,
-      bodyImage: blog?.bodyImage || null,
+      headerImage: null,
+      bodyImage: null,
     },
     onSubmit: (values) => {
       console.log(values);
@@ -89,7 +88,7 @@ const EditBlog = () => {
 
   useEffect(() => {
     refetch();
-  }, [parseId]);
+  }, [parseId, refetch]);
   return (
     <div>
       <div className="flex justify-center items-center text-bold text-3xl h-full m-8 mb-3">
@@ -160,7 +159,6 @@ const EditBlog = () => {
             onChange={(e) => handleChangeFile(e, "bodyImage")} // Truyền thêm tên field
           />
         </Form.Item>
-
         <Form.Item className="flex justify-center items-center">
           <div className="">
             <Button

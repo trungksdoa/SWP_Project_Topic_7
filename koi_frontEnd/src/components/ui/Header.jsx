@@ -18,7 +18,6 @@ const Header = () => {
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id
-  console.log(userId)
   const { data: carts } = useGetCartByUserId(userId);
 
   // Calculate total quantity from carts

@@ -50,7 +50,6 @@ const AddProduct = () => {
       image: null,
     },
     onSubmit: (values) => {
-      console.log(values);
       const formData = new FormData();
       const product = {
         name: values.name,
