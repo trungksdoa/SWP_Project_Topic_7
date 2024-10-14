@@ -85,13 +85,13 @@ export const UserMenu = () => {
             className="mb-[10px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
             onClick={showModalLogin}
           >
-            {t("login")}
+            {t("Login")}
           </Button>
           <Button
             className="!w-[100px] text-center bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
             onClick={showModalRegister}
           >
-            {t("register")}
+            {t("Register")}
           </Button>
         </div>
       );

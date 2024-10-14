@@ -64,7 +64,12 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
                     <p>x {item?.quantity}</p>
                   </div>
                   <div className="ml-auto">
-                    <p>Price: ${item?.productId?.price} </p>
+                    <p>Price: 
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(item?.unitPrice)}
+                    </p>
                   </div>
                 </div>
                 <hr className="my-[10px]" />
@@ -74,7 +79,12 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
           <div className="text-right">
             <p>
               Total Price:{" "}
-              <span className="text-orange-700">${order?.totalAmount}</span>
+              <span className="text-orange-700">
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(order?.totalAmount)}
+              </span>
             </p>
           </div>
           <div className="mt-[15px] text-right">

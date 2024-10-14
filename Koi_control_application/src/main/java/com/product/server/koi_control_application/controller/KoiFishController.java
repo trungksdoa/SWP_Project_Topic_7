@@ -8,6 +8,7 @@ import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.ListSwapKoiFishDTO;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
@@ -235,6 +236,20 @@ public class KoiFishController {
 
         BaseResponse response = BaseResponse.builder()
                 .data(iKoiFishService.addGrowthHistory(koiFishId, koiFish, file))
+                .message("Update fish successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/swappondbylistkoi/{pondId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BaseResponse> swapPondByListKoi(@PathVariable("pondId") int pondId,
+                                                          @Schema(type = "string", format = "json", implementation = ListSwapKoiFishDTO.class)
+                                                          @RequestPart("fishlist") @Valid List<Integer> koiFishs) {
+
+        BaseResponse response = BaseResponse.builder()
+                .data(iKoiFishService.swapPondIdListKoi(pondId, koiFishs))
                 .message("Update fish successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();

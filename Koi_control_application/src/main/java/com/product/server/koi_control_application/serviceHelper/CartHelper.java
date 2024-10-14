@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CartHelper implements ICartHelper {
     private final CartRepository cartRepository;
     @Override
-    @Transactional
     public Cart save(Cart cart) {
       try{
             log.info("Saving cart");
@@ -25,5 +24,15 @@ public class CartHelper implements ICartHelper {
       }catch (Exception e){
           throw new BadRequestException("Failed to save cart");
       }
+    }
+
+    @Override
+    public void deleteByUserIdAndProductId(int userId, int productId) {
+        cartRepository.deleteByUserIdAndProductId(userId, productId);
+    }
+
+    @Override
+    public void deleteByUserId(int userId) {
+        cartRepository.deleteByUserId(userId);
     }
 }

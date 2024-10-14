@@ -50,6 +50,8 @@ public class PondController {
         if(file != null && !file.isEmpty()){
             String filename = iImageService.uploadImage(file);
             pond.setImageUrl(filename);
+        }else{
+            pond.setImageUrl(iImageService.getDefaultImage("defaultpond.jpg"));
         }
         Pond pond1 = iPondService.addPond(pond);
 

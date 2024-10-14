@@ -76,6 +76,9 @@ public class Pond {
         calculateAndSetVolume();
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if(date == null){
+            date = LocalDate.now();
+        }
     }
 
 

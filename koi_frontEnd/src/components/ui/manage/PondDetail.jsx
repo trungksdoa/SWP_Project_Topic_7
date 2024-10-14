@@ -1,41 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useGetPondById } from "../../../hooks/koi/useGetPondById.js";
 import { useUpdateKoi } from '../../../hooks/koi/useUpdateKoi';
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Select } from "antd";
+import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal } from "antd";
 import { toast } from "react-toastify";
-import { LOCAL_STORAGE_KOI_KEY } from '../../../constant/localStorage';
 import { manageKoiActions } from '../../../store/manageKoi/slice';
+import dayjs from 'dayjs';
+import { useUpdatePond } from '../../../hooks/koi/useUpdatePond';
+import { managePondActions } from '../../../store/managePond/slice';
+import { useDeletePond } from "../../../hooks/koi/useDeletePond";
+import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
+
+const { Option } = Select;
 
 const PondDetail = () => {
-    const {pondId} = useParams();
+    const { pondId } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const pond = location.state?.pond;
     const pondIdNumber = Number(pondId);
     const userLogin = useSelector((state) => state.manageUser.userLogin);
     const userId = userLogin?.id;
-    const {data: lstKoi, error: koiError, refetch} = useGetAllKoi(userId);
+    const { data: lstKoi, error: koiError, refetch, isFetching: koiLoading } = useGetAllKoi(userId);
     const [selectedKoi, setSelectedKoi] = useState(null);
-    const {data: selectedPond, error: pondError, loading: pondLoading} = useGetPondById(pondIdNumber);
-    const koiInPond = lstKoi?.filter(koi => koi.pondId === pondIdNumber) || [];
-
-    const [componentDisabled, setComponentDisabled] = useState(true);
-    const dispatch = useDispatch();
-    const mutation = useUpdateKoi();
+    const { data: selectedPond, error: pondError, loading: pondLoading } = useGetPondById(pondIdNumber);
+    const [koiInPond, setKoiInPond] = useState([]);
     const [imgSrc, setImgSrc] = useState("");
+    const updateKoiMutation = useUpdateKoi();
+    const [componentDisabled, setComponentDisabled] = useState(true);
+    const updatePondMutation = useUpdatePond();
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [deleteOption, setDeleteOption] = useState(null);
+    const [destinationPond, setDestinationPond] = useState(null);
+    const [showMoveConfirmation, setShowMoveConfirmation] = useState(false);
+    const [isMovingFish, setIsMovingFish] = useState(false);
+    const deletePondMutation = useDeletePond();
+    const { data: lstPond } = useGetAllPond(userId);
+    const [otherPonds, setOtherPonds] = useState([]);
+
+    const pondData = pond || selectedPond;
+
+    useEffect(() => {
+        if (lstKoi && pondIdNumber) {
+            const filteredKoi = lstKoi.filter(koi => koi.pondId === pondIdNumber);
+            setKoiInPond(filteredKoi);
+        }
+    }, [lstKoi, pondIdNumber]);
 
     const handleChangeFile = (e) => {
         let file = e.target.files?.[0];
         if (
             file &&
-            [
-                "image/jpeg",
-                "image/jpg",
-                "image/png",
-                "image/gif",
-                "image/webp",
-            ].includes(file.type)
+            ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"].includes(file.type)
         ) {
             let reader = new FileReader();
             reader.readAsDataURL(file);
@@ -43,9 +64,6 @@ const PondDetail = () => {
                 setImgSrc(e.target?.result);
             };
             formik.setFieldValue("image", file);
-            setComponentDisabled(false);
-        } else {
-            setComponentDisabled(true);
         }
     };
 
@@ -54,58 +72,271 @@ const PondDetail = () => {
         initialValues: {
             name: selectedKoi?.name || "",
             variety: selectedKoi?.variety || "",
-            sex: selectedKoi?.sex ? "Female" : "Male",
-            purchasePrice: selectedKoi?.purchasePrice || "",
-            pondId: selectedKoi?.pondId || "",
+            sex: selectedKoi?.sex ? "true" : "false",
+            purchasePrice: selectedKoi?.purchasePrice || 0,
+            weight: selectedKoi?.weight || 0,
+            length: selectedKoi?.length || 0,
+            pondId: selectedKoi?.pondId || null,
+            dateOfBirth: selectedKoi?.dateOfBirth ? dayjs(selectedKoi.dateOfBirth) : null,
             image: null,
         },
         onSubmit: (values) => {
             const formData = new FormData();
-            const updateKoi = {
-                ...selectedKoi,
-                name: values.name,
-                variety: values.variety,
-                sex: values.sex === "Female",
-                purchasePrice: parseFloat(values.purchasePrice),
-                pondId: values.pondId,
+            const updatedKoi = {
+                name: values.name || "",
+                variety: values.variety || "",
+                sex: values.sex === "true",
+                purchasePrice: parseFloat(values.purchasePrice) || 0,
+                weight: parseFloat(values.weight) || 0,
+                length: parseFloat(values.length) || 0,
+                pondId: parseInt(values.pondId) || null,
+                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
                 userId: userId,
             };
+            formData.append("fish", JSON.stringify(updatedKoi));
             if (values.image) {
                 formData.append("image", values.image);
             }
-            formData.append("fish", JSON.stringify(updateKoi));
-            mutation.mutate(
+            updateKoiMutation.mutate(
                 { id: selectedKoi.id, payload: formData },
                 {
                     onSuccess: (updatedKoi) => {
-                        const updatedKoiWithImage = {
-                            ...updatedKoi,
-                            imageUrl: imgSrc || selectedKoi.imageUrl,
-                        };
-                        dispatch(manageKoiActions.updateKoi(updatedKoiWithImage));
-                        setSelectedKoi(updatedKoiWithImage);
-                        const updatedList = lstKoi.map(koi => 
-                            koi.id === updatedKoiWithImage.id ? updatedKoiWithImage : koi
-                        );
-                        localStorage.setItem(LOCAL_STORAGE_KOI_KEY, JSON.stringify(updatedList));
-                        setComponentDisabled(true);
-                        refetch();
+                        dispatch(manageKoiActions.updateKoi(updatedKoi));
                         toast.success("Koi updated successfully");
+                        setSelectedKoi(null);
+                        refetch();
                     },
                     onError: (error) => {
                         console.error("Error updating koi:", error);
-                        toast.error(`Error updating koi: ${error.message || 'An unexpected error occurred'}`);
+                        toast.error(`Error updating koi: ${error.message}`);
                     },
                 }
             );
         },
     });
 
-    useEffect(() => {
-        if (selectedPond) {
-            console.log('Pond data:', selectedPond);
+    const handleClick = (koi) => {
+        setSelectedKoi(koi);
+        setImgSrc(koi.imageUrl);
+    };
+
+    const handleClose = () => {
+        setSelectedKoi(null);
+        setImgSrc("");
+    };
+
+    const handleOutsideClick = (e) => {
+        if (e.target.id === 'modal-overlay') {
+            setSelectedKoi(null);
+            setImgSrc("");
         }
-    }, [selectedPond]);
+    };
+
+    const handleReturn = () => {
+        navigate('/pond-management');
+    };
+
+    const handlePondChangeFile = (e) => {
+        let file = e.target.files?.[0];
+        if (
+            file &&
+            ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"].includes(file.type)
+        ) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                setImgSrc(e.target?.result);
+            };
+            pondFormik.setFieldValue("image", file);
+            setComponentDisabled(false);
+        }
+    };
+
+    const pondFormik = useFormik({
+        enableReinitialize: true,
+        initialValues: {
+            name: pondData?.name || "",
+            width: pondData?.width || 0,
+            length: pondData?.length || 0,
+            depth: pondData?.depth || 0,
+            image: null,
+        },
+        onSubmit: (values) => {
+            const formData = new FormData();
+            const updatePond = {
+                name: values.name,
+                width: parseFloat(values.width),
+                length: parseFloat(values.length),
+                depth: parseFloat(values.depth),
+                userId: userId,
+            };
+            if (values.image) {
+                formData.append("image", values.image);
+            }
+            formData.append("pond", JSON.stringify(updatePond));
+            updatePondMutation.mutate(
+                { id: pondIdNumber, payload: formData },
+                {
+                    onSuccess: (updatedPond) => {
+                        const updatedPondWithImage = {
+                            ...updatedPond,
+                            imageUrl: imgSrc || pondData.imageUrl,
+                        };
+                        dispatch(managePondActions.updatePond(updatedPondWithImage));
+                        toast.success("Pond updated successfully");
+                        navigate('/pond-management');
+                    },
+                    onError: (error) => {
+                        toast.error(`Error updating pond: ${error.message}`);
+                    },
+                }
+            );
+        },
+    });
+
+    const handleDeleteClick = (pondId) => {
+        const pond = lstPond.find(p => p.id === pondId);
+        const fishCount = koiInPond.length;
+    
+        Modal.confirm({
+          title: 'Delete Pond',
+          content: (
+            <div>
+              <p>Are you sure you want to delete this pond?</p>
+              {fishCount > 0 && (
+                <>
+                  <p>This pond contains {fishCount} fish. What would you like to do with them?</p>
+                </>
+              )}
+            </div>
+          ),
+          footer: (_, { OkBtn, CancelBtn }) => (
+            <>
+              {fishCount > 0 ? (
+                <div className="flex justify-between mt-4">
+                  <Button
+                    className="w-1/3"
+                    onClick={() => {
+                      setDeleteOption('delete');
+                      deletePond(pondId);
+                      Modal.destroyAll();
+                    }}
+                    type="primary"
+                    danger
+                  >
+                    Delete fish and pond
+                  </Button>
+                  <Button
+                    className="w-1/3"
+                    onClick={() => {
+                      setDeleteOption('move');
+                      handleMoveFish(pondId);
+                      Modal.destroyAll();
+                    }}
+                    type="primary"
+                  >
+                    Move fish
+                  </Button>
+                  <Button
+                    className="w-1/3"
+                    onClick={() => {
+                      setDeleteOption(null);
+                      Modal.destroyAll();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex justify-end mt-4">
+                  <Button
+                    className="mr-2"
+                    onClick={() => {
+                      deletePond(pondId);
+                      Modal.destroyAll();
+                    }}
+                    type="primary"
+                    danger
+                  >
+                    Delete pond
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setDeleteOption(null);
+                      Modal.destroyAll();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </>
+          ),
+          closable: true,
+          maskClosable: true,
+        });
+    };
+    
+    const deletePond = async (pondId) => {
+        setIsDeleting(true);
+        try {
+          await deletePondMutation.mutateAsync(pondId);
+          toast.success("Pond deleted successfully!");
+          navigate('/pond-management');
+        } catch (error) {
+          toast.error(`Error deleting pond: ${error.message}`);
+        } finally {
+          setIsDeleting(false);
+        }
+    };
+    
+    const handleMoveFish = (pondId) => {
+        const otherPonds = lstPond.filter(pond => pond.id !== pondId);
+        setOtherPonds(otherPonds);
+        setShowMoveConfirmation(true);
+    };
+    
+    const confirmMoveFish = async () => {
+        if (!destinationPond) {
+          toast.error("Please select a destination pond");
+          return;
+        }
+    
+        setIsMovingFish(true);
+    
+        try {
+          // Update each koi's pond ID
+          await Promise.all(koiInPond.map(koi => {
+            const formData = new FormData();
+            const updateKoi = {
+              ...koi,
+              pondId: destinationPond,
+            };
+            formData.append("fish", JSON.stringify(updateKoi));
+            
+            return updateKoiMutation.mutateAsync(
+              { id: koi.id, payload: formData },
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              }
+            );
+          }));
+    
+          // Delete the original pond
+          await deletePondMutation.mutateAsync(pondIdNumber);
+    
+          toast.success("Pond deleted and fish moved successfully!");
+          setShowMoveConfirmation(false);
+          navigate('/pond-management');
+        } catch (error) {
+          console.error("Error moving fish:", error);
+          toast.error(`Error moving fish: ${error.message || 'An unexpected error occurred'}`);
+        } finally {
+          setIsMovingFish(false);
+        }
+    };
 
     if (koiError) {
         console.error('Error fetching koi:', koiError);
@@ -117,184 +348,274 @@ const PondDetail = () => {
         return <div>Error loading pond details.</div>;
     }
 
-    if (!lstKoi || pondLoading || !selectedPond) {
-        return <div>Loading...</div>;
-    }    
-
-    if (koiInPond.length === 0) {
-        return <div>No koi found in this pond.</div>;
+    if (koiLoading || pondLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Spin tip="Loading" size="large" />
+            </div>
+        );
     }
 
-    const handleClick = (koi) => {
-        setSelectedKoi(koi);
-    };
-
-    const handleClose = () => {
-        setSelectedKoi(null);
-        
-    };
-
-    const handleOutsideClick = (e) => {
-        if (e.target.id === 'modal-overlay') {
-            setSelectedKoi(null);
-            
-        }
-    };
-
-
     return (
-        <div>
-            <div className="flex justify-center items-center text-bold text-3xl h-full m-8">
-                <strong>Koi in Pond</strong>
+        <div className="container mx-auto px-4 py-8">
+            <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
+                Return
+            </Button>
+            <div className="flex justify-center items-center text-bold text-3xl">
+                <strong>Pond Details</strong>
             </div>
-           
-            <div className="container grid grid-cols-4 gap-6 my-16 mx-auto">
-                <div className="col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {pondData && (
+                <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+                    <Form onFinish={pondFormik.handleSubmit} layout="vertical">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex justify-center items-center"> {/* Added flex and centering classes */}
+                                <img
+                                    src={imgSrc || pondData.imageUrl}
+                                    alt={pondData.name}
+                                    className="w-full max-w-xs h-auto object-cover rounded mb-4"
+                                />
+                            </div>
+                            <div>
+                                <Form.Item label="Name" className="mb-2">
+                                    <Input
+                                        name="name"
+                                        value={pondFormik.values.name}
+                                        onChange={pondFormik.handleChange}
+                                        className="w-full"
+                                    />
+                                </Form.Item>
+                                <Form.Item label="Width (meters)" className="mb-2">
+                                    <InputNumber
+                                        name="width"
+                                        min={0}
+                                        value={pondFormik.values.width}
+                                        onChange={(value) => pondFormik.setFieldValue("width", value)}
+                                        className="w-full"
+                                    />
+                                </Form.Item>
+                                <Form.Item label="Length (meters)" className="mb-2">
+                                    <InputNumber
+                                        name="length"
+                                        min={0}
+                                        value={pondFormik.values.length}
+                                        onChange={(value) => pondFormik.setFieldValue("length", value)}
+                                        className="w-full"
+                                    />
+                                </Form.Item>
+                                <Form.Item label="Depth (meters)" className="mb-2">
+                                    <InputNumber
+                                        name="depth"
+                                        min={0}
+                                        value={pondFormik.values.depth}
+                                        onChange={(value) => pondFormik.setFieldValue("depth", value)}
+                                        className="w-full"
+                                    />
+                                </Form.Item>
+                                <Form.Item label="Image" className="mb-2">
+                                    <input
+                                        type="file"
+                                        accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+                                        onChange={handlePondChangeFile}
+                                    />
+                                </Form.Item>
+                            </div>
+                            
+                        </div>
+                        <Form.Item className="flex justify-center mt-6">
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
+                                loading={updatePondMutation.isPending}
+                            >
+                                Update Pond
+                            </Button>
+                            <Button
+                                onClick={() => handleDeleteClick(pondIdNumber)}
+                                className="bg-red-500 text-white hover:bg-red-600 font-bold text-xl px-8 py-2 ml-4"
+                                loading={isDeleting}
+                            >
+                                Delete Pond
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            )}
+
+            <h2 className="text-2xl font-bold my-6 text-center">Koi in Pond</h2>
+            {koiInPond.length === 0 ? (
+                <p className="text-center">No koi found in this pond.</p>
+            ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 m-8">
                     {koiInPond.map((koi, index) => (
-                        <div key={index} className="text-center">
+                        <div key={index} className="text-center bg-white shadow-md rounded-lg p-4">
                             <img
                                 onClick={() => handleClick(koi)}
                                 src={koi.imageUrl}
                                 alt={koi.name}
-                                className="w-32 h-32 mx-auto object-cover cursor-pointer"
+                                className="w-32 h-32 mx-auto object-cover cursor-pointer rounded-full"
                             />
-                            <h3 className="text-lg mt-2 cursor-pointer" onClick={() => handleClick(koi)}>{koi.name}</h3>
+                            <h3 className="text-lg mt-2 cursor-pointer font-semibold" onClick={() => handleClick(koi)}>{koi.name}</h3>
+                            <p className="text-sm text-gray-600">{koi.variety}</p>
                         </div>
                     ))}
                 </div>
-                {selectedKoi && (
+            )}
+
+            {selectedKoi && (
+                <div
+                    id="modal-overlay"
+                    className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+                    onClick={handleOutsideClick}
+                >
                     <div
-                        id="modal-overlay"
-                        className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
-                        onClick={handleOutsideClick}
+                        className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
+                        style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <div
-                            className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col rounded-xl"
-                            style={{ width: '80%', maxWidth: '700px' }}
+                        <button
+                            onClick={handleClose}
+                            className="absolute top-2 right-2 text-2xl font-bold"
                         >
-                            <button
-                                onClick={handleClose}
-                                className="absolute -top-1 right-2 text-2xl font-bold"
-                            >
-                                &times;
-                            </button>
-                            <div className="flex flex-row">
-                                <div className="mr-6">
+                            &times;
+                        </button>
+                        <h2 className="text-2xl font-bold mb-6 text-center">Koi Information</h2>
+                        <Form onFinish={formik.handleSubmit} layout="vertical">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
                                     <img
                                         src={imgSrc || selectedKoi.imageUrl}
                                         alt={selectedKoi.name}
-                                        className="w-80 h-70 object-cover"
+                                        className="w-full h-auto object-cover rounded mb-4"
                                     />
-                                    <div className="mt-2">
-                                        <strong>Image:</strong>
+                                    <Form.Item label="Image">
                                         <input
-                                            disabled={componentDisabled}
                                             type="file"
                                             accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
                                             onChange={handleChangeFile}
                                         />
-                                        {imgSrc && formik.values.image && (
-                                            <img
-                                                src={imgSrc}
-                                                alt="Preview"
-                                                style={{
-                                                    width: "80px",
-                                                    height: "70px",
-                                                    objectFit: "cover",
-                                                    marginTop: "10px",
-                                                }}
-                                            />
-                                        )}
-                                    </div>
+                                    </Form.Item>
                                 </div>
-                                <div className="flex flex-col w-full">
-                                    <Checkbox
-                                        checked={!componentDisabled}
-                                        onChange={(e) => setComponentDisabled(!e.target.checked)}
-                                        className="mb-4"
-                                    >
-                                        Update Info
-                                    </Checkbox>
-
-                                    <Form
-                                        disabled={componentDisabled}
-                                        onFinish={formik.handleSubmit}
-                                    >
-                                        <div className="flex justify-between m-1">
-                                            <strong>Name:</strong>
-                                            <Input
-                                                className="text-right w-1/2 pr-2"
-                                                style={{color: 'black'}}    
-                                                name="name"
-                                                value={formik.values.name}
-                                                onChange={formik.handleChange}
-                                            />
-                                        </div>
-                                        <div className="flex justify-between m-1">
-                                            <strong>Variety:</strong>
-                                            <Input
-                                                className="text-right w-1/2 pr-2"
-                                                style={{color: 'black'}}   
-                                                name="variety"
-                                                value={formik.values.variety}
-                                                onChange={formik.handleChange}
-                                            />
-                                        </div>
-                                        <div className="flex justify-between m-1">
-                                            <strong>Sex:</strong>
-                                            <Select
-                                                style={{ 
-                                                    width: '50%', 
-                                                    textAlign: 'right', 
-                                                    borderRadius: '0.25rem',
-                                                    color: 'black' 
-                                                }}
-                                                name="sex"
-                                                value={formik.values.sex}
-                                                onChange={(value) => formik.setFieldValue("sex", value)}
-                                            >
-                                                <Select.Option value="Male">Male</Select.Option>
-                                                <Select.Option value="Female">Female</Select.Option>
-                                            </Select>
-                                        </div>
-                                        <div className="flex justify-between m-1">
-                                            <strong>Purchase Price:</strong>
-                                            <Input
-                                                className="text-right w-1/2 pr-2"
-                                                style={{color: 'black'}}   
-                                                name="purchasePrice"
-                                                value={formik.values.purchasePrice}
-                                                onChange={formik.handleChange}
-                                            />
-                                        </div>
-                                        <div className="flex justify-between m-1">
-                                            <strong>Pond ID:</strong>
-                                            <Input
-                                                className="text-right  w-1/2 pr-2"
-                                                style={{color: 'black'}}   
-                                                name="pondId"
-                                                value={formik.values.pondId}
-                                                onChange={formik.handleChange}
-                                            />
-                                        </div>
-                                        <Form.Item className="mt-4">
-                                            <Button
-                                                type="primary"
-                                                htmlType="submit"
-                                                disabled={componentDisabled}
-                                                loading={mutation.isPending}
-                                            >
-                                                Update
-                                            </Button>
-                                        </Form.Item>
-                                    </Form>
+                                <div>
+                                    <Form.Item label="Name" className="mb-2">
+                                        <Input
+                                            name="name"
+                                            value={formik.values.name}
+                                            onChange={formik.handleChange}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Variety" className="mb-2">
+                                        <Input
+                                            name="variety"
+                                            value={formik.values.variety}
+                                            onChange={formik.handleChange}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Sex" className="mb-2">
+                                        <Select
+                                            name="sex"
+                                            value={formik.values.sex}
+                                            onChange={(value) => formik.setFieldValue("sex", value)}
+                                            className="w-full"
+                                        >
+                                            <Select.Option value="true">Female</Select.Option>
+                                            <Select.Option value="false">Male</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item label="Purchase Price (VND)" className="mb-2">
+                                        <InputNumber
+                                            name="purchasePrice"
+                                            min={0}
+                                            value={formik.values.purchasePrice}
+                                            onChange={(value) => formik.setFieldValue("purchasePrice", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Weight (grams)" className="mb-2">
+                                        <InputNumber
+                                            name="weight"
+                                            min={0}
+                                            value={formik.values.weight}
+                                            onChange={(value) => formik.setFieldValue("weight", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Length (centimeters)" className="mb-2">
+                                        <InputNumber
+                                            name="length"
+                                            min={0}
+                                            value={formik.values.length}
+                                            onChange={(value) => formik.setFieldValue("length", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Date of Birth" className="mb-2">
+                                        <DatePicker
+                                            name="dateOfBirth"
+                                            value={formik.values.dateOfBirth}
+                                            onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
                                 </div>
                             </div>
-                        </div>
+                            <Form.Item className="flex justify-center mt-6">
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
+                                    loading={updateKoiMutation.isPending}
+                                >
+                                    Update Koi
+                                </Button>
+                            </Form.Item>
+                        </Form>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+
+            {showMoveConfirmation && (
+              <Modal
+                title="Move Fish"
+                visible={showMoveConfirmation}
+                onCancel={() => setShowMoveConfirmation(false)}
+                footer={null}
+              >
+                <p>Select a pond to move the fish to:</p>
+                <Select
+                  style={{ width: '100%', marginBottom: '20px' }}
+                  placeholder="Select a pond"
+                  onChange={(value) => setDestinationPond(value)}
+                  value={destinationPond}
+                >
+                  {otherPonds.map(pond => (
+                    <Option key={pond.id} value={pond.id}>{pond.name}</Option>
+                  ))}
+                </Select>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button 
+                    key="cancel" 
+                    onClick={() => setShowMoveConfirmation(false)}
+                    style={{ marginRight: '10px' }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    key="submit" 
+                    type="primary" 
+                    onClick={confirmMoveFish}
+                    disabled={!destinationPond || isMovingFish}
+                    loading={isMovingFish}
+                  >
+                    Confirm Move
+                  </Button>
+                </div>
+              </Modal>
+            )}
         </div>
     );
 }
+
 export default PondDetail;

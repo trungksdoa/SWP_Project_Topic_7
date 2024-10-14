@@ -65,5 +65,6 @@ export const manageKoiFishServices = {
             }
         }
     },
-    deleteKoi: (id) => api.delete(`/${id}`)
+    deleteKoi: (id) => api.delete(`/${id}`),
+    updateKoiPond: (id, payload) => api.put(`/${id}`, payload)
 }

@@ -9111,7 +9111,7 @@ promzard@^1.0.0:
   dependencies:
     read "^3.0.1"
 
-prop-types@^15.6.2, prop-types@^15.8.1:
+prop-types@^15.5.8, prop-types@^15.6.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -9608,6 +9608,15 @@ react-draggable@^4.4.6:
   dependencies:
     clsx "^1.1.1"
     prop-types "^15.8.1"
+
+react-dual-listbox@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/react-dual-listbox/-/react-dual-listbox-6.0.3.tgz#9a63250ca67a8f04d7607299e1dd109b9f5f3c01"
+  integrity sha512-8rVkwrRz4GobkarRmisKHCBWUN3EuVQruQmtvgocNg/HQ3Poc8zBUefDqC1PxDh3gKXQygFjG41zL1IIOEolgQ==
+  dependencies:
+    classnames "^2.2.5"
+    lodash "^4.17.21"
+    prop-types "^15.5.8"
 
 react-fast-compare@3.2.2:
   version "3.2.2"

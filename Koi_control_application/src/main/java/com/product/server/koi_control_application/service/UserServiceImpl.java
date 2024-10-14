@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class UserServiceImpl implements IUserService {
                     .build();
 
 
-            user.setAvatarUrl(imageService.getDefaultImage());
+            user.setAvatarUrl(imageService.getDefaultImage("DefaultAvatar.png"));
             //Create user
             user.setPassword(passwordEncoder.encode(register.getPassword()));
 
@@ -204,7 +205,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public String generateNewPassword() {
-        return RandomStringUtils.randomAlphanumeric(12);
+        return RandomStringUtils.random(12, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+");
     }
 
     /**
@@ -233,6 +234,7 @@ public class UserServiceImpl implements IUserService {
      * @throws NotFoundException if no user is found with the given ID
      */
     @Override
+    @Transactional
     public void updateUser(int id, Users rUser, MultipartFile file) throws IOException {
         Users user = usersRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + rUser.getUsername()));
