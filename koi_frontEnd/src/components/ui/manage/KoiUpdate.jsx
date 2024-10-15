@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Select, DatePicker, Modal } from "antd";
+import { Button, Form, Input, InputNumber, Select, DatePicker, Modal  } from "antd";
 import { toast } from "react-toastify";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import { manageKoiActions } from "../../../store/manageKoi/slice";
 import dayjs from "dayjs";
+import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 
 const KoiUpdate = () => {
   const { id } = useParams();
@@ -23,15 +24,48 @@ const KoiUpdate = () => {
   const updateKoiMutation = useUpdateKoi();
   const deleteKoiMutation = useDeleteKoi();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [koiAge, setKoiAge] = useState(null);
+  const [showOtherPonds, setShowOtherPonds] = useState(false);
+  const [showPondInfo, setShowPondInfo] = useState(false);
+  const [selectedPondInfo, setSelectedPondInfo] = useState(null);
 
   const koi = location.state?.koi;
+
+  const { refetch } = useGetAllKoi(userId);
 
   useEffect(() => {
     if (koi) {
       setImgSrc(koi.imageUrl);
       setSelectedPond(koi.pondId);
+      calculateAge(koi.dateOfBirth);
     }
-  }, [koi]);
+    refetch();
+  }, [koi, refetch]);
+
+  const calculateAge = (birthDate) => {
+    if (birthDate) {
+      const today = dayjs();
+      const birthDayjs = dayjs(birthDate);
+      const ageInDays = today.diff(birthDayjs, 'day');
+      setKoiAge(ageInDays);
+    } else {
+      setKoiAge(null);
+    }
+  };
+
+  const formatAge = (ageInDays) => {
+    if (ageInDays === null) return 'Unknown';
+    const years = Math.floor(ageInDays / 365);
+    const months = Math.floor((ageInDays % 365) / 30);
+    const days = ageInDays % 30;
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+    if (days > 0 || parts.length === 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+
+    return parts.join(', ');
+  };
 
   const handleChangeFile = (e) => {
     let file = e.target.files?.[0];
@@ -83,7 +117,7 @@ const KoiUpdate = () => {
           onSuccess: (updatedKoi) => {
             dispatch(manageKoiActions.updateKoi(updatedKoi));
             toast.success("Koi updated successfully");
-            navigate('/koi-management');
+            refetch();
           },
           onError: (error) => {
             console.error("Error updating koi:", error);
@@ -124,6 +158,18 @@ const KoiUpdate = () => {
     }
   };
 
+  const currentPond = lstPond?.find(pond => pond.id === selectedPond);
+
+  const handlePondClick = (pond) => {
+    if (pond.id === selectedPond) {
+      setSelectedPondInfo(pond);
+      setShowPondInfo(true);
+    } else {
+      formik.setFieldValue("pondId", pond.id);
+      setSelectedPond(pond.id);
+    }
+  };
+
   return (
     <div>
       <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
@@ -135,11 +181,11 @@ const KoiUpdate = () => {
       
       <Form onFinish={formik.handleSubmit} layout="vertical">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-8">
-          <div className="flex justify-center items-center">
+          <div className=" justify-start items-center">
             <img
               src={imgSrc || koi?.imageUrl}
               alt={koi?.name || "Koi preview"}
-              className="w-full max-w-xs h-auto object-cover rounded mb-4"
+              className="w-85 h-85 object-cover rounded-xl mb-4 mr-4"
             />
           </div>
           <div>
@@ -202,10 +248,17 @@ const KoiUpdate = () => {
               <DatePicker
                 name="dateOfBirth"
                 value={formik.values.dateOfBirth}
-                onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                onChange={(date) => {
+                  formik.setFieldValue("dateOfBirth", date);
+                  calculateAge(date);
+                }}
                 className="w-full"
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
               />
             </Form.Item>
+            <div className="mb-2">
+              Age: {formatAge(koiAge)}
+            </div>
             <Form.Item label="Image">
               <input
                 type="file"
@@ -215,47 +268,108 @@ const KoiUpdate = () => {
             </Form.Item>
           </div>
         </div>
-        <Form.Item label="Pond" className="mb-2">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {lstPond?.map((pond) => (
-              <div
-                key={pond.id}
-                className={`text-center cursor-pointer ${
-                  selectedPond === pond.id ? "border-4 border-blue-500" : ""
-                }`}
-                onClick={() => {
-                  formik.setFieldValue("pondId", pond.id);
-                  setSelectedPond(pond.id);
-                }}
-              >
-                <img
-                  src={pond.imageUrl}
-                  alt={pond.name}
-                  className="w-full h-32 object-cover rounded-md"
-                />
-                <p className="mt-2">{pond.name}</p>
-              </div>
-            ))}
-          </div>
-        </Form.Item>
-        <Form.Item className="flex justify-center mt-6">
+        <Form.Item className="flex justify-center">
           <Button
             type="primary"
             htmlType="submit"
-            className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
             loading={updateKoiMutation.isPending}
           >
             Update Koi
           </Button>
           <Button
             onClick={() => handleDeleteClick(id)}
-            className="bg-red-500 text-white hover:bg-red-600 font-bold text-xl px-8 py-2 ml-4"
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold ml-2 text-xl"
             loading={isDeleting}
           >
             Delete Koi
           </Button>
         </Form.Item>
+        <div className="items-center space-x-4 mb-4 ml-8 mb-8">
+          <div className="flex items-center space-x-4 mb-4 ml-8 font-bold text-xl">
+            Pond
+          </div>
+          <div className="flex items-center space-x-4 mb-4 ml-8 mb-8">
+          <Form.Item className="mb-0 flex-shrink-0" style={{ width: '200px' }}>
+            {currentPond ? (
+              <div 
+                className="text-center rounded-xl border-2 border-blue-500 cursor-pointer"
+                onClick={() => handlePondClick(currentPond)}
+              >
+                <img
+                  src={currentPond.imageUrl}
+                  alt={currentPond.name}
+                  className="w-full h-28 object-cover rounded-t-xl"
+                />
+                <p>{currentPond.name}</p>
+              </div>
+            ) : (
+              <p>No pond selected</p>
+            )}
+          </Form.Item>
+
+          <Button 
+            onClick={() => setShowOtherPonds(!showOtherPonds)}
+            className="text-center justify-between"
+          >
+            {'>'}
+          </Button>
+
+          {showOtherPonds && (
+            <div className="flex-grow overflow-x-auto">
+              <div className="flex space-x-4">
+                {lstPond?.filter(pond => pond.id !== selectedPond).map((pond) => (
+                  <div
+                    key={pond.id}
+                    className="flex-shrink-0 w-48 text-center cursor-pointer rounded-xl"
+                    onClick={() => handlePondClick(pond)}
+                  >
+                    <img
+                      src={pond.imageUrl}
+                      alt={pond.name}
+                      className="w-full h-28 object-cover rounded-t-xl"
+                    />
+                    <p className="mt-1 text-sm">{pond.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          </div>
+        </div>
       </Form>
+
+      <Modal
+        title="Pond Information"
+        visible={showPondInfo}
+        onCancel={() => setShowPondInfo(false)}
+        footer={null}
+      >
+        {selectedPondInfo && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
+            <div className="flex justify-center items-center"> 
+              <img
+                src={selectedPondInfo.imageUrl}
+                alt={selectedPondInfo.name}
+                className="w-full h-auto object-cover rounded mb-4"
+              />
+            </div>
+            <div className="grid grid-cols-2 mb-2 items-center">
+              <p className="font-bold text-left">Name:</p>
+              <p className="text-right">{selectedPondInfo.name}</p>
+              
+              <p className="font-bold text-left">Length:</p>
+              <p className="text-right">{selectedPondInfo.length} meters</p>
+              
+              <p className="font-bold text-left">Width:</p>
+              <p className="text-right">{selectedPondInfo.width} meters</p>
+              
+              <p className="font-bold text-left">Depth:</p>
+              <p className="text-right">{selectedPondInfo.depth} meters</p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

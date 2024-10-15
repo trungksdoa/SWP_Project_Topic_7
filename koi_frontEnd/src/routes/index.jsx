@@ -44,6 +44,7 @@ import WaterParameterPage from "../pages/WaterParameterPage";
 import KoiAdd from "../components/ui/manage/KoiAdd";
 import KoiUpdate from "../components/ui/manage/KoiUpdate";
 import KoiMove from "../components/ui/manage/KoiMove";
+import Endpoint from "../components/ui/Endpoint";
 
 const router = [
   {
@@ -52,6 +53,10 @@ const router = [
       {
         path: "/",
         element: <HomePage />,
+      },
+      {
+        path: "/endpoint",
+        element: <Endpoint />,
       },
       {
         path: PATH.STORE,
