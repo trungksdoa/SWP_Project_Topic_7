@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
-import { Spin, message, Button } from "antd";
+import { Spin, message, Button, Modal } from "antd";
 import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import { manageKoiFishServices } from "../../../services/koifish/manageKoiFishServices";
+import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
+import { toast } from "react-toastify";
 
 const KoiMove = () => {
     const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -12,21 +14,29 @@ const KoiMove = () => {
     const { data: lstKoi, isFetching: koiLoading, refetch: refetchKoi } = useGetAllKoi(userId);
     const { data: lstPond, isFetching: pondLoading, refetch: refetchPond } = useGetAllPond(userId);
 
-    const [selectedKoi, setSelectedKoi] = useState([]);
     const [selectedPond, setSelectedPond] = useState(null);
     const [koiInSelectedPond, setKoiInSelectedPond] = useState([]);
+    const [filteredKoi, setFilteredKoi] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const koiPerPage = 6;
 
     const [isMoving, setIsMoving] = useState(false);
+    const [availableSelectedKoi, setAvailableSelectedKoi] = useState([]);
+    const [selectedPondKoi, setSelectedPondKoi] = useState([]);
+
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const deleteKoiMutation = useDeleteKoi();
 
     useEffect(() => {
         if (selectedPond && lstKoi) {
             const filteredKoi = lstKoi.filter(koi => koi.pondId === selectedPond.id);
             setKoiInSelectedPond(filteredKoi);
+            setFilteredKoi(lstKoi.filter(koi => koi.pondId !== selectedPond.id));
         } else {
             setKoiInSelectedPond([]);
+            setFilteredKoi(lstKoi || []);
         }
     }, [selectedPond, lstKoi]);
 
@@ -40,17 +50,16 @@ const KoiMove = () => {
 
     const indexOfLastKoi = currentPage * koiPerPage;
     const indexOfFirstKoi = indexOfLastKoi - koiPerPage;
-    const currentKoi = lstKoi ? lstKoi.slice(indexOfFirstKoi, indexOfLastKoi) : [];
+    const currentKoi = filteredKoi.slice(indexOfFirstKoi, indexOfLastKoi);
 
-    const pageCount = Math.ceil((lstKoi?.length || 0) / koiPerPage);
+    const pageCount = Math.ceil(filteredKoi.length / koiPerPage);
 
-    const handleKoiClick = (koi) => {
+    const handleAvailableKoiClick = (koi) => {
         if (selectedPond) {
-            // Update the koi's pondId to the selected pond's id
             const updatedKoi = { ...koi, pondId: selectedPond.id };
-            setSelectedKoi(prev => 
-                prev.includes(koi) 
-                    ? prev.filter(k => k !== koi) 
+            setAvailableSelectedKoi(prev => 
+                prev.some(k => k.id === koi.id)
+                    ? prev.filter(k => k.id !== koi.id)
                     : [...prev, updatedKoi]
             );
         } else {
@@ -58,10 +67,18 @@ const KoiMove = () => {
         }
     };
 
+    const handleSelectedPondKoiClick = (koi) => {
+        setSelectedPondKoi(prev => 
+            prev.some(k => k.id === koi.id)
+                ? prev.filter(k => k.id !== koi.id)
+                : [...prev, koi]
+        );
+    };
+
     const handlePondClick = (pond) => {
         setSelectedPond(prev => prev === pond ? null : pond);
         // Clear selected koi when changing ponds
-        setSelectedKoi([]);
+        setAvailableSelectedKoi([]);
     };
 
     const handleDotClick = (pageNumber) => {
@@ -73,24 +90,20 @@ const KoiMove = () => {
             message.error("Please select a destination pond.");
             return;
         }
-        if (selectedKoi.length === 0) {
+        if (availableSelectedKoi.length === 0) {
             message.error("Please select at least one Koi to move.");
             return;
         }
 
         setIsMoving(true);
         try {
-            for (const koi of selectedKoi) {
+            for (const koi of availableSelectedKoi) {
                 const formData = new FormData();
-                const updatedKoi = {
-                    ...koi,
-                    pondId: selectedPond.id
-                };
-                formData.append("fish", JSON.stringify(updatedKoi));
+                formData.append("fish", JSON.stringify(koi));
                 await manageKoiFishServices.updateKoi(koi.id, formData);
             }
-            message.success(`Successfully moved ${selectedKoi.length} Koi to ${selectedPond.name}.`);
-            setSelectedKoi([]);
+            message.success(`Successfully moved ${availableSelectedKoi.length} Koi to ${selectedPond.name}.`);
+            setAvailableSelectedKoi([]);
             setSelectedPond(null);
             
             // Refetch both koi and pond data
@@ -106,6 +119,44 @@ const KoiMove = () => {
         }
     };
 
+    const handleDeleteClick = () => {
+        if (selectedPondKoi.length === 0) {
+            message.error("Please select at least one Koi to delete.");
+            return;
+        }
+
+        Modal.confirm({
+            title: 'Delete Koi',
+            content: `Are you sure you want to delete ${selectedPondKoi.length} koi?`,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                deleteKoi();
+            },
+        });
+    };
+
+    const deleteKoi = async () => {
+        setIsDeleting(true);
+        try {
+            for (const koi of selectedPondKoi) {
+                await deleteKoiMutation.mutateAsync(koi.id);
+            }
+            toast.success(`Successfully deleted ${selectedPondKoi.length} Koi!`);
+            setSelectedPondKoi([]);
+            
+            // Refetch koi data
+            await refetchKoi();
+            
+        } catch (error) {
+            console.error("Error deleting Koi:", error);
+            toast.error(`Error deleting koi: ${error.message}`);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className="mb-16">
             <BreadcrumbComponent
@@ -115,23 +166,25 @@ const KoiMove = () => {
                 <strong>Move Koi</strong>
             </div>
             <div className="flex flex-row space-x-4">
-                {/* First column: Koi list */}
+                {/* First column: Available Koi list */}
                 <div className="w-1/4 bg-gray-100 p-4 rounded-lg flex flex-col justify-between" style={{ minHeight: '520px' }}>
                     <div>
-                        <h2 className="text-xl font-bold mb-4 text-center">Koi List</h2>
+                        <h2 className="text-xl font-bold mb-4 text-center">
+                            {selectedPond ? "Available Koi" : "All Koi"}
+                        </h2>
                         <div className="grid grid-cols-2 gap-4">
-                            {currentKoi && currentKoi.map((koi, index) => (
+                            {currentKoi.map((koi, index) => (
                                 <div 
                                     key={index} 
-                                    className={`text-center cursor-pointer ${
-                                        selectedKoi.some(k => k.id === koi.id) ? 'border-4 border-blue-500' : ''
+                                    className={`text-center cursor-pointer rounded-lg overflow-hidden ${
+                                        availableSelectedKoi.some(k => k.id === koi.id) ? 'ring-4 ring-blue-500' : ''
                                     }`}
-                                    onClick={() => handleKoiClick(koi)}
+                                    onClick={() => handleAvailableKoiClick(koi)}
                                 >
                                     <img
                                         src={koi.imageUrl}
                                         alt={koi.name}
-                                        className="w-full h-24 object-cover rounded-lg mb-2"
+                                        className="w-full h-24 object-cover mb-2"
                                     />
                                     <p className="font-semibold">{koi.name}</p>
                                 </div>
@@ -195,11 +248,17 @@ const KoiMove = () => {
                                 ) : (
                                     <div className="grid grid-cols-6 gap-2">
                                         {koiInSelectedPond.map((koi, index) => (
-                                            <div key={index} className="text-center">
+                                            <div 
+                                                key={index} 
+                                                className={`text-center cursor-pointer rounded-lg overflow-hidden ${
+                                                    selectedPondKoi.some(k => k.id === koi.id) ? 'ring-4 ring-red-500' : ''
+                                                }`}
+                                                onClick={() => handleSelectedPondKoiClick(koi)}
+                                            >
                                                 <img
                                                     src={koi.imageUrl}
                                                     alt={koi.name}
-                                                    className="w-full h-16 object-cover rounded-lg mb-1"
+                                                    className="w-full h-16 object-cover mb-1"
                                                 />
                                                 <p className="text-xs font-semibold truncate">{koi.name}</p>
                                             </div>
@@ -220,13 +279,15 @@ const KoiMove = () => {
                         {lstPond && lstPond.map((pond, index) => (
                             <div 
                                 key={index} 
-                                className={`text-center cursor-pointer ${selectedPond === pond ? 'border-4 border-blue-500' : ''}`}
+                                className={`text-center cursor-pointer rounded-lg overflow-hidden ${
+                                    selectedPond === pond ? 'ring-4 ring-blue-500' : ''
+                                }`}
                                 onClick={() => handlePondClick(pond)}
                             >
                                 <img
                                     src={pond.imageUrl}
                                     alt={pond.name}
-                                    className="w-full h-24 object-cover rounded-lg mb-2"
+                                    className="w-full h-24 object-cover mb-2"
                                 />
                                 <p className="font-semibold">{pond.name}</p>
                             </div>
@@ -237,16 +298,24 @@ const KoiMove = () => {
                 {/* Add a new row for the "Move" button */}
                 
             </div>
-            <div className="flex justify-center mt-4">
-                    <Button
+            <div className="flex justify-center mt-4 space-x-4">
+                <Button
                     className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
                     onClick={handleMoveKoi}
-                    disabled={isMoving || !selectedPond || selectedKoi.length === 0}
+                    disabled={isMoving || !selectedPond || availableSelectedKoi.length === 0}
                     loading={isMoving}
-                    >
-                        {isMoving ? "Moving..." : "Move Selected Koi"}
-                    </Button>
-                </div>
+                >
+                    {isMoving ? "Moving..." : "Move Selected Koi"}
+                </Button>
+                <Button
+                    className="bg-red-600 text-white hover:bg-red-700 px-8 py-2 text-xl font-bold"
+                    onClick={handleDeleteClick}
+                    disabled={isDeleting || selectedPondKoi.length === 0}
+                    loading={isDeleting}
+                >
+                    {isDeleting ? "Deleting..." : "Delete Selected Koi"}
+                </Button>
+            </div>
         </div>
     );
 };

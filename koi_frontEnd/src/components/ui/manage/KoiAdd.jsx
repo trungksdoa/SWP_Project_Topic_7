@@ -112,11 +112,11 @@ const KoiAdd = () => {
       
       <Form onFinish={formik.handleSubmit} layout="vertical">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-8">
-          <div className="flex justify-center items-center">
+          <div className="justify-start items-center">
             <img
               src={imgSrc || "placeholder-image-url"} // You might want to add a placeholder image URL
               alt="Koi preview"
-              className="w-full max-w-xs h-auto object-cover rounded mb-4"
+              className="w-85 h-85 object-cover rounded-xl mb-4 mr-4"
             />
           </div>
           <div>
@@ -181,6 +181,7 @@ const KoiAdd = () => {
                 value={formik.values.dateOfBirth ? dayjs(formik.values.dateOfBirth) : null}
                 onChange={(date, dateString) => formik.setFieldValue("dateOfBirth", dateString)}
                 className="w-full"
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
               />
             </Form.Item>
             <Form.Item label="Image">
@@ -197,7 +198,7 @@ const KoiAdd = () => {
             {lstPond?.map((pond) => (
               <div
                 key={pond.id}
-                className={`text-center cursor-pointer ${
+                className={`text-center cursor-pointer rounded-xl ${
                   selectedPond === pond.id ? "border-4 border-blue-500" : ""
                 }`}
                 onClick={() => {
@@ -219,7 +220,7 @@ const KoiAdd = () => {
           <Button
             type="primary"
             htmlType="submit"
-            className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold m-8"
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
             loading={addKoiMutation.isPending}
           >
             Add Koi

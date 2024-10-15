@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useGetPondById } from "../../../hooks/koi/useGetPondById.js";
 import { useUpdateKoi } from '../../../hooks/koi/useUpdateKoi';
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal } from "antd";
+import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal, Pagination } from "antd";
 import { toast } from "react-toastify";
 import { manageKoiActions } from '../../../store/manageKoi/slice';
 import dayjs from 'dayjs';
@@ -13,6 +13,9 @@ import { useUpdatePond } from '../../../hooks/koi/useUpdatePond';
 import { managePondActions } from '../../../store/managePond/slice';
 import { useDeletePond } from "../../../hooks/koi/useDeletePond";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
+import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
+import { useAddKoi } from "../../../hooks/koi/useAddKoi";
+import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -42,8 +45,25 @@ const PondDetail = () => {
     const deletePondMutation = useDeletePond();
     const { data: lstPond } = useGetAllPond(userId);
     const [otherPonds, setOtherPonds] = useState([]);
+    const [koiAge, setKoiAge] = useState(null);
+    const [selectedPondId, setSelectedPondId] = useState(null);
+    const [selectedKoiForDeletion, setSelectedKoiForDeletion] = useState([]);
+    const [isDeletingKoi, setIsDeletingKoi] = useState(false);
+    const deleteKoiMutation = useDeleteKoi();
+    const [showAddKoiModal, setShowAddKoiModal] = useState(false);
+    const [newKoiImgSrc, setNewKoiImgSrc] = useState("");
+    const addKoiMutation = useAddKoi();
+    const [sortCriteria, setSortCriteria] = useState('name');
+    const [sortOrder, setSortOrder] = useState('asc');
 
     const pondData = pond || selectedPond;
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const koiPerPage = 8;
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     useEffect(() => {
         if (lstKoi && pondIdNumber) {
@@ -66,6 +86,23 @@ const PondDetail = () => {
             formik.setFieldValue("image", file);
         }
     };
+
+    const calculateAge = (birthDate) => {
+        if (birthDate) {
+            const today = dayjs();
+            const birthDayjs = dayjs(birthDate);
+            const ageInDays = today.diff(birthDayjs, 'day');
+            setKoiAge(ageInDays);
+        } else {
+            setKoiAge(null);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedKoi) {
+            calculateAge(selectedKoi.dateOfBirth);
+        }
+    }, [selectedKoi]);
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -112,6 +149,7 @@ const PondDetail = () => {
                     },
                 }
             );
+            calculateAge(values.dateOfBirth);
         },
     });
 
@@ -184,7 +222,7 @@ const PondDetail = () => {
                         };
                         dispatch(managePondActions.updatePond(updatedPondWithImage));
                         toast.success("Pond updated successfully");
-                        navigate('/pond-management');
+                        refetch();
                     },
                     onError: (error) => {
                         toast.error(`Error updating pond: ${error.message}`);
@@ -297,7 +335,7 @@ const PondDetail = () => {
     };
     
     const confirmMoveFish = async () => {
-        if (!destinationPond) {
+        if (!selectedPondId) {
           toast.error("Please select a destination pond");
           return;
         }
@@ -310,7 +348,7 @@ const PondDetail = () => {
             const formData = new FormData();
             const updateKoi = {
               ...koi,
-              pondId: destinationPond,
+              pondId: selectedPondId,
             };
             formData.append("fish", JSON.stringify(updateKoi));
             
@@ -336,6 +374,181 @@ const PondDetail = () => {
         } finally {
           setIsMovingFish(false);
         }
+    };
+
+    const handleKoiSelectionForDeletion = (koiId) => {
+        setSelectedKoiForDeletion(prev => {
+            if (prev.includes(koiId)) {
+                return prev.filter(id => id !== koiId);
+            } else {
+                return [...prev, koiId];
+            }
+        });
+    };
+
+    const handleDeleteSelectedKoi = () => {
+        if (selectedKoiForDeletion.length === 0) {
+            toast.error("Please select at least one Koi to delete.");
+            return;
+        }
+
+        Modal.confirm({
+            title: 'Delete Koi',
+            content: `Are you sure you want to delete ${selectedKoiForDeletion.length} koi?`,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                deleteSelectedKoi();
+            },
+        });
+    };
+
+    const deleteSelectedKoi = async () => {
+        setIsDeletingKoi(true);
+        try {
+            for (const koiId of selectedKoiForDeletion) {
+                await deleteKoiMutation.mutateAsync(koiId);
+            }
+            toast.success(`Successfully deleted ${selectedKoiForDeletion.length} Koi!`);
+            setSelectedKoiForDeletion([]);
+            refetch();
+        } catch (error) {
+            console.error("Error deleting Koi:", error);
+            toast.error(`Error deleting koi: ${error.message}`);
+        } finally {
+            setIsDeletingKoi(false);
+        }
+    };
+
+    const handleAddNewKoi = () => {
+        setShowAddKoiModal(true);
+    };
+
+    const handleCloseAddKoiModal = () => {
+        setShowAddKoiModal(false);
+        setNewKoiImgSrc("");
+    };
+
+    const handleNewKoiChangeFile = (e) => {
+        let file = e.target.files?.[0];
+        if (
+            file &&
+            ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"].includes(file.type)
+        ) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                setNewKoiImgSrc(e.target?.result);
+            };
+            addKoiFormik.setFieldValue("image", file);
+        }
+    };
+
+    const calculateAgeMonths = (dateOfBirth) => {
+        if (!dateOfBirth) return 0;
+        const birthDate = dayjs(dateOfBirth);
+        const currentDate = dayjs();
+        const diffMonths = currentDate.diff(birthDate, 'month');
+        return diffMonths;
+    };
+
+    const addKoiFormik = useFormik({
+        initialValues: {
+            name: "",
+            variety: "",
+            sex: true,
+            purchasePrice: 0,
+            weight: 0,
+            length: 0,
+            dateOfBirth: null,
+            image: null,
+        },
+        onSubmit: (values, { resetForm }) => {
+            const formData = new FormData();
+            const currentDate = dayjs();
+            const ageMonth = calculateAgeMonths(values.dateOfBirth);
+
+            const newKoi = {
+                name: values.name || "",
+                variety: values.variety || "",
+                sex: values.sex === "true",
+                purchasePrice: parseFloat(values.purchasePrice) || 0,
+                weight: parseFloat(values.weight) || 0,
+                length: parseFloat(values.length) || 0,
+                pondId: pondIdNumber,
+                dateOfBirth: values.dateOfBirth,
+                userId: userId,
+                date: currentDate.format('YYYY-MM-DD'),
+                ageMonth: ageMonth,
+            };
+            formData.append("fish", JSON.stringify(newKoi));
+            if (values.image) {
+                formData.append("image", values.image);
+            }
+            addKoiMutation.mutate(formData, {
+                onSuccess: (addedKoi) => {
+                    const newKoiWithImage = {
+                        ...addedKoi,
+                        imageUrl: newKoiImgSrc,
+                    };
+                    dispatch(manageKoiActions.addKoi(newKoiWithImage));
+                    toast.success("Koi added successfully");
+                    handleCloseAddKoiModal();
+                    refetch().then(() => {
+                        resetForm();
+                        setNewKoiImgSrc("");
+                    });
+                },
+                onError: (error) => {
+                    console.error("Error adding koi:", error);
+                    toast.error(`Error adding koi: ${error.message}`);
+                },
+            });
+        },
+    });
+
+    const handleSortChange = (value) => {
+        setSortCriteria(value);
+    };
+
+    const toggleSortOrder = () => {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
+
+    const sortedKoiInPond = useMemo(() => {
+        if (!koiInPond) return [];
+        return [...koiInPond].sort((a, b) => {
+            let comparison = 0;
+            switch (sortCriteria) {
+                case 'name':
+                    comparison = a.name.localeCompare(b.name);
+                    break;
+                case 'length':
+                    comparison = a.length - b.length;
+                    break;
+                case 'weight':
+                    comparison = a.weight - b.weight;
+                    break;
+                case 'age':
+                    comparison = new Date(a.dateOfBirth) - new Date(b.dateOfBirth);
+                    break;
+                case 'dateCreated':
+                    comparison = new Date(a.createdAt) - new Date(b.createdAt);
+                    break;
+                default:
+                    comparison = 0;
+            }
+            return sortOrder === 'asc' ? comparison : -comparison;
+        });
+    }, [koiInPond, sortCriteria, sortOrder]);
+
+    const indexOfLastKoi = currentPage * koiPerPage;
+    const indexOfFirstKoi = indexOfLastKoi - koiPerPage;
+    const currentKoi = sortedKoiInPond.slice(indexOfFirstKoi, indexOfLastKoi);
+
+    const onPageChange = (page) => {
+        setCurrentPage(page);
     };
 
     if (koiError) {
@@ -368,11 +581,11 @@ const PondDetail = () => {
                 <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
                     <Form onFinish={pondFormik.handleSubmit} layout="vertical">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="flex justify-center items-center"> {/* Added flex and centering classes */}
+                            <div className="flex justify-center items-center"> 
                                 <img
                                     src={imgSrc || pondData.imageUrl}
                                     alt={pondData.name}
-                                    className="w-full max-w-xs h-auto object-cover rounded mb-4"
+                                    className="w-80 h-80 object-cover rounded-xl mb-4"
                                 />
                             </div>
                             <div>
@@ -425,14 +638,14 @@ const PondDetail = () => {
                             <Button
                                 type="primary"
                                 htmlType="submit"
-                                className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
+                                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2"
                                 loading={updatePondMutation.isPending}
                             >
                                 Update Pond
                             </Button>
                             <Button
                                 onClick={() => handleDeleteClick(pondIdNumber)}
-                                className="bg-red-500 text-white hover:bg-red-600 font-bold text-xl px-8 py-2 ml-4"
+                                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold ml-2"
                                 loading={isDeleting}
                             >
                                 Delete Pond
@@ -443,24 +656,76 @@ const PondDetail = () => {
             )}
 
             <h2 className="text-2xl font-bold my-6 text-center">Koi in Pond</h2>
-            {koiInPond.length === 0 ? (
-                <p className="text-center">No koi found in this pond.</p>
-            ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 m-8">
-                    {koiInPond.map((koi, index) => (
-                        <div key={index} className="text-center bg-white shadow-md rounded-lg p-4">
-                            <img
-                                onClick={() => handleClick(koi)}
-                                src={koi.imageUrl}
-                                alt={koi.name}
-                                className="w-32 h-32 mx-auto object-cover cursor-pointer rounded-full"
-                            />
-                            <h3 className="text-lg mt-2 cursor-pointer font-semibold" onClick={() => handleClick(koi)}>{koi.name}</h3>
-                            <p className="text-sm text-gray-600">{koi.variety}</p>
-                        </div>
-                    ))}
+            
+            <div className="flex justify-between items-center mx-4 my-6">
+                <div className="w-1/3"></div> {/* Empty div for spacing */}
+                <div className="flex justify-center items-center w-1/3">
+                    <button
+                        className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
+                        onClick={handleAddNewKoi}
+                    >
+                        Add a new Koi
+                    </button>
+                    <button
+                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForDeletion.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
+                        disabled={selectedKoiForDeletion.length === 0 || isDeletingKoi}
+                        onClick={handleDeleteSelectedKoi}
+                    >
+                        {isDeletingKoi ? "Deleting..." : "Delete Koi"}
+                    </button>
                 </div>
+                <div className="flex justify-end items-center w-1/3">
+                    <Select
+                        defaultValue="name"
+                        style={{ width: 120 }}
+                        onChange={handleSortChange}
+                    >
+                        <Option value="name">Name</Option>
+                        <Option value="length">Length</Option>
+                        <Option value="weight">Weight</Option>
+                        <Option value="age">Age</Option>
+                        <Option value="dateCreated">Date Created</Option>
+                    </Select>
+                    <Button onClick={toggleSortOrder} className="ml-2">
+                        {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+                    </Button>
+                </div>
+            </div>
+
+            {sortedKoiInPond.length === 0 ? ( 
+                <p className="text-center mt-6">No koi found in this pond.</p>
+            ) : (
+                <>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 m-8">
+                        {currentKoi.map((koi, index) => (
+                            <div key={index} className="relative text-center bg-white shadow-md rounded-lg p-4">
+                                <Checkbox
+                                    className="absolute top-2 right-2"
+                                    checked={selectedKoiForDeletion.includes(koi.id)}
+                                    onChange={() => handleKoiSelectionForDeletion(koi.id)}
+                                />
+                                <img
+                                    onClick={() => handleClick(koi)}
+                                    src={koi.imageUrl}
+                                    alt={koi.name}
+                                    className="w-32 h-32 mx-auto object-cover cursor-pointer rounded-full"
+                                />
+                                <h3 className="text-lg mt-2 cursor-pointer font-semibold" onClick={() => handleClick(koi)}>{koi.name}</h3>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-center mt-8 mb-8">
+                        <Pagination
+                            current={currentPage}
+                            total={sortedKoiInPond.length}
+                            pageSize={koiPerPage}
+                            onChange={onPageChange}
+                            showSizeChanger={false}
+                        />
+                    </div>
+                </>
             )}
+        
 
             {selectedKoi && (
                 <div
@@ -486,7 +751,7 @@ const PondDetail = () => {
                                     <img
                                         src={imgSrc || selectedKoi.imageUrl}
                                         alt={selectedKoi.name}
-                                        className="w-full h-auto object-cover rounded mb-4"
+                                        className="w-80 h-80 object-cover rounded mb-4"
                                     />
                                     <Form.Item label="Image">
                                         <input
@@ -555,10 +820,17 @@ const PondDetail = () => {
                                         <DatePicker
                                             name="dateOfBirth"
                                             value={formik.values.dateOfBirth}
-                                            onChange={(date) => formik.setFieldValue("dateOfBirth", date)}
+                                            onChange={(date) => {
+                                                formik.setFieldValue("dateOfBirth", date);
+                                                calculateAge(date);
+                                            }}
                                             className="w-full"
+                                            disabledDate={(current) => current && current > dayjs().endOf('day')}
                                         />
                                     </Form.Item>
+                                    <div className="mb-2">
+                                        Age: {koiAge !== null ? `${koiAge} days` : 'Unknown'}
+                                    </div>
                                 </div>
                             </div>
                             <Form.Item className="flex justify-center mt-6">
@@ -582,23 +854,30 @@ const PondDetail = () => {
                 visible={showMoveConfirmation}
                 onCancel={() => setShowMoveConfirmation(false)}
                 footer={null}
+                width={800} // Increased width to accommodate the grid
               >
                 <p>Select a pond to move the fish to:</p>
-                <Select
-                  style={{ width: '100%', marginBottom: '20px' }}
-                  placeholder="Select a pond"
-                  onChange={(value) => setDestinationPond(value)}
-                  value={destinationPond}
-                >
+                <div className="grid grid-cols-4 gap-4 mt-4 mb-6">
                   {otherPonds.map(pond => (
-                    <Option key={pond.id} value={pond.id}>{pond.name}</Option>
+                    <div 
+                      key={pond.id} 
+                      className={`cursor-pointer border p-2 rounded ${selectedPondId === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
+                      onClick={() => setSelectedPondId(pond.id)}
+                    >
+                      <img 
+                        src={pond.imageUrl} 
+                        alt={pond.name} 
+                        className="w-80 h-80 object-cover rounded mb-2"
+                      />
+                      <p className="text-center font-semibold">{pond.name}</p>
+                    </div>
                   ))}
-                </Select>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                </div>
+                <div className="flex justify-end mt-4">
                   <Button 
                     key="cancel" 
                     onClick={() => setShowMoveConfirmation(false)}
-                    style={{ marginRight: '10px' }}
+                    className="mr-2"
                   >
                     Cancel
                   </Button>
@@ -606,13 +885,128 @@ const PondDetail = () => {
                     key="submit" 
                     type="primary" 
                     onClick={confirmMoveFish}
-                    disabled={!destinationPond || isMovingFish}
+                    disabled={!selectedPondId || isMovingFish}
                     loading={isMovingFish}
                   >
                     Confirm Move
                   </Button>
                 </div>
               </Modal>
+            )}
+
+            {showAddKoiModal && (
+                <div
+                    id="modal-overlay"
+                    className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+                    onClick={handleCloseAddKoiModal}
+                >
+                    <div
+                        className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
+                        style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={handleCloseAddKoiModal}
+                            className="absolute top-2 right-2 text-2xl font-bold"
+                        >
+                            &times;
+                        </button>
+                        <h2 className="text-2xl font-bold mb-6 text-center">Add New Koi</h2>
+                        <Form onFinish={addKoiFormik.handleSubmit} layout="vertical">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <img
+                                        src={newKoiImgSrc || "placeholder-image-url"}
+                                        alt="New Koi preview"
+                                        className="w-80 h-80 object-cover rounded-xl mb-4 mr-4"
+                                    />
+                                </div>
+                                <div>
+                                    <Form.Item label="Name" className="mb-2">
+                                        <Input
+                                            name="name"
+                                            value={addKoiFormik.values.name}
+                                            onChange={addKoiFormik.handleChange}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Variety" className="mb-2">
+                                        <Input
+                                            name="variety"
+                                            value={addKoiFormik.values.variety}
+                                            onChange={addKoiFormik.handleChange}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Sex" className="mb-2">
+                                        <Select
+                                            name="sex"
+                                            value={addKoiFormik.values.sex}
+                                            onChange={(value) => addKoiFormik.setFieldValue("sex", value)}
+                                            className="w-full"
+                                        >
+                                            <Select.Option value={true}>Female</Select.Option>
+                                            <Select.Option value={false}>Male</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item label="Purchase Price (VND)" className="mb-2">
+                                        <InputNumber
+                                            name="purchasePrice"
+                                            min={0}
+                                            value={addKoiFormik.values.purchasePrice}
+                                            onChange={(value) => addKoiFormik.setFieldValue("purchasePrice", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Weight (grams)" className="mb-2">
+                                        <InputNumber
+                                            name="weight"
+                                            min={0}
+                                            value={addKoiFormik.values.weight}
+                                            onChange={(value) => addKoiFormik.setFieldValue("weight", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Length (centimeters)" className="mb-2">
+                                        <InputNumber
+                                            name="length"
+                                            min={0}
+                                            value={addKoiFormik.values.length}
+                                            onChange={(value) => addKoiFormik.setFieldValue("length", value)}
+                                            className="w-full"
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Date of Birth" className="mb-2">
+                                        <DatePicker
+                                            name="dateOfBirth"
+                                            value={addKoiFormik.values.dateOfBirth ? dayjs(addKoiFormik.values.dateOfBirth) : null}
+                                            onChange={(date, dateString) => addKoiFormik.setFieldValue("dateOfBirth", dateString)}
+                                            className="w-full"
+                                            disabledDate={(current) => current && current > dayjs().endOf('day')}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="Image">
+                                        <input
+                                            type="file"
+                                            accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+                                            onChange={handleNewKoiChangeFile}
+                                        />
+                                    </Form.Item>
+                                </div>
+                            </div>
+                            <Form.Item className="flex justify-center mt-6">
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
+                                    loading={addKoiMutation.isPending}
+                                >
+                                    Add Koi
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </div>
+                </div>
             )}
         </div>
     );
