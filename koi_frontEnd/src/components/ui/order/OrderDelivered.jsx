@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Spin, Button, message } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
 
@@ -11,12 +11,16 @@ const OrderDelivered = ({ lstDelivered, isFetching, refetch, switchToCompleteTab
     );
   }
 
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   const handleConfirmDelivery = (orderId) => {
     try {
       manageOrderServices.receiveOrder(orderId);
-      message.success("Order marked as completed");
       refetch();
       switchToCompleteTab();
+      message.success("Order marked as completed");
     } catch (error) {
       // console.error('Error completing order:', error);
       // message.error('Failed to complete order');

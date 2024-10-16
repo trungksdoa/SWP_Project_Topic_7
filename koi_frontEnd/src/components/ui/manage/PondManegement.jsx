@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond.js";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Spin, Modal } from "antd"; // Removed Radio
+import { Button, Checkbox, Form, Input, Spin, Modal, Select, Space, Pagination } from "antd"; // Removed Radio
 import { toast } from "react-toastify";
 import { useUpdatePond } from "../../../hooks/koi/useUpdatePond";
 import { useDeletePond } from "../../../hooks/koi/useDeletePond"; // Add this import
@@ -14,9 +14,8 @@ import { useAddPond } from "../../../hooks/koi/useAddPond";
 import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import DualListBox from 'react-dual-listbox';
 import 'react-dual-listbox/lib/react-dual-listbox.css';
-import { Select } from 'antd';
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi"; // Assuming you have this hook
-import { Pagination } from 'antd';
+import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -42,6 +41,8 @@ const PondManagement = () => {
   const [isMovingFish, setIsMovingFish] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pondsPerPage = 8;
+  const [sortCriteria, setSortCriteria] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
 
   const { data: lstKoi } = useGetAllKoi(userId);
   const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
@@ -393,9 +394,47 @@ const PondManagement = () => {
     }
   };
 
+  const sortedPonds = useMemo(() => {
+    if (!lstPond) return [];
+    return [...lstPond].sort((a, b) => {
+      let comparison = 0;
+      switch (sortCriteria) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'length':
+          comparison = a.length - b.length;
+          break;
+        case 'width':
+          comparison = a.width - b.width;
+          break;
+        case 'depth':
+          comparison = a.depth - b.depth;
+          break;
+        case 'dateCreated':
+          comparison = new Date(a.createdAt) - new Date(b.createdAt);
+          break;
+        case 'koiAmount':
+          comparison = a.fishCount - b.fishCount;
+          break;
+        default:
+          comparison = 0;
+      }
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [lstPond, sortCriteria, sortOrder]);
+
   const indexOfLastPond = currentPage * pondsPerPage;
   const indexOfFirstPond = indexOfLastPond - pondsPerPage;
-  const currentPonds = lstPond ? lstPond.slice(indexOfFirstPond, indexOfLastPond) : [];
+  const currentPonds = sortedPonds.slice(indexOfFirstPond, indexOfLastPond);
+
+  const handleSortChange = (value) => {
+    setSortCriteria(value);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
 
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -428,32 +467,60 @@ const PondManagement = () => {
           </Button>
         </div>
       )}
-      {/* Add Pond button - always visible */}
-      <div className="flex justify-center items-center mt-4">
-        <button
-          onClick={handleAddClick}
-          className="w-50 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white 
-                    rounded-full flex items-center justify-center font-bold"
-        >
-          Add a new Pond
-        </button>
-        <button
-          onClick={() => navigate('/move-koi')}
-          className="w-50 h-auto min-h-[2.5rem] py-2 px-4 bg-orange-500 text-white 
-                    rounded-full flex items-center justify-center font-bold ml-4"
-        >
-          Move Koi
-        </button>
+
+      <div className="flex justify-center items-center mt-4 my-6">
+        <div className="w-1/3"></div> {/* Empty div for spacing */}
+        <div className="flex justify-center items-center w-1/3">
+          <button
+            onClick={handleAddClick}
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white 
+                      rounded-full flex items-center justify-center font-bold mr-2"
+          >
+            Add a new Pond
+          </button>
+          <button
+            onClick={() => navigate('/move-koi')}
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-orange-500 text-white 
+                      rounded-full flex items-center justify-center font-bold ml-2"
+          >
+            Move Koi
+          </button>
+        </div>
+        <div className="flex justify-end items-center w-1/3">
+          <Space>
+            <Select
+              defaultValue="name"
+              style={{ width: 120 }}
+              onChange={handleSortChange}
+            >
+              <Option value="name">Name</Option>
+              <Option value="length">Length</Option>
+              <Option value="width">Width</Option>
+              <Option value="depth">Depth</Option>
+              <Option value="dateCreated">Date Created</Option>
+              <Option value="koiAmount">Koi Amount</Option>
+            </Select>
+            <Button onClick={toggleSortOrder}>
+              {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+            </Button>
+          </Space>
+        </div>
       </div>
-      <div className="container grid grid-cols-4 gap-6 my-16">
+
+
+      <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-16">
         {currentPonds.map((pond, index) => (
-          <div key={index} className="text-center">
-            <img
+          <div key={index} className="text-center flex flex-col items-center">
+            <div 
+              className="w-full h-48 overflow-hidden cursor-pointer rounded-xl"
               onClick={() => handleClick(pond)}
-              src={pond.imageUrl}
-              alt={pond.name}
-              className="w-[100%] max-h-[200px] object-cover cursor-pointer"
-            />
+            >
+              <img
+                src={pond.imageUrl}
+                alt={pond.name}
+                className="w-full h-full object-cover transition-transform duration-300 rounded-xl"
+              />
+            </div>
             <h3
               className="text-lg mt-2 cursor-pointer"
               onClick={() => handleClick(pond)}
@@ -467,7 +534,7 @@ const PondManagement = () => {
       <div className="flex justify-center mt-8 mb-8">
         <Pagination
           current={currentPage}
-          total={lstPond ? lstPond.length : 0}
+          total={sortedPonds.length}
           pageSize={pondsPerPage}
           onChange={onPageChange}
           showSizeChanger={false}
@@ -498,7 +565,7 @@ const PondManagement = () => {
               <div className="mr-6">
                 <img
                   src={imgSrc || "placeholder-image-url"}
-                  className="w-80 h-70 object-cover"
+                  className="w-50 h-30 object-cover"
                 />
                 <div className="mt-2">
                   <strong>Image:</strong>
