@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Input, Button, Form } from "antd";
+import { Input, Button, Form, message } from "antd";
 import { useGetBlogById } from "../../../hooks/blogs/useGetBlogById";
 import { usePutBlog } from "../../../hooks/blogs/usePutBlogs";
 import { useFormik } from "formik";
@@ -50,16 +50,15 @@ const EditBlog = () => {
         console.log(pair[0], pair[1]); // Debugging purpose
       }
 
-      // Gửi mutation hoặc gọi API tại đây
       mutation.mutate(
         { id: parseId, payload: formData },
         {
           onSuccess: (response) => {
             formik.resetForm();
-            toast.success("Product added successfully");
+            message.success("Product added successfully");
           },
           onError: (error) => {
-            toast.error("Error adding product");
+            message.error("Error adding product");
           },
         }
       );
