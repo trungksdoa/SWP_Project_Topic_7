@@ -12,6 +12,7 @@ public interface IKoiFishService {
     KoiFish addKoiFish( KoiFish koiFish);
     KoiFish getKoiFish(int id);
     KoiFish getKoiFishsaved(int id);
+
     Page<KoiFish> getKoiFishs(int page, int size);
     Page<KoiFish> getKoiFishsByPondId(int pondId, int page, int size);
     Page<KoiFish> getKoiFishsByUserId(int userId, int page, int size);
@@ -20,15 +21,21 @@ public interface IKoiFishService {
     List<KoiFish>   getKoiFishsByUserId(int userId);
     List<KoiFish> getFishByUserNoPond(int userId);
     void deleteKoiFish(int id);
+    void deleteGrowthHistory(int id);
     int getLastestKoigrownId(int koiId);
     int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file, boolean isNew) throws IOException;
+
     Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size);
     List<KoiGrowthHistory> getGrowthHistorys(int koiId);
-    KoiFish addGrowthHistory(int id, KoiFish request, MultipartFile file) throws IOException;
+
+    KoiGrowthHistory addGrowthHistory(int id, KoiGrowthHistory request);
+    KoiGrowthHistory getGrowthHistory(int id);
+
     void evaluateAndUpdateKoiGrowthStatus(int koiId);
     void evaluateAndUpdateKoiFishStatus(KoiFish koiFish);
     void UpdateKoiFishGrowth(int koiId);
+
     List<KoiFish>swapPondIdListKoi(int pondId, List<Integer> koiFishId);
 
 }

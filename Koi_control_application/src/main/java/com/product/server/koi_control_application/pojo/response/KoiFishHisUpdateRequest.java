@@ -1,5 +1,4 @@
-package com.product.server.koi_control_application.pojo;
-
+package com.product.server.koi_control_application.pojo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,20 +8,15 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class KoiFishUpdateRequest {
-    private String name;
-    private String variety;
-    private Boolean sex;
-    private Integer purchasePrice;
+public class KoiFishHisUpdateRequest {
     private LocalDate date;
     private Integer pondId;
     private BigDecimal weight;
     private BigDecimal length;
-    private LocalDate dateOfBirth;
-    private Double ageMonth;
-
 }
