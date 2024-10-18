@@ -112,11 +112,11 @@ const KoiAdd = () => {
       
       <Form onFinish={formik.handleSubmit} layout="vertical">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-8">
-          <div className="justify-start items-center">
-            <img
+        <div className="flex justify-center items-start">
+        <img
               src={imgSrc || "placeholder-image-url"} // You might want to add a placeholder image URL
               alt="Koi preview"
-              className="w-85 h-85 object-cover rounded-xl mb-4 mr-4"
+              className="w-80 h-80 object-cover rounded-xl mb-4 mr-4"
             />
           </div>
           <div>

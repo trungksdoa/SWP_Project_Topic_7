@@ -22,7 +22,6 @@ const { Option } = Select;
 const PondManagement = () => {
   const [selectedPond, setSelectedPond] = useState(null);
   const [koiInPond, setKoiInPond] = useState([]);
-  const [componentDisabled, setComponentDisabled] = useState(true);
   const [imgSrc, setImgSrc] = useState("");
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
@@ -43,6 +42,8 @@ const PondManagement = () => {
   const pondsPerPage = 8;
   const [sortCriteria, setSortCriteria] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [koiInSelectedPond, setKoiInSelectedPond] = useState([]);
 
   const { data: lstKoi } = useGetAllKoi(userId);
   const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
@@ -53,10 +54,6 @@ const PondManagement = () => {
   useEffect(() => {
     refetch();
   }, [refetch]);
-
-  const handleClick = (pond) => {
-    navigate(`/pond-detail/${pond.id}`, { state: { pond } });
-  };
 
   const handleAddClick = () => {
     setShowAddPopup(true);
@@ -73,46 +70,10 @@ const PondManagement = () => {
   };
 
   const handleDetailClick = (pondId) => {
-    navigate(`/pond-detail/${pondId}`);
+    handleModalClose();
+    navigate(`/pond-detail/${pondId}`, { state: { pond: selectedPond } });
   };
 
-  const handleClose = () => {
-    setSelectedPond(null);
-    setKoiInPond([]);
-    setImgSrc("");
-  };
-
-  const handleOutsideClick = (e) => {
-    if (e.target.id === "modal-overlay") {
-      setSelectedPond(null);
-      setKoiInPond([]);
-      setImgSrc("");
-    }
-  };
-
-  const handleChangeFile = (e) => {
-    let file = e.target.files?.[0];
-    if (
-      file &&
-      [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ].includes(file.type)
-    ) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        setImgSrc(e.target?.result);
-      };
-      formik.setFieldValue("image", file);
-      setComponentDisabled(false);
-    } else {
-      setComponentDisabled(true);
-    }
-  };
 
   const handleAddPondChangeFile = (e) => {
     let file = e.target.files?.[0];
@@ -134,60 +95,6 @@ const PondManagement = () => {
       addPondFormik.setFieldValue("image", file);
     }
   };
-
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      name: selectedPond?.name || "",
-      width: selectedPond?.width || "",
-      length: selectedPond?.length || "",
-      depth: selectedPond?.depth || "",
-      image: null,
-    },
-    onSubmit: (values) => {
-      const formData = new FormData();
-      const updatePond = {
-        name: values.name,
-        width: parseFloat(values.width),
-        length: parseFloat(values.length),
-        depth: parseFloat(values.depth),
-        userId: userId,
-      };
-      if (values.image) {
-        formData.append("image", values.image);
-      }
-      formData.append("pond", JSON.stringify(updatePond));
-      mutation.mutate(
-        { id: selectedPond.id, payload: formData },
-        {
-          onSuccess: (updatedPond) => {
-            const updatedPondWithImage = {
-              ...updatedPond,
-              imageUrl: imgSrc,
-            };
-            dispatch(managePondActions.updatePond(updatedPondWithImage));
-            setSelectedPond(updatedPondWithImage);
-            const updatedList = lstPond.map((pond) =>
-              pond.id === updatedPondWithImage.id ? updatedPondWithImage : pond
-            );
-            localStorage.setItem(
-              LOCAL_STORAGE_POND_KEY,
-              JSON.stringify(updatedList)
-            );
-            refetch();
-            toast.success("Pond updated successfully");
-
-            setSelectedPond(null); // Close the popup
-            setImgSrc("");
-            setComponentDisabled(true);
-          },
-          onError: (error) => {
-            toast.error(`Error updating pond: ${error.message}`);
-          },
-        }
-      );
-    },
-  });
 
   const addPondFormik = useFormik({
     enableReinitialize: true,
@@ -238,18 +145,11 @@ const PondManagement = () => {
     },
   });
 
-  const handlePondSelect = (pondId) => {
-    setSelectedPond(pondId);
-    const otherPondOptions = lstPond
-      .filter(pond => pond.id !== pondId)
-      .map(pond => ({ value: pond.id, label: pond.name }));
-    setOtherPonds(otherPondOptions);
-    setSelectedDestinationPonds([]);
-  };
+
 
   const handleDeleteClick = (pondId) => {
     const pond = lstPond.find(p => p.id === pondId);
-    const fishCount = koiInPond.length;
+    const fishCount = koiInSelectedPond.length;
 
     Modal.confirm({
       title: 'Delete Pond',
@@ -266,13 +166,13 @@ const PondManagement = () => {
       footer: (_, { OkBtn, CancelBtn }) => (
         <>
           {fishCount > 0 ? (
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-center items-center mt-4 space-x-4 w-full">
               <Button
-                className="w-1/3"
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold"
                 onClick={() => {
                   setDeleteOption('delete');
                   deletePond(pondId);
-                  Modal.destroyAll(); // Close the modal
+                  Modal.destroyAll();
                 }}
                 type="primary"
                 danger
@@ -280,18 +180,18 @@ const PondManagement = () => {
                 Delete fish and pond
               </Button>
               <Button
-                className="w-1/3"
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-blue-500 text-white rounded-full font-bold"
                 onClick={() => {
                   setDeleteOption('move');
                   handleMoveFish(pondId);
-                  Modal.destroyAll(); // Close the modal
+                  Modal.destroyAll();
                 }}
                 type="primary"
               >
                 Move fish
               </Button>
               <Button
-                className="w-1/3"
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-gray-300 text-black rounded-full font-bold"
                 onClick={() => {
                   setDeleteOption(null);
                   Modal.destroyAll();
@@ -306,7 +206,7 @@ const PondManagement = () => {
                 className="mr-2"
                 onClick={() => {
                   deletePond(pondId);
-                  Modal.destroyAll(); // Close the modal
+                  Modal.destroyAll();
                 }}
                 type="primary"
                 danger
@@ -327,6 +227,7 @@ const PondManagement = () => {
       ),
       closable: true,
       maskClosable: true,
+      onCancel: handleModalClose, 
     });
   };
 
@@ -334,7 +235,7 @@ const PondManagement = () => {
     setIsDeleting(true);
     try {
       await deletePondMutation.mutateAsync(pondId);
-      toast.success("Pond and fish deleted successfully!");
+      toast.success("Pond deleted successfully!");
       setSelectedPond(null);
       refetch();
     } catch (error) {
@@ -440,30 +341,43 @@ const PondManagement = () => {
     setCurrentPage(page);
   };
 
+  const handlePondClick = (pond) => {
+    setSelectedPond(pond);
+    const koiInPond = lstKoi.filter(koi => koi.pondId === pond.id);
+    setKoiInSelectedPond(koiInPond);
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedPond(null);
+  };
+
   if (isFetching) {
     return (
-      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+      <div className="flex justify-center items-center min-h-[450px]">
         <Spin tip="Loading" size="large" />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="min-h-[450px]">
       <BreadcrumbComponent
         items={[{ name: "Home", path: "/" }, { name: "Pond Management" }]}
       />
-        <div className="flex justify-center items-center text-bold text-3xl h-full m-8">
+        <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
           <strong>Pond Management</strong>
         </div>
       {/* Add Koi message */}
       {lstPond?.length > 0 && (!lstKoi || lstKoi.length === 0) && (
-        <div className="flex items-center justify-center">
+        <div className="flex flex-row items-center justify-center space-x-4">
+          <div className="text-lg">You have no Koi</div>
           <Button 
-            className="w-50 h-auto min-h-[2.5rem] text-xl py-2 px-4 bg-black text-white rounded-full flex items-center justify-center font-bold"
-            onClick={() => navigate('/koi-management')}
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
+            onClick={() => navigate('/add-koi')}
           >
-            Let's add koi!
+            Add a Koi
           </Button>
         </div>
       )}
@@ -508,12 +422,12 @@ const PondManagement = () => {
       </div>
 
 
-      <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-16">
+      <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-16 mb-2">
         {currentPonds.map((pond, index) => (
           <div key={index} className="text-center flex flex-col items-center">
             <div 
               className="w-full h-48 overflow-hidden cursor-pointer rounded-xl"
-              onClick={() => handleClick(pond)}
+              onClick={() => handlePondClick(pond)}
             >
               <img
                 src={pond.imageUrl}
@@ -523,7 +437,7 @@ const PondManagement = () => {
             </div>
             <h3
               className="text-lg mt-2 cursor-pointer"
-              onClick={() => handleClick(pond)}
+              onClick={() => handlePondClick(pond)}
             >
               {pond.name}
             </h3>
@@ -531,7 +445,7 @@ const PondManagement = () => {
         ))}
       </div>
 
-      <div className="flex justify-center mt-8 mb-8">
+      <div className="flex justify-center mb-8">
         <Pagination
           current={currentPage}
           total={sortedPonds.length}
@@ -565,7 +479,7 @@ const PondManagement = () => {
               <div className="mr-6">
                 <img
                   src={imgSrc || "placeholder-image-url"}
-                  className="w-50 h-30 object-cover"
+                  className="w-80 h-40 object-cover"
                 />
                 <div className="mt-2">
                   <strong>Image:</strong>
@@ -574,18 +488,7 @@ const PondManagement = () => {
                     accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
                     onChange={handleAddPondChangeFile}
                   />
-                  {imgSrc && (
-                    <img
-                      src={imgSrc}
-                      alt="Preview"
-                      style={{
-                        width: "80px",
-                        height: "70px",
-                        objectFit: "cover",
-                        marginTop: "10px",
-                      }}
-                    />
-                  )}
+                  
                 </div>
               </div>
               <div className="flex flex-col w-full">
@@ -637,11 +540,12 @@ const PondManagement = () => {
                     />
                   </div>
 
-                  <Form.Item className="mt-4">
+                  <Form.Item className="flex justify-center mt-6 mb-2">
                     <Button
                       type="primary"
                       htmlType="submit"
-                      loading={addPondMutation.isLoading}
+                      className="w-40 h-auto min-h-[2.5rem] py-2 px-2 bg-black text-white rounded-full font-bold mt-4"
+                      loading={addPondMutation.isPending}
                     >
                       Add Pond
                     </Button>
@@ -653,199 +557,85 @@ const PondManagement = () => {
         </div>
       )}
 
-      {selectedPond && (
-        <div
-          id="modal-overlay"
-          className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
-          onClick={handleOutsideClick}
+      {isModalVisible && selectedPond && (
+        <Modal
+          visible={isModalVisible}
+          onCancel={handleModalClose}
+          footer={null}
+          width={800}
         >
-          <div
-            className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col"
-            style={{ width: "80%", maxWidth: "700px" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={handleClose}
-              className="absolute -top-1 right-2 text-2xl font-bold"
-            >
-              &times;
-            </button>
-
-            <div className="flex flex-row justify-center">
-              <div className="mr-6">
+          <div className="p-4">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="md:w-1/2 ml-4">
                 <img
                   src={selectedPond.imageUrl}
                   alt={selectedPond.name}
-                  className="w-80 h-70 object-cover"
+                  className="w-80 h-40 object-cover rounded-lg"
                 />
-                <div className="mt-2">
-                  <strong>Image:</strong>
-                  <input
-                    disabled={componentDisabled}
-                    type="file"
-                    accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-                    onChange={handleChangeFile}
-                  />
-                  {imgSrc && formik.values.image && (
-                    <img
-                      src={imgSrc}
-                      alt="Preview"
-                      style={{
-                        width: "80px",
-                        height: "70px",
-                        objectFit: "cover",
-                        marginTop: "10px",
-                      }}
-                    />
-                  )}
+              </div>
+              <div className="md:w-1/2 mt-4 md:mt-0">
+                <div className="flex justify-between m-1">
+                  <strong>Name:</strong>
+                  <p>{selectedPond.name}</p>
+                </div>
+                <div className="flex justify-between m-1">
+                  <strong>Width:</strong>
+                  <p>{selectedPond.width} meters</p>
+                </div>
+                <div className="flex justify-between m-1">
+                  <strong>Length:</strong>
+                  <p>{selectedPond.length} meters</p>
+                </div>
+                <div className="flex justify-between m-1">
+                  <strong>Depth:</strong>
+                  <p>{selectedPond.depth} meters</p>
+                </div>
+                <div className="flex justify-between m-1">
+                  <strong>Volume:</strong>
+                  <p>{selectedPond.volume} cubic meters</p>
                 </div>
               </div>
-              <div className="flex flex-col w-full">
-                <Checkbox
-                  checked={!componentDisabled}
-                  onChange={(e) => setComponentDisabled(!e.target.checked)}
-                  className="mb-4"
-                >
-                  Update Info
-                </Checkbox>
-                <Form
-                  disabled={componentDisabled}
-                  onFinish={formik.handleSubmit}
-                >
-                  <div className="flex flex-row items-center justify-between m-1">
-                    <div className="w-10">
-                      <strong>Name:</strong>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-25">
-                        <Input
-                          className="text-right pr-15"
-                          style={{ color: "black" }}
-                          name="name"
-                          value={formik.values.name}
-                          onChange={formik.handleChange}
-                        />
-                      </div>
-                      {/* <div className="w-15 text-right">
-                        meters
-                      </div> */}
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center justify-between m-1">
-                    <div className="w-10">
-                      <strong>Width:</strong>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-25">
-                        <Input
-                          className="text-right pr-2"
-                          style={{ color: "black" }}
-                          min={0}
-                          type="number"
-                          name="width"
-                          value={formik.values.width}
-                          onChange={formik.handleChange}
-                        />
-                      </div>
-                      <div className="w-15 text-right">
-                        meters
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center justify-between m-1">
-                    <div className="w-10">
-                      <strong>Length:</strong>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-25">
-                        <Input
-                      className="text-right pr-2"
-                      style={{ color: "black" }}
-                      min={0}
-                      type="number"
-                      name="length"
-                      value={formik.values.length}
-                      onChange={formik.handleChange}
-                        />
-                      </div>
-                      <div className="w-15 text-right">
-                        meters
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between m-1">
-                    <strong>Depth:</strong>
-                    <Input
-                      className="text-right w-1/2 pr-2"
-                      style={{ color: "black" }}
-                      min={0}
-                      type="number"
-                      name="depth"
-                      value={formik.values.depth}
-                      onChange={formik.handleChange}
-                    />
-                  </div>
-
-                  <div className="flex justify-between mt-4">
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      disabled={componentDisabled}
-                      loading={mutation.isPending}
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      type="primary"
-                      danger
-                      onClick={() => handleDeleteClick(selectedPond.id)}
-                      disabled={componentDisabled}
-                      loading={isDeleting}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </Form>
-              </div>
             </div>
-            <div className="w-full mt-4">
-              {koiInPond.length > 0 ? (
-                <>
-                  <div className="flex justify-between">
-                    <div className="text-left">
-                      <h4 className="text-lg font-bold mb-2">Koi in Pond</h4>
-                    </div>
-                    <div className="text-right">
-                      <h3
-                        className="underline text-blue-500 cursor-pointer"
-                        onClick={() => handleDetailClick(selectedPond.id)}
-                      >
-                        Pond Detail
-                      </h3>
-                    </div>
-                  </div>
+            <div className="mt-6">
+              {koiInSelectedPond.length > 0 ? (
+                <div>
+                  <h4 className="font-bold text-lg mb-4 ml-4">Koi in this pond</h4>
+                  <div className="flex flex-row ml-4 space-x-4 overflow-x-auto">
 
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    {koiInPond.map((koi, index) => (
-                      <li key={index} className="flex flex-col items-center">
+                    {koiInSelectedPond.map((koi, index) => (
+                      <div key={index} className="flex flex-col items-center flex-shrink-0">
                         <img
                           src={koi.imageUrl}
                           alt={koi.name}
-                          className="w-24 h-24 object-cover mb-2"
+                          className="w-16 h-16 object-cover rounded-full mb-2"
                         />
-                        <span>{koi.name}</span>
-                      </li>
+                        <p className="text-center font-semibold text-sm">{koi.name}</p>
+                      </div>  
                     ))}
-                  </ul>
-                </>
+                  </div>
+                </div>
               ) : (
-                <h4 className="text-lg font-bold mb-2">
-                  There is no Koi in Pond
-                </h4>
+                <p className="text-center text-gray-500">This pond has no koi.</p>
               )}
             </div>
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={() => handleDetailClick(selectedPond.id)}
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2"
+              >
+                View Details
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDeleteClick(selectedPond.id);
+                }}
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold ml-2"
+              >
+                Delete Pond
+              </Button>
+            </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {showDeleteConfirmation && (
