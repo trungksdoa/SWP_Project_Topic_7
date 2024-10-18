@@ -17,9 +17,7 @@ import CartPage from "../pages/CartPage";
 import KoiManagementPage from "../pages/KoiManagementPage";
 import PondManegementPage from "../pages/PondManagementPage";
 import ManagementKoiLayout from "../components/layouts/ManagementKoiLayout";
-import WaterParameter from "../components/ui/manage/WaterParameter";
-import FoodCalculator from "../components/ui/manage/FoodCalculator";
-import SaltCalculator from "../components/ui/manage/SaltCalculator";
+
 import PaymentLayout from "../components/layouts/PaymentLayout";
 import EditProduct from "../components/ui/admin/manageProducts/EditProduct";
 import CheckoutPage from "../pages/CheckoutPage";
@@ -137,14 +135,8 @@ const router = [
         path: PATH.WATER_PARAMETER,
         element: <WaterParameterPage />,
       },
-      {
-        path: PATH.FOOD_CALCULATOR,
-        element: <FoodCalculator />,
-      },
-      {
-        path: PATH.SALT_CALCULATOR,
-        element: <SaltCalculator />,
-      },
+      
+       
       {
         path: PATH.PACKAGES,
         element: <PackagesPage />,
