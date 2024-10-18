@@ -81,7 +81,6 @@ public class OpenAPIConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                         )
-
                 );
     }
 }
