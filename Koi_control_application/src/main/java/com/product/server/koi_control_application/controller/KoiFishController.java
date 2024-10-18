@@ -58,6 +58,8 @@ public class KoiFishController {
         if (file != null && !file.isEmpty()) {
             String filename = iImageService.uploadImage(file);
             koiFish.setImageUrl(filename);
+        }else{
+            koiFish.setImageUrl(iImageService.getDefaultImage("defaultkoi.jpg"));
         }
 
         if (koiFish.getWeight() == null || koiFish.getLength() == null)
