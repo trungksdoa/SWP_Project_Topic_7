@@ -586,7 +586,7 @@ const WaterParameter = () => {
                     name="lastCleanedAt"
                     value={formik.values.lastCleanedAt}
                     onChange={formik.handleChange}
-                    disabled={!isEditEnabled}
+                    disabled
                     className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                   />
                 </Form.Item>

@@ -86,7 +86,7 @@ const HeaderManage = () => {
               to={PATH.WATER_PARAMETER}
               className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
             >
-              {t("Calculate")} 
+              {t("Water Parameter")}
               {/* <ul className="submenu_2">
                 <li className="flex text-white">
                   <NavLink

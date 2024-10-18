@@ -13,6 +13,7 @@ import ForgotPassword from "../auth/ForgotPassword"; // Import ForgotPassword
 import { useDispatch, useSelector } from "react-redux";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { manageUserActions } from "../../../store/manageUser/slice";
+import { manageCartActions } from "../../../store/manageCart/slice";
 
 export const UserMenu = () => {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,7 @@ export const UserMenu = () => {
   const handleLogout = () => {
     localStorage.removeItem(LOCAL_STORAGE_LOGIN_KEY);
     dispatch(manageUserActions.updateUserLogin(null));
+    dispatch(manageCartActions.setCartCount(null));
     naigate(PATH.HOME);
   };
 

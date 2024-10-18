@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Spin, Button, message } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
 
-const OrderDelivered = ({ lstDelivered, isFetching, refetch }) => {
+const OrderDelivered = ({ lstDelivered, isFetching, refetch, switchToCompleteTab }) => {
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -19,6 +19,7 @@ const OrderDelivered = ({ lstDelivered, isFetching, refetch }) => {
     try {
       manageOrderServices.receiveOrder(orderId);
       refetch();
+      switchToCompleteTab();
       message.success("Order marked as completed");
     } catch (error) {
       // console.error('Error completing order:', error);

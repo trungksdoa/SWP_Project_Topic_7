@@ -55,6 +55,10 @@ const HistoryOrder = () => {
   const switchToCancelledTab = () => {
     setActiveKey("cancel");
   };
+  const switchToCompleteTab = () => {
+    setActiveKey("completed");
+  };
+
 
   return (
     <div>
@@ -97,7 +101,7 @@ const HistoryOrder = () => {
             {
               label: "Delivered Orders",
               key: "delivered",
-              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} refetch={refetch} />,
+              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} refetch={refetch} switchToCompleteTab={switchToCompleteTab} />,
             },
             {
               label: "Completed Orders",
