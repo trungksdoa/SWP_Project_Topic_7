@@ -100,7 +100,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
     @Override
     public void deleteKoiFish(int id) {
-        KoiFish koiFish = getKoiFish(id);
         koiFishRepository.deleteById(id);
     }
 
@@ -205,50 +204,34 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
 
     @Override
-    public KoiFish addGrowthHistory(int id, KoiFish request, MultipartFile file) throws IOException {
+    public KoiGrowthHistory addGrowthHistory(int id, KoiGrowthHistory request) {
         KoiFish koiFish = getKoiFish(id);
 
-        if (request.getUserId()!=0 && !usersRepository.existsById(request.getUserId()))
-            throw new NotFoundException("User not found.");
-
-        if ((request.getPondId()!= 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+        if ((request.getPondId()!= 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), koiFish.getUserId()))
             throw new NotFoundException("Pond not found");
 
-        if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
-            throw new AlreadyExistedException("KoiFish name existed.");
-
-        if(file != null && !file.isEmpty()){
-            String filename = iImageService.updateImage(koiFish.getImageUrl(), file);
-            koiFish.setImageUrl(filename);
-        } else {
-            koiFish.setImageUrl(koiFish.getImageUrl());
-        }
-        
-        Optional.ofNullable(request.getWeight()).ifPresent(koiFish::setWeight);
-        Optional.ofNullable(request.getLength()).ifPresent(koiFish::setLength);
-        Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
-        Optional.ofNullable(request.getVariety()).ifPresent(koiFish::setVariety);
-        Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
-        Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
-        if ((request.getPondId()!= 0)){
-            if(koiFish.getPondId()!= request.getPondId()){
-                koiFish.setInPondFrom(request.getDate());
-            }
-            koiFish.setPondId(request.getPondId());
-        }
-        koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
+        KoiGrowthHistory.KoiGrowthHistoryBuilder builder = KoiGrowthHistory.builder()
                 .koiId(koiFish.getId())
-                .inPondFrom(koiFish.getInPondFrom())
+                .isFirstMeasurement(false)
+                .dateOfBirth(koiFish.getDateOfBirth())
+                .inPondFrom(request.getDate())
                 .weight(request.getWeight())
                 .length(request.getLength())
-                .pondId(koiFish.getPondId())
-                .date(koiFish.getDate())
-                .build());
-        evaluateAndUpdateKoiGrowthStatus(id);
+                .pondId(request.getPondId())
+                .date(request.getDate());
 
-        return getKoiFishsaved(id);
+       KoiGrowthHistory saved = koiGrowthHistoryRepository.save(builder.build());
+
+       evaluateAndUpdateKoiGrowthStatus(id);
+
+
+        return getGrowthHistory(saved.getId());
     }
 
+    @Override
+    public KoiGrowthHistory getGrowthHistory(int id) {
+        return koiGrowthHistoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Growth history not found"));
+    }
 
     @Override
     public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
@@ -301,6 +284,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                     currentHistory.setInPondFrom(currentHistory.getDate());
                     firstDateInCluster = currentHistory.getDate();
                 } else {
+
                     currentHistory.setInPondFrom(firstDateInCluster);
                 }
 
@@ -308,6 +292,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
 
             }else {
+                currentHistory.setStatus(3);
                 firstDateInCluster = currentHistory.getDate();
                 currentHistory.setInPondFrom(firstDateInCluster);
             }
@@ -448,5 +433,16 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         }
 
         return koiFishList;
+    }
+
+    @Override
+    public void deleteGrowthHistory(int id) {
+        KoiGrowthHistory koiGrowthHistory = getGrowthHistory(id);
+        if(koiGrowthHistory.getId()==getLastestKoigrownId(koiGrowthHistory.getKoiId())){
+            throw new NotFoundException("Cannot delete the latest growth history.");
+        }else{
+        koiGrowthHistoryRepository.deleteById(id);
+        }
+        evaluateAndUpdateKoiGrowthStatus(koiGrowthHistory.getKoiId());
     }
 }

@@ -8,6 +8,7 @@ import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
+import com.product.server.koi_control_application.pojo.response.KoiFishHisUpdateRequest;
 import com.product.server.koi_control_application.pojo.response.ListSwapKoiFishDTO;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
@@ -91,14 +92,14 @@ public class KoiFishController {
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishUpdateRequest.class)
-                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file,
+                                                      @RequestParam(value = "isNew", required = false) Boolean isNew) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
-        JsonNode rootNode = mapper.readTree(koiFishJson);
-        Boolean isNew = rootNode.path("isNew").asBoolean();
+
         BaseResponse response = BaseResponse.builder()
                 .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, isNew))
                 .message("Update fish successfully")
@@ -121,6 +122,22 @@ public class KoiFishController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/growthUpHistory/{growId}")
+    public ResponseEntity<BaseResponse> deleteKoiGrow(@PathVariable("growId") int growId) {
+       KoiGrowthHistory koiGrowthHistory = iKoiFishService.getGrowthHistory(growId);
+        iKoiFishService.deleteGrowthHistory(growId);
+
+        BaseResponse response = BaseResponse.builder()
+                .data(koiGrowthHistory)
+                .message("Delete fish successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 
     @GetMapping("/listkoi/bypondid/{pondId}/page")
     public ResponseEntity<BaseResponse> getKoisByPondId(@PathVariable("pondId") int pondId, @RequestParam(defaultValue = "0") int page,
@@ -226,16 +243,16 @@ public class KoiFishController {
 
     @PostMapping(value = "/growthUpHistory/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> addGrowthHistory(@PathVariable("koiFishId") int koiFishId,
-                                                         @Schema(type = "string", format = "json", implementation = KoiFishDTO.class)
-                                                         @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
+                                                         @Schema(type = "string", format = "json", implementation = KoiFishHisUpdateRequest.class)
+                                                         @RequestPart("fishgrow") @Valid String koiFishJson) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
+        @Valid KoiGrowthHistory koiFish = mapper.readValue(koiFishJson, KoiGrowthHistory.class);
 
         BaseResponse response = BaseResponse.builder()
-                .data(iKoiFishService.addGrowthHistory(koiFishId, koiFish, file))
+                .data(iKoiFishService.addGrowthHistory(koiFishId, koiFish))
                 .message("Update fish successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
