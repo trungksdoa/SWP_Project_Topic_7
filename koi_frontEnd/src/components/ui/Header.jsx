@@ -42,7 +42,7 @@ const Header = () => {
     }
   }, [carts, dispatch, isLoggedOut]);
   return (
-    <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
+    <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between h-16 mx-auto">
         <Link to={PATH.HOME}>
           <img className="w-[65px]" src="../../images/logo.webp" alt="logo" />
@@ -54,7 +54,7 @@ const Header = () => {
               to={PATH.KOI_MANAGEMENT}
               className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
             >
-              {t("Management")}
+              {t("Services")}
             </NavLink>
           </li>
           <li className="flex text-white">
@@ -63,7 +63,7 @@ const Header = () => {
               to={PATH.WATER_PARAMETER}
               className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
             >
-              {t("Calculator")}
+              {t("Calculate")}
             </NavLink>
           </li>
           <li className="flex text-white">

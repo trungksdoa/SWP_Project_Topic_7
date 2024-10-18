@@ -55,7 +55,7 @@ const HeaderManage = () => {
   }, []);
 
   return (
-    <header className="p-4 bg-black top-0 left-0 right-0 z-30 sticky">
+    <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between items-center h-16 mx-auto">
         <Link to={PATH.HOME} className="mr-[30px]">
           <img className="w-[80px]" src="../../images/logo.webp" alt="logo" />
@@ -65,34 +65,28 @@ const HeaderManage = () => {
             className="scrollable-navbar flex whitespace-nowrap p-2 scrollbar-hide"
             ref={navbarRef}
           >
-            <li className="flex relative py-[20px] cursor-pointer items-center menu mr-[60px] text-white">
-              {t("Management")}
-              <ul className="submenu">
-                <li className="flex mb-[30px] text-white">
+            
                   <NavLink
                     rel="noopener noreferrer"
                     to={PATH.KOI_MANAGEMENT}
-                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-                  >
-                    {t("Koi Management")}
-                  </NavLink>
-                </li>
-                <li className="flex text-white mb-[15px]">
+              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
+            >
+              {t(" Manage Koi")}
+            </NavLink>
+                
                   <NavLink
                     rel="noopener noreferrer"
                     to={PATH.POND_MANAGEMENT}
-                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-                  >
-                    {t("Pond Management")}
+                    className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
+                    >
+                    {t("Manage Pond")}
                   </NavLink>
-                </li>
-              </ul>
-            </li>
+              
             <NavLink
               to={PATH.WATER_PARAMETER}
               className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
             >
-              {t("Calculator")}
+              {t("Calculate")} 
               {/* <ul className="submenu_2">
                 <li className="flex text-white">
                   <NavLink
