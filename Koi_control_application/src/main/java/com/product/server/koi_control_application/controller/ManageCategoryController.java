@@ -42,4 +42,11 @@ public class ManageCategoryController {
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable int cateId) {
         return ResponseUtil.createSuccessResponse(categoryService.getCategoryById(cateId), "Get category success");
     }
+
+    
+    @PostMapping("/{categoryId}/subcategories")
+    @Operation(summary = "Add subcategory", description = "Adds a new subcategory to an existing category")
+    public ResponseEntity<BaseResponse> addSubcategory(@PathVariable int categoryId, @RequestBody @Valid Category subcategory) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
 }

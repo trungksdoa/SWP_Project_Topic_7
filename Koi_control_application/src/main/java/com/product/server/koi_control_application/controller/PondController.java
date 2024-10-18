@@ -34,6 +34,36 @@ public class PondController {
     private final IPondService iPondService;
     private final IImageService iImageService;
 
+    @PostMapping("/{pondId}/maintenance")
+    @Operation(summary = "Add maintenance record", description = "Adds a new maintenance record for a specific pond")
+    public ResponseEntity<BaseResponse> addMaintenanceRecord(@PathVariable int pondId, @RequestBody @Valid MaintenanceDTO maintenanceDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/{pondId}/maintenance-history")
+    @Operation(summary = "Get maintenance history", description = "Retrieves the maintenance history for a specific pond")
+    public ResponseEntity<BaseResponse> getMaintenanceHistory(@PathVariable int pondId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{pondId}/alert")
+    @Operation(summary = "Set pond alert", description = "Sets an alert for a specific pond (e.g., water quality issues)")
+    public ResponseEntity<BaseResponse> setPondAlert(@PathVariable int pondId, @RequestBody @Valid PondAlertDTO alertDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/{pondId}/alerts")
+    @Operation(summary = "Get pond alerts", description = "Retrieves all active alerts for a specific pond")
+    public ResponseEntity<BaseResponse> getPondAlerts(@PathVariable int pondId) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{pondId}/schedule-maintenance")
+    @Operation(summary = "Schedule pond maintenance", description = "Schedules a maintenance task for a specific pond")
+    public ResponseEntity<BaseResponse> scheduleMaintenanceTask(@PathVariable int pondId, @RequestBody @Valid MaintenanceScheduleDTO scheduleDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+    
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createPond(
             @Schema(type = "string", format = "json", implementation = PondDTO.class)
@@ -130,6 +160,8 @@ public class PondController {
             mess = "List is emmty";
         return ResponseUtil.createSuccessResponse(ponds, mess);
     }
+
+    
 //Bị  thừa rồi xóa đi nhé
 //    @GetMapping("/listpond/page")
 //    public ResponseEntity<BaseResponse> getPondWithPage(@RequestParam(defaultValue = "0") int page,
