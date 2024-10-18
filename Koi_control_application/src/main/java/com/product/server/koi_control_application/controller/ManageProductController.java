@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.request.ProductDTO;
 import com.product.server.koi_control_application.serviceInterface.IProductService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static com.product.server.koi_control_application.mappingInterface.ManageProductMappings.*;
 
@@ -74,13 +77,13 @@ public class ManageProductController {
 
     @PostMapping("/{productId}/variants")
     @Operation(summary = "Add product variant", description = "Adds a new variant to an existing product")
-    public ResponseEntity<BaseResponse> addProductVariant(@PathVariable int productId, @RequestBody @Valid ProductVariantDTO variantDTO) {
+    public ResponseEntity<BaseResponse> addProductVariant(@PathVariable int productId, @RequestBody @Valid Map<String, Object> variantDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
     @PutMapping("/variants/{variantId}")
     @Operation(summary = "Update product variant", description = "Updates an existing product variant")
-    public ResponseEntity<BaseResponse> updateProductVariant(@PathVariable int variantId, @RequestBody @Valid ProductVariantDTO variantDTO) {
+    public ResponseEntity<BaseResponse> updateProductVariant(@PathVariable int variantId, @RequestBody @Valid Map<String, Object> variantDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
@@ -92,7 +95,7 @@ public class ManageProductController {
 
     @PostMapping("/{productId}/reviews")
     @Operation(summary = "Add product review", description = "Adds a new review to a product")
-    public ResponseEntity<BaseResponse> addProductReview(@PathVariable int productId, @RequestBody @Valid ProductReviewDTO reviewDTO) {
+    public ResponseEntity<BaseResponse> addProductReview(@PathVariable int productId, @RequestBody @Valid Map<String, Object> reviewDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 

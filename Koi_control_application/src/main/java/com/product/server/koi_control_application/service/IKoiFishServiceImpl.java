@@ -31,7 +31,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-
 public class IKoiFishServiceImpl implements IKoiFishService {
     private final UsersRepository usersRepository;
     private final KoiFishRepository koiFishRepository;

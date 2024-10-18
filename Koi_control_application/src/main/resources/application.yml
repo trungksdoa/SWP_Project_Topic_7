@@ -26,6 +26,19 @@ openapi:
       prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
       dev:  http://localhost:8080 
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 spring:
   jackson:
     time-zone= Asia/Ho_Chi_Minh

@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.repository.BlogsRepository;
 import com.product.server.koi_control_application.service.BlogServiceImpl;
 import com.product.server.koi_control_application.serviceHelper.BlogHelper;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ class BlogServiceImplTest {
         blogService = new BlogServiceImpl(blogsRepository, imageService, blogHelper);
     }
     @Test
+    @Timed(value = "createBlog.createBlog")
     void createBlog() throws IOException {
         Blogs blog = new Blogs();
         blog.setTitle("Test Blog");
@@ -66,6 +68,7 @@ class BlogServiceImplTest {
     }
 
     @Test
+    @Timed(value = "updateBlog.updateBlog")
     void updateBlog() throws IOException {
         int id = 1;
         Blogs blog = new Blogs();
@@ -88,6 +91,7 @@ class BlogServiceImplTest {
     }
 
     @Test
+    @Timed(value = "deleteBlog.deleteBlog")
     void deleteBlog() {
         int id = 1;
         Blogs blog = new Blogs();
@@ -101,6 +105,7 @@ class BlogServiceImplTest {
     }
 
     @Test
+    @Timed(value = "getAllBlogs.getAllBlogs")
     void getAllBlogs() {
         List<Blogs> blogsList = Arrays.asList(new Blogs(), new Blogs());
 
@@ -113,6 +118,7 @@ class BlogServiceImplTest {
     }
 
     @Test
+    @Timed(value = "getBlogById.getBlogById")
     void getBlogById() {
         int id = 1;
         Blogs blog = new Blogs();

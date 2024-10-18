@@ -13,6 +13,7 @@ import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/koifishs")
@@ -260,7 +262,7 @@ public class KoiFishController {
 
     @PostMapping("/{koiFishId}/medical-record")
     @Operation(summary = "Add medical record", description = "Adds a new medical record for a specific koi fish")
-    public ResponseEntity<BaseResponse> addMedicalRecord(@PathVariable int koiFishId, @RequestBody @Valid MedicalRecordDTO medicalRecordDTO) {
+    public ResponseEntity<BaseResponse> addMedicalRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object>  medicalRecordDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
@@ -272,7 +274,7 @@ public class KoiFishController {
 
     @PostMapping("/{koiFishId}/breeding-record")
     @Operation(summary = "Add breeding record", description = "Adds a new breeding record for a specific koi fish")
-    public ResponseEntity<BaseResponse> addBreedingRecord(@PathVariable int koiFishId, @RequestBody @Valid BreedingRecordDTO breedingRecordDTO) {
+    public ResponseEntity<BaseResponse> addBreedingRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object> breedingRecordDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 

@@ -7,6 +7,7 @@ import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,18 +31,18 @@ public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
 
-    //
-    @PostMapping("/apply-coupon")
-    @Operation(summary = "Apply coupon to cart", description = "Applies a coupon code to the user's cart")
-    public ResponseEntity<BaseResponse> applyCoupon(@RequestBody @Valid CouponDTO couponDTO, HttpServletRequest request) {
-        throw new UnsupportedOperationException("This method is not implemented yet");
-    }
 
-    @DeleteMapping("/remove-coupon")
-    @Operation(summary = "Remove coupon from cart", description = "Removes the applied coupon from the user's cart")
-    public ResponseEntity<BaseResponse> removeCoupon(HttpServletRequest request) {
-        throw new UnsupportedOperationException("This method is not implemented yet");
-    }
+//    @PostMapping("/apply-coupon")
+//    @Operation(summary = "Apply coupon to cart", description = "Applies a coupon code to the user's cart")
+//    public ResponseEntity<BaseResponse> applyCoupon(@RequestBody @Valid CouponDTO couponDTO, HttpServletRequest request) {
+//        throw new UnsupportedOperationException("This method is not implemented yet");
+//    }
+
+//    @DeleteMapping("/remove-coupon")
+//    @Operation(summary = "Remove coupon from cart", description = "Removes the applied coupon from the user's cart")
+//    public ResponseEntity<BaseResponse> removeCoupon(HttpServletRequest request) {
+//        throw new UnsupportedOperationException("This method is not implemented yet");
+//    }
 
     @GetMapping("/summary")
     @Operation(summary = "Get cart summary", description = "Retrieves a summary of the user's cart including total price, discounts, and taxes")
