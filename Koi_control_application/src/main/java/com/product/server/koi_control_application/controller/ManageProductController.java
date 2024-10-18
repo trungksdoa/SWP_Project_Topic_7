@@ -66,4 +66,34 @@ public class ManageProductController {
     }
 
 
+    @PostMapping("/bulk-create")
+    @Operation(summary = "Bulk create products", description = "Creates multiple products in a single request")
+    public ResponseEntity<BaseResponse> bulkCreateProducts(@RequestBody @Valid List<ProductDTO> products) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{productId}/variants")
+    @Operation(summary = "Add product variant", description = "Adds a new variant to an existing product")
+    public ResponseEntity<BaseResponse> addProductVariant(@PathVariable int productId, @RequestBody @Valid ProductVariantDTO variantDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PutMapping("/variants/{variantId}")
+    @Operation(summary = "Update product variant", description = "Updates an existing product variant")
+    public ResponseEntity<BaseResponse> updateProductVariant(@PathVariable int variantId, @RequestBody @Valid ProductVariantDTO variantDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @DeleteMapping("/variants/{variantId}")
+    @Operation(summary = "Delete product variant", description = "Deletes a product variant")
+    public ResponseEntity<BaseResponse> deleteProductVariant(@PathVariable int variantId) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{productId}/reviews")
+    @Operation(summary = "Add product review", description = "Adds a new review to a product")
+    public ResponseEntity<BaseResponse> addProductReview(@PathVariable int productId, @RequestBody @Valid ProductReviewDTO reviewDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
 }
