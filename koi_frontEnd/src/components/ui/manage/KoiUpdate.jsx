@@ -25,7 +25,6 @@ const KoiUpdate = () => {
   const deleteKoiMutation = useDeleteKoi();
   const [isDeleting, setIsDeleting] = useState(false);
   const [koiAge, setKoiAge] = useState(null);
-  const [showOtherPonds, setShowOtherPonds] = useState(false);
   const [showPondInfo, setShowPondInfo] = useState(false);
   const [selectedPondInfo, setSelectedPondInfo] = useState(null);
 
@@ -181,11 +180,11 @@ const KoiUpdate = () => {
       
       <Form onFinish={formik.handleSubmit} layout="vertical">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-8">
-          <div className=" justify-start items-center">
+          <div className="flex justify-center items-start">
             <img
               src={imgSrc || koi?.imageUrl}
               alt={koi?.name || "Koi preview"}
-              className="w-85 h-85 object-cover rounded-xl mb-4 mr-4"
+              className="w-80 h-80 object-cover rounded-xl mb-4 mr-4"
             />
           </div>
           <div>
@@ -285,56 +284,29 @@ const KoiUpdate = () => {
             Delete Koi
           </Button>
         </Form.Item>
-        <div className="items-center space-x-4 mb-4 ml-8 mb-8">
+        <div className="items-center space-x-4 mb-4 ml-8">
           <div className="flex items-center space-x-4 mb-4 ml-8 font-bold text-xl">
             Pond
           </div>
-          <div className="flex items-center space-x-4 mb-4 ml-8 mb-8">
-          <Form.Item className="mb-0 flex-shrink-0" style={{ width: '200px' }}>
-            {currentPond ? (
-              <div 
-                className="text-center rounded-xl border-2 border-blue-500 cursor-pointer"
-                onClick={() => handlePondClick(currentPond)}
+          <div className="flex items-center space-x-4 mb-4 ml-8 overflow-x-auto">
+            {lstPond?.map((pond) => (
+              <div
+                key={pond.id}
+                className={`flex-shrink-0 w-48 text-center cursor-pointer rounded-xl transition-all duration-300 ${
+                  pond.id === selectedPond 
+                    ? 'order-first bg-blue-100 border-2 border-blue-500' 
+                    : 'filter grayscale hover:grayscale-0'
+                }`}
+                onClick={() => handlePondClick(pond)}
               >
                 <img
-                  src={currentPond.imageUrl}
-                  alt={currentPond.name}
+                  src={pond.imageUrl}
+                  alt={pond.name}
                   className="w-full h-28 object-cover rounded-t-xl"
                 />
-                <p>{currentPond.name}</p>
+                <p className="mt-1 text-sm p-2">{pond.name}</p>
               </div>
-            ) : (
-              <p>No pond selected</p>
-            )}
-          </Form.Item>
-
-          <Button 
-            onClick={() => setShowOtherPonds(!showOtherPonds)}
-            className="text-center justify-between"
-          >
-            {'>'}
-          </Button>
-
-          {showOtherPonds && (
-            <div className="flex-grow overflow-x-auto">
-              <div className="flex space-x-4">
-                {lstPond?.filter(pond => pond.id !== selectedPond).map((pond) => (
-                  <div
-                    key={pond.id}
-                    className="flex-shrink-0 w-48 text-center cursor-pointer rounded-xl"
-                    onClick={() => handlePondClick(pond)}
-                  >
-                    <img
-                      src={pond.imageUrl}
-                      alt={pond.name}
-                      className="w-full h-28 object-cover rounded-t-xl"
-                    />
-                    <p className="mt-1 text-sm">{pond.name}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            ))}
           </div>
         </div>
       </Form>

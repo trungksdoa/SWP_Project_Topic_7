@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import { Spin, message, Button, Modal } from "antd";
@@ -9,6 +10,7 @@ import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { toast } from "react-toastify";
 
 const KoiMove = () => {
+    const navigate = useNavigate();
     const userLogin = useSelector((state) => state.manageUser.userLogin);
     const userId = userLogin?.id;
     const { data: lstKoi, isFetching: koiLoading, refetch: refetchKoi } = useGetAllKoi(userId);
@@ -42,7 +44,7 @@ const KoiMove = () => {
 
     if (koiLoading || pondLoading) {
         return (
-            <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+            <div className="flex justify-center items-center min-h-[450px]">
                 <Spin tip="Loading" size="large" />
             </div>
         );
@@ -162,52 +164,40 @@ const KoiMove = () => {
             <BreadcrumbComponent
                 items={[{ name: "Home", path: "/" }, { name: "Move Koi" }]}
             />
-            <div className="flex justify-center items-center text-bold text-3xl h-full m-8">
+            <Button onClick={() => navigate('/pond-management')} className="bg-gray-200 hover:bg-gray-300 mt-2 ">
+                Return
+            </Button>
+            <div className="flex justify-center items-center text-bold text-3xl h-full mb-2">
                 <strong>Move Koi</strong>
             </div>
+            
             <div className="flex flex-row space-x-4">
-                {/* First column: Available Koi list */}
-                <div className="w-1/4 bg-gray-100 p-4 rounded-lg flex flex-col justify-between" style={{ minHeight: '520px' }}>
-                    <div>
-                        <h2 className="text-xl font-bold mb-4 text-center">
-                            {selectedPond ? "Available Koi" : "All Koi"}
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            {currentKoi.map((koi, index) => (
-                                <div 
-                                    key={index} 
-                                    className={`text-center cursor-pointer rounded-lg overflow-hidden ${
-                                        availableSelectedKoi.some(k => k.id === koi.id) ? 'ring-4 ring-blue-500' : ''
-                                    }`}
-                                    onClick={() => handleAvailableKoiClick(koi)}
-                                >
-                                    <img
-                                        src={koi.imageUrl}
-                                        alt={koi.name}
-                                        className="w-full h-24 object-cover mb-2"
-                                    />
-                                    <p className="font-semibold">{koi.name}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    {/* Dot pagination */}
-                    <div className="flex justify-center mt-4">
-                        {Array.from({ length: pageCount }, (_, i) => (
-                            <button
-                                key={i}
-                                className={`h-2 w-2 rounded-full mx-1 ${
-                                    currentPage === i + 1 ? 'bg-blue-500' : 'bg-gray-300'
+                {/* First column: Pond list (previously third column) */}
+                <div className="w-1/4 bg-gray-100 p-4 rounded-lg">
+                    <h2 className="text-xl font-bold mb-4 text-center">Pond List</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        {lstPond && lstPond.map((pond, index) => (
+                            <div 
+                                key={index} 
+                                className={`text-center cursor-pointer rounded-lg overflow-hidden ${
+                                    selectedPond === pond ? 'bg-blue-100 border-2 border-blue-500' : ''
                                 }`}
-                                onClick={() => handleDotClick(i + 1)}
-                            />
+                                onClick={() => handlePondClick(pond)}
+                            >
+                                <img
+                                    src={pond.imageUrl}
+                                    alt={pond.name}
+                                    className="w-full h-24 object-cover mb-2"
+                                />
+                                <p className="font-semibold">{pond.name}</p>
+                            </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Second column: Selected Pond Information and Koi List */}
+                {/* Second column: Selected Pond Information and Koi List (unchanged) */}
                 <div className="w-1/2 bg-gray-100 p-4 rounded-lg">
-                    <h2 className="text-xl font-bold mb-4 text-center">Selected Pond Information</h2>
+                    <h2 className="text-xl font-bold mb-4 text-center">Moving Control</h2>
                     {selectedPond ? (
                         <div className="flex flex-col space-y-4">
                             <div className="flex flex-row space-x-4">
@@ -251,7 +241,7 @@ const KoiMove = () => {
                                             <div 
                                                 key={index} 
                                                 className={`text-center cursor-pointer rounded-lg overflow-hidden ${
-                                                    selectedPondKoi.some(k => k.id === koi.id) ? 'ring-4 ring-red-500' : ''
+                                                    selectedPondKoi.some(k => k.id === koi.id) ? 'bg-red-100 border-2 border-red-500' : ''
                                                 }`}
                                                 onClick={() => handleSelectedPondKoiClick(koi)}
                                             >
@@ -272,31 +262,44 @@ const KoiMove = () => {
                     )}
                 </div>
 
-                {/* Third column: Pond list */}
-                <div className="w-1/4 bg-gray-100 p-4 rounded-lg">
-                    <h2 className="text-xl font-bold mb-4 text-center">Pond List</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        {lstPond && lstPond.map((pond, index) => (
-                            <div 
-                                key={index} 
-                                className={`text-center cursor-pointer rounded-lg overflow-hidden ${
-                                    selectedPond === pond ? 'ring-4 ring-blue-500' : ''
+                {/* Third column: Available Koi list (previously first column) */}
+                <div className="w-1/4 bg-gray-100 p-4 rounded-lg flex flex-col justify-between" style={{ minHeight: '520px' }}>
+                    <div>
+                        <h2 className="text-xl font-bold mb-4 text-center">
+                            {selectedPond ? "Available Koi" : "All Koi"}
+                        </h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            {currentKoi.map((koi, index) => (
+                                <div 
+                                    key={index} 
+                                    className={`text-center cursor-pointer rounded-lg overflow-hidden ${
+                                        availableSelectedKoi.some(k => k.id === koi.id) ? 'bg-blue-100 border-2 border-blue-500' : ''
+                                    }`}
+                                    onClick={() => handleAvailableKoiClick(koi)}
+                                >
+                                    <img
+                                        src={koi.imageUrl}
+                                        alt={koi.name}
+                                        className="w-full h-24 object-cover mb-2"
+                                    />
+                                    <p className="font-semibold">{koi.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Dot pagination */}
+                    <div className="flex justify-center mt-4">
+                        {Array.from({ length: pageCount }, (_, i) => (
+                            <button
+                                key={i}
+                                className={`h-2 w-2 rounded-full mx-1 ${
+                                    currentPage === i + 1 ? 'bg-blue-500' : 'bg-gray-300'
                                 }`}
-                                onClick={() => handlePondClick(pond)}
-                            >
-                                <img
-                                    src={pond.imageUrl}
-                                    alt={pond.name}
-                                    className="w-full h-24 object-cover mb-2"
-                                />
-                                <p className="font-semibold">{pond.name}</p>
-                            </div>
+                                onClick={() => handleDotClick(i + 1)}
+                            />
                         ))}
                     </div>
                 </div>
-
-                {/* Add a new row for the "Move" button */}
-                
             </div>
             <div className="flex justify-center mt-4 space-x-4">
                 <Button

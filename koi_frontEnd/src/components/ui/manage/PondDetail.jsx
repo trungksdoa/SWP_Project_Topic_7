@@ -55,6 +55,9 @@ const PondDetail = () => {
     const addKoiMutation = useAddKoi();
     const [sortCriteria, setSortCriteria] = useState('name');
     const [sortOrder, setSortOrder] = useState('asc');
+    const [showMoveKoiConfirmation, setShowMoveKoiConfirmation] = useState(false);
+    const [selectedDestinationPond, setSelectedDestinationPond] = useState(null);
+    const [isMovingKoi, setIsMovingKoi] = useState(false);
 
     const pondData = pond || selectedPond;
 
@@ -251,39 +254,39 @@ const PondDetail = () => {
           footer: (_, { OkBtn, CancelBtn }) => (
             <>
               {fishCount > 0 ? (
-                <div className="flex justify-between mt-4">
-                  <Button
-                    className="w-1/3"
+                <div className="flex justify-center items-center mt-4 space-x-4 w-full">
+                    <Button
+                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold"
                     onClick={() => {
-                      setDeleteOption('delete');
-                      deletePond(pondId);
-                      Modal.destroyAll();
+                        setDeleteOption('delete');
+                        deletePond(pondId);
+                        Modal.destroyAll();
                     }}
                     type="primary"
                     danger
-                  >
+                    >
                     Delete fish and pond
-                  </Button>
-                  <Button
-                    className="w-1/3"
+                    </Button>
+                    <Button
+                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-blue-500 text-white rounded-full font-bold"
                     onClick={() => {
-                      setDeleteOption('move');
-                      handleMoveFish(pondId);
-                      Modal.destroyAll();
+                        setDeleteOption('move');
+                        handleMoveFish(pondId);
+                        Modal.destroyAll();
                     }}
                     type="primary"
-                  >
+                    >
                     Move fish
-                  </Button>
-                  <Button
-                    className="w-1/3"
+                    </Button>
+                    <Button
+                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-gray-300 text-black rounded-full font-bold"
                     onClick={() => {
-                      setDeleteOption(null);
-                      Modal.destroyAll();
+                        setDeleteOption(null);
+                        Modal.destroyAll();
                     }}
-                  >
+                    >
                     Cancel
-                  </Button>
+                    </Button>
                 </div>
               ) : (
                 <div className="flex justify-end mt-4">
@@ -551,6 +554,55 @@ const PondDetail = () => {
         setCurrentPage(page);
     };
 
+    const handleMoveSelectedKoi = () => {
+        if (selectedKoiForDeletion.length === 0) {
+            toast.error("Please select at least one Koi to move.");
+            return;
+        }
+        setShowMoveKoiConfirmation(true);
+    };
+
+    const confirmMoveKoi = async () => {
+        if (!selectedDestinationPond) {
+            toast.error("Please select a destination pond");
+            return;
+        }
+
+        setIsMovingKoi(true);
+
+        try {
+            // Update each selected koi's pond ID
+            await Promise.all(selectedKoiForDeletion.map(koiId => {
+                const koi = koiInPond.find(k => k.id === koiId);
+                const formData = new FormData();
+                const updateKoi = {
+                    ...koi,
+                    pondId: selectedDestinationPond.id,
+                };
+                formData.append("fish", JSON.stringify(updateKoi));
+                
+                return updateKoiMutation.mutateAsync(
+                    { id: koiId, payload: formData },
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    }
+                );
+            }));
+
+            toast.success("Koi moved successfully!");
+            setShowMoveKoiConfirmation(false);
+            setSelectedKoiForDeletion([]);
+            refetch();
+        } catch (error) {
+            console.error("Error moving koi:", error);
+            toast.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
+        } finally {
+            setIsMovingKoi(false);
+        }
+    };
+
     if (koiError) {
         console.error('Error fetching koi:', koiError);
         return <div>Error loading koi.</div>;
@@ -659,7 +711,7 @@ const PondDetail = () => {
             
             <div className="flex justify-between items-center mx-4 my-6">
                 <div className="w-1/3"></div> {/* Empty div for spacing */}
-                <div className="flex justify-center items-center w-1/3">
+                <div className="flex justify-center items-center">
                     <button
                         className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
                         onClick={handleAddNewKoi}
@@ -672,6 +724,13 @@ const PondDetail = () => {
                         onClick={handleDeleteSelectedKoi}
                     >
                         {isDeletingKoi ? "Deleting..." : "Delete Koi"}
+                    </button>
+                    <button
+                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForDeletion.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
+                        disabled={selectedKoiForDeletion.length === 0 || isMovingKoi}
+                        onClick={handleMoveSelectedKoi}
+                    >
+                        {isMovingKoi ? "Moving..." : "Move Koi"}
                     </button>
                 </div>
                 <div className="flex justify-end items-center w-1/3">
@@ -867,7 +926,7 @@ const PondDetail = () => {
                       <img 
                         src={pond.imageUrl} 
                         alt={pond.name} 
-                        className="w-80 h-80 object-cover rounded mb-2"
+                        className="w-50 h-50 object-cover rounded mb-2"
                       />
                       <p className="text-center font-semibold">{pond.name}</p>
                     </div>
@@ -1007,6 +1066,53 @@ const PondDetail = () => {
                         </Form>
                     </div>
                 </div>
+            )}
+
+            {showMoveKoiConfirmation && (
+                <Modal
+                    title="Move Koi"
+                    visible={showMoveKoiConfirmation}
+                    onCancel={() => setShowMoveKoiConfirmation(false)}
+                    footer={null}
+                    width={800}
+                >
+                    <p>Select a pond to move the koi to:</p>
+                    <div className="grid grid-cols-4 gap-4 mt-4 mb-6">
+                        {lstPond.filter(pond => pond.id !== pondIdNumber).map(pond => (
+                            <div 
+                                key={pond.id} 
+                                className={`cursor-pointer border p-2 rounded ${selectedDestinationPond?.id === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
+                                onClick={() => setSelectedDestinationPond(pond)}
+                            >
+                                <img 
+                                    src={pond.imageUrl} 
+                                    alt={pond.name} 
+                                    className="w-50 h-50 object-cover rounded mb-2"
+                                />
+                                <p className="text-center font-semibold">{pond.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-center items-center mt-4 space-x-4">
+                        <Button 
+                            key="cancel" 
+                            onClick={() => setShowMoveKoiConfirmation(false)}
+                            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 text-black rounded-full font-bold"
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            key="submit" 
+                            type="primary" 
+                            onClick={confirmMoveKoi}
+                            disabled={!selectedDestinationPond || isMovingKoi}
+                            loading={isMovingKoi}
+                            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold"
+                        >
+                            Confirm Move
+                        </Button>
+                    </div>
+                </Modal>
             )}
         </div>
     );
