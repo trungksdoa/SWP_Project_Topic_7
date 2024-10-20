@@ -89,7 +89,7 @@ const HeaderManage = () => {
               {t("Water Parameter")}
             </NavLink>
             <NavLink
-              to={PATH.WATER_PARAMETER}
+              to={PATH.FOOD_CALCULATOR}
               className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
             >
               {t("Food Calculator")}

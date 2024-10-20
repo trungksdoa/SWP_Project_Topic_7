@@ -44,6 +44,19 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
     return assessKoiGrowth(filteredGrowthData, koiAge);
   }, [filteredGrowthData, koiAge]);
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc' }}>
+          <p>Age: {label} months</p>
+          <p>Length: {payload[0].value} cm</p>
+          <p>Weight: {payload[1].value} kg</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Modal
       title={`Koi Growth Data ${selectedYear ? `(${selectedYear})` : ''}`}
@@ -73,20 +86,20 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={filteredGrowthData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="ageMonthHis" label={{ value: 'Age (months)', position: 'insideBottom', offset: -5 }} />
+              <XAxis dataKey="ageMonthHis" label={{ value: 'Age (months)', position: 'insideBottom', offset: -3 }} />
               <YAxis 
                 yAxisId="left" 
-                label={{ value: 'Length (cm)', angle: -90, position: 'insideLeft', offset: -5 }} 
+                label={{ value: 'Length (cm)', angle: -90, position: 'insideLeft', offset: 0 }} 
               />
               <YAxis 
                 yAxisId="right" 
                 orientation="right" 
-                label={{ value: 'Weight (g)', angle: 90, position: 'insideRight', offset: 5 }} 
+                label={{ value: 'Weight (kg)', angle: 90, position: 'insideRight', offset: 5 }} 
               />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Line yAxisId="left" type="monotone" dataKey="length" stroke="#8884d8" name="Length (cm)" />
-              <Line yAxisId="right" type="monotone" dataKey="weight" stroke="#82ca9d" name="Weight (g)" />
+              <Line yAxisId="right" type="monotone" dataKey="weight" stroke="#82ca9d" name="Weight (kg)" />
             </LineChart>
           </ResponsiveContainer>
         </>

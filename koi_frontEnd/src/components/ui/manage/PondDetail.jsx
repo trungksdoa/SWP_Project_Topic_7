@@ -159,6 +159,7 @@ const PondDetail = () => {
     const handleClick = (koi) => {
         setSelectedKoi(koi);
         setImgSrc(koi.imageUrl);
+        calculateAge(koi.dateOfBirth);
     };
 
     const handleClose = () => {
@@ -584,9 +585,13 @@ const PondDetail = () => {
                 return updateKoiMutation.mutateAsync(
                     { id: koiId, payload: formData },
                     {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
+                        onSuccess: (updatedKoi) => {
+                            dispatch(manageKoiActions.updateKoi(updatedKoi));
                         },
+                        onError: (error) => {
+                            console.error(`Error updating koi ${koiId}:`, error);
+                            toast.error(`Error updating koi ${koiId}: ${error.message}`);
+                        }
                     }
                 );
             }));
@@ -794,7 +799,7 @@ const PondDetail = () => {
                 >
                     <div
                         className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
-                        style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
+                        style={{ width: 700, maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
@@ -803,106 +808,26 @@ const PondDetail = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold mb-6 text-center">Koi Information</h2>
-                        <Form onFinish={formik.handleSubmit} layout="vertical">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <img
-                                        src={imgSrc || selectedKoi.imageUrl}
-                                        alt={selectedKoi.name}
-                                        className="w-80 h-80 object-cover rounded mb-4"
-                                    />
-                                    <Form.Item label="Image">
-                                        <input
-                                            type="file"
-                                            accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-                                            onChange={handleChangeFile}
-                                        />
-                                    </Form.Item>
-                                </div>
-                                <div>
-                                    <Form.Item label="Name" className="mb-2">
-                                        <Input
-                                            name="name"
-                                            value={formik.values.name}
-                                            onChange={formik.handleChange}
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Variety" className="mb-2">
-                                        <Input
-                                            name="variety"
-                                            value={formik.values.variety}
-                                            onChange={formik.handleChange}
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Sex" className="mb-2">
-                                        <Select
-                                            name="sex"
-                                            value={formik.values.sex}
-                                            onChange={(value) => formik.setFieldValue("sex", value)}
-                                            className="w-full"
-                                        >
-                                            <Select.Option value="true">Female</Select.Option>
-                                            <Select.Option value="false">Male</Select.Option>
-                                        </Select>
-                                    </Form.Item>
-                                    <Form.Item label="Purchase Price (VND)" className="mb-2">
-                                        <InputNumber
-                                            name="purchasePrice"
-                                            min={0}
-                                            value={formik.values.purchasePrice}
-                                            onChange={(value) => formik.setFieldValue("purchasePrice", value)}
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Weight (grams)" className="mb-2">
-                                        <InputNumber
-                                            name="weight"
-                                            min={0}
-                                            value={formik.values.weight}
-                                            onChange={(value) => formik.setFieldValue("weight", value)}
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Length (centimeters)" className="mb-2">
-                                        <InputNumber
-                                            name="length"
-                                            min={0}
-                                            value={formik.values.length}
-                                            onChange={(value) => formik.setFieldValue("length", value)}
-                                            className="w-full"
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label="Date of Birth" className="mb-2">
-                                        <DatePicker
-                                            name="dateOfBirth"
-                                            value={formik.values.dateOfBirth}
-                                            onChange={(date) => {
-                                                formik.setFieldValue("dateOfBirth", date);
-                                                calculateAge(date);
-                                            }}
-                                            className="w-full"
-                                            disabledDate={(current) => current && current > dayjs().endOf('day')}
-                                        />
-                                    </Form.Item>
-                                    <div className="mb-2">
-                                        Age: {koiAge !== null ? `${koiAge} days` : 'Unknown'}
-                                    </div>
-                                </div>
+                        <h2 className="text-2xl font-bold mb-4 text-center">Koi Information</h2>
+                        <div className="grid grid-cols-3 gap-6">
+                            <div className="flex items-center justify-center"> 
+                                <img
+                                    src={imgSrc || selectedKoi.imageUrl}
+                                    alt={selectedKoi.name}
+                                    className="w-full h-auto object-cover rounded"
+                                />
                             </div>
-                            <Form.Item className="flex justify-center mt-6">
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    className="bg-black text-white hover:bg-gray-800 px-8 py-2 text-xl font-bold"
-                                    loading={updateKoiMutation.isPending}
-                                >
-                                    Update Koi
-                                </Button>
-                            </Form.Item>
-                        </Form>
+                            <div className="col-span-2">
+                                <p className="flex justify-between mb-1"><strong>Name:</strong> <span>{selectedKoi.name}</span></p>
+                                <p className="flex justify-between mb-1"><strong>Variety:</strong> <span>{selectedKoi.variety}</span></p>
+                                <p className="flex justify-between mb-1"><strong>Sex:</strong> <span>{selectedKoi.sex ? 'Female' : 'Male'}</span></p>
+                                <p className="flex justify-between mb-1"><strong>Purchase Price:</strong> <span>{selectedKoi.purchasePrice} VND</span></p>  
+                                <p className="flex justify-between mb-1"><strong>Weight:</strong> <span>{selectedKoi.weight} grams</span></p>
+                                <p className="flex justify-between mb-1"><strong>Length:</strong> <span>{selectedKoi.length} cm</span></p>
+                                <p className="flex justify-between mb-1"><strong>Date of Birth:</strong> <span>{selectedKoi.dateOfBirth ? dayjs(selectedKoi.dateOfBirth).format('YYYY-MM-DD') : 'Unknown'}</span></p>
+                                <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{koiAge !== null ? `${koiAge} days` : 'Unknown'}</span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
