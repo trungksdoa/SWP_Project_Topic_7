@@ -51,6 +51,7 @@ const WaterParameter = () => {
     selectedPond?.id
   );
   const [saltMessage, setSaltMessage] = useState(""); // Thêm state để lưu thông báo muối
+  const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] = useState(false);
   const handleGoToStore = () => {
     setShowStore(true);
   };
@@ -335,42 +336,56 @@ const WaterParameter = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
-        width="80%" // Increased width for better layout
-        className="custom-modal" // Added custom class for styling
+        width="80%"
+        className="custom-modal"
       >
         {loading ? (
           <Spin />
         ) : !waterParameters ||
           waterParameters === null ||
           Object.keys(waterParameters).length === 0 ? (
-          <div className="flex justify-between">
-            <div className="mr-6 basis-1/3">
+          <div className="flex">
+            {/* Left column: Image */}
+            <div className="w-1/2 pr-4 flex items-center justify-center">
               <img
                 src={selectedPond?.imageUrl}
                 alt={selectedPond?.name}
-                className="w-full rounded-[8px] h-70 object-cover shadow-lg" // Added shadow for depth
+                className="w-3/4 h-3/4 object-cover rounded-[8px] shadow-lg"
               />
             </div>
-            <div className="basis-2/3">
-              <div className="font-bold text-[24px] text-center">
-                No water parameters available
+            
+            {/* Right column: Content */}
+            <div className="w-1/2 flex flex-col justify-center items-center">
+              {/* First row: No water parameter and Add Water Parameter button */}
+              <div className="text-center">
+                <h2 className="font-bold text-[24px] mb-4">
+                  No water parameters available
+                </h2>
+                <Button
+                  onClick={() => {
+                    setIsAddWaterParaModalVisible(true);
+                    setIsModalVisible(false);
+                  }}
+                  className="bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
+                >
+                  Add Water Parameter
+                </Button>
               </div>
-              <AddWaterPara selectedPond={selectedPond} />
             </div>
           </div>
         ) : (
           <div className="">
             <div className="flex justify-around">
-              <div className="mr-6">
+              <div className="mr-6 w-1/4"> {/* Reduced width to 25% */}
                 <img
                   src={selectedPond.imageUrl}
                   alt={selectedPond.name}
-                  className="w-full rounded-[8px] h-70 object-cover shadow-lg" // Added shadow for depth
+                  className="w-80 h-80 object-cover shadow-lg" // Reduced height to 48 (12rem)
                 />
               </div>
               <Form
                 layout="vertical" // Changed layout to vertical for better readability
-                style={{ width: "100%" }}
+                style={{ width: "70%" }} // Adjusted width to 70%
                 onFinish={formik.handleSubmit}
               >
                 <Form.Item className="text-bold" label="Edit Parameter">
@@ -816,8 +831,7 @@ const WaterParameter = () => {
                   {checkKoiExistence() && <div>{checkKoiExistence()}</div>}
                   <div>
                     <p>
-                      Let to the store to check out products that can improve
-                      your pond.{" "}
+                      You can check out products that can improve your pond at the store.
                     </p>
                     <Button
                       onClick={() => {
@@ -833,6 +847,37 @@ const WaterParameter = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* New Modal for Add Water Parameter */}
+      <Modal
+        visible={isAddWaterParaModalVisible}
+        onCancel={() => setIsAddWaterParaModalVisible(false)}
+        footer={null}
+        width="80%"
+        className="custom-modal"
+      >
+        <div className="flex">
+          {/* Left column: Image */}
+          <div className="w-1/2 pr-4 flex items-center justify-center">
+            <img
+              src={selectedPond?.imageUrl}
+              alt={selectedPond?.name}
+              className="w-3/4 h-3/4 object-cover rounded-[8px] shadow-lg"
+            />
+          </div>
+          
+          {/* Right column: Add Water Parameter form */}
+          <div className="w-1/2">
+            <AddWaterPara
+              selectedPond={selectedPond}
+              onSuccess={() => {
+                setIsAddWaterParaModalVisible(false);
+                refetch();
+              }}
+            />
+          </div>
+        </div>
       </Modal>
     </div>
   );

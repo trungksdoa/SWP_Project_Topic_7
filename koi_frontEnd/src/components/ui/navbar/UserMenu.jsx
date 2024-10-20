@@ -75,6 +75,10 @@ export const UserMenu = () => {
     setIsModalForgotPassword(false);
   };
 
+  const handleRegisterSuccess = () => {
+    setIsModalRegister(false);
+  };
+
   const renderAvatar = () => {
     return <UserOutlined style={{ color: "white" }} />;
   };
@@ -218,8 +222,9 @@ export const UserMenu = () => {
         open={isModalRegister}
         onOk={handleOkRegister}
         onCancel={handleCancelRegister}
+        footer={null}
       >
-        <RegisterForm showModalLogin={showModalLogin} />
+        <RegisterForm showModalLogin={showModalLogin} onRegisterSuccess={handleRegisterSuccess} />
       </Modal>
       <Modal
         title=""

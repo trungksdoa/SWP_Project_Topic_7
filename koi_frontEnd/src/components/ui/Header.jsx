@@ -57,15 +57,7 @@ const Header = () => {
               {t("Services")}
             </NavLink>
           </li>
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.WATER_PARAMETER}
-              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
-            >
-              {t("Calculate")}
-            </NavLink>
-          </li>
+          
           <li className="flex text-white">
             <NavLink
               rel="noopener noreferrer"

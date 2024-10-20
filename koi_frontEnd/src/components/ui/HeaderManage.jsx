@@ -71,7 +71,7 @@ const HeaderManage = () => {
                     to={PATH.KOI_MANAGEMENT}
               className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
             >
-              {t(" Manage Koi")}
+              {t(" My Koi")}
             </NavLink>
                 
                   <NavLink
@@ -79,7 +79,7 @@ const HeaderManage = () => {
                     to={PATH.POND_MANAGEMENT}
                     className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
                     >
-                    {t("Manage Pond")}
+                    {t("My Pond")}
                   </NavLink>
               
             <NavLink
@@ -87,36 +87,14 @@ const HeaderManage = () => {
               className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
             >
               {t("Water Parameter")}
-              {/* <ul className="submenu_2">
-                <li className="flex text-white">
-                  <NavLink
-                    rel="noopener noreferrer"
-                    to={PATH.WATER_PARAMETER}
-                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-                  >
-                    {t("Water Parameter")}
-                  </NavLink>
-                </li>
-                <li className="flex text-white my-[30px]">
-                  <NavLink
-                    rel="noopener noreferrer"
-                    to={PATH.FOOD_CALCULATOR}
-                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-                  >
-                    {t("Food Calculator")}
-                  </NavLink>
-                </li>
-                <li className="flex text-white mb-[15px]">
-                  <NavLink
-                    rel="noopener noreferrer"
-                    to={PATH.SALT_CALCULATOR}
-                    className="flex sub-menu items-center px-4 -mb-1 dark:border- dark:text-violet-600 dark:border-violet-600"
-                  >
-                    {t("Salt Calculator")}
-                  </NavLink>
-                </li>
-              </ul> */}
             </NavLink>
+            <NavLink
+              to={PATH.WATER_PARAMETER}
+              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
+            >
+              {t("Food Calculator")}
+            </NavLink>
+            
             <li className="flex text-white">
               <NavLink
                 rel="noopener noreferrer"

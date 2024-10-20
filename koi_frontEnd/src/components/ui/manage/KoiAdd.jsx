@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 const KoiAdd = () => {
   const [imgSrc, setImgSrc] = useState("");
   const [selectedPond, setSelectedPond] = useState(null);
+  const [currentDay, setCurrentDay] = useState(dayjs());
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const dispatch = useDispatch();
@@ -55,6 +56,7 @@ const KoiAdd = () => {
       pondId: null,
       dateOfBirth: null,
       image: null,
+      date: dayjs(),
     },
     onSubmit: (values) => {
       const formData = new FormData();
@@ -69,9 +71,9 @@ const KoiAdd = () => {
         weight: parseFloat(values.weight) || 0,
         length: parseFloat(values.length) || 0,
         pondId: parseInt(values.pondId) || null,
-        dateOfBirth: values.dateOfBirth,
+        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
         userId: userId,
-        date: currentDate.format('YYYY-MM-DD'),
+        date: values.date ? values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
         ageMonth: ageMonth,
       };
       formData.append("fish", JSON.stringify(newKoi));
@@ -85,6 +87,7 @@ const KoiAdd = () => {
             imageUrl: imgSrc,
           };
           dispatch(manageKoiActions.addKoi(newKoiWithImage));
+          
           toast.success("Koi added successfully");
           refetchKoiList();
           navigate('/koi-management');
@@ -157,7 +160,7 @@ const KoiAdd = () => {
                 className="w-full"
               />
             </Form.Item>
-            <Form.Item label="Weight (grams)" className="mb-2">
+            <Form.Item label="Weight (kg)" className="mb-2">
               <InputNumber
                 name="weight"
                 min={0}
@@ -166,7 +169,7 @@ const KoiAdd = () => {
                 className="w-full"
               />
             </Form.Item>
-            <Form.Item label="Length (centimeters)" className="mb-2">
+            <Form.Item label="Length (cm)" className="mb-2">
               <InputNumber
                 name="length"
                 min={0}
@@ -178,8 +181,22 @@ const KoiAdd = () => {
             <Form.Item label="Date of Birth" className="mb-2">
               <DatePicker
                 name="dateOfBirth"
-                value={formik.values.dateOfBirth ? dayjs(formik.values.dateOfBirth) : null}
-                onChange={(date, dateString) => formik.setFieldValue("dateOfBirth", dateString)}
+                value={formik.values.dateOfBirth}
+                onChange={(date) => {
+                  formik.setFieldValue("dateOfBirth", date);
+                }}
+                className="w-full"
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
+              />
+            </Form.Item>
+            <Form.Item label="Date" className="mb-2">
+              <DatePicker
+                name="date"
+                value={formik.values.date}
+                onChange={(date) => {
+                  formik.setFieldValue("date", date || dayjs());
+                  setCurrentDay(date || dayjs());
+                }}
                 className="w-full"
                 disabledDate={(current) => current && current > dayjs().endOf('day')}
               />

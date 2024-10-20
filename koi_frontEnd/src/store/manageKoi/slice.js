@@ -18,6 +18,16 @@ const manageKoiSlice = createSlice({
     addKoi: (state, action) => {
       state.kois.push(action.payload);
     },
+    addGrowth: (state, action) => {
+      const { id, growthData } = action.payload;
+      const koiIndex = state.kois.findIndex(koi => koi.id === id);
+      if (koiIndex !== -1) {
+        if (!state.kois[koiIndex].growthHistory) {
+          state.kois[koiIndex].growthHistory = [];
+        }
+        state.kois[koiIndex].growthHistory.push(growthData);
+      }
+    },
   },
 });
 

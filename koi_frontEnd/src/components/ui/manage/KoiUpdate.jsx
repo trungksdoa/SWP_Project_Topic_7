@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Select, DatePicker, Modal  } from "antd";
+import { Button, Form, Input, InputNumber, Select, DatePicker, Modal } from "antd";
 import { toast } from "react-toastify";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
@@ -10,9 +10,14 @@ import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import { manageKoiActions } from "../../../store/manageKoi/slice";
 import dayjs from "dayjs";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
+import { useGetGrowth } from "../../../hooks/koi/useGetGrowth";
+import { useAddGrowth } from "../../../hooks/koi/useAddGrowth";
+import { useQueryClient } from '@tanstack/react-query';
+import KoiGrowthChart from './Chart';
 
 const KoiUpdate = () => {
   const { id } = useParams();
+  
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,10 +28,16 @@ const KoiUpdate = () => {
   const { data: lstPond } = useGetAllPond(userId);
   const updateKoiMutation = useUpdateKoi();
   const deleteKoiMutation = useDeleteKoi();
+  const addGrowthMutation = useAddGrowth();
   const [isDeleting, setIsDeleting] = useState(false);
   const [koiAge, setKoiAge] = useState(null);
   const [showPondInfo, setShowPondInfo] = useState(false);
   const [selectedPondInfo, setSelectedPondInfo] = useState(null);
+  const [currentDay, setCurrentDay] = useState(dayjs());
+  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
+  const { data: growthData, refetch: refetchGrowthData, isLoading, isError, error } = useGetGrowth(id);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const koi = location.state?.koi;
 
@@ -37,9 +48,14 @@ const KoiUpdate = () => {
       setImgSrc(koi.imageUrl);
       setSelectedPond(koi.pondId);
       calculateAge(koi.dateOfBirth);
+      setCurrentDay(koi.date ? dayjs(koi.date) : dayjs());
     }
     refetch();
   }, [koi, refetch]);
+
+  useEffect(() => {
+    console.log("Growth data in component:", growthData);
+  }, [growthData]);
 
   const calculateAge = (birthDate) => {
     if (birthDate) {
@@ -50,6 +66,20 @@ const KoiUpdate = () => {
     } else {
       setKoiAge(null);
     }
+  };
+
+  const handleViewChart = async () => {
+    try {
+      await refetchGrowthData();
+      setIsModalVisible(true);
+    } catch (error) {
+      console.error("Error refetching growth data:", error);
+      toast.error("Failed to fetch growth data");
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
   };
 
   const formatAge = (ageInDays) => {
@@ -70,7 +100,7 @@ const KoiUpdate = () => {
     let file = e.target.files?.[0];
     if (
       file &&
-      ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"].includes(file.type)
+      ["image/jpeg", "image/jpg", "image/pn g", "image/gif", "image/webp"].includes(file.type)
     ) {
       let reader = new FileReader();
       reader.readAsDataURL(file);
@@ -92,6 +122,7 @@ const KoiUpdate = () => {
       pondId: koi?.pondId || null,
       dateOfBirth: koi?.dateOfBirth ? dayjs(koi.dateOfBirth) : null,
       image: null,
+      date: koi?.date ? dayjs(koi.date) : dayjs(),
     },
     onSubmit: (values) => {
       const formData = new FormData();
@@ -105,18 +136,51 @@ const KoiUpdate = () => {
         pondId: parseInt(values.pondId) || null,
         dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
         userId: userId,
+        date: values.date ? values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
       };
       formData.append("fish", JSON.stringify(updatedKoi));
       if (values.image) {
         formData.append("image", values.image);
       }
+
+      // Update Koi
       updateKoiMutation.mutate(
         { id: id, payload: formData },
         {
           onSuccess: (updatedKoi) => {
             dispatch(manageKoiActions.updateKoi(updatedKoi));
             toast.success("Koi updated successfully");
-            refetch();
+
+            // Add Growth data
+            const growthData = {
+              fish: {
+                name: values.name || "",
+                variety: values.variety || "",
+                sex: values.sex === "true",
+                purchasePrice: parseFloat(values.purchasePrice) || 0,
+                weight: parseFloat(values.weight) || 0,
+                length: parseFloat(values.length) || 0,
+                pondId: parseInt(values.pondId) || null,
+                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+                userId: userId,
+                date: values.date ? values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+              }
+            };
+
+            addGrowthMutation.mutate(
+              { id, payload: growthData },
+              {
+                onSuccess: (addedGrowthData) => {
+                  dispatch(manageKoiActions.addGrowth({ id, growthData: addedGrowthData }));
+                  toast.success("Growth history added successfully");
+                  refetch();
+                },
+                onError: (error) => {
+                  console.error("Error adding growth history:", error);
+                  toast.error(`Error adding growth history: ${error.message}`);
+                },
+              }
+            );
           },
           onError: (error) => {
             console.error("Error updating koi:", error);
@@ -169,6 +233,35 @@ const KoiUpdate = () => {
     }
   };
 
+  const handleAddGrowthHistory = () => {
+    const values = form.getFieldsValue(['weight', 'length', 'date']);
+    
+    if (!values.weight || !values.length || !values.date) {
+      toast.error('Please fill in weight, length, and date fields');
+      return;
+    }
+
+    const payload = {
+      weight: values.weight,
+      length: values.length,
+      date: values.date.format('YYYY-MM-DD'),
+    };
+
+    addGrowthHistoryMutation(
+      { id, payload },
+      {
+        onSuccess: () => {
+          dispatch(manageKoiActions.addGrowthHistory(payload));
+          toast.success("Growth history entry added successfully");
+          refetchGrowthHistory();
+        },
+        onError: (error) => {
+          toast.error(`Error adding growth history: ${error.message}`);
+        }
+      }
+    );
+  };
+
   return (
     <div>
       <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
@@ -194,6 +287,7 @@ const KoiUpdate = () => {
                 name="name"
                 value={formik.values.name}  
                 onChange={formik.handleChange}
+                
                 className="w-full"
               />
             </Form.Item>
@@ -225,7 +319,7 @@ const KoiUpdate = () => {
                 className="w-full"
               />
             </Form.Item>
-            <Form.Item label="Weight (grams)" className="mb-2">
+            <Form.Item label="Weight (kg)" className="mb-2">
               <InputNumber
                 name="weight"
                 min={0}
@@ -234,7 +328,7 @@ const KoiUpdate = () => {
                 className="w-full"
               />
             </Form.Item>
-            <Form.Item label="Length (centimeters)" className="mb-2">
+            <Form.Item label="Length (cm)" className="mb-2">
               <InputNumber
                 name="length"
                 min={0}
@@ -255,6 +349,18 @@ const KoiUpdate = () => {
                 disabledDate={(current) => current && current > dayjs().endOf('day')}
               />
             </Form.Item>
+            <Form.Item label="Date" className="mb-2">
+              <DatePicker
+                name="date"
+                value={formik.values.date}
+                onChange={(date) => {
+                  formik.setFieldValue("date", date || dayjs());
+                  setCurrentDay(date || dayjs());
+                }}
+                className="w-full"
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
+              />
+            </Form.Item>
             <div className="mb-2">
               Age: {formatAge(koiAge)}
             </div>
@@ -265,6 +371,7 @@ const KoiUpdate = () => {
                 onChange={handleChangeFile}
               />
             </Form.Item>
+            
           </div>
         </div>
         <Form.Item className="flex justify-center">
@@ -283,12 +390,18 @@ const KoiUpdate = () => {
           >
             Delete Koi
           </Button>
+          <Button
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold ml-2 text-xl"
+            onClick={handleViewChart}
+          >
+            View Chart
+          </Button>
         </Form.Item>
         <div className="items-center space-x-4 mb-4 ml-8">
           <div className="flex items-center space-x-4 mb-4 ml-8 font-bold text-xl">
             Pond
           </div>
-          <div className="flex items-center space-x-4 mb-4 ml-8 overflow-x-auto">
+          <div className="flex items-center space-x-4 mb-8 ml-8 overflow-x-auto">
             {lstPond?.map((pond) => (
               <div
                 key={pond.id}
@@ -311,6 +424,56 @@ const KoiUpdate = () => {
         </div>
       </Form>
 
+      <KoiGrowthChart
+        isVisible={isModalVisible}
+        onClose={handleModalClose}
+        growthData={growthData}
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        koiAge={koiAge} // Add this line
+      />
+      
+      {/* <Modal
+        title="Koi Growth Data"
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        width={800}
+      >
+        {isLoading && <p>Loading growth data...</p>}
+        {isError && <p>Error loading growth data: {error?.message}</p>}
+        {!isLoading && !isError && (
+          <div>
+            {growthData && growthData.length > 0 ? (
+              <table className="min-w-full bg-white">
+                <thead>
+                  <tr>
+                    <th className="py-2 px-4 border-b">Date</th>
+                    <th className="py-2 px-4 border-b">Weight (g)</th>
+                    <th className="py-2 px-4 border-b">Length (cm)</th>
+                    <th className="py-2 px-4 border-b">Age (months)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {growthData.map((entry, index) => (
+                    <tr key={index}>
+                      <td className="py-2 px-4 border-b">{entry.date}</td>
+                      <td className="py-2 px-4 border-b">{entry.weight}</td>
+                      <td className="py-2 px-4 border-b">{entry.length}</td>
+                      <td className="py-2 px-4 border-b">{entry.ageMonthHis}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No growth data available for this koi.</p>
+            )}
+          </div>
+        )}
+        
+      </Modal> */}
+          
       <Modal
         title="Pond Information"
         visible={showPondInfo}
@@ -342,6 +505,9 @@ const KoiUpdate = () => {
           </div>
         )}
       </Modal>
+
+      
+
     </div>
   );
 };

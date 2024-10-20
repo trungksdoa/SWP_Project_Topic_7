@@ -1,17 +1,17 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Controller } from "react-hook-form";
-import { Input, Button } from "antd";
+import { Input, Button, message, Radio } from "antd";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { manageUserActionThunks } from "../../../store/manageUser";
-import { Radio } from "antd";
+import { useNavigate } from "react-router-dom";
 
-const RegisterForm = ({ showModalLogin }) => {
+const RegisterForm = ({ showModalLogin, onRegisterSuccess }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const { isFetchingRegister } = useSelector((state) => state.manageUser);
 
   const handleShowModalLogin = () => {
@@ -37,12 +37,19 @@ const RegisterForm = ({ showModalLogin }) => {
 
     dispatch(manageUserActionThunks.registerThunk(formattedData))
       .unwrap()
-      .then((res) => {
-        toast.success(res.data.message);
-        showModalLogin();
+      .then(() => {
+        toast.success("Account created successfully. Please check your email for the log in link.");
+        if (typeof onRegisterSuccess === 'function') {
+          onRegisterSuccess(); // Close the popup on successful registration
+        }
       })
       .catch((err) => {
-        console.log(err);
+        if (err.response && err.response.status === 409) {
+          toast.warning("User already exists. Please check your email or try logging in.");
+        } else {
+          toast.error('Registration failed. Please try again.');
+        }
+        console.error(err);
       });
   };
 
@@ -175,7 +182,7 @@ const RegisterForm = ({ showModalLogin }) => {
               }}
             >
               <Radio className="mr-[100px]" value="ROLE_MEMBER">Farmer</Radio>
-              <Radio value="ROLE_SHOP">Shop</Radio>
+              <Radio value="ROLE_SHOP">Blogger</Radio>
             </Radio.Group>
           )}
           rules={{ required: "Please select a role" }}

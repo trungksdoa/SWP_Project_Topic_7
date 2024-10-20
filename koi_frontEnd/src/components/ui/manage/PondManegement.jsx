@@ -367,7 +367,7 @@ const PondManagement = () => {
         items={[{ name: "Home", path: "/" }, { name: "Pond Management" }]}
       />
         <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
-          <strong>Pond Management</strong>
+          <strong>My Pond</strong>
         </div>
       {/* Add Koi message */}
       {lstPond?.length > 0 && (!lstKoi || lstKoi.length === 0) && (
