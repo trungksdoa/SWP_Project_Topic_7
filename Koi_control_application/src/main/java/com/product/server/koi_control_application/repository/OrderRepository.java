@@ -1,6 +1,8 @@
 package com.product.server.koi_control_application.repository;
 
 import com.product.server.koi_control_application.model.Orders;
+import com.product.server.koi_control_application.pojo.OrderReport;
+import com.product.server.koi_control_application.pojo.report.BarChart;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,5 +42,9 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
     int updateSimulatorOrder(@Param("newStatus") String newStatus,
                              @Param("currentStatus") String currentStatus);
 
-
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(o.status, COUNT(o)) " +
+            "FROM Orders o " +
+            "WHERE o.status IN ('COMPLETED', 'CANCELLED') " +
+            "GROUP BY o.status")
+    List<BarChart> getOrdersStatus();
 }

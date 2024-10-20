@@ -4,12 +4,16 @@ package com.product.server.koi_control_application.controller;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/manage/api/users")
@@ -69,7 +73,7 @@ public class ManageUserController {
 
     @PostMapping("/{userId}/change-role")
     @Operation(summary = "Change user role", description = "Changes the role of a user account")
-    public ResponseEntity<BaseResponse> changeUserRole(@PathVariable int userId, @RequestBody @Valid ChangeRoleDTO changeRoleDTO) {
+    public ResponseEntity<BaseResponse> changeUserRole(@PathVariable int userId, @RequestBody @Valid Map<String, Object> changeRoleDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 }
