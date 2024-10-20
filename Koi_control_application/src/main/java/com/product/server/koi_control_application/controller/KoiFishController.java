@@ -14,6 +14,7 @@ import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/koifishs")
@@ -277,4 +279,33 @@ public class KoiFishController {
     }
 
 
+    @PostMapping("/{koiFishId}/medical-record")
+    @Operation(summary = "Add medical record", description = "Adds a new medical record for a specific koi fish")
+    public ResponseEntity<BaseResponse> addMedicalRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object>  medicalRecordDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/{koiFishId}/medical-history")
+    @Operation(summary = "Get medical history", description = "Retrieves the medical history for a specific koi fish")
+    public ResponseEntity<BaseResponse> getMedicalHistory(@PathVariable int koiFishId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{koiFishId}/breeding-record")
+    @Operation(summary = "Add breeding record", description = "Adds a new breeding record for a specific koi fish")
+    public ResponseEntity<BaseResponse> addBreedingRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object> breedingRecordDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/{koiFishId}/breeding-history")
+    @Operation(summary = "Get breeding history", description = "Retrieves the breeding history for a specific koi fish")
+    public ResponseEntity<BaseResponse> getBreedingHistory(@PathVariable int koiFishId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/batch-update")
+    @Operation(summary = "Batch update koi fish", description = "Updates multiple koi fish records in a single request")
+    public ResponseEntity<BaseResponse> batchUpdateKoiFish(@RequestBody @Valid List<KoiFishUpdateRequest> updateRequests) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
 }
