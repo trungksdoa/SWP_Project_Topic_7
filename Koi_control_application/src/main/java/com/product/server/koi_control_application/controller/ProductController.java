@@ -53,4 +53,8 @@ public class ProductController {
     public ResponseEntity<BaseResponse> getProductList() {
         return ResponseUtil.createSuccessResponse(productService.getAllProducts(), "Products retrieved successfully");
     }
+
+    //Create full search api
+
+
 }

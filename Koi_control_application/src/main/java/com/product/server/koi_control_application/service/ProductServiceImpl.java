@@ -227,6 +227,11 @@ public class ProductServiceImpl implements IProductService {
                 .collect(Collectors.toMap(Product::getId, Product::getStock));
     }
 
+    @Override
+    public List<Product> searchProductByName(String name) {
+        return List.of();
+    }
+
     /*
      * Checks if there is enough stock for a product and updates the stock if possible.
      *
