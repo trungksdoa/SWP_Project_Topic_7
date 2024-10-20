@@ -45,12 +45,11 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     boolean existsById(int id);
 
-    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(u.createdAt, COUNT(u))" +
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(FUNCTION('DATE', u.createdAt), COUNT(u))" +
             "FROM Users u " +
             "WHERE u.createdAt >= :startDate AND u.createdAt < :endDate " +
             "GROUP BY FUNCTION('DATE', u.createdAt) " +
             "ORDER BY FUNCTION('DATE', u.createdAt)")
     List<BarChart> getRecentUserGrowthData(LocalDateTime startDate, LocalDateTime endDate);
-
 
 }

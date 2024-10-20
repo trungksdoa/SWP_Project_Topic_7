@@ -6,10 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +26,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("select p from Product p where p.slug = ?1")
     Optional<Product> findBySlug(String slug);
 
-    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(p.name, COUNT(oi.productId)) " +
-            "FROM Product p " +
-            "LEFT JOIN OrderItems oi ON p.id = oi.productId.id " +
-            "GROUP BY p.id, p.name " +
-            "ORDER BY COUNT(oi.productId) DESC")
-    List<BarChart> getTopSellingProducts(int limit);
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(p.name,COUNT(oi.productId.id)) " +
+    "FROM Product p " +
+    "LEFT JOIN OrderItems oi ON p.id = oi.productId.id " +
+    "WHERE oi.createdAt >= :startDate AND oi.createdAt <= :endDate " +
+    "GROUP BY p.id, p.name " +
+    "ORDER BY COUNT(oi.productId.id) DESC " +
+    "LIMIT :limit")
+    List<BarChart> getTopSellingProductsByDateRange(@Param("limit") int limit, 
+                                        @Param("startDate") LocalDateTime startDate, 
+                                        @Param("endDate") LocalDateTime endDate);
 }

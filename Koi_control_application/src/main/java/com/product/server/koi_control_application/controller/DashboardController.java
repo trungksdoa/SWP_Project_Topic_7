@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/admin/dashboard")
@@ -24,30 +25,37 @@ import java.time.LocalDate;
 public class DashboardController {
 
     private final IDashBoardService dashboardService;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
     @GetMapping("/user-growth")
     @Operation(summary = "Get user growth data", description = "Retrieves data for user growth chart")
     public ResponseEntity<BaseResponse> getUserGrowth(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        
-        // The x-axis would represent the dates, and the y-axis would show the number of new user registrations for each day.
-        return ResponseUtil.createSuccessResponse(dashboardService.getUserGrowthData(startDate, endDate), "User growth data retrieved successfully");
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        LocalDate parsedStartDate = LocalDate.parse(startDate, DATE_FORMATTER);
+        LocalDate parsedEndDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        return ResponseUtil.createSuccessResponse(dashboardService.getUserGrowthData(parsedStartDate, parsedEndDate), "User growth data retrieved successfully");
     }
 
     //Chart type: Pie Chart or Donut Chart
     @GetMapping("/order-status")
     @Operation(summary = "Get order status breakdown", description = "Retrieves data for order status breakdown chart")
-    public ResponseEntity<BaseResponse> getOrderStatusBreakdown() {
-        return ResponseUtil.createSuccessResponse(dashboardService.getOrderStatusBreakdown(), "Order status breakdown retrieved successfully");
+    public ResponseEntity<BaseResponse> getOrderStatusBreakdown(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        LocalDate parsedStartDate = LocalDate.parse(startDate, DATE_FORMATTER);
+        LocalDate parsedEndDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        return ResponseUtil.createSuccessResponse(dashboardService.getOrderStatusBreakdown(parsedStartDate, parsedEndDate), "Order status breakdown retrieved successfully");
     }
-
-    //Chart type: Bar Chart
 
     @GetMapping("/top-selling-products")
     @Operation(summary = "Get top-selling products", description = "Retrieves data for top-selling products")
     public ResponseEntity<BaseResponse> getTopSellingProducts(
-            @RequestParam(defaultValue = "10") int limit) {
-        return ResponseUtil.createSuccessResponse(dashboardService.getTopSellingProducts(limit), "Top-selling products retrieved successfully");
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        LocalDate parsedStartDate = LocalDate.parse(startDate, DATE_FORMATTER);
+        LocalDate parsedEndDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        return ResponseUtil.createSuccessResponse(dashboardService.getTopSellingProducts(limit, parsedStartDate, parsedEndDate), "Top-selling products retrieved successfully");
     }
 }

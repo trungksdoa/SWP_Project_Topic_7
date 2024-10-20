@@ -45,6 +45,7 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
     @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(o.status, COUNT(o)) " +
             "FROM Orders o " +
             "WHERE o.status IN ('COMPLETED', 'CANCELLED') " +
+            "AND o.createdAt >= :startDate AND o.createdAt <= :endDate " +
             "GROUP BY o.status")
-    List<BarChart> getOrdersStatus();
+    List<BarChart> getOrdersStatusByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

@@ -34,12 +34,18 @@ public class DashboardService  implements IDashBoardService {
     }
 
     @Override
-    public List<BarChart> getOrderStatusBreakdown() {
-        return orderRepository.getOrdersStatus();
+    public List<BarChart> getOrderStatusBreakdown(LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
+
+        return orderRepository.getOrdersStatusByDateRange(startDateTime, endDateTime);
     }
 
     @Override
-    public List<BarChart> getTopSellingProducts(int limit) {
-        return productRepository.getTopSellingProducts(limit);
+    public List<BarChart> getTopSellingProducts(int limit, LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
+
+        return productRepository.getTopSellingProductsByDateRange(limit, startDateTime, endDateTime);
     }
 }
