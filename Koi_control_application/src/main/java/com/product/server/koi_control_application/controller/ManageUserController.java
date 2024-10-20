@@ -39,4 +39,37 @@ public class ManageUserController {
     public ResponseEntity<BaseResponse> fetchAllUser(@RequestParam int page, @RequestParam int size) {
         return ResponseUtil.createSuccessResponse(userService.getUsers(page, size), "Access granted");
     }
+
+
+
+
+    @PostMapping("/{userId}/suspend")
+    @Operation(summary = "Suspend user", description = "Suspends a user account")
+    public ResponseEntity<BaseResponse> suspendUser(@PathVariable int userId) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{userId}/activate")
+    @Operation(summary = "Activate user", description = "Activates a suspended user account")
+    public ResponseEntity<BaseResponse> activateUser(@PathVariable int userId) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search users", description = "Searches for users based on various criteria")
+    public ResponseEntity<BaseResponse> searchUsers(@RequestParam String query, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @GetMapping("/statistics")
+    @Operation(summary = "Get user statistics", description = "Retrieves various statistics about user accounts")
+    public ResponseEntity<BaseResponse> getUserStatistics() {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/{userId}/change-role")
+    @Operation(summary = "Change user role", description = "Changes the role of a user account")
+    public ResponseEntity<BaseResponse> changeUserRole(@PathVariable int userId, @RequestBody @Valid ChangeRoleDTO changeRoleDTO) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
 }

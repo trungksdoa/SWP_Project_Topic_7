@@ -7,6 +7,7 @@ import com.product.server.koi_control_application.pojo.request.CartDTO;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,6 +31,36 @@ public class CartController {
     private final ICartService cartService;
     private final JwtTokenUtil jwtUtil;
 
+
+//    @PostMapping("/apply-coupon")
+//    @Operation(summary = "Apply coupon to cart", description = "Applies a coupon code to the user's cart")
+//    public ResponseEntity<BaseResponse> applyCoupon(@RequestBody @Valid CouponDTO couponDTO, HttpServletRequest request) {
+//        throw new UnsupportedOperationException("This method is not implemented yet");
+//    }
+
+//    @DeleteMapping("/remove-coupon")
+//    @Operation(summary = "Remove coupon from cart", description = "Removes the applied coupon from the user's cart")
+//    public ResponseEntity<BaseResponse> removeCoupon(HttpServletRequest request) {
+//        throw new UnsupportedOperationException("This method is not implemented yet");
+//    }
+
+    @GetMapping("/summary")
+    @Operation(summary = "Get cart summary", description = "Retrieves a summary of the user's cart including total price, discounts, and taxes")
+    public ResponseEntity<BaseResponse> getCartSummary(HttpServletRequest request) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/save-for-later/{cartItemId}")
+    @Operation(summary = "Save cart item for later", description = "Moves a cart item to the 'Save for Later' list")
+    public ResponseEntity<BaseResponse> saveForLater(@PathVariable int cartItemId, HttpServletRequest request) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
+
+    @PostMapping("/move-to-cart/{savedItemId}")
+    @Operation(summary = "Move saved item to cart", description = "Moves a saved item back to the active cart")
+    public ResponseEntity<BaseResponse> moveToCart(@PathVariable int savedItemId, HttpServletRequest request) {
+        throw new UnsupportedOperationException("This method is not implemented yet");
+    }
 
     @PostMapping
     public ResponseEntity<BaseResponse> addToCart(@RequestBody @Valid Cart cart, HttpServletRequest request)  {
