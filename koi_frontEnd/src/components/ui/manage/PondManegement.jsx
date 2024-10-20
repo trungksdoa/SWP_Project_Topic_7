@@ -176,8 +176,9 @@ const PondManagement = () => {
                 }}
                 type="primary"
                 danger
+                loading={isDeleting}
               >
-                Delete fish and pond
+                {isDeleting ? 'Deleting...' : 'Delete fish and pond'}
               </Button>
               <Button
                 className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-blue-500 text-white rounded-full font-bold"

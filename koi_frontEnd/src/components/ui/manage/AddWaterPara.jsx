@@ -75,50 +75,50 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
   });
 
   return (
-    <div className="mt-[8px] w-full">
+    <div className="mt-[8px] w-full z-50 justify-center items-center">
       <Form
         layout="vertical"
         style={{ width: "100%" }}
         onFinish={formik.handleSubmit}
       >
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-2">
           <div>
-            <Form.Item label="Nitrite NO2 (mg/L)">
+            <Form.Item label="Nitrite NO2 (mg/L)" className="mb-2">
               <Input
                 name="nitriteNO2"
                 value={formik.values.nitriteNO2}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Nitrate NO3 (mg/L)">
+            <Form.Item label="Nitrate NO3 (mg/L)" className="mb-2">
               <Input
                 name="nitrateNO3"
                 value={formik.values.nitrateNO3}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Ammonium NH4 (mg/L)">
+            <Form.Item label="Ammonium NH4 (mg/L)" className="mb-2">
               <Input
                 name="ammoniumNH4"
                 value={formik.values.ammoniumNH4}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Hardness GH (ppm)">
+            <Form.Item label="Hardness GH (ppm)" className="mb-2">
               <Input
                 name="hardnessGH"
                 value={formik.values.hardnessGH}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Salt (ppm)">
+            <Form.Item label="Salt (ppm)" className="mb-2">
               <Input
                 name="salt"
                 value={formik.values.salt}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Temperature (°C)">
+            <Form.Item label="Temperature (°C)" className="mb-2">
               <Input
                 name="temperature"
                 value={formik.values.temperature}
@@ -127,42 +127,43 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
             </Form.Item>
           </div>
           <div>
-            <Form.Item label="Carbonate Hardness KH (ppm)">
+            <Form.Item label="Carbonate Hardness KH (ppm)" className="mb-2">
               <Input
                 name="carbonateHardnessKH"
                 value={formik.values.carbonateHardnessKH}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="CO2 (ppm)">
+            <Form.Item label="CO2 (ppm)" className="mb-2">
               <Input
                 name="co2"
                 value={formik.values.co2}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Total Chlorines (ppm)">
+            <Form.Item label="Total Chlorines (ppm)" className="mb-2">
               <Input
                 name="totalChlorines"
                 value={formik.values.totalChlorines}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="Last Cleaned At">
+            <Form.Item label="Last Cleaned At" className="mb-2">
               <DatePicker
                 name="lastCleanedAt"
                 value={formik.values.lastCleanedAt ? dayjs(formik.values.lastCleanedAt) : null}
                 onChange={handleChangeDatePicker}
+                style={{ width: '100%' }}
               />
             </Form.Item>
-            <Form.Item label="Cleaned Day Count">
+            <Form.Item label="Cleaned Day Count" className="mb-2">
               <Input
                 name="cleanedDayCount"
                 value={formik.values.cleanedDayCount}
                 onChange={formik.handleChange}
               />
             </Form.Item>
-            <Form.Item label="pH">
+            <Form.Item label="pH" className="mb-2">
               <Input
                 name="ph"
                 value={formik.values.ph}
@@ -171,15 +172,17 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
             </Form.Item>
           </div>
         </div>
-        <Form.Item>
-          <Button
-            className="bg-black text-white hover:!text-white hover:!bg-black"
+        <div className="flex justify-center mt-4">
+          <Form.Item>
+            <Button
+            className="bg-black text-white font-bold text-lg hover:!text-white hover:!bg-black"
             htmlType="submit"
             loading={mutation.isPending}
           >
             Add New
-          </Button>
-        </Form.Item>
+            </Button>
+          </Form.Item>
+        </div>
       </Form>
     </div>
   );

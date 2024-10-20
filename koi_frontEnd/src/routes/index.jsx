@@ -1,4 +1,4 @@
-import { useRoutes } from "react-router-dom";
+import { useRoutes, Navigate } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import MainLayout from "../components/layouts/MainLayout";
 import { PATH } from "../constant";
@@ -43,6 +43,7 @@ import KoiAdd from "../components/ui/manage/KoiAdd";
 import KoiUpdate from "../components/ui/manage/KoiUpdate";
 import KoiMove from "../components/ui/manage/KoiMove";
 import Endpoint from "../components/ui/Endpoint";
+import FoodCalculator from "../components/ui/manage/FoodCalculator";
 
 const router = [
   {
@@ -135,8 +136,10 @@ const router = [
         path: PATH.WATER_PARAMETER,
         element: <WaterParameterPage />,
       },
-      
-       
+      {
+        path: PATH.FOOD_CALCULATOR,
+        element: <FoodCalculator />,
+      },
       {
         path: PATH.PACKAGES,
         element: <PackagesPage />,
@@ -219,5 +222,11 @@ const router = [
       },
     ],
   },
+  // Add this catch-all route at the end of the router array
+  {
+    path: "*",
+    element: <Navigate to="/endpoint" replace />
+  }
 ];
+
 export const Router = () => useRoutes(router);

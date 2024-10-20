@@ -289,11 +289,11 @@ const WaterParameter = () => {
           `Total Chlorines: must be in the range from ${waterStandard.chlorineMin}g to ${waterStandard.chlorineMax}g`
         );
       }
-      if (waterParameters.amountFed != waterStandard.amountFedStandard) {
-        errors.push(
-          `Amount: Fed must be equal to ${waterStandard.amountFedStandard}g`
-        );
-      }
+      // if (waterParameters.amountFed != waterStandard.amountFedStandard) {
+      //   errors.push(
+      //     `Amount: Fed must be equal to ${waterStandard.amountFedStandard}g`
+      //   );
+      // }
       setValidationErrors(errors);
     }
   }, [waterParameters, waterStandard]);
@@ -319,8 +319,8 @@ const WaterParameter = () => {
               onClick={() => handleClick(pond)}
               src={pond.imageUrl}
               alt={pond.name}
-              className="w-[100%] max-h-[200px] mx-auto object-cover cursor-pointer"
-            />
+              className="w-full h-48 object-cover cursor-pointer" // Updated this line
+              />
             <h3
               className="text-lg mt-2 cursor-pointer"
               onClick={() => handleClick(pond)}
@@ -344,13 +344,13 @@ const WaterParameter = () => {
         ) : !waterParameters ||
           waterParameters === null ||
           Object.keys(waterParameters).length === 0 ? (
-          <div className="flex">
+          <div className="flex w-80%">
             {/* Left column: Image */}
-            <div className="w-1/2 pr-4 flex items-center justify-center">
+            <div className="w-1/2 pr-4 flex items-start justify-center">
               <img
                 src={selectedPond?.imageUrl}
                 alt={selectedPond?.name}
-                className="w-3/4 h-3/4 object-cover rounded-[8px] shadow-lg"
+                className="w-80 h-80 object-cover rounded-[8px] shadow-lg"
               />
             </div>
             
@@ -376,7 +376,7 @@ const WaterParameter = () => {
         ) : (
           <div className="">
             <div className="flex justify-around">
-              <div className="mr-6 w-1/4"> {/* Reduced width to 25% */}
+              <div className="mr-6 w-1/4 items-start"> {/* Reduced width to 25% */}
                 <img
                   src={selectedPond.imageUrl}
                   alt={selectedPond.name}
@@ -384,289 +384,140 @@ const WaterParameter = () => {
                 />
               </div>
               <Form
-                layout="vertical" // Changed layout to vertical for better readability
-                style={{ width: "70%" }} // Adjusted width to 70%
+                layout="vertical"
+                style={{ width: "60%" }}
                 onFinish={formik.handleSubmit}
               >
-                <Form.Item className="text-bold" label="Edit Parameter">
-                  <Checkbox onChange={handleEditToggle}></Checkbox>
-                </Form.Item>
+                <div className="flex items-center mb-2">
+                  <h3 className="text-lg font-semibold mr-4">Edit Water Parameter</h3>
+                  <Form.Item className="mb-0">
+                    <Checkbox onChange={handleEditToggle}></Checkbox>
+                  </Form.Item>
+                </div>
 
-                {/* Form Items */}
-                <Form.Item
-                  label="Nitrite NO2"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="nitriteNO2"
-                      value={formik.values.nitriteNO2 || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.nitriteNO2 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.nitriteNO2 ? "mg/L" : "mg/L"}
-                    </span>
+                {isEditEnabled && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Form.Item label="Nitrite NO2 (mg/L)" className="mb-2">
+                        <Input
+                          name="nitriteNO2"
+                          value={formik.values.nitriteNO2 || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Nitrate NO3 (mg/L)" className="mb-2">
+                        <Input
+                          name="nitrateNO3"
+                          value={formik.values.nitrateNO3 || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Ammonium NH4 (mg/L)" className="mb-2">
+                        <Input
+                          name="ammoniumNH4"
+                          value={formik.values.ammoniumNH4 || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Hardness GH (ppm)" className="mb-2">
+                        <Input
+                          name="hardnessGH"
+                          value={formik.values.hardnessGH || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Salt (ppm)" className="mb-2">
+                        <Input
+                          name="salt"
+                          value={formik.values.salt || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Temperature (°C)" className="mb-2">
+                        <Input
+                          name="temperature"
+                          value={formik.values.temperature || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <Form.Item label="Carbonate Hardness KH (ppm)" className="mb-2">
+                        <Input
+                          name="carbonateHardnessKH"
+                          value={formik.values.carbonateHardnessKH || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="CO2 (ppm)" className="mb-2">
+                        <Input
+                          name="co2"
+                          value={formik.values.co2 || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Total Chlorines (ppm)" className="mb-2">
+                        <Input
+                          name="totalChlorines"
+                          value={formik.values.totalChlorines || ""}
+                          onChange={formik.handleChange}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Last Cleaned At" className="mb-2">
+                        <DatePicker
+                          name="lastCleanedAt"
+                          value={formik.values.lastCleanedAt ? dayjs(formik.values.lastCleanedAt) : null}
+                          onChange={(date) => formik.setFieldValue("lastCleanedAt", date ? date.format("YYYY-MM-DD") : null)}
+                          style={{ width: '75%' }}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        />
+                      </Form.Item>
+                      <Form.Item label="Cleaned Day Count" className="mb-2">
+                        <Input
+                          name="cleanedDayCount"
+                          value={formik.values.cleanedDayCount || ""}
+                          onChange={formik.handleChange}
+                          style={{ width: '75%' }}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        />
+                      </Form.Item>
+                      <Form.Item label="pH" className="mb-2">
+                        <Input
+                          name="ph"
+                          value={formik.values.ph || ""}
+                          onChange={formik.handleChange}
+                          style={{ width: '75%' }}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        />
+                      </Form.Item>
+                    </div>
                   </div>
-                </Form.Item>
-                <Form.Item
-                  label="Nitrite NO2"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="nitriteNO2"
-                      value={formik.values.nitriteNO2 || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.nitriteNO2 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.nitriteNO2 ? "mg/L" : "mg/L"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Nitrate NO3"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="nitrateNO3"
-                      value={formik.values.nitrateNO3 || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.nitrateNO3 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.nitrateNO3 ? "mg/L" : "mg/L"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Ammonium NH4"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="ammoniumNH4"
-                      value={formik.values.ammoniumNH4 || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.ammoniumNH4 ? "mg/L" : "mg/L"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.ammoniumNH4 ? "mg/L" : "mg/L"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Hardness GH"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="hardnessGH"
-                      value={formik.values.hardnessGH || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.hardnessGH ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.hardnessGH ? "ppm" : "ppm"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Salt"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="salt"
-                      value={formik.values.salt || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.salt ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.salt ? "ppm" : "ppm"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Temperature"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="temperature"
-                      value={formik.values.temperature || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.temperature ? "°C" : "°C"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.temperature ? "°C" : "°C"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Carbonate Hardness KH"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="carbonateHardnessKH"
-                      value={formik.values.carbonateHardnessKH || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={
-                        formik.values.carbonateHardnessKH ? "ppm" : "ppm"
-                      } // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.carbonateHardnessKH ? "ppm" : "ppm"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="CO2"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="co2"
-                      value={formik.values.co2 || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.co2 ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.co2 ? "ppm" : "ppm"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Total Chlorines"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="totalChlorines"
-                      value={formik.values.totalChlorines || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.totalChlorines ? "ppm" : "ppm"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.totalChlorines ? "ppm" : "ppm"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Amount Fed"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="amountFed"
-                      value={formik.values.amountFed || ""} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={formik.values.amountFed ? "kg" : "kg"} // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.amountFed ? "g" : "g"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="Last Cleaned At"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <Input
-                    name="lastCleanedAt"
-                    value={formik.values.lastCleanedAt}
-                    onChange={formik.handleChange}
-                    disabled
-                    className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                  />
-                </Form.Item>
-                <Form.Item
-                  label="Cleaned Day Count"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <div className="flex items-center">
-                    <Input
-                      name="cleanedDayCount"
-                      value={formik.values.cleanedDayCount || 0} // Đảm bảo giá trị là chuỗi
-                      onChange={formik.handleChange}
-                      disabled={!isEditEnabled}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                      placeholder={
-                        formik.values.cleanedDayCount ? "days" : "days"
-                      } // Hiển thị placeholder nếu không có giá trị
-                    />
-                    <span className="ml-2 text-gray-500">
-                      {formik.values.cleanedDayCount ? "days" : "days"}
-                    </span>
-                  </div>
-                </Form.Item>
-                <Form.Item
-                  label="pH"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <Input
-                    name="ph"
-                    value={formik.values.ph}
-                    onChange={formik.handleChange}
-                    disabled={!isEditEnabled}
-                    className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                  />
-                </Form.Item>
-                <Form.Item
-                  label="Last Cleaned"
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <Checkbox
-                    name="lastCleaned"
-                    checked={formik.values.lastCleaned}
-                    onChange={(e) =>
-                      formik.setFieldValue("lastCleaned", e.target.checked)
-                    }
-                    disabled={!isEditEnabled}
-                  >
-                    Mark as last cleaned
-                  </Checkbox>
-                </Form.Item>
-                <Form.Item
-                  style={{ display: isEditEnabled ? "block" : "none" }}
-                >
-                  <Button
-                    className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200" // Updated button styling
-                    type="primary"
-                    disabled={!isEditEnabled}
-                    htmlType="submit"
-                    loading={mutation.isPending}
-                  >
-                    Update
-                  </Button>
-                </Form.Item>
+                )}
+
+                {isEditEnabled && (
+                  <Form.Item className="flex justify-center mt-4">
+                    <Button
+                      className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                      type="primary"
+                      htmlType="submit"
+                      loading={mutation.isPending}
+                    >
+                      Update
+                    </Button>
+                  </Form.Item>
+                )}
+
                 <Button
-                  className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200" // Updated button styling
+                  className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
                   onClick={handleShowParameters}
                 >
                   Show Parameters do not meet the standards.
@@ -698,6 +549,10 @@ const WaterParameter = () => {
                       <div ref={draggleRef}>{modal}</div>
                     </Draggable>
                   )}
+                  width="60%" // Increased from default (usually 520px) to 80% of screen width
+                  bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }} // Added to enable scrolling if content is too long
+                  centered // Add this prop to center the modal
+                  style={{ top: 20 }} // Add some top margin to prevent it from being flush against the top of the screen
                 >
                   <div
                     className="note-container"
@@ -833,14 +688,16 @@ const WaterParameter = () => {
                     <p>
                       You can check out products that can improve your pond at the store.
                     </p>
-                    <Button
-                      onClick={() => {
-                        window.open(PATH.STORE, "_blank"); // Mở tab mới
-                      }}
-                      className="mt-[15px] bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
-                    >
-                      Go To Store
-                    </Button>
+                    <div className="mt-4 flex justify-center"> {/* Added container with centering */}
+                      <Button
+                        onClick={() => {
+                          window.open(PATH.STORE, "_blank");
+                        }}
+                        className="bg-black text-white hover:bg-gray-800 transition-colors duration-200 px-6 py-2" // Added more padding
+                      >
+                        Go To Store
+                      </Button>
+                    </div>
                   </div>
                 </Modal>
               </Form>
@@ -854,21 +711,20 @@ const WaterParameter = () => {
         visible={isAddWaterParaModalVisible}
         onCancel={() => setIsAddWaterParaModalVisible(false)}
         footer={null}
-        width="80%"
+        width="60%" // Increased width for better responsiveness
+        bodyStyle={{ maxHeight: '80vh', overflowY: 'auto' }} // Added scrolling for tall content
+        centered // Centers the modal vertically
         className="custom-modal"
       >
-        <div className="flex">
-          {/* Left column: Image */}
-          <div className="w-1/2 pr-4 flex items-center justify-center">
+        <div className="flex flex-col md:flex-row items-start md:items-center">
+          <div className="w-full md:w-1/3 mb-4 md:mb-0 md:pr-4 items-start">
             <img
               src={selectedPond?.imageUrl}
               alt={selectedPond?.name}
-              className="w-3/4 h-3/4 object-cover rounded-[8px] shadow-lg"
+              className="w-full h-auto object-cover rounded-lg shadow-lg"
             />
           </div>
-          
-          {/* Right column: Add Water Parameter form */}
-          <div className="w-1/2">
+          <div className="w-full md:w-2/3">
             <AddWaterPara
               selectedPond={selectedPond}
               onSuccess={() => {
