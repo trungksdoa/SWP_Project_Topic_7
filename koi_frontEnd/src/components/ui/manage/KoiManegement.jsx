@@ -266,7 +266,7 @@ const KoiManegement = () => {
   return (
     <div className="min-h-[450px]">
       <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
-        <strong>Koi Management</strong>
+        <strong>My Koi</strong>
       </div>
       
       {lstPond?.length === 0 ? (

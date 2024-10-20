@@ -45,6 +45,7 @@
     "react-router-dom": "^6.26.2",
     "react-toastify": "^10.0.5",
     "react-world-flags": "^1.6.0",
+    "recharts": "^2.13.0",
     "redux": "^5.0.1",
     "styled-components": "^6.1.13",
     "tailwindcss": "^3.4.10",
