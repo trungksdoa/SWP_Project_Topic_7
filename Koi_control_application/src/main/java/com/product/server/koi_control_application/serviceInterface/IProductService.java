@@ -117,5 +117,11 @@ public interface IProductService {
 
      Map<Integer, Integer> getProductStocks(List<Integer> productIds) ;
 
-//     void disableOutOfStockProducts(List<CartProductDTO> cart) ;
+    /**
+     *
+     * @param name
+     * @return
+     */
+
+     List<Product> searchProductByName(String name);
 }
