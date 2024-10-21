@@ -81,10 +81,21 @@ public class JwtTokenUtil {
         return null;
     }
 
+
+
     protected Claims parseClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+
+    public void verifyTokenFromRequest(HttpServletRequest request){
+        String token = getTokenFromRequest(request);
+        if (token == null) {
+            throw new IllegalArgumentException("Token is invalid");
+        }
+        validateAccessToken(token);
     }
 }

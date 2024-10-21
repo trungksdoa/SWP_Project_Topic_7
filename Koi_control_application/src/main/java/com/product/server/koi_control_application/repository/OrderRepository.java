@@ -42,10 +42,19 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
     int updateSimulatorOrder(@Param("newStatus") String newStatus,
                              @Param("currentStatus") String currentStatus);
 
-    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(o.status, COUNT(o)) " +
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(o.status, COUNT(o.id), MAX(o.createdAt)) " +
             "FROM Orders o " +
             "WHERE o.status IN ('COMPLETED', 'CANCELLED') " +
             "AND o.createdAt >= :startDate AND o.createdAt <= :endDate " +
-            "GROUP BY o.status")
+            "GROUP BY o.status " +
+            "ORDER BY COUNT(o.id) DESC")
     List<BarChart> getOrdersStatusByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(DATE(o.createdAt), SUM(o.totalAmount), MAX(o.createdAt)) " +
+            "FROM Orders o " +
+            "WHERE o.status = 'COMPLETED' " +
+            "AND o.createdAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY DATE(o.createdAt) " +
+            "ORDER BY DATE(o.createdAt)")
+    List<BarChart> getTotalSalesByDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

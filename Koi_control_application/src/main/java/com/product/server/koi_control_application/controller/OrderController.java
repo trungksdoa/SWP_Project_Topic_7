@@ -38,7 +38,7 @@ import static com.product.server.koi_control_application.ultil.PaymentUtil.sendH
 @RequestMapping(BASE_ORDER)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+
 @Tag(name = "Order", description = "API for Order")
 public class OrderController {
     private final IOrderService orderService;
@@ -47,7 +47,7 @@ public class OrderController {
     private final ICategoryService categoryService;
     private final IPaymentService paymentService;
 
-    //    @PostMapping("/create-product-order")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @PostMapping(CREATE_ORDER)
     public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderRequestDTO req, HttpServletRequest request) throws Exception {
 
@@ -91,19 +91,21 @@ public class OrderController {
     }
 
 
-    //    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @GetMapping(GET_ORDER_BY_ID)
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
         return ResponseUtil.createSuccessResponse(order, "Order retrieved successfully");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<BaseResponse> getAllOrders() {
         List<Orders> orders = orderService.getAllOrders();
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     //    @GetMapping("/user/{userId}/")
     @GetMapping(GET_ORDER_BY_USER + '/')
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @RequestParam int page, @RequestParam int size) {
@@ -111,14 +113,14 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    //    @GetMapping("/user/{userId}/list")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @GetMapping(GET_ORDER_LIST_BY_USER)
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId) {
         List<Orders> orders = orderService.getOrdersByUser(userId);
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    //    @GetMapping("/status/{orderId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @GetMapping(GET_ORDER_STATUS)
     public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
         Orders order = orderService.getOrderById(orderId);
@@ -128,7 +130,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(map, "Order status retrieved successfully");
     }
 
-    //    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @GetMapping(GET_ORDER_BY_USER)
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
                                                         @RequestParam(defaultValue = "0", required = false) int page,
@@ -137,7 +139,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }
 
-    //    @DeleteMapping("/user/{userId}/order/{orderId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @DeleteMapping(CANCEL_PENDING_ORDER)
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
@@ -167,7 +169,7 @@ public class OrderController {
         return momoProducts;
     }
 
-    //    @PostMapping("/receive-order")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
     @PostMapping(VERIFY_ORDER)
     @Operation(summary = "Mark an order as received", description = "From other user updates their order status to DELIVERED " + " : " +
             "{" +
@@ -179,7 +181,6 @@ public class OrderController {
             "}")
     public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, OrderVerifyDTO data) {
         //To confirm that the user is an admin
-        jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.COMPLETED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
@@ -197,11 +198,16 @@ public class OrderController {
             "DELIVERED, " +
             "}")
     public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
-        jwtUtil.getUserIdFromToken(request);
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SHIPPING.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/order/delivered")
+    public ResponseEntity<BaseResponse> updateDeliveredOrder(HttpServletRequest request,@RequestParam int orderId) {
+        Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
+        return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
+    }
 
 }

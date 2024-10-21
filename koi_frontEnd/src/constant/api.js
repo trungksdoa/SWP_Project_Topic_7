@@ -22,3 +22,4 @@ export const MANAGE_CATEGORY_API_ADMIN = import.meta.env
 export const MANAGE_BLOGS_API = import.meta.env.VITE_MANAGE_BLOGS_API;
 export const MANAGE_PAYMENT_STATUS_API = import.meta.env
   .VITE_MANAGE_PAYMENT_STATUS_API;
+export const DASHBOARD_API = import.meta.env.VITE_DASHBOARD_API;
