@@ -1,4 +1,3 @@
-package com.product.server.koi_control_application.service;
 
 
 import com.product.server.koi_control_application.customException.AlreadyExistedException;
@@ -126,6 +125,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         } else {
             koiFish.setImageUrl(koiFish.getImageUrl());
         }
+
         Optional.ofNullable(request.getWeight()).ifPresent(koiFish::setWeight);
         Optional.ofNullable(request.getLength()).ifPresent(koiFish::setLength);
         Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
@@ -133,6 +133,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         Optional.ofNullable(request.getSex()).ifPresent(koiFish::setSex);
         Optional.ofNullable(request.getPurchasePrice()).ifPresent(koiFish::setPurchasePrice);
         Optional.ofNullable(request.getDate()).ifPresent(koiFish::setDate);
+
         if ((request.getPondId()!= 0)){
             if(koiFish.getPondId()!= request.getPondId()){
                 koiFish.setInPondFrom(request.getDate());
@@ -140,48 +141,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
             koiFish.setPondId(request.getPondId());
         }
 
-        KoiGrowthHistory.KoiGrowthHistoryBuilder builder = KoiGrowthHistory.builder()
-                .koiId(koiFish.getId())
-                .isFirstMeasurement(false)
-                .dateOfBirth(koiFish.getDateOfBirth())
-                .inPondFrom(koiFish.getInPondFrom())
-                .weight(request.getWeight())
-                .length(request.getLength())
-                .pondId(koiFish.getPondId())
-                .date(koiFish.getDate());
+        // Make sure there's no code here that adds to KoiGrowthHistory
 
-
-//        if (!isNew) {
-//            builder.id(getLastestKoigrownId(koiFish.getId()));
-//        }
-        koiGrowthHistoryRepository.save(builder.build());
-
-        if (request.getDateOfBirth()!= null && request.getDateOfBirth()!= koiFish.getDateOfBirth()){
-            koiFish.setDateOfBirth(request.getDateOfBirth());
-            koiFish.setAgeMonth(null);
-            koiFishRepository.save(koiFish);
-            List<KoiGrowthHistory> koiGrowthHistories = getGrowthHistorys(koiFish.getId());
-            for(KoiGrowthHistory koifishgrowth : koiGrowthHistories){
-                koifishgrowth.setDateOfBirth(koiFish.getDateOfBirth());
-                koiGrowthHistoryRepository.save(koifishgrowth);
-            }
-
-        }
-        else if(request.getAgeMonth()   != null && koiFish.getAgeMonth().equals(request.getAgeMonth())){
-            koiFish.setAgeMonth(request.getAgeMonth());
-            koiFish.setDateOfBirth(null);
-            koiFishRepository.save(koiFish);
-            List<KoiGrowthHistory> koiGrowthHistories = getGrowthHistorys(koiFish.getId());
-            for(KoiGrowthHistory koifishgrowth : koiGrowthHistories) {
-                koifishgrowth.setDateOfBirth(koiFish.getDateOfBirth());
-                koiGrowthHistoryRepository.save(koifishgrowth);
-            }
-        }
-
-
-        evaluateAndUpdateKoiGrowthStatus(id);
-
-        return getKoiFishsaved(id);
+        return koiFishRepository.save(koiFish);
     }
 
     @Override
@@ -445,3 +407,4 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         evaluateAndUpdateKoiGrowthStatus(koiGrowthHistory.getKoiId());
     }
 }
+

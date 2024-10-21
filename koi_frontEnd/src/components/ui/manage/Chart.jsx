@@ -25,7 +25,19 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
     if (selectedYear) {
       filtered = filtered.filter(data => new Date(data.date).getFullYear() === selectedYear);
     }
-    return filtered;
+    
+    // Remove duplicate data points
+    return filtered.reduce((acc, current, index, array) => {
+      if (index === 0) {
+        acc.push(current);
+      } else {
+        const prev = array[index - 1];
+        if (current.length !== prev.length || current.weight !== prev.weight) {
+          acc.push(current);
+        }
+      }
+      return acc;
+    }, []);
   }, [growthData, selectedYear]);
 
   const getDateRange = () => {
