@@ -151,9 +151,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .date(koiFish.getDate());
 
 
-        if (!isNew) {
-            builder.id(getLastestKoigrownId(koiFish.getId()));
-        }
+//        if (!isNew) {
+//            builder.id(getLastestKoigrownId(koiFish.getId()));
+//        }
         koiGrowthHistoryRepository.save(builder.build());
 
         if (request.getDateOfBirth()!= null && request.getDateOfBirth()!= koiFish.getDateOfBirth()){
