@@ -11,9 +11,8 @@ export const useAddGrowth = () => {
     onError: (error) => {
       console.error('Error in useAddGrowth:', error);
     },
-    onSuccess: () => {
-      // Optionally invalidate and refetch
-      queryClient.invalidateQueries(['growthHistory']);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['growthHistory', variables.id]);
     }
   });
 };

@@ -7,18 +7,7 @@ const api = apiInstanceHeader.create({
 
 export const manageKoiFishServices = {
     getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
-    updateKoi: async (id, payload) => {
-        try {
-          const response = await api.put(`/${id}`, payload, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-          return response.data;
-        } catch (error) {
-          throw error.response?.data || error.message;
-        }
-    },
+    updateKoi: (id, payload) => api.put(`/${id}`, payload),
     addKoi: async (payload) => {
         console.log("Payload received in addKoi:", payload); // Add this line for debugging
 
@@ -72,17 +61,13 @@ export const manageKoiFishServices = {
 
         const formData = new FormData();
         
-        if (typeof payload.fish === 'object') {
-            formData.append('fish', JSON.stringify(payload.fish));
-        } else if (typeof payload.fish === 'string') {
-            formData.append('fish', payload.fish);
+        if (typeof payload.fishgrow === 'object') {
+            formData.append('fishgrow', JSON.stringify(payload.fishgrow));
+        } else if (typeof payload.fishgrow === 'string') {
+            formData.append('fishgrow', payload.fishgrow);
         } else {
-            console.error('Invalid fish data:', payload.fish); // Add this line for debugging
+            console.error('Invalid fish data:', payload.fishgrow); // Add this line for debugging
             throw new Error('Invalid fish data');
-        }
-
-        if (payload.image) {
-            formData.append('image', payload.image);
         }
 
         try {

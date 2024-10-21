@@ -689,23 +689,30 @@ const PondManagement = () => {
           visible={showMoveConfirmation}
           onCancel={() => setShowMoveConfirmation(false)}
           footer={null}
+          width={800}
         >
           <p>Select a pond to move the fish to:</p>
-          <Select
-            style={{ width: '100%', marginBottom: '20px' }}
-            placeholder="Select a pond"
-            onChange={(value) => setDestinationPond(value)}
-            value={destinationPond}
-          >
+          <div className="grid grid-cols-4 gap-4 mt-4 mb-6">
             {otherPonds.map(pond => (
-              <Option key={pond.id} value={pond.id}>{pond.name}</Option>
+              <div 
+                key={pond.id} 
+                className={`cursor-pointer border p-2 rounded ${destinationPond === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
+                onClick={() => setDestinationPond(pond.id)}
+              >
+                <img 
+                  src={pond.imageUrl} 
+                  alt={pond.name} 
+                  className="w-full h-32 object-cover rounded mb-2"
+                />
+                <p className="text-center font-semibold">{pond.name}</p>
+              </div>
             ))}
-          </Select>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          </div>
+          <div className="flex justify-end mt-4">
             <Button 
               key="cancel" 
               onClick={() => setShowMoveConfirmation(false)}
-              style={{ marginRight: '10px' }}
+              className="mr-2"
             >
               Cancel
             </Button>
