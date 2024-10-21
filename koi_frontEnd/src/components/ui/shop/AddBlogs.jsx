@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import { Input, Button, Form } from "antd";
+import { Input, Button, Form, Spin } from "antd";
 import { usePostBlog } from "../../../hooks/blogs/usePostBlog";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AddBlogs = () => {
+  const navigate = useNavigate();
   const mutation = usePostBlog();
   const [imgSrc, setImgSrc] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -18,7 +22,7 @@ const AddBlogs = () => {
       bodyImage: null,
     },
     onSubmit: (values) => {
-      console.log(values);
+      setIsLoading(true);
       const formData = new FormData();
 
       // Convert blog data to JSON and append to formData
@@ -49,11 +53,14 @@ const AddBlogs = () => {
       // Gửi mutation hoặc gọi API tại đây
       mutation.mutate(formData, {
         onSuccess: (response) => {
+          setIsLoading(false);
           formik.resetForm();
-          toast.success("Product added successfully");
+          toast.success("Blog added successfully");
+          navigate('/blogs/manageblogs');
         },
         onError: (error) => {
-          toast.error("Error adding product");
+          setIsLoading(false);
+          toast.error("Error adding blog");
         },
       });
     },
@@ -79,88 +86,108 @@ const AddBlogs = () => {
     }
   };
 
-  return (
-    <Form
-      labelCol={{ span: 4 }}
-      wrapperCol={{ span: 16 }}
-      onSubmitCapture={formik.handleSubmit}
-      className="p-4"
-    >
-      <div className="flex justify-center items-center text-bold text-3xl h-full m-2 mb-6">
-        <strong>Blogs Editors</strong>
+  const textAreaStyle = {
+    resize: 'none',
+    padding: '8px',
+    minHeight: '150px',  // Increased minimum height
+    maxHeight: '300px',  // Set a maximum height
+    overflowY: 'auto',   // Enable vertical scrolling
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin tip="Loading" size="large" />
       </div>
-      <Form.Item label="Title">
-        <Input
-          placeholder="Title"
-          className="mb-4 w-full"
-          onChange={formik.handleChange}
-          name="title"
-          value={formik.values.title}
-        />
-      </Form.Item>
-      <Form.Item label="Header 1">
-        <Input
-          placeholder="Header_1"
-          onChange={formik.handleChange}
-          name="headerTop"
-          value={formik.values.headerTop}
-        />
-      </Form.Item>
-      <Form.Item label="Header 2">
-        <Input
-          placeholder="Header_2"
-          onChange={formik.handleChange}
-          name="headerMiddle"
-          value={formik.values.headerMiddle}
-        />
-      </Form.Item>
+    );
+  }
 
-      <Form.Item label="Content 1">
-        <Input.TextArea
-          placeholder="Content_1"
-          className="mb-4 w-full"
-          onChange={formik.handleChange}
-          name="contentTop"
-          value={formik.values.contentTop}
-        />
-      </Form.Item>
-      <Form.Item label="Content 2">
-        <Input.TextArea
-          placeholder="Content_2"
-          className="mb-4 w-full"
-          onChange={formik.handleChange}
-          name="contentMiddle"
-          value={formik.values.contentMiddle}
-        />
-      </Form.Item>
-      <Form.Item label="Header Image">
-        <input
-          type="file"
-          accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-          onChange={(e) => handleChangeFile(e, "headerImage")} // Truyền thêm tên field
-        />
-      </Form.Item>
-
-      <Form.Item label="Body Image">
-        <input
-          type="file"
-          accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-          onChange={(e) => handleChangeFile(e, "bodyImage")} // Truyền thêm tên field
-        />
-      </Form.Item>
-      <Form.Item className="flex justify-center items-center">
-        <div>
+  return (
+    <div className="min-h-screen flex flex-col pb-10">
+      <Button   
+        onClick={() => navigate('/blogs/manageblogs')}
+        className="bg-gray-200 hover:bg-gray-300 ml-4 mt-4 self-start"
+      >
+        Return
+      </Button>
+      <Form
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 16 }}
+        onSubmitCapture={formik.handleSubmit}
+        className="p-4 flex-grow flex flex-col"
+      >
+        <div className="text-center text-3xl font-bold mb-6">
+          Blogs Editors
+        </div>
+        <div className="flex-grow space-y-4">  {/* Added space between form items */}
+          <Form.Item label="Title">
+            <Input
+              placeholder="Title"
+              className="w-full"
+              onChange={formik.handleChange}
+              name="title"
+              value={formik.values.title}
+            />
+          </Form.Item>
+          <Form.Item label="Header 1">
+            <Input.TextArea
+              onChange={formik.handleChange}
+              name="headerTop"
+              value={formik.values.headerTop}
+              style={{...textAreaStyle, minHeight: '100px', maxHeight: '400px'}}
+            />
+          </Form.Item>
+          <Form.Item label="Header 2">
+            <Input.TextArea
+              onChange={formik.handleChange}
+              name="headerMiddle"
+              value={formik.values.headerMiddle}
+              style={{...textAreaStyle, minHeight: '100px', maxHeight: '400px'}}
+            />
+          </Form.Item>
+          <Form.Item label="Content 1">
+            <Input.TextArea
+              onChange={formik.handleChange}
+              name="contentTop"
+              value={formik.values.contentTop}
+              style={{...textAreaStyle, minHeight: '200px', maxHeight: '400px'}}  // Larger for content
+            />
+          </Form.Item>
+          <Form.Item label="Content 2">
+            <Input.TextArea
+              onChange={formik.handleChange}
+              name="contentMiddle"
+              value={formik.values.contentMiddle}
+              style={{...textAreaStyle, minHeight: '200px', maxHeight: '400px'}}  // Larger for content
+            />
+          </Form.Item>
+          <Form.Item label="Header Image">
+            <input
+              type="file"
+              accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+              onChange={(e) => handleChangeFile(e, "headerImage")}
+            />
+          </Form.Item>
+          <Form.Item label="Body Image">
+            <input
+              type="file"
+              accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+              onChange={(e) => handleChangeFile(e, "bodyImage")}
+            />
+          </Form.Item>
+        </div>
+        <Form.Item className="mt-8 flex justify-center">
           <Button 
             htmlType="submit" 
             type="primary" 
             loading={mutation.isPending}
-            className="text-xl text-white bg-black px-40 py-4" 
+            className="text-xl text-white bg-black px-20 py-4 w-64" 
           >
             <strong>Post</strong>
           </Button>
-        </div>
-      </Form.Item>
-    </Form>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
