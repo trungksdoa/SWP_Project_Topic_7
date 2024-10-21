@@ -5,13 +5,16 @@ import { useState } from "react";
 import { PATH } from "../../../constant";
 import { Button, Layout, Menu, theme } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
+
 import {
   UserOutlined,
   CarFilled,
   HomeFilled,
+  DollarOutlined,
+  FileTextOutlined,
   DesktopOutlined,
   ProductOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import {
@@ -42,6 +45,7 @@ const AdminTemplate = () => {
     navigate(PATH.HOME);
   };
 
+
   return (
     <div>
       <Layout
@@ -62,65 +66,187 @@ const AdminTemplate = () => {
                 />
               </NavLink>
             </div>
-            <Menu.Item className="text-white" key={5} icon={<UserOutlined style={{color: selectedKeys.includes(PATH.MANAGE_USER) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={2} 
-                to={PATH.MANAGE_USER} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            {/* Dashboard */}
+            <Menu.Item
+              className="text-white"
+              key={1}
+              icon={
+                <HomeFilled
+                  style={{
+                    color: selectedKeys.includes(PATH.ADMIN)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={1}
+                to={PATH.ADMIN_DASHBOARD}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
+              >
+                {t("Dashboard")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item
+              className="text-white"
+              key={5}
+              icon={
+                <UserOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_USER)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={2}
+                to={PATH.MANAGE_USER}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Users")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={6} icon={<ProductOutlined style={{color: selectedKeys.includes(PATH.MANAGE_PRODUCTS) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={3} 
-                to={PATH.MANAGE_PRODUCTS} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={6}
+              icon={
+                <ProductOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_PRODUCTS)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={3}
+                to={PATH.MANAGE_PRODUCTS}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Products")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={7} icon={<ProductOutlined style={{color: selectedKeys.includes(PATH.MANAGE_PACKAGE) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={4} 
-                to={PATH.MANAGE_PACKAGE} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={7}
+              icon={
+                <ProductOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_PACKAGE)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={4}
+                to={PATH.MANAGE_PACKAGE}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Packages")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={8} icon={<UnorderedListOutlined style={{color: selectedKeys.includes(PATH.MANAGE_CATEGORY) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={5} 
-                to={PATH.MANAGE_CATEGORY} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={8}
+              icon={
+                <UnorderedListOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_CATEGORY)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={5}
+                to={PATH.MANAGE_CATEGORY}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Category")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={9} icon={<UnorderedListOutlined style={{color: selectedKeys.includes(PATH.MANAGE_ORDER) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={6} 
-                to={PATH.MANAGE_ORDER} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={9}
+              icon={
+                <UnorderedListOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_ORDER)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={6}
+                to={PATH.MANAGE_ORDER}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Order")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={10} icon={<UnorderedListOutlined style={{color: selectedKeys.includes(PATH.MANAGE_ORDER) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={7} 
-                to={PATH.MANAGE_PAYMENT_STATUS} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={10}
+              icon={
+                <UnorderedListOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_ORDER)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={7}
+                to={PATH.MANAGE_PAYMENT_STATUS}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Manage Payment Status")}
               </NavLink>
             </Menu.Item>
-            <Menu.Item className="text-white" key={10} icon={<HomeFilled style={{color: selectedKeys.includes(PATH.HOME) ? "orange" : "white"}} />}>
-              <NavLink 
-                key={8} 
-                to={PATH.HOME} 
-                className={({ isActive }) => isActive ? "!text-orange-500" : "!text-white"}
+            <Menu.Item
+              className="text-white"
+              key={10}
+              icon={
+                <HomeFilled
+                  style={{
+                    color: selectedKeys.includes(PATH.HOME)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={8}
+                to={PATH.HOME}
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
               >
                 {t("Back to home")}
               </NavLink>

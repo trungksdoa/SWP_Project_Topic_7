@@ -7,6 +7,10 @@ import java.util.List;
 
 public interface IDashBoardService {
     List<BarChart> getUserGrowthData(LocalDate startDate, LocalDate endDate);
+
     List<BarChart> getOrderStatusBreakdown(LocalDate startDate, LocalDate endDate);
-    List<BarChart> getTopSellingProducts(int limit, LocalDate startDate, LocalDate endDate);
-}   
+
+    List<BarChart> getTopSellingProducts(LocalDate startDate, LocalDate endDate);
+
+    List<BarChart>  getTotalSales(LocalDate startDate, LocalDate endDate);
+}
