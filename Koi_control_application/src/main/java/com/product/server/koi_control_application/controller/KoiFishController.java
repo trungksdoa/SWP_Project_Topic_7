@@ -1,6 +1,5 @@
 package com.product.server.koi_control_application.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.product.server.koi_control_application.model.KoiFish;
@@ -60,7 +59,7 @@ public class KoiFishController {
         if (file != null && !file.isEmpty()) {
             String filename = iImageService.uploadImage(file);
             koiFish.setImageUrl(filename);
-        }else{
+        } else {
             koiFish.setImageUrl(iImageService.getDefaultImage("defaultkoi.jpg"));
         }
 
@@ -96,8 +95,9 @@ public class KoiFishController {
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishUpdateRequest.class)
-                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file,
-                                                      @RequestParam(value = "isNew", required = false) Boolean isNew) throws IOException {
+                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file
+                                                      //  @RequestParam(value = "isNew", required = false) Boolean isNew) t
+    ) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -105,7 +105,7 @@ public class KoiFishController {
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
         BaseResponse response = BaseResponse.builder()
-                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, isNew))
+                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, false))
                 .message("Update fish successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
@@ -129,7 +129,7 @@ public class KoiFishController {
 
     @DeleteMapping("/growthUpHistory/{growId}")
     public ResponseEntity<BaseResponse> deleteKoiGrow(@PathVariable("growId") int growId) {
-       KoiGrowthHistory koiGrowthHistory = iKoiFishService.getGrowthHistory(growId);
+        KoiGrowthHistory koiGrowthHistory = iKoiFishService.getGrowthHistory(growId);
         iKoiFishService.deleteGrowthHistory(growId);
 
         BaseResponse response = BaseResponse.builder()
@@ -140,7 +140,6 @@ public class KoiFishController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
 
     @GetMapping("/listkoi/bypondid/{pondId}/page")
@@ -281,7 +280,7 @@ public class KoiFishController {
 
     @PostMapping("/{koiFishId}/medical-record")
     @Operation(summary = "Add medical record", description = "Adds a new medical record for a specific koi fish")
-    public ResponseEntity<BaseResponse> addMedicalRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object>  medicalRecordDTO) {
+    public ResponseEntity<BaseResponse> addMedicalRecord(@PathVariable int koiFishId, @RequestBody @Valid Map<String, Object> medicalRecordDTO) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
 
