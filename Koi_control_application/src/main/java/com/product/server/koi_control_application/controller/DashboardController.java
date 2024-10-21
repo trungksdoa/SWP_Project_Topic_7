@@ -6,9 +6,7 @@ import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/admin/dashboard")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 @Tag(name = "Dashboard", description = "APIs for dashboard data")
 public class DashboardController {
 
@@ -51,11 +49,19 @@ public class DashboardController {
     @GetMapping("/top-selling-products")
     @Operation(summary = "Get top-selling products", description = "Retrieves data for top-selling products")
     public ResponseEntity<BaseResponse> getTopSellingProducts(
-            @RequestParam(defaultValue = "10") int limit,
             @RequestParam String startDate,
             @RequestParam String endDate) {
         LocalDate parsedStartDate = LocalDate.parse(startDate, DATE_FORMATTER);
         LocalDate parsedEndDate = LocalDate.parse(endDate, DATE_FORMATTER);
-        return ResponseUtil.createSuccessResponse(dashboardService.getTopSellingProducts(limit, parsedStartDate, parsedEndDate), "Top-selling products retrieved successfully");
+        return ResponseUtil.createSuccessResponse(dashboardService.getTopSellingProducts(parsedStartDate, parsedEndDate), "Top-selling products retrieved successfully");
+    }
+
+    @GetMapping("/total-sales")
+    @Operation(summary = "Get total sales", description = "Retrieves total sales data")
+    public ResponseEntity<BaseResponse> getTotalSales(@RequestParam String startDate,
+                                                      @RequestParam String endDate) {
+        LocalDate parsedStartDate = LocalDate.parse(startDate, DATE_FORMATTER);
+        LocalDate parsedEndDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        return ResponseUtil.createSuccessResponse(dashboardService.getTotalSales(parsedStartDate,parsedEndDate), "Total sales data retrieved successfully");
     }
 }

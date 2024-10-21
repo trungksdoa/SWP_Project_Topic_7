@@ -12,9 +12,13 @@ import java.time.LocalDateTime;
 public class BarChart {
     private Object label;
     private Long count;
+    private LocalDateTime date;
 
-    public BarChart(Object label, Long count) {
+
+    public BarChart(Object label, Long count, LocalDateTime date) {
         this.label = label;
         this.count = count;
+        this.date = date;
     }
+
 }

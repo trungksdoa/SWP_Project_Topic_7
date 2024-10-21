@@ -86,4 +86,6 @@ public interface IOrderService {
      * @param id The ID of the order to delete.
      */
     void deleteOrder(int id);
+
+    void updateSimulatorOrder();
 }

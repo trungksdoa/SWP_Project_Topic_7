@@ -6,6 +6,7 @@ import com.product.server.koi_control_application.pojo.report.BarChart;
 import com.product.server.koi_control_application.pojo.response.UserResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
@@ -45,11 +46,10 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     boolean existsById(int id);
 
-    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(FUNCTION('DATE', u.createdAt), COUNT(u))" +
-            "FROM Users u " +
-            "WHERE u.createdAt >= :startDate AND u.createdAt < :endDate " +
-            "GROUP BY FUNCTION('DATE', u.createdAt) " +
-            "ORDER BY FUNCTION('DATE', u.createdAt)")
-    List<BarChart> getRecentUserGrowthData(LocalDateTime startDate, LocalDateTime endDate);
-
+    @Query("SELECT new com.product.server.koi_control_application.pojo.report.BarChart(DATE(u.createdAt), COUNT(u.id), MAX(u.createdAt)) " +
+    "FROM Users u " +
+    "WHERE u.createdAt >= :startDate AND u.createdAt <= :endDate " +
+    "GROUP BY DATE(u.createdAt) " +
+    "ORDER BY DATE(u.createdAt)")
+List<BarChart> getRecentUserGrowthData(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

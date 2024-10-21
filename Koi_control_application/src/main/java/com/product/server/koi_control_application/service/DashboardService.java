@@ -1,7 +1,5 @@
 package com.product.server.koi_control_application.service;
 
-import com.product.server.koi_control_application.pojo.OrderReport;
-import com.product.server.koi_control_application.pojo.UserReport;
 import com.product.server.koi_control_application.pojo.report.BarChart;
 import com.product.server.koi_control_application.repository.OrderRepository;
 import com.product.server.koi_control_application.repository.ProductRepository;
@@ -12,11 +10,8 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,27 +20,25 @@ public class DashboardService  implements IDashBoardService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
-    @Override
-    public List<BarChart> getUserGrowthData(LocalDate fromDate, LocalDate toDate) {
-        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
-        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
 
-        return userRepository.getRecentUserGrowthData(startDateTime, endDateTime);
+    @Override
+    public List<BarChart> getUserGrowthData(LocalDate startDate, LocalDate endDate) {
+        return userRepository.getRecentUserGrowthData(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 
     @Override
-    public List<BarChart> getOrderStatusBreakdown(LocalDate fromDate, LocalDate toDate) {
-        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
-        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
-
-        return orderRepository.getOrdersStatusByDateRange(startDateTime, endDateTime);
+    public List<BarChart> getOrderStatusBreakdown(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getOrdersStatusByDateRange(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
 
     @Override
-    public List<BarChart> getTopSellingProducts(int limit, LocalDate fromDate, LocalDate toDate) {
-        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
-        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
-
-        return productRepository.getTopSellingProductsByDateRange(limit, startDateTime, endDateTime);
+    public List<BarChart> getTopSellingProducts(LocalDate startDate, LocalDate endDate) {
+        return productRepository.getTopSellingProductsByDateRange(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
     }
+
+    @Override
+    public List<BarChart>  getTotalSales(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getTotalSalesByDate(startDate.atStartOfDay(),endDate.atTime(LocalTime.MAX));
+    }
+
 }

@@ -44,7 +44,7 @@ import KoiUpdate from "../components/ui/manage/KoiUpdate";
 import KoiMove from "../components/ui/manage/KoiMove";
 import Endpoint from "../components/ui/Endpoint";
 import FoodCalculator from "../components/ui/manage/FoodCalculator";
-
+import AdminDashboard from "../components/ui/AdminDashboard";
 const router = [
   {
     element: <MainLayout />,
@@ -165,6 +165,10 @@ const router = [
         path: PATH.ADMIN,
         element: <AdminPage />,
         children: [
+          {
+            path: PATH.ADMIN_DASHBOARD,
+            element: <AdminDashboard />,
+          },
           {
             path: PATH.MANAGE_USER,
             element: <ManageUser />,

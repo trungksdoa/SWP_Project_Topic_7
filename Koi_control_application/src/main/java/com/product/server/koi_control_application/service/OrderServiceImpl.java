@@ -4,7 +4,6 @@ import com.product.server.koi_control_application.customException.BadRequestExce
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.pojo.OutStockProduct;
 import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import com.product.server.koi_control_application.pojo.response.CartProductDTO;
 import com.product.server.koi_control_application.repository.OrderRepository;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * OrderServiceImpl is a service implementation class that handles various operations related to orders.
@@ -197,5 +195,11 @@ public class OrderServiceImpl implements IOrderService {
     @Transactional(readOnly = true)
     public List<Orders> getOrdersByUser(int userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+
+    @Override
+    public void updateSimulatorOrder() {
+        orderRepository.updateSimulatorOrder(OrderCode.DELIVERED.getValue(), OrderCode.SHIPPING.getValue());
     }
 }
