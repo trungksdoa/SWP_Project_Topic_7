@@ -109,10 +109,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     public KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file, boolean isNew) throws IOException {
         KoiFish koiFish = getKoiFish(id);
 
-        if (request.getUserId()!=0 && !usersRepository.existsById(request.getUserId()))
-            throw new NotFoundException("User not found.");
+//        if (request.getUserId()!=0 && !usersRepository.existsById(request.getUserId()))
+//            throw new NotFoundException("User not found.");
 
-        if ((request.getPondId()!= 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), request.getUserId()))
+        if ((request.getPondId()!= 0) && !pondRepository.existsByIdAndUserId(request.getPondId(), koiFish.getUserId()))
             throw new NotFoundException("Pond not found");
 
         if (koiFishRepository.existsByNameAndPondIdExceptId(request.getName(), request.getPondId(), id))
