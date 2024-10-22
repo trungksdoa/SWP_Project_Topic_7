@@ -20,8 +20,12 @@ public interface IKoiFishService {
     List<KoiFish>   getKoiFishsByPondId(int pondId);
     List<KoiFish>   getKoiFishsByUserId(int userId);
     List<KoiFish> getFishByUserNoPond(int userId);
+    List<KoiFish> getFishByListId(List<Integer> koiFishId);
+
     void deleteKoiFish(int id);
     void deleteGrowthHistory(int id);
+    void deleteKoiFishList(List<Integer> koifishId);
+
     int getLastestKoigrownId(int koiId);
     int countKoiFishByPondId(int pondId);
     KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file, boolean isNew) throws IOException;
