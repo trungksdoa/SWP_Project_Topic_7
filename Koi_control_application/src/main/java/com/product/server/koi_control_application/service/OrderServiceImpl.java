@@ -12,6 +12,7 @@ import com.product.server.koi_control_application.serviceHelper.interfaces.IOrde
 import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.serviceInterface.IProductService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements IOrderService {
     private final ICartService cartService;
     private final IIProcessHelper processHelper;
     private final IOrderHelper orderHelper;
+    private final IUserService userService;
 
 
     /**
@@ -68,7 +70,13 @@ public class OrderServiceImpl implements IOrderService {
             throw new BadRequestException("Please updated your quantity of products in cart to continue");
         }
 
+
+
         Orders order = processHelper.processOrder(userId, orderRequestDTO, cartItems);
+
+        order.setAddress(orderRequestDTO.getAddress());
+        order.setPhone(orderRequestDTO.getPhone());
+        order.setFullName(orderRequestDTO.getFullName());
 
         // Process order items
         return orderHelper.save(order);

@@ -9,6 +9,7 @@ import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.request.UserRegister;
 import com.product.server.koi_control_application.pojo.response.UserResponseDTO;
 import com.product.server.koi_control_application.repository.UsersRepository;
+import com.product.server.koi_control_application.serviceHelper.interfaces.IUserHelper;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import com.product.server.koi_control_application.serviceInterface.IPackageService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
@@ -37,10 +38,9 @@ import java.util.List;
 public class UserServiceImpl implements IUserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailServiceImpl emailService;
     private final IImageService imageService;
     private final IPackageService packageService;
-
+    private final IUserHelper userHelper;
 
     /**
      * Registers a new user in the system.
@@ -52,6 +52,7 @@ public class UserServiceImpl implements IUserService {
      * @throws DataIntegrityViolationException for other database integrity issues
      */
     @Override
+    @Transactional
     public Users saveUser(UserRegister register) {
         try {
 
@@ -64,12 +65,13 @@ public class UserServiceImpl implements IUserService {
 
             user.setAvatarUrl(imageService.getDefaultImage("DefaultAvatar.png"));
             //Create user
-            user.setPassword(passwordEncoder.encode(register.getPassword()));
+            String passwordED = userHelper.passwordEncoded(register.getPassword());
+            user.setPassword(passwordED);
 
             user.getRoles().add(new UserRole(register.getRole().getValue()));
 
             // Send email to user
-            userRegisterMail(user.getEmail(), user);
+           userHelper.userRegisterMail(register.getEmail(), user);
 
             user.setAUserPackage(packageService.getPackageByDefault());
             return usersRepository.save(user);
@@ -84,18 +86,6 @@ public class UserServiceImpl implements IUserService {
     }
 
 
-    /**
-     * Sends a registration confirmation email to the user with a verification link.
-     *
-     * @param email     The email address of the registered user
-     * @param savedUser The User object of the registered user
-     */
-    @Override
-    public void userRegisterMail(String email, Users savedUser) {
-        String verificationLink = "https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/users/verify/email/" + email;
-        String emailBody = "Your account has been created successfully. Please verify your email to activate your account by clicking the following link: " + verificationLink;
-        emailService.sendMail(savedUser.getEmail(), "Welcome to KOI Control Application", emailBody);
-    }
 
     /**
      * Retrieves a user by their ID.
@@ -118,33 +108,11 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public Users getUsersByEmail(String email) {
-        return usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(email));
+        return userHelper.getUsersByEmail(email);
     }
 
 
-    /**
-     * Retrieves a user by their username.
-     *
-     * @param username The username of the user to retrieve
-     * @return The User object, or null if not found
-     */
-    @Override
-    public Users getUsersByUsername(String username) {
-        return usersRepository.findByUsername(username).orElse(null);
-    }
 
-    /**
-     * Authenticates a user based on email and password.
-     *
-     * @param email    The email address of the user
-     * @param password The password of the user
-     * @return The authenticated User object
-     * @throws NotFoundException if no user is found with the given email and password
-     */
-    @Override
-    public Users userLogin(String email, String password) {
-        return usersRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new NotFoundException(email));
-    }
 
     /**
      * Retrieves a paginated list of users.
@@ -177,6 +145,7 @@ public class UserServiceImpl implements IUserService {
      * @throws NotFoundException if no user is found with the given ID
      */
     @Override
+    @Transactional
     public void deleteUser(int id) {
         Users user = getUser(id);
         if (user == null) {
@@ -186,17 +155,6 @@ public class UserServiceImpl implements IUserService {
         usersRepository.delete(user);
     }
 
-    /**
-     * Initiates the password reset process for a user.
-     *
-     * @param email The email address of the user requesting password reset
-     * @throws NotFoundException if no user is found with the given email
-     */
-    @Override
-    public void resetPassword(String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(email));
-        usersRepository.save(user);
-    }
 
     /**
      * Generates a new random password.
@@ -216,6 +174,7 @@ public class UserServiceImpl implements IUserService {
      * @throws NotFoundException if no user is found with the given email
      */
     @Override
+    @Transactional
     public void updatePassword(String email, String newPassword) {
         Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
@@ -277,9 +236,27 @@ public class UserServiceImpl implements IUserService {
      * @param userPackage The UserPackage to add to the user's account
      */
     @Override
+    @Transactional
     public void addPackage(int userId, UserPackage userPackage) {
         Users user = getUser(userId);
         user.setAUserPackage(userPackage);
-        usersRepository.save(user);
+        updateUser(user);
     }
+
+    @Override
+    @Transactional
+    public void lockedUser(int userId) {
+        Users user = getUser(userId);
+        user.setActive(false);
+        updateUser(user);
+    }
+
+    @Override
+    @Transactional
+    public void unlockUser(int userId) {
+        Users user = getUser(userId);
+        user.setActive(true);
+        updateUser(user);
+    }
+
 }
