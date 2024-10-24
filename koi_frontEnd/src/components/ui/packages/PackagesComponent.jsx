@@ -3,7 +3,9 @@ import { useGetPackage } from "../../../hooks/admin/managePackages/useGetPackage
 import { useGetUserById } from "../../../hooks/user/useGetUserById";
 import { useSelector } from "react-redux";
 import { usePostPackage } from "../../../hooks/user/usePostPackage";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 const PackagesComponent = () => {
   const { data: lstPackage, refetch, isFetching } = useGetPackage();
@@ -12,6 +14,15 @@ const PackagesComponent = () => {
   const mutation = usePostPackage();
   const userPackage = user?.userPackage;
   const userPackageId = userPackage?.id;
+
+  //Màn hình chờ phải đẹp
+  if(isFetching) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>
+    )
+  }
 
   // Hàm xử lý khi nhấn nút "Buy Now"
   const handleBuyNow = (packageId) => {
@@ -31,6 +42,32 @@ const PackagesComponent = () => {
     });
   };
 
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+  
   return (
     <div className="my-[150px]">
       <div className="pricing-container">
