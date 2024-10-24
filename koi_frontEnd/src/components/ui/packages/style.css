@@ -1,0 +1,35 @@
+.swiper {
+  padding: 5%; /* Add padding to the Swiper container */
+}
+
+.swiper-slide {
+  width: 350px !important;
+}
+
+.pricing-card .circle-header {
+  margin-top: 10%; /* Move down further */
+}
+
+.pricing-card .wave-container {
+  margin-top: 20%; /* Adjust to fit below the circle header */
+}
+
+.pricing-card .features {
+  position: relative;
+  margin-top: 70%; /* Adjust to fit below the wave container */
+}
+
+.pricing-card {
+  box-sizing: border-box;
+  width: 90%;
+  max-width: 300px;
+  height: 300px;
+  margin: 0 auto 15px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #fff, #f0f0f0);
+  transition: transform 0.3s ease;
+  text-align: center;
+  position: relative;
+}
