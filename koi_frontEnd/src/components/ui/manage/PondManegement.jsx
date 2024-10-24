@@ -15,7 +15,8 @@ import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import DualListBox from 'react-dual-listbox';
 import 'react-dual-listbox/lib/react-dual-listbox.css';
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi"; // Assuming you have this hook
-import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
+import { SortAscendingOutlined, SortDescendingOutlined, SearchOutlined } from '@ant-design/icons';
+import { manageKoiActions } from '../../../store/manageKoi/slice';
 
 const { Option } = Select;
 
@@ -44,6 +45,7 @@ const PondManagement = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [koiInSelectedPond, setKoiInSelectedPond] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: lstKoi } = useGetAllKoi(userId);
   const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
@@ -261,21 +263,28 @@ const PondManagement = () => {
     setIsMovingFish(true);
 
     try {
+      // Get all koi in the pond to be deleted
+      const koiToMove = lstKoi.filter(koi => koi.pondId === selectedPond.id);
+
       // Update each koi's pond ID
-      await Promise.all(koiInPond.map(koi => {
+      await Promise.all(koiToMove.map(koi => {
         const formData = new FormData();
-        const updateKoi = {
+        const updatedKoi = {
           ...koi,
           pondId: destinationPond,
         };
-        formData.append("fish", JSON.stringify(updateKoi));
+        formData.append("fish", JSON.stringify(updatedKoi));
         
         return updateKoiMutation.mutateAsync(
           { id: koi.id, payload: formData },
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
+            onSuccess: (updatedKoi) => {
+              dispatch(manageKoiActions.updateKoi(updatedKoi));
             },
+            onError: (error) => {
+              console.error(`Error updating koi ${koi.id}:`, error);
+              toast.error(`Error updating koi ${koi.id}: ${error.message}`);
+            }
           }
         );
       }));
@@ -326,9 +335,15 @@ const PondManagement = () => {
     });
   }, [lstPond, sortCriteria, sortOrder]);
 
+  const filteredPonds = useMemo(() => {
+    return sortedPonds.filter(pond => 
+      pond.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [sortedPonds, searchTerm]);
+
   const indexOfLastPond = currentPage * pondsPerPage;
   const indexOfFirstPond = indexOfLastPond - pondsPerPage;
-  const currentPonds = sortedPonds.slice(indexOfFirstPond, indexOfLastPond);
+  const currentPonds = filteredPonds.slice(indexOfFirstPond, indexOfLastPond);
 
   const handleSortChange = (value) => {
     setSortCriteria(value);
@@ -383,23 +398,32 @@ const PondManagement = () => {
         </div>
       )}
 
-      <div className="flex justify-center items-center mt-4 my-6">
-        <div className="w-1/3"></div> {/* Empty div for spacing */}
+      <div className="flex justify-between items-center mx-4 my-6">
+        <div className="flex justify-start items-center w-1/3">
+          <Input
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: 300, height: 50, fontSize: 18 }}
+            className="mr-2"
+            suffix={<SearchOutlined style={{ fontSize: 18 }} />}
+          />
+        </div>
         <div className="flex justify-center items-center w-1/3">
           <button
             onClick={handleAddClick}
             className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white 
-                      rounded-full flex items-center justify-center font-bold mr-2"
+                      rounded-full flex items-center justify-center font-bold"
           >
             Add a new Pond
           </button>
-          <button
+          {/* <button
             onClick={() => navigate('/move-koi')}
             className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-orange-500 text-white 
                       rounded-full flex items-center justify-center font-bold ml-2"
           >
             Move Koi
-          </button>
+          </button> */}
         </div>
         <div className="flex justify-end items-center w-1/3">
           <Space>
@@ -449,7 +473,7 @@ const PondManagement = () => {
       <div className="flex justify-center mb-8">
         <Pagination
           current={currentPage}
-          total={sortedPonds.length}
+          total={filteredPonds.length}
           pageSize={pondsPerPage}
           onChange={onPageChange}
           showSizeChanger={false}
@@ -702,7 +726,7 @@ const PondManagement = () => {
                 <img 
                   src={pond.imageUrl} 
                   alt={pond.name} 
-                  className="w-full h-32 object-cover rounded mb-2"
+                  className="w-50 h-50 object-cover rounded mb-2"
                 />
                 <p className="text-center font-semibold">{pond.name}</p>
               </div>
