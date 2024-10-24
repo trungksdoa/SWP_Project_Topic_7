@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class IPondServiceImpl implements IPondService {
     private final KoiFishRepository koiFishRepository;
     private final IPackageService iPackageService;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Pond addPond(Pond pond) {
         Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
 //        if(!usersRepository.existsById(pond.getUserId()))
@@ -95,12 +97,14 @@ public class IPondServiceImpl implements IPondService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePond(int id) {
         Pond pond = getPond(id);
         pondRepository.delete(pond);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Pond updatePond(int id, Pond request, MultipartFile file) throws IOException {
         Pond pond = getPond(id);
         if(!usersRepository.existsById(request.getUserId()))

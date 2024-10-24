@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     private final IPackageService iPackageService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public KoiFish addKoiFish(KoiFish koiFish) {
         Users user = usersRepository.findById(koiFish.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
 
@@ -68,6 +70,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public KoiFish getKoiFish(int id) {
         KoiFish koiFish = koiFishRepository.findById(id).orElseThrow(() -> new NotFoundException("KoiFish not found"));
         return koiFish;
@@ -95,6 +98,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         return koiFishs;
     }
 
+    @Transactional
     @Override
     public void deleteKoiFish(int id) {
         koiFishRepository.deleteById(id);
@@ -106,6 +110,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public KoiFish updateKoiFish(int id, KoiFish request, MultipartFile file, boolean isNew) throws IOException {
         KoiFish koiFish = getKoiFish(id);
 
@@ -197,6 +202,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<KoiFish> getKoiFishs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return koiFishRepository.findAll(pageable);
@@ -204,6 +210,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public KoiGrowthHistory addGrowthHistory(int id, KoiGrowthHistory request) {
         KoiFish koiFish = getKoiFish(id);
 
@@ -229,11 +236,13 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public KoiGrowthHistory getGrowthHistory(int id) {
         return koiGrowthHistoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Growth history not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<KoiGrowthHistory> getGrowthHistorys(int koiId,int page, int size) {
         Pageable pageable =  PageRequest.of(page, size, Sort.by("date").ascending());
 
@@ -241,6 +250,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void UpdateKoiFishGrowth(int koiId) {
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
         koiGrowthHistories.sort(Comparator.comparing(KoiGrowthHistory::getDate));
@@ -249,6 +259,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void evaluateAndUpdateKoiGrowthStatus(int koiId) {
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
         koiGrowthHistories.sort(Comparator.comparing(KoiGrowthHistory::getDate));
@@ -322,6 +333,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<KoiFish> getKoiFishsByPondId(int pondId) {
         List<KoiFish> koiFishs = koiFishRepository.findAllByPondId(pondId);
         for (KoiFish koiFish : koiFishs) {
@@ -332,6 +344,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<KoiFish> getKoiFishsByUserId(int userId) {
         List<KoiFish> koiFishs = koiFishRepository.findAllByUserId(userId);
         for (KoiFish koiFish : koiFishs) {
@@ -347,6 +360,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<KoiGrowthHistory> getGrowthHistorys(int koiId) {
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
         koiGrowthHistories.sort(Comparator.comparing(KoiGrowthHistory::getDate));
@@ -401,6 +415,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<KoiFish> swapPondIdListKoi(int pondId, List<Integer> koiFishId) {
         Pond pond   =  pondRepository.findById(pondId).orElseThrow(() -> new NotFoundException("Pond not found."));
         Users user = usersRepository.findById(pond.getUserId()).orElseThrow(() -> new NotFoundException("User not found."));
@@ -436,6 +451,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteGrowthHistory(int id) {
         KoiGrowthHistory koiGrowthHistory = getGrowthHistory(id);
         if(koiGrowthHistory.getId()==getLastestKoigrownId(koiGrowthHistory.getKoiId())){
@@ -447,6 +463,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteKoiFishList(List<Integer> koifishId) {
         for (Integer id : koifishId) {
             deleteKoiFish(id);
@@ -454,6 +471,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<KoiFish> getFishByListId(List<Integer> koiFishId) {
         List<KoiFish> koiFishList = new ArrayList<>();
         for (Integer id : koiFishId) {
