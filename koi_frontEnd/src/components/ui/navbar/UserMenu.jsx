@@ -89,12 +89,14 @@ export const UserMenu = () => {
         <div className="flex flex-col">
           <Button
             className="mb-[10px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+            id="login-dialog"
             onClick={showModalLogin}
           >
             {t("Login")}
           </Button>
           <Button
             className="!w-[100px] text-center bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
+            id="register-dialog"
             onClick={showModalRegister}
           >
             {t("Register")}

@@ -138,6 +138,7 @@ const LoginForm = ({
             marginBottom: "10px",
           }}
           size="large"
+          id="login-button"
           className="!text-white w-[100%] !hover:bg-rose-700"
         >
           {t("login")}
@@ -153,6 +154,7 @@ const LoginForm = ({
           <span
             onClick={handleShowModalRegister}
             className="text-orange-400 underline hover:!text-orange-600 cursor-pointer"
+            id="register-button"
           >
             {t("register")}
           </span>
