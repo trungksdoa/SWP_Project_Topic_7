@@ -16,7 +16,6 @@ import static com.product.server.koi_control_application.mappingInterface.Catego
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Tag(name = "Category", description = "API for Category")
-
 public class CategoryController {
     private final ICategoryService categoryService;
 
