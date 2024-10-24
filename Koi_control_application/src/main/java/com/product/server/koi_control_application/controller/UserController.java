@@ -90,11 +90,6 @@ public class UserController {
 
         Users savedUser = userService.saveUser(users);
 
-        userService.userRegisterMail(
-                URLEncoder.encode(savedUser.getEmail(), StandardCharsets.UTF_8),
-                savedUser
-        );
-
         return ResponseUtil.createResponse(null, "User registered successfully", HttpStatus.CREATED);
     }
 
@@ -214,6 +209,20 @@ public class UserController {
         String jsonBody = new ObjectMapper().writeValueAsString(momoPaymentRequest);
         HttpResponse<String> response = sendHttpRequest(jsonBody, PAYMENT_URL);
         return new ObjectMapper().readTree(response.body());
+    }
+
+    @GetMapping("/lock/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse> lockedUser(@PathVariable int userId) {
+        userService.lockedUser(userId);
+        return ResponseUtil.createSuccessResponse("User locked successfully", "User locked successfully");
+    }
+
+    @GetMapping("/unlock/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<BaseResponse> unlockUser(@PathVariable int userId) {
+        userService.unlockUser(userId);
+        return ResponseUtil.createSuccessResponse("User unlocked successfully", "User unlocked successfully");
     }
 
 }

@@ -18,14 +18,6 @@ import java.util.List;
 public interface IUserService {
 
     /**
-     * Sends a registration email to the user.
-     *
-     * @param email      The email address of the user.
-     * @param savedUser  The Users object representing the registered user.
-     */
-    void userRegisterMail(String email, Users savedUser);
-
-    /**
      * Retrieves a user by their ID.
      *
      * @param id The ID of the user to retrieve.
@@ -40,23 +32,6 @@ public interface IUserService {
      * @return      The Users object corresponding to the provided email.
      */
     Users getUsersByEmail(String email);
-
-    /**
-     * Retrieves a user by their username.
-     *
-     * @param username The username of the user to retrieve.
-     * @return        The Users object corresponding to the provided username.
-     */
-    Users getUsersByUsername(String username);
-
-    /**
-     * Authenticates a user based on their username and password.
-     *
-     * @param username The username of the user.
-     * @param password The password of the user.
-     * @return        The authenticated Users object.
-     */
-    Users userLogin(String username, String password);
 
     /**
      * Retrieves a paginated list of users.
@@ -89,12 +64,6 @@ public interface IUserService {
      */
     Users saveUser(UserRegister register);
 
-    /**
-     * Initiates a password reset process for a user.
-     *
-     * @param email The email address of the user requesting a password reset.
-     */
-    void resetPassword(String email);
 
     /**
      * Generates a new random password.
@@ -135,4 +104,8 @@ public interface IUserService {
      * @param userPackage The UserPackage object to be added.
      */
     void addPackage(int userId, UserPackage userPackage);
+
+    void lockedUser(int userId);
+
+    void unlockUser(int userId);
 }

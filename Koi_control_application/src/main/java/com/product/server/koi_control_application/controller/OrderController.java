@@ -179,7 +179,7 @@ public class OrderController {
             "SHIPPING, " +
             "DELIVERED, " +
             "}")
-    public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, OrderVerifyDTO data) {
+    public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request,@RequestBody OrderVerifyDTO data) {
         //To confirm that the user is an admin
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.COMPLETED.getValue());
@@ -197,15 +197,16 @@ public class OrderController {
             "SHIPPING, " +
             "DELIVERED, " +
             "}")
-    public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, OrderVerifyDTO data) {
+    public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request,@RequestBody OrderVerifyDTO data) {
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SHIPPING.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/order/delivered")
-    public ResponseEntity<BaseResponse> updateDeliveredOrder(HttpServletRequest request,@RequestParam int orderId) {
+    @PostMapping("/order/delivered")
+    public ResponseEntity<BaseResponse> updateDeliveredOrder(HttpServletRequest request,@RequestBody OrderVerifyDTO data) {
+        int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
