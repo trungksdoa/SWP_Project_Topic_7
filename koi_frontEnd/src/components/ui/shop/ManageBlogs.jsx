@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { manageBlogsServicesH } from "../../../services/shop/manageBlogServicesH";
 import { useSelector } from "react-redux";
 import { useGetBlogsByAuthorId } from "../../../hooks/blogs/useGetBlogsByAuthorId";
-import { Table, Button, Spin } from "antd"; // Import Table and Button from antd
+import { Table, Button, Spin, Tooltip, Modal } from "antd";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
 import { useDeleeteBlogById } from "../../../hooks/blogs/useDeleeteBlogById";
+import { toast } from "react-toastify";
 
 const ManageBlogs = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -24,21 +25,31 @@ const ManageBlogs = () => {
     refetch();
   }, []);
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      setDeletingId(id); // Set ID sản phẩm đang được xóa
-      mutatetion.mutate(id, {
-        onSuccess: () => {
-          toast.success("Delete Product Successfully!");
-          refetch();
-          setDeletingId(null); // Xóa thành công, reset ID xóa
-        },
-        onError: () => {
-          toast.error("Delete Product Failed!");
-          setDeletingId(null); // Nếu lỗi, reset ID xóa
-        },
-      });
+    Modal.confirm({
+      title: 'Delete Blog',
+      content: 'Are you sure you want to delete this blog?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        deleteBlog(id);
+      },
+    });
+  };
+
+  const deleteBlog = async (id) => {
+    setDeletingId(id);
+    try {
+      await mutatetion.mutateAsync(id);
+      toast.success("Blog deleted successfully!");
+      refetch();
+    } catch (error) {
+      toast.error(`Error deleting blog: ${error.message}`);
+    } finally {
+      setDeletingId(null);
     }
   };
+
   // if (isFetching) {
   //   return (
   //     <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -47,97 +58,106 @@ const ManageBlogs = () => {
   //   );
   // }
 
+  const truncateText = (text, maxLength) => {
+    if (text && text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    }
+    return text;
+  };
+
   const columns = [
     {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      width: "10%",
+      width: "20%",
+      render: (text) => (
+        <Tooltip title={text}>
+          <div className="truncate">{truncateText(text, 30)}</div>
+        </Tooltip>
+      ),
     },
     {
-      title: "Header Top",
+      title: "Header",
       dataIndex: "headerTop",
       key: "headerTop",
+      width: "20%",
+      render: (text) => (
+        <Tooltip title={text}>
+          <div className="truncate">{truncateText(text, 30)}</div>
+        </Tooltip>
+      ),
     },
     {
-      title: "Header Middle",
-      dataIndex: "headerMiddle",
-      key: "headerMiddle",
-    },
-    {
-      title: "Content Top",
+      title: "Content",
       dataIndex: "contentTop",
       key: "contentTop",
+      width: "30%",
       render: (text) => (
-        <div>{text.length > 100 ? `${text.substring(0, 100)}... ` : text}</div>
+        <Tooltip title={text}>
+          <div className="truncate">{truncateText(text, 50)}</div>
+        </Tooltip>
       ),
     },
     {
-      title: "Content Middle",
-      dataIndex: "contentMiddle",
-      key: "contentMiddle",
-      render: (text) => (
-        <div>{text.length > 100 ? `${text.substring(0, 100)}... ` : text}</div>
-      ),
-    },
-    {
-      title: "Body Image",
+      title: "Image",
       dataIndex: "bodyImageUrl",
       key: "bodyImageUrl",
-      render: (url) => <img src={url} alt="Body" style={{ width: "100px" }} />,
-    },
-    {
-      title: "Header Image",
-      dataIndex: "headerImageUrl",
-      key: "headerImageUrl",
+      width: "10%",
       render: (url) => (
-        <img src={url} alt="Header" style={{ width: "100px" }} />
+        <img 
+          src={url} 
+          alt="Body" 
+          className="w-12 h-12 object-cover rounded"
+        />
       ),
     },
     {
       title: "Actions",
       key: "actions",
+      width: "20%",
       render: (_, record) => {
         return (
-          <>
+          <div className="flex space-x-2">
             <Button
-              className="mr-[15px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white w-20 h-8"
-              onClick={() => {
-                navigate(`${PATH.EDIT_BLOG}/${record?.id}`);
-              }}
+              className="bg-green-400 text-white hover:bg-green-500 hover:text-white"
+              onClick={() => navigate(`${PATH.EDIT_BLOG}/${record?.id}`)}
             >
               Edit
             </Button>
             <Button
-              onClick={() => {
-                handleDelete(record?.id);
-              }}
+              onClick={() => handleDelete(record?.id)}
               loading={deletingId === record?.id}
-              className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out w-20 h-8"
+              className="bg-red-600 text-white hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out"
             >
               Delete
             </Button>
-          </>
+          </div>
         );
       },
-      width: "15%",
     },
   ];
 
   return (
-    <div className="my-[60px]">
-      <div className="flex justify-center items-center text-bold text-3xl h-2 mb-2">
-        <strong>Manage Blog</strong>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <Button
+          className="bg-black text-white hover:bg-gray-800"
+          onClick={() => navigate('/blogs/add')}
+        >
+          Add Blog
+        </Button>
+        <h1 className="text-3xl font-bold absolute left-1/2 transform -translate-x-1/2">Manage Blogs</h1>
+        <div className="w-[100px]"></div> {/* Spacer to balance the layout */}
       </div>
-      <button
-        className="bg-black text-white px-[12px] py-[8px] rounded-[6px] mb-[30px]"
-        onClick={() => {
-          navigate(PATH.ADD_BLOG);
-        }}
-      >
-        Add Blogs
-      </button>
-      <Table dataSource={lstBlogs} columns={columns} rowKey="id" />
+      <Table 
+        dataSource={lstBlogs} 
+        columns={columns} 
+        rowKey="id" 
+        pagination={{ pageSize: 10 }}
+        className="shadow-lg rounded-lg overflow-hidden"
+        bordered={false} // Remove the border
+      />
     </div>
   );
 };

@@ -8,7 +8,7 @@ import com.product.server.koi_control_application.pojo.KoiFishDTO;
 import com.product.server.koi_control_application.pojo.KoiFishUpdateRequest;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.pojo.response.KoiFishHisUpdateRequest;
-import com.product.server.koi_control_application.pojo.response.ListSwapKoiFishDTO;
+import com.product.server.koi_control_application.pojo.response.ListKoiFishDTO;
 import com.product.server.koi_control_application.repository.KoiFishRepository;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import com.product.server.koi_control_application.serviceInterface.IKoiFishService;
@@ -95,9 +95,8 @@ public class KoiFishController {
     @PutMapping(value = "/{koiFishId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateKoiFish(@PathVariable("koiFishId") int koiFishId,
                                                       @Schema(type = "string", format = "json", implementation = KoiFishUpdateRequest.class)
-                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file
-                                                      //  @RequestParam(value = "isNew", required = false) Boolean isNew) t
-    ) throws IOException {
+                                                      @RequestPart("fish") @Valid String koiFishJson, @RequestParam(value = "image", required = false) MultipartFile file,
+                                                      @RequestParam(value = "isNew", required = false) Boolean isNew) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -105,7 +104,7 @@ public class KoiFishController {
         @Valid KoiFish koiFish = mapper.readValue(koiFishJson, KoiFish.class);
 
         BaseResponse response = BaseResponse.builder()
-                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, false))
+                .data(iKoiFishService.updateKoiFish(koiFishId, koiFish, file, isNew))
                 .message("Update fish successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
@@ -140,6 +139,22 @@ public class KoiFishController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/deletelistkoi")
+    public ResponseEntity<BaseResponse> deleteKoiFishByList( @Schema(type = "string", format = "json", implementation = ListKoiFishDTO.class)
+                                                                 @RequestPart("fishlist") @Valid List<Integer> koiFishs)  {
+        List<KoiFish> koiFishs1 = iKoiFishService.getFishByListId(koiFishs);
+        iKoiFishService.deleteKoiFishList(koiFishs);
+        BaseResponse response = BaseResponse.builder()
+                .data(koiFishs1)
+                .message("Delete fishlist successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 
 
     @GetMapping("/listkoi/bypondid/{pondId}/page")
@@ -265,7 +280,7 @@ public class KoiFishController {
 
     @PutMapping(value = "/swappondbylistkoi/{pondId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse> swapPondByListKoi(@PathVariable("pondId") int pondId,
-                                                          @Schema(type = "string", format = "json", implementation = ListSwapKoiFishDTO.class)
+                                                          @Schema(type = "string", format = "json", implementation = ListKoiFishDTO.class)
                                                           @RequestPart("fishlist") @Valid List<Integer> koiFishs) {
 
         BaseResponse response = BaseResponse.builder()
@@ -307,4 +322,9 @@ public class KoiFishController {
     public ResponseEntity<BaseResponse> batchUpdateKoiFish(@RequestBody @Valid List<KoiFishUpdateRequest> updateRequests) {
         throw new UnsupportedOperationException("This method is not implemented yet");
     }
+
+
+
+
+
 }

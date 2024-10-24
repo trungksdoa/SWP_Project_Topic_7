@@ -38,6 +38,7 @@ const KoiUpdate = () => {
   const queryClient = useQueryClient();
   const { data: growthData, refetch: refetchGrowthData, isLoading, isError, error } = useGetGrowth(id);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAddingGrowth, setIsAddingGrowth] = useState(false);
 
   const koi = location.state?.koi;
 
@@ -53,9 +54,6 @@ const KoiUpdate = () => {
     refetch();
   }, [koi, refetch]);
 
-  useEffect(() => {
-    console.log("Growth data in component:", growthData);
-  }, [growthData]);
 
   const calculateAge = (birthDate) => {
     if (birthDate) {
@@ -71,7 +69,11 @@ const KoiUpdate = () => {
   const handleViewChart = async () => {
     try {
       await refetchGrowthData();
-      setIsModalVisible(true);
+      if (!growthData || growthData.length === 0) {
+        toast.info("No growth data available. Please add growth history first.");
+      } else {
+        setIsModalVisible(true);
+      }
     } catch (error) {
       console.error("Error refetching growth data:", error);
       toast.error("Failed to fetch growth data");
@@ -143,44 +145,13 @@ const KoiUpdate = () => {
         formData.append("image", values.image);
       }
 
-      // Update Koi
       updateKoiMutation.mutate(
         { id: id, payload: formData },
         {
           onSuccess: (updatedKoi) => {
             dispatch(manageKoiActions.updateKoi(updatedKoi));
             toast.success("Koi updated successfully");
-
-            // Add Growth data
-            const growthData = {
-              fish: {
-                name: values.name || "",
-                variety: values.variety || "",
-                sex: values.sex === "true",
-                purchasePrice: parseFloat(values.purchasePrice) || 0,
-                weight: parseFloat(values.weight) || 0,
-                length: parseFloat(values.length) || 0,
-                pondId: parseInt(values.pondId) || null,
-                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
-                userId: userId,
-                date: values.date ? values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-              }
-            };
-
-            addGrowthMutation.mutate(
-              { id, payload: growthData },
-              {
-                onSuccess: (addedGrowthData) => {
-                  dispatch(manageKoiActions.addGrowth({ id, growthData: addedGrowthData }));
-                  toast.success("Growth history added successfully");
-                  refetch();
-                },
-                onError: (error) => {
-                  console.error("Error adding growth history:", error);
-                  toast.error(`Error adding growth history: ${error.message}`);
-                },
-              }
-            );
+            refetch(); // Refetch the koi list to update the UI
           },
           onError: (error) => {
             console.error("Error updating koi:", error);
@@ -233,30 +204,28 @@ const KoiUpdate = () => {
     }
   };
 
-  const handleAddGrowthHistory = () => {
-    const values = form.getFieldsValue(['weight', 'length', 'date']);
-    
-    if (!values.weight || !values.length || !values.date) {
-      toast.error('Please fill in weight, length, and date fields');
-      return;
-    }
-
-    const payload = {
-      weight: values.weight,
-      length: values.length,
-      date: values.date.format('YYYY-MM-DD'),
+  const handleAddGrowth = () => {
+    setIsAddingGrowth(true);
+    const growthData = {
+      weight: parseFloat(formik.values.weight) || 0,
+      length: parseFloat(formik.values.length) || 0,
+      pondId: parseInt(formik.values.pondId) || null,
+      date: formik.values.date ? formik.values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
     };
 
-    addGrowthHistoryMutation(
-      { id, payload },
+    addGrowthMutation.mutate(
+      { id: id, payload: { fishgrow: JSON.stringify(growthData) } },
       {
         onSuccess: () => {
-          dispatch(manageKoiActions.addGrowthHistory(payload));
-          toast.success("Growth history entry added successfully");
-          refetchGrowthHistory();
+          toast.success("Growth data added successfully");
+          refetchGrowthData(); // Refetch growth data after adding new entry
         },
         onError: (error) => {
-          toast.error(`Error adding growth history: ${error.message}`);
+          console.error("Error adding growth data:", error);
+          toast.error(`Error adding growth data: ${error.message}`);
+        },
+        onSettled: () => {
+          setIsAddingGrowth(false);
         }
       }
     );
@@ -390,11 +359,19 @@ const KoiUpdate = () => {
           >
             Delete Koi
           </Button>
+          
           <Button
             className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold ml-2 text-xl"
             onClick={handleViewChart}
           >
             View Chart
+          </Button>
+          <Button
+            className="w-70 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold ml-2 text-xl"
+            onClick={handleAddGrowth}
+            loading={isAddingGrowth}
+          >
+            Add Growth History
           </Button>
         </Form.Item>
         <div className="items-center space-x-4 mb-4 ml-8">

@@ -3,6 +3,6 @@ import { manageKoiFishServices } from "../../services/koifish/manageKoiFishServi
 
 export const useUpdateKoi = () => {
     return useMutation({
-        mutationFn: ({id, payload, userId}) => manageKoiFishServices.updateKoi(id, payload, userId)
+        mutationFn: ({id, payload}) => manageKoiFishServices.updateKoi(id, payload)
     })
 }
