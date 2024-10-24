@@ -1,7 +1,7 @@
 import { MANAGE_CATEGORY_API } from "../../constant/api";
-import { apiInstanceHeader } from "../../constant/apiInstanceHeader";
+import { apiInstance } from "../../constant/apiInstance";
 
-const api = apiInstanceHeader.create({
+const api = apiInstance.create({
     baseURL: MANAGE_CATEGORY_API
 })
 
