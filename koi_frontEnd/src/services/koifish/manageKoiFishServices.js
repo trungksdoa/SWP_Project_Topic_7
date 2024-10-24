@@ -7,7 +7,16 @@ const api = apiInstanceHeader.create({
 
 export const manageKoiFishServices = {
     getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
-    updateKoi: (id, payload) => api.put(`/${id}`, payload),
+    updateKoi: async (id, payload, isNew = false) => {
+        const url = `/${id}?isNew=${isNew}`;
+        try {
+            const response = await api.put(url, payload);
+            return response.data;
+        } catch (error) {
+            console.error('Error in updateKoi:', error.response || error);
+            throw error;
+        }
+    },
     addKoi: async (payload) => {
         console.log("Payload received in addKoi:", payload); // Add this line for debugging
 
@@ -56,8 +65,8 @@ export const manageKoiFishServices = {
     },
     deleteKoi: (id) => api.delete(`/${id}`),
     updateKoiPond: (id, payload) => api.put(`/${id}`, payload),
-    addGrowth: async (id, payload) => {
-        console.log("Payload received in addGrowth:", payload); // Add this line for debugging
+    addGrowth: async (id, payload, isNew = true) => {
+        console.log("Payload received in addGrowth:", payload);
 
         const formData = new FormData();
         
@@ -66,12 +75,14 @@ export const manageKoiFishServices = {
         } else if (typeof payload.fishgrow === 'string') {
             formData.append('fishgrow', payload.fishgrow);
         } else {
-            console.error('Invalid fish data:', payload.fishgrow); // Add this line for debugging
+            console.error('Invalid fish data:', payload.fishgrow);
             throw new Error('Invalid fish data');
         }
 
+        const url = `/growthUpHistory/${id}?isNew=${isNew}`;
+
         try {
-            const response = await api.post(`/growthUpHistory/${id}`, formData, {
+            const response = await api.post(url, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

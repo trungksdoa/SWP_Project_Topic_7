@@ -5,7 +5,7 @@ import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useGetPondById } from "../../../hooks/koi/useGetPondById.js";
 import { useUpdateKoi } from '../../../hooks/koi/useUpdateKoi';
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal, Pagination } from "antd";
+import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal, Pagination, Space } from "antd";
 import { toast } from "react-toastify";
 import { manageKoiActions } from '../../../store/manageKoi/slice';
 import dayjs from 'dayjs';
@@ -15,7 +15,7 @@ import { useDeletePond } from "../../../hooks/koi/useDeletePond";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useAddKoi } from "../../../hooks/koi/useAddKoi";
-import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
+import { SortAscendingOutlined, SortDescendingOutlined, SearchOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -58,6 +58,8 @@ const PondDetail = () => {
     const [showMoveKoiConfirmation, setShowMoveKoiConfirmation] = useState(false);
     const [selectedDestinationPond, setSelectedDestinationPond] = useState(null);
     const [isMovingKoi, setIsMovingKoi] = useState(false);
+    const [allSelected, setAllSelected] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const pondData = pond || selectedPond;
 
@@ -94,11 +96,24 @@ const PondDetail = () => {
         if (birthDate) {
             const today = dayjs();
             const birthDayjs = dayjs(birthDate);
-            const ageInDays = today.diff(birthDayjs, 'day');
-            setKoiAge(ageInDays);
+            const ageInMonths = today.diff(birthDayjs, 'month');
+            setKoiAge(ageInMonths);
         } else {
             setKoiAge(null);
         }
+    };
+
+    // Add a new function to format the age
+    const formatAge = (ageInMonths) => {
+        if (ageInMonths === null) return 'Unknown';
+        const years = Math.floor(ageInMonths / 12);
+        const months = ageInMonths % 12;
+
+        const parts = [];
+        if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
+        if (months > 0 || parts.length === 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+
+        return parts.join(', ');
     };
 
     useEffect(() => {
@@ -237,7 +252,6 @@ const PondDetail = () => {
     });
 
     const handleDeleteClick = (pondId) => {
-        const pond = lstPond.find(p => p.id === pondId);
         const fishCount = koiInPond.length;
     
         Modal.confirm({
@@ -339,7 +353,7 @@ const PondDetail = () => {
     };
     
     const confirmMoveFish = async () => {
-        if (!selectedPondId) {
+        if (!destinationPond) {
           toast.error("Please select a destination pond");
           return;
         }
@@ -347,21 +361,28 @@ const PondDetail = () => {
         setIsMovingFish(true);
     
         try {
+          // Get all koi in the pond to be deleted
+          const koiToMove = koiInPond;
+    
           // Update each koi's pond ID
-          await Promise.all(koiInPond.map(koi => {
+          await Promise.all(koiToMove.map(koi => {
             const formData = new FormData();
-            const updateKoi = {
+            const updatedKoi = {
               ...koi,
-              pondId: selectedPondId,
+              pondId: destinationPond,
             };
-            formData.append("fish", JSON.stringify(updateKoi));
+            formData.append("fish", JSON.stringify(updatedKoi));
             
             return updateKoiMutation.mutateAsync(
               { id: koi.id, payload: formData },
               {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
+                onSuccess: (updatedKoi) => {
+                  dispatch(manageKoiActions.updateKoi(updatedKoi));
                 },
+                onError: (error) => {
+                  console.error(`Error updating koi ${koi.id}:`, error);
+                  toast.error(`Error updating koi ${koi.id}: ${error.message}`);
+                }
               }
             );
           }));
@@ -369,8 +390,9 @@ const PondDetail = () => {
           // Delete the original pond
           await deletePondMutation.mutateAsync(pondIdNumber);
     
-          toast.success("Pond deleted and fish moved successfully!");
+          toast.success("Fish moved and pond deleted successfully!");
           setShowMoveConfirmation(false);
+          setDestinationPond(null);
           navigate('/pond-management');
         } catch (error) {
           console.error("Error moving fish:", error);
@@ -382,11 +404,11 @@ const PondDetail = () => {
 
     const handleKoiSelectionForDeletion = (koiId) => {
         setSelectedKoiForDeletion(prev => {
-            if (prev.includes(koiId)) {
-                return prev.filter(id => id !== koiId);
-            } else {
-                return [...prev, koiId];
-            }
+            const newSelection = prev.includes(koiId)
+                ? prev.filter(id => id !== koiId)
+                : [...prev, koiId];
+            setAllSelected(newSelection.length === currentKoi.length);
+            return newSelection;
         });
     };
 
@@ -547,9 +569,15 @@ const PondDetail = () => {
         });
     }, [koiInPond, sortCriteria, sortOrder]);
 
+    const filteredKoiInPond = useMemo(() => {
+        return sortedKoiInPond.filter(koi => 
+            koi.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sortedKoiInPond, searchTerm]);
+
     const indexOfLastKoi = currentPage * koiPerPage;
     const indexOfFirstKoi = indexOfLastKoi - koiPerPage;
-    const currentKoi = sortedKoiInPond.slice(indexOfFirstKoi, indexOfLastKoi);
+    const currentKoi = filteredKoiInPond.slice(indexOfFirstKoi, indexOfLastKoi);
 
     const onPageChange = (page) => {
         setCurrentPage(page);
@@ -606,6 +634,20 @@ const PondDetail = () => {
         } finally {
             setIsMovingKoi(false);
         }
+    };
+
+    const handleSelectAll = (checked) => {
+        setAllSelected(checked);
+        if (checked) {
+            setSelectedKoiForDeletion(currentKoi.map(koi => koi.id));
+        } else {
+            setSelectedKoiForDeletion([]);
+        }
+    };
+
+    const handleCancelSelect = () => {
+        setSelectedKoiForDeletion([]);
+        setAllSelected(false);
     };
 
     if (koiError) {
@@ -715,23 +757,32 @@ const PondDetail = () => {
             <h2 className="text-2xl font-bold my-6 text-center">Koi in Pond</h2>
             
             <div className="flex justify-between items-center mx-4 my-6">
-                <div className="w-1/3"></div> {/* Empty div for spacing */}
+                <div className="flex justify-start items-center w-1/3">
+                    <Input
+                        placeholder="Search by name"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{ width: 300, height: 50, fontSize: 18 }}
+                        className="mr-2"
+                        suffix={<SearchOutlined style={{ fontSize: 18 }} />}
+                    />
+                </div>
                 <div className="flex justify-center items-center">
                     <button
-                        className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
+                        className="w-40 h-auto min-h-[2.5rem] py-1 px-1 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
                         onClick={handleAddNewKoi}
                     >
                         Add a new Koi
                     </button>
                     <button
-                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForDeletion.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
+                        className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForDeletion.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold`}
                         disabled={selectedKoiForDeletion.length === 0 || isDeletingKoi}
                         onClick={handleDeleteSelectedKoi}
                     >
                         {isDeletingKoi ? "Deleting..." : "Delete Koi"}
                     </button>
                     <button
-                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForDeletion.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
+                        className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForDeletion.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
                         disabled={selectedKoiForDeletion.length === 0 || isMovingKoi}
                         onClick={handleMoveSelectedKoi}
                     >
@@ -739,24 +790,39 @@ const PondDetail = () => {
                     </button>
                 </div>
                 <div className="flex justify-end items-center w-1/3">
-                    <Select
-                        defaultValue="name"
-                        style={{ width: 120 }}
-                        onChange={handleSortChange}
+                    <Space>
+                        <Select
+                            defaultValue="name"
+                            style={{ width: 120 }}
+                            onChange={handleSortChange}
+                        >
+                            <Option value="name">Name</Option>
+                            <Option value="length">Length</Option>
+                            <Option value="weight">Weight</Option>
+                            <Option value="age">Age</Option>
+                            <Option value="dateCreated">Date Created</Option>
+                        </Select>
+                        <Button onClick={toggleSortOrder}>
+                            {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+                        </Button>
+                    </Space>
+                    <Checkbox
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        checked={allSelected}
+                        className="ml-1 mr-1 whitespace-nowrap"
                     >
-                        <Option value="name">Name</Option>
-                        <Option value="length">Length</Option>
-                        <Option value="weight">Weight</Option>
-                        <Option value="age">Age</Option>
-                        <Option value="dateCreated">Date Created</Option>
-                    </Select>
-                    <Button onClick={toggleSortOrder} className="ml-2">
-                        {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+                        Select All
+                    </Checkbox>
+                    <Button
+                        onClick={handleCancelSelect}
+                        disabled={selectedKoiForDeletion.length === 0}
+                    >
+                        Cancel
                     </Button>
                 </div>
             </div>
 
-            {sortedKoiInPond.length === 0 ? ( 
+            {filteredKoiInPond.length === 0 ? ( 
                 <p className="text-center mt-6">No koi found in this pond.</p>
             ) : (
                 <>
@@ -781,7 +847,7 @@ const PondDetail = () => {
                     <div className="flex justify-center mt-8 mb-8">
                         <Pagination
                             current={currentPage}
-                            total={sortedKoiInPond.length}
+                            total={filteredKoiInPond.length}
                             pageSize={koiPerPage}
                             onChange={onPageChange}
                             showSizeChanger={false}
@@ -825,7 +891,7 @@ const PondDetail = () => {
                                 <p className="flex justify-between mb-1"><strong>Weight:</strong> <span>{selectedKoi.weight} grams</span></p>
                                 <p className="flex justify-between mb-1"><strong>Length:</strong> <span>{selectedKoi.length} cm</span></p>
                                 <p className="flex justify-between mb-1"><strong>Date of Birth:</strong> <span>{selectedKoi.dateOfBirth ? dayjs(selectedKoi.dateOfBirth).format('YYYY-MM-DD') : 'Unknown'}</span></p>
-                                <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{koiAge !== null ? `${koiAge} days` : 'Unknown'}</span></p>
+                                <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{formatAge(koiAge)}</span></p>
                             </div>
                         </div>
                     </div>
@@ -838,15 +904,15 @@ const PondDetail = () => {
                 visible={showMoveConfirmation}
                 onCancel={() => setShowMoveConfirmation(false)}
                 footer={null}
-                width={800} // Increased width to accommodate the grid
+                width={800}
               >
                 <p>Select a pond to move the fish to:</p>
                 <div className="grid grid-cols-4 gap-4 mt-4 mb-6">
                   {otherPonds.map(pond => (
                     <div 
                       key={pond.id} 
-                      className={`cursor-pointer border p-2 rounded ${selectedPondId === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
-                      onClick={() => setSelectedPondId(pond.id)}
+                      className={`cursor-pointer border p-2 rounded ${destinationPond === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
+                      onClick={() => setDestinationPond(pond.id)}
                     >
                       <img 
                         src={pond.imageUrl} 
@@ -869,7 +935,7 @@ const PondDetail = () => {
                     key="submit" 
                     type="primary" 
                     onClick={confirmMoveFish}
-                    disabled={!selectedPondId || isMovingFish}
+                    disabled={!destinationPond || isMovingFish}
                     loading={isMovingFish}
                   >
                     Confirm Move

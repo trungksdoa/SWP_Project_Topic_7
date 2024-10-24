@@ -25,19 +25,7 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
     if (selectedYear) {
       filtered = filtered.filter(data => new Date(data.date).getFullYear() === selectedYear);
     }
-    
-    // Remove duplicate data points
-    return filtered.reduce((acc, current, index, array) => {
-      if (index === 0) {
-        acc.push(current);
-      } else {
-        const prev = array[index - 1];
-        if (current.length !== prev.length || current.weight !== prev.weight) {
-          acc.push(current);
-        }
-      }
-      return acc;
-    }, []);
+    return filtered;
   }, [growthData, selectedYear]);
 
   const getDateRange = () => {
@@ -79,7 +67,6 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
     >
       {isLoading && <p>Loading growth data...</p>}
       {isError && <p>Error loading growth data: {error?.message}</p>}
-      {!isLoading && !isError && filteredGrowthData.length > 0 ? (
         <>
           <Select
             style={{ width: 120, marginBottom: 16 }}
@@ -114,10 +101,7 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
               <Line yAxisId="right" type="monotone" dataKey="weight" stroke="#82ca9d" name="Weight (kg)" />
             </LineChart>
           </ResponsiveContainer>
-        </>
-      ) : (
-        <p>No growth data available for this koi.</p>
-      )}
+        </>  
     </Modal>
   );
 };
