@@ -59,8 +59,8 @@ const KoiUpdate = () => {
     if (birthDate) {
       const today = dayjs();
       const birthDayjs = dayjs(birthDate);
-      const ageInDays = today.diff(birthDayjs, 'day');
-      setKoiAge(ageInDays);
+      const ageInMonths = today.diff(birthDayjs, 'month');
+      setKoiAge(ageInMonths);
     } else {
       setKoiAge(null);
     }
@@ -84,16 +84,14 @@ const KoiUpdate = () => {
     setIsModalVisible(false);
   };
 
-  const formatAge = (ageInDays) => {
-    if (ageInDays === null) return 'Unknown';
-    const years = Math.floor(ageInDays / 365);
-    const months = Math.floor((ageInDays % 365) / 30);
-    const days = ageInDays % 30;
+  const formatAge = (ageInMonths) => {
+    if (ageInMonths === null) return 'Unknown';
+    const years = Math.floor(ageInMonths / 12);
+    const months = ageInMonths % 12;
 
     const parts = [];
     if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
-    if (months > 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
-    if (days > 0 || parts.length === 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    if (months > 0 || parts.length === 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
 
     return parts.join(', ');
   };
@@ -126,7 +124,7 @@ const KoiUpdate = () => {
       image: null,
       date: koi?.date ? dayjs(koi.date) : dayjs(),
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const formData = new FormData();
       const updatedKoi = {
         name: values.name || "",
@@ -145,20 +143,26 @@ const KoiUpdate = () => {
         formData.append("image", values.image);
       }
 
-      updateKoiMutation.mutate(
-        { id: id, payload: formData },
-        {
-          onSuccess: (updatedKoi) => {
-            dispatch(manageKoiActions.updateKoi(updatedKoi));
-            toast.success("Koi updated successfully");
-            refetch(); // Refetch the koi list to update the UI
-          },
-          onError: (error) => {
-            console.error("Error updating koi:", error);
-            toast.error(`Error updating koi: ${error.message}`);
-          },
+      try {
+        await updateKoiMutation.mutateAsync(
+          { id: id, payload: formData, isNew: false },
+          {
+            onSuccess: (updatedKoi) => {
+              dispatch(manageKoiActions.updateKoi(updatedKoi));
+              toast.success("Koi updated successfully");
+              refetch();
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error updating koi:", error);
+        toast.error(`Error updating koi: ${error.message}`);
+        if (error.response) {
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
         }
-      );
+      }
     },
   });
 
@@ -204,31 +208,50 @@ const KoiUpdate = () => {
     }
   };
 
-  const handleAddGrowth = () => {
+  const handleAddGrowth = async () => {
     setIsAddingGrowth(true);
-    const growthData = {
+
+    const formData = new FormData();
+    const updatedKoi = {
+      name: formik.values.name || "",
+      variety: formik.values.variety || "",
+      sex: formik.values.sex === "true",
+      purchasePrice: parseFloat(formik.values.purchasePrice) || 0,
       weight: parseFloat(formik.values.weight) || 0,
       length: parseFloat(formik.values.length) || 0,
       pondId: parseInt(formik.values.pondId) || null,
+      dateOfBirth: formik.values.dateOfBirth ? formik.values.dateOfBirth.format('YYYY-MM-DD') : null,
+      userId: userId,
       date: formik.values.date ? formik.values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
     };
 
-    addGrowthMutation.mutate(
-      { id: id, payload: { fishgrow: JSON.stringify(growthData) } },
-      {
-        onSuccess: () => {
-          toast.success("Growth data added successfully");
-          refetchGrowthData(); // Refetch growth data after adding new entry
-        },
-        onError: (error) => {
-          console.error("Error adding growth data:", error);
-          toast.error(`Error adding growth data: ${error.message}`);
-        },
-        onSettled: () => {
-          setIsAddingGrowth(false);
+    formData.append("fish", JSON.stringify(updatedKoi));
+    if (formik.values.image) {
+      formData.append("image", formik.values.image);
+    }
+
+    try {
+      await updateKoiMutation.mutateAsync(
+        { id: id, payload: formData, isNew: true }, // Set isNew to true
+        {
+          onSuccess: () => {
+            toast.success("Growth data added successfully");
+            refetch(); // Refetch koi data after adding growth
+          },
+          onError: (error) => {
+            console.error("Error adding growth data:", error);
+            toast.error(`Error adding growth data: ${error.message}`);
+          },
+          onSettled: () => {
+            setIsAddingGrowth(false); // Ensure loading state is reset
+          }
         }
-      }
-    );
+      );
+    } catch (error) {
+      console.error("Error adding growth data:", error);
+      toast.error(`Error adding growth data: ${error.message}`);
+      setIsAddingGrowth(false); // Reset loading state on error
+    }
   };
 
   return (
@@ -348,7 +371,7 @@ const KoiUpdate = () => {
             type="primary"
             htmlType="submit"
             className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
-            loading={updateKoiMutation.isPending}
+            loading={updateKoiMutation.isLoading} // Use mutation's loading state
           >
             Update Koi
           </Button>
@@ -359,7 +382,7 @@ const KoiUpdate = () => {
           >
             Delete Koi
           </Button>
-          
+        
           <Button
             className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold ml-2 text-xl"
             onClick={handleViewChart}
@@ -369,7 +392,7 @@ const KoiUpdate = () => {
           <Button
             className="w-70 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold ml-2 text-xl"
             onClick={handleAddGrowth}
-            loading={isAddingGrowth}
+            loading={isAddingGrowth} // Only this button shows loading
           >
             Add Growth History
           </Button>
