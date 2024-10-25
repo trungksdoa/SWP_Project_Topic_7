@@ -6,10 +6,11 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
 import { PATH } from "../../../constant";
+import { usePostOrder } from "../../../hooks/order/usePostOrder";
 
 const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching }) => {
   const mutation = useDeleteOrder();
-  const sendOrderMutation = usePostSendOrder();
+  const sendOrderMutation = usePostOrder();
   const [loadingId, setLoadingId] = useState(null); 
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const navigate = useNavigate();
@@ -30,8 +31,26 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
   };
 
  
-  const handleContinueOrder = (orderId) => {
-    navigate(PATH.CHECKOUT);
+  const handleContinueOrder = (order) => {
+    const values = {
+      fullName: order.fullName || "",
+      phoneNumber: order.phoneNumber || "",
+      address: order.address || "",
+      orderId: order.id,
+    };
+
+    sendOrderMutation.mutate(values, {
+      onSuccess: (res) => {
+        if (res?.data?.data?.shortLink) {
+          window.location.href = res.data.data.shortLink;
+        } else {
+          toast.error("Failed to generate payment link");
+        }
+      },
+      onError: (error) => {
+        toast.error("Error processing the order: " + error.message);
+      }
+    });
   }
 
 
@@ -98,10 +117,9 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
               <strong>Cancel</strong>
             </Button>
             <Button
-              className="w-[120px] bg-black border-black border-[1px] text-white hover:!bg-black hover:!text-white ml-2"
-              onClick={() => {
-                handleContinueOrder(order?.id)
-              }}
+              className="w-[160px] bg-black border-black border-[1px] text-white hover:!bg-black hover:!text-white ml-2"
+              loading={sendOrderMutation.isPending}
+              onClick={() => handleContinueOrder(order)}
             >
               <strong>Continue Order</strong>
             </Button>

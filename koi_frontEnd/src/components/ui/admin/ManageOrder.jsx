@@ -147,35 +147,35 @@ const ManageOrder = () => {
         //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
           return (
-            <Tag color="gray" className="!bg-gray-500 !text-white">
+            <Tag color="gray" className="w-[100px] !bg-gray-500 !text-white text-center">
               PENDING
             </Tag>
           );
         }
         if (record.status === "CANCELLED") {
           return (
-            <Tag color="red" className="!bg-red-500 !text-white">
+            <Tag color="red" className="w-[100px] !bg-red-500 !text-white text-center">
               CANCELLED
             </Tag>
           );
         }
         if (record.status === "SUCCESS") {
           return (
-            <Tag color="green" className="!bg-green-500 !text-white">
+            <Tag color="green" className="w-[100px] !bg-green-500 !text-white text-center">
               WAIT FOR SHIPPING
             </Tag>
           );
         }
         if (record.status === "SHIPPING") {
           return (
-            <Tag color="blue" className="!bg-blue-500 !text-white">
+            <Tag color="blue" className="w-[100px] !bg-blue-500 !text-white text-center">
               ON DELIVERY
             </Tag>
           );
         }
         if (record.status === "DELIVERED") {
           return (
-            <Tag color="purple" className="!bg-purple-500 !text-white">
+            <Tag color="purple" className="w-[100px] !bg-purple-500 !text-white text-center">
               DELIVERED
             </Tag>
           );
@@ -183,7 +183,7 @@ const ManageOrder = () => {
         //COMPLETED
         if (record.status === "COMPLETED") {
           return (
-            <Tag color="orange" className="!bg-orange-500 !text-white">
+            <Tag color="orange" className="w-[100px] !bg-orange-500 !text-white text-center">
               COMPLETED
             </Tag>
           );
@@ -235,7 +235,7 @@ const ManageOrder = () => {
   return (
     <div>
       <Button
-        className="bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
+        className="mb-[15px] bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
         onClick={() => refetch()}
       >
         Refresh Data
