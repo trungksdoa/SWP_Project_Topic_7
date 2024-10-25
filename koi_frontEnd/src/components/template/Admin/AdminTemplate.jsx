@@ -240,7 +240,7 @@ const AdminTemplate = () => {
               icon={
                 <UnorderedListOutlined
                   style={{
-                    color: selectedKeys.includes(PATH.MANAGE_BLOG)
+                    color: selectedKeys.includes(PATH.ADMIN_BLOG)
                       ? "orange"
                       : "white",
                   }}
@@ -249,7 +249,7 @@ const AdminTemplate = () => {
             >
               <NavLink
                 key={8}
-                
+                to={PATH.ADMIN_BLOG}  
                 className={({ isActive }) =>
                   isActive ? "!text-orange-500" : "!text-white"
                 }

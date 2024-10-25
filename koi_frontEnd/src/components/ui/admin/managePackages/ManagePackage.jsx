@@ -1,41 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Spin } from "antd";
+import { Button, Table, Spin, Modal } from "antd";
 import { useGetPackage } from "../../../../hooks/admin/managePackages/useGetPackage";
-import { PATH } from "../../../../constant";
-import { useNavigate } from "react-router-dom";
 import { useDeletePackage } from '../../../../hooks/admin/managePackages/useDeletePackage'
+import { toast } from "react-toastify";
+import EditPackages from "./EditPackages";
+import AddPackage from "../managePackages/AddPackage";
+
 const ManagePackage = () => {
   const { data: lstPackage, refetch, isFetching } = useGetPackage();
-  const navigate = useNavigate()
   const [deletingId, setDeletingId] = useState(null);
-  const mutate = useDeletePackage()
+  const mutate = useDeletePackage();
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingPackageId, setEditingPackageId] = useState(null);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [nextId, setNextId] = useState(0);
 
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this package?")) {
-      setDeletingId(id); 
-      mutate.mutate(id, {
-        onSuccess: () => {
-          toast.success("Delete package successfully!");
-          refetch();
-          setDeletingId(null); 
-        },
-        onError: () => {
-          toast.error("Delete package failed!");
-          setDeletingId(null);
-        },
-      });
-    }
-  }
   useEffect(() => {
     refetch()
   }, [])
 
+  useEffect(() => {
+    if (lstPackage && lstPackage.length > 0) {
+      const maxId = Math.max(...lstPackage.map(pkg => pkg.id));
+      setNextId(maxId + 1);
+    }
+  }, [lstPackage]);
+
+  const handleDelete = (id) => {
+    Modal.confirm({
+        title: 'Delete Package',
+        content: 'Are you sure you want to delete this package?',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk() {
+            setDeletingId(id);
+            mutate.mutate(id, {
+                onSuccess: () => {
+                    toast.success("Delete package successfully!");
+                    refetch();
+                    setDeletingId(null);
+                },
+                onError: () => {
+                    toast.error("Delete package failed!");
+                    setDeletingId(null);
+                },
+            });
+        },
+    });
+  }
+
+  const handleEdit = (packageId) => {
+    setEditingPackageId(packageId);
+    setEditModalVisible(true);
+  };
+
+  const handleEditSuccess = () => {
+    refetch();
+  };
+
+  const handleAddSuccess = () => {
+    refetch();
+    setAddModalVisible(false);
+  };
 
   const columns = [
     {
         title: "ID",
-        dataIndex: "id"
+        dataIndex: "id",
+        align: "center",
+        width: "10%"
     },
     {
       title: "Name",
@@ -98,18 +132,16 @@ const ManagePackage = () => {
         render: (_, pkg) => (
           <div key={pkg.id}>
             <Button
-              onClick={() => {
-                navigate(`${PATH.EDIT_PACKAGE}/${pkg?.id}`);
-              }}
+              onClick={() => handleEdit(pkg?.id)}
               className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
             >
               Edit
             </Button>
             <Button
-            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
+            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
               onClick={() => handleDelete(pkg?.id)}
-              loading={deletingId === pkg?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
-              disabled={deletingId === pkg?.id} // Vô hiệu hóa nút nếu đang xóa
+              loading={deletingId === pkg?.id}
+              disabled={deletingId === pkg?.id}
             >
               Delete
             </Button>
@@ -122,6 +154,7 @@ const ManagePackage = () => {
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -132,6 +165,12 @@ const ManagePackage = () => {
 
   return (
     <div>
+      <Button
+        className="bg-orange-500 mb-4 text-white px-4 py-2 rounded-md"
+        onClick={() => setAddModalVisible(true)}
+      >
+        Add new package
+      </Button>
       <Table
         columns={columns}
         dataSource={data}
@@ -141,6 +180,18 @@ const ManagePackage = () => {
         }}
         size="small"
         className="compact-table"
+      />
+      <EditPackages
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        packageId={editingPackageId}
+        onSuccess={handleEditSuccess}
+      />
+      <AddPackage
+        visible={addModalVisible}
+        onCancel={() => setAddModalVisible(false)}
+        onSuccess={handleAddSuccess}
+        nextId={nextId}
       />
     </div>
   );
