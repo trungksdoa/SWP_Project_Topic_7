@@ -2,7 +2,12 @@ import React, { useEffect } from "react";
 import { Spin, Button, message } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
 
-const OrderDelivered = ({ lstDelivered, isFetching, refetch, switchToCompleteTab }) => {
+const OrderDelivered = ({
+  lstDelivered,
+  isFetching,
+  refetch,
+  switchToCompleteTab,
+}) => {
   if (isFetching) {
     return (
       <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
@@ -10,10 +15,6 @@ const OrderDelivered = ({ lstDelivered, isFetching, refetch, switchToCompleteTab
       </div>
     );
   }
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   const handleConfirmDelivery = (orderId) => {
     try {
@@ -65,7 +66,7 @@ const OrderDelivered = ({ lstDelivered, isFetching, refetch, switchToCompleteTab
             <p>
               Total Price:{" "}
               <span className="text-green-700">
-                {new Intl.NumberFormat("vi-VN", { 
+                {new Intl.NumberFormat("vi-VN", {
                   style: "currency",
                   currency: "VND",
                 }).format(order?.totalAmount)}

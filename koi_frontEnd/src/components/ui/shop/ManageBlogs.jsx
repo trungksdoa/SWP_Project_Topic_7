@@ -143,7 +143,7 @@ const ManageBlogs = () => {
       <div className="flex justify-between items-center mb-6">
         <Button
           className="bg-black text-white hover:bg-gray-800"
-          onClick={() => navigate('/blogs/add')}
+          onClick={() => navigate(PATH.ADD_BLOG)}
         >
           Add Blog
         </Button>

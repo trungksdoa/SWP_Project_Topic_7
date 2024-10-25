@@ -36,8 +36,8 @@ export const PATH = {
   BLOGS: "/blogs",
   BLOG_DETAIL: "/blogs/detail",
   MANAGE_BLOG: '/blogs/manageblogs',
-  EDIT_BLOG: '/blogs/edit',
-  ADD_BLOG: '/blogs/add',
+  EDIT_BLOG: '/blogs/manageblogs/edit',
+  ADD_BLOG: '/blogs/manageblogs/add',
   MANAGE_ORDER: "/admin/manage-order",
   MANAGE_PAYMENT_STATUS: '/admin/manage-payment-status'
 };
