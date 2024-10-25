@@ -137,7 +137,6 @@ const ManageUser = () => {
           </div>
         );
       },
-      width: "10%",
     },
     {
       title: <div style={{ textAlign: 'center' }}>Package</div>,
