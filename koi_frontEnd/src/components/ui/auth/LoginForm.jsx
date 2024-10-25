@@ -89,7 +89,7 @@ const LoginForm = ({
     <div className="flex flex-col items-center justify-center">
       <img src="../../../images/logo.webp" className="w-20 h-20" alt="logo" />
       <h1 className="text-[30px] font-bold text-orange-400 mt-[10px]">
-        {t("login")}
+        {t("Login")}
       </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -141,7 +141,7 @@ const LoginForm = ({
           id="login-button"
           className="!text-white w-[100%] !hover:bg-rose-700"
         >
-          {t("login")}
+          {t("Login")}
         </Button>
         <p
           className="underline cursor-pointer my-[10px] hover:text-black transition-all duration-300"
@@ -156,7 +156,7 @@ const LoginForm = ({
             className="text-orange-400 underline hover:!text-orange-600 cursor-pointer"
             id="register-button"
           >
-            {t("register")}
+            {t("Register")}
           </span>
         </p>
       </form>

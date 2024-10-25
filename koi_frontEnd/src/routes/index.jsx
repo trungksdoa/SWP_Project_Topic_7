@@ -45,6 +45,8 @@ import KoiMove from "../components/ui/manage/KoiMove";
 import Endpoint from "../components/ui/Endpoint";
 import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import AdminDashboard from "../components/ui/AdminDashboard";
+import ManageAdminBlog from "../components/ui/admin/manageAdminBlog";
+
 const router = [
   {
     element: <MainLayout />,
@@ -208,6 +210,10 @@ const router = [
           {
             path: PATH.MANAGE_PAYMENT_STATUS,
             element: <ManagePayment />
+          },
+          {
+            path: PATH.ADMIN_BLOG,
+            element: <ManageAdminBlog />
           }
         ],
       },
