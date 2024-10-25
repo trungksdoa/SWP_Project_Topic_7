@@ -16,12 +16,12 @@ const ManagePackage = () => {
       setDeletingId(id); 
       mutate.mutate(id, {
         onSuccess: () => {
-          toast.success("Delete Product Successfully!");
+          toast.success("Delete package successfully!");
           refetch();
           setDeletingId(null); 
         },
         onError: () => {
-          toast.error("Delete Product Failed!");
+          toast.error("Delete package failed!");
           setDeletingId(null);
         },
       });
@@ -34,23 +34,63 @@ const ManagePackage = () => {
 
   const columns = [
     {
-        title: "Id",
+        title: "ID",
         dataIndex: "id"
     },
     {
       title: "Name",
       dataIndex: "name",
+      render: (text, record) => {
+        let bgColor = '';
+        switch (record.name.toLowerCase()) {
+          case 'advanced':
+            bgColor = '#FAF3E1';
+            break;
+          case 'professional':
+            bgColor = '#F5E7C6';
+            break;
+          case 'vip':
+            bgColor = '#FF6D1F';
+            break;
+          case 'svip':
+            bgColor = '#222222';
+            break;
+          default:
+            bgColor = 'transparent';
+        }
+        
+        return (
+          <div
+            style={{
+              border: '1px solid #d9d9d9',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: bgColor,
+              color: record.name.toLowerCase() === 'svip' ? 'white' : 'inherit',
+              display: 'inline-block',
+              width: '110px',
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontWeight: 'bold',
+            }}
+          >
+            {text}
+          </div>
+        );
+      },
     },
     {
-      title: "fishSlots",
+      title: "Fish Slots",
       dataIndex: "fishSlots",
     },
     {
-      title: "pondSlots",
+      title: "Pond Slots",
       dataIndex: "pondSlots",
     },
     {
-      title: "price",
+      title: "Price",
       dataIndex: "price",
     },
     {
@@ -61,12 +101,12 @@ const ManagePackage = () => {
               onClick={() => {
                 navigate(`${PATH.EDIT_PACKAGE}/${pkg?.id}`);
               }}
-              className="mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
+              className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
             >
               Edit
             </Button>
             <Button
-            className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
+            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
               onClick={() => handleDelete(pkg?.id)}
               loading={deletingId === pkg?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
               disabled={deletingId === pkg?.id} // Vô hiệu hóa nút nếu đang xóa
@@ -99,9 +139,24 @@ const ManagePackage = () => {
         showSorterTooltip={{
           target: "sorter-icon",
         }}
+        size="small"
+        className="compact-table"
       />
     </div>
   );
 };
 
 export default ManagePackage;
+
+// Add this at the end of the file or in a separate CSS file
+const styles = `
+  .compact-table .ant-table-tbody > tr > td {
+    padding: 8px 16px;
+  }
+`;
+
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.innerHTML = styles;
+  document.head.appendChild(styleElement);
+}

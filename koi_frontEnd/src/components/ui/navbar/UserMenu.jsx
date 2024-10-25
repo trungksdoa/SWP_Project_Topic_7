@@ -123,6 +123,13 @@ export const UserMenu = () => {
             >
               {t("Profile")}
             </NavLink>
+            <NavLink
+              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.HISTORY_ORDER}
+            >
+              {t("History")}
+            </NavLink>
+            
             <Button
               onClick={handleLogout}
               className=" bg-white text-black hover:!text-white !w-[100px] text-center hover:!border-black hover:!bg-black"

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
-import { Button, Spin, Pagination, Select, Space, Checkbox, Modal } from "antd";
+import { Button, Spin, Pagination, Select, Space, Checkbox, Modal, Input } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-
+import { SearchOutlined } from "@ant-design/icons";
 const { Option } = Select;
 
 const KoiManegement = () => {
@@ -32,6 +32,8 @@ const KoiManegement = () => {
   const [isMovingKoi, setIsMovingKoi] = useState(false);
   const [showMoveKoiConfirmation, setShowMoveKoiConfirmation] = useState(false);
   const [selectedDestinationPond, setSelectedDestinationPond] = useState(null);
+  const [allSelected, setAllSelected] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const updateKoiMutation = useUpdateKoi();
 
@@ -39,7 +41,8 @@ const KoiManegement = () => {
 
   useEffect(() => {
     refetch();
-  }, [refetch]);
+    setAllSelected(false);
+  }, [refetch, currentPage]);
 
 
   const handleDeleteKoi = () => {
@@ -98,7 +101,12 @@ const KoiManegement = () => {
 
   const indexOfLastKoi = currentPage * koiPerPage;
   const indexOfFirstKoi = indexOfLastKoi - koiPerPage;
-  const currentKoi = sortedKoi.slice(indexOfFirstKoi, indexOfLastKoi);
+  const filteredKoi = useMemo(() => {
+    return sortedKoi.filter(koi => 
+      koi.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [sortedKoi, searchTerm]);
+  const currentKoi = filteredKoi.slice(indexOfFirstKoi, indexOfLastKoi);
 
   const handleAddClick = () => {
     navigate('/add-koi');
@@ -135,11 +143,11 @@ const KoiManegement = () => {
 
   const handleKoiSelection = (koiId) => {
     setSelectedKoiForAction(prev => {
-      if (prev.includes(koiId)) {
-        return prev.filter(id => id !== koiId);
-      } else {
-        return [...prev, koiId];
-      }
+      const newSelection = prev.includes(koiId)
+        ? prev.filter(id => id !== koiId)
+        : [...prev, koiId];
+      setAllSelected(newSelection.length === currentKoi.length);
+      return newSelection;
     });
   };
 
@@ -230,22 +238,20 @@ const KoiManegement = () => {
     if (birthDate) {
       const today = dayjs();
       const birthDayjs = dayjs(birthDate);
-      const ageInDays = today.diff(birthDayjs, 'day');
-      return ageInDays;
+      const ageInMonths = today.diff(birthDayjs, 'month');
+      return ageInMonths;
     }
     return null;
   };
 
-  const formatAge = (ageInDays) => {
-    if (ageInDays === null) return 'Unknown';
-    const years = Math.floor(ageInDays / 365);
-    const months = Math.floor((ageInDays % 365) / 30);
-    const days = ageInDays % 30;
+  const formatAge = (ageInMonths) => {
+    if (ageInMonths === null) return 'Unknown';
+    const years = Math.floor(ageInMonths / 12);
+    const months = ageInMonths % 12;
 
     const parts = [];
     if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
-    if (months > 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
-    if (days > 0 || parts.length === 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    if (months > 0 || parts.length === 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
 
     return parts.join(', ');
   };
@@ -254,6 +260,21 @@ const KoiManegement = () => {
     if (!date) return 'Unknown';
     return dayjs(date).format('DD/MM/YYYY');
   };
+
+  const handleSelectAll = (checked) => {
+    setAllSelected(checked);
+    if (checked) {
+      setSelectedKoiForAction(currentKoi.map(koi => koi.id));
+    } else {
+      setSelectedKoiForAction([]);
+    }
+  };
+
+  const handleCancelSelect = () => {
+    setSelectedKoiForAction([]);
+    setAllSelected(false);
+  };
+
 
   if (isFetching) {
     return (
@@ -292,31 +313,39 @@ const KoiManegement = () => {
         </div>
       ) : (
         <>
-      
-              <div className="flex justify-between items-center mx-4 my-6">
-                <div className="w-1/3"></div> {/* Empty div for spacing */}
-                <div className="flex justify-center items-center">
-                    <button
-                        className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
-                        onClick={handleAddClick}
-                    >
-                        Add a new Koi
-                    </button>
-                    <button
-                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForAction.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
-                        disabled={selectedKoiForAction.length === 0 || isDeletingKoi}
-                        onClick={handleDeleteSelectedKoi}
-                    >
-                        {isDeletingKoi ? "Deleting..." : "Delete Koi"}
-                    </button>
-                    <button
-                        className={`w-40 h-auto min-h-[2.5rem] py-2 px-4 ${selectedKoiForAction.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
-                        disabled={selectedKoiForAction.length === 0 || isMovingKoi}
-                        onClick={handleMoveSelectedKoi}
-                    >
-                        {isMovingKoi ? "Moving..." : "Move Koi"}
-                    </button>
-                </div>
+          <div className="flex justify-between items-center mx-4 my-6">
+            <div className="flex justify-start items-center w-1/3">
+              <Input
+                placeholder="Search by name"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ width: 300, height: 45, fontSize: 16 }}
+                className="mr-2"
+                suffix={<SearchOutlined style={{ fontSize: 16 }} />}
+              />
+            </div> 
+            <div className="flex justify-center items-center">
+              <button
+                className="w-40 h-auto min-h-[2.5rem] py-1 px-1 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
+                onClick={handleAddClick}
+              >
+                Add a new Koi
+              </button>     
+              <button
+                className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForAction.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold`}
+                disabled={selectedKoiForAction.length === 0 || isDeletingKoi}
+                onClick={handleDeleteSelectedKoi}
+              >
+                {isDeletingKoi ? "Deleting..." : "Delete Koi"}
+              </button>
+              <button
+                className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForAction.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
+                disabled={selectedKoiForAction.length === 0 || isMovingKoi}
+                onClick={handleMoveSelectedKoi}
+              >
+                {isMovingKoi ? "Moving..." : "Move Koi"}
+              </button>
+            </div>
             <div className="flex justify-end items-center w-1/3">
               <Space>
                 <Select
@@ -334,6 +363,19 @@ const KoiManegement = () => {
                   {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
                 </Button>
               </Space>
+              <Checkbox
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                checked={allSelected}
+                className="ml-2 mr-2 whitespace-nowrap"
+              >
+                Select All
+              </Checkbox>
+              <Button
+                onClick={handleCancelSelect}
+                disabled={selectedKoiForAction.length === 0}
+              >
+                Cancel
+              </Button>
             </div>
           </div>
 
@@ -371,7 +413,7 @@ const KoiManegement = () => {
           <div className="flex justify-center mb-8">
             <Pagination
               current={currentPage}
-              total={sortedKoi.length}
+              total={filteredKoi.length}
               pageSize={koiPerPage}
               onChange={onPageChange}
               showSizeChanger={false}

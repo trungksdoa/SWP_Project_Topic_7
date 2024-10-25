@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 import { manageKoiFishServices } from "../../services/koifish/manageKoiFishServices"
 
-export const useUpdateKoi = () => {
+export const useDeleteGrowth = ( ) => {
     return useMutation({
-        mutationFn: ({ id, payload, isNew }) => manageKoiFishServices.updateKoi(id, payload, isNew)
+        mutationFn: (id) => manageKoiFishServices.deleteGrowth(id)
     })
 }

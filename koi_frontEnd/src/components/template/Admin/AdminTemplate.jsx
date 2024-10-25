@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { PATH } from "../../../constant";
 import { Button, Layout, Menu, theme } from "antd";
@@ -27,6 +27,8 @@ const AdminTemplate = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
   const getSelectedKeys = (pathname) => {
     if (pathname.startsWith(PATH.ADMIN)) {
       return [PATH.ADMIN];
@@ -45,6 +47,10 @@ const AdminTemplate = () => {
     navigate(PATH.HOME);
   };
 
+  const getSectionName = (pathname) => {
+    const path = pathname.split('/').pop();
+    return t(path.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '));
+  };
 
   return (
     <div>
@@ -211,7 +217,7 @@ const AdminTemplate = () => {
               icon={
                 <UnorderedListOutlined
                   style={{
-                    color: selectedKeys.includes(PATH.MANAGE_ORDER)
+                    color: selectedKeys.includes(PATH.MANAGE_PAYMENT_STATUS)
                       ? "orange"
                       : "white",
                   }}
@@ -230,7 +236,30 @@ const AdminTemplate = () => {
             </Menu.Item>
             <Menu.Item
               className="text-white"
-              key={10}
+              key={11}
+              icon={
+                <UnorderedListOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.MANAGE_BLOG)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={8}
+                
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
+              >
+                {t("Manage Blog")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item
+              className="text-white"
+              key={12}
               icon={
                 <HomeFilled
                   style={{
@@ -242,7 +271,7 @@ const AdminTemplate = () => {
               }
             >
               <NavLink
-                key={8}
+                key={9}
                 to={PATH.HOME}
                 className={({ isActive }) =>
                   isActive ? "!text-orange-500" : "!text-white"
@@ -254,17 +283,16 @@ const AdminTemplate = () => {
           </Menu>
         </Sider>
         <Layout>
-          <Header>
-            <div className="container text-right">
-              <Button
-                className="ms-auto bg-black text-white hover:!text-white hover:!bg-black"
-                onClick={() => {
-                  handleLogout();
-                }}
-              >
-                {t("Logout")}
-              </Button>
-            </div>
+          <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' }}>
+            <h2 style={{ color: 'black', margin: 0, fontSize: '27px', fontWeight: 'bold' }}>{getSectionName(location.pathname)}</h2>
+            <Button
+              className="bg-black text-white hover:!text-white hover:!bg-black"
+              onClick={() => {
+                handleLogout();
+              }}
+            >
+              {t("Logout")}
+            </Button>
           </Header>
           <div
             style={{
