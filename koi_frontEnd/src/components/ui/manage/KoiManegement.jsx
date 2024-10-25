@@ -319,9 +319,9 @@ const KoiManegement = () => {
                 placeholder="Search by name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ width: 300, height: 50, fontSize: 18 }}
+                style={{ width: 300, height: 45, fontSize: 16 }}
                 className="mr-2"
-                suffix={<SearchOutlined style={{ fontSize: 18 }} />}
+                suffix={<SearchOutlined style={{ fontSize: 16 }} />}
               />
             </div> 
             <div className="flex justify-center items-center">

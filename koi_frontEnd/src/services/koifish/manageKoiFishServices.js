@@ -63,6 +63,7 @@ export const manageKoiFishServices = {
             }
         }
     },
+    deleteGrowth: (id) => api.delete(`/growthUpHistory/${id}`),
     deleteKoi: (id) => api.delete(`/${id}`),
     updateKoiPond: (id, payload) => api.put(`/${id}`, payload),
     addGrowth: async (id, payload, isNew = true) => {
