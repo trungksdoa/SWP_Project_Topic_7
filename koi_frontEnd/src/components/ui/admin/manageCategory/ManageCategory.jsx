@@ -48,12 +48,12 @@ const ManageCategory = () => {
             onClick={() => {
               navigate(`${PATH.EDIT_CATEGORY}/${category?.id}`);
             }}
-            className="mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white"
+            className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
           >
             Edit
           </Button>
           <Button
-            className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
+            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
             onClick={() => handleDelete(category?.id)}
             loading={deletingId === category?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
             disabled={deletingId === category?.id} // Vô hiệu hóa nút nếu đang xóa

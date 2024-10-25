@@ -1,33 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Spin, Checkbox, Col, Row, Card, Select } from "antd";
-const { Meta } = Card;
+import { useSelector } from "react-redux";
+import { Spin, Checkbox, Row, Card, Select, Pagination } from "antd";
 import { useTranslation } from "react-i18next";
 import { useGetAllProducts } from "../../hooks/admin/manageProducts/UseGetAllProducts";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
-import { manageCartActions } from "../../store/manageCart/slice";
 import { toast } from "react-toastify";
-import { usePostCarts } from "../../hooks/manageCart/usePostCarts";
-import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
 import { useGetCategory } from "../../hooks/admin/manageCategory/useGetCategory";
 import BreadcrumbComponent from "../ui/BreadcrumbCoponent";
 
 const StoreTemplate = () => {
-  // State và hook dùng chung
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const userId = userLogin?.id;
   const { data: lstCategory } = useGetCategory();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { data: lstProducts, isFetching } = useGetAllProducts();
 
-
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
 
   useEffect(() => {
     if (lstProducts) {
@@ -40,55 +33,59 @@ const StoreTemplate = () => {
       toast.error("Please login to add to cart");
       return;
     }
-
-    const payload = {
-      userId: userLogin?.id,
-      productId: product?.id,
-      quantity: 1,
-    };
+    // Implement add to cart functionality here
   };
 
-  // Function lọc sản phẩm dựa trên categoryId
   const filterProducts = (
     products,
     isWaterTreatmentChecked,
     isKoiTreatmentChecked
   ) => {
-    let filteredProducts = products;
-
+    let filtered = products;
     if (isWaterTreatmentChecked && !isKoiTreatmentChecked) {
-      filteredProducts = products.filter((product) => product.categoryId === 1);
+      filtered = products.filter((product) => product.categoryId === 1);
     } else if (!isWaterTreatmentChecked && isKoiTreatmentChecked) {
-      filteredProducts = products.filter((product) => product.categoryId === 2);
+      filtered = products.filter((product) => product.categoryId === 2);
     }
-
-    return filteredProducts;
+    return filtered;
   };
 
   const onChange = (checkedValues) => {
-    const filteredProducts = filterProducts(
+    const filtered = filterProducts(
       lstProducts,
       checkedValues.includes(1),
       checkedValues.includes(2)
     );
-    setFilteredProducts(filteredProducts);
+    setFilteredProducts(filtered);
+    setCurrentPage(1);
   };
 
   const handleSort = (value) => {
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const sorted = [...filteredProducts].sort((a, b) => {
       return value === "asc" ? a.price - b.price : b.price - a.price;
     });
-    setFilteredProducts(sortedProducts);
+    setFilteredProducts(sorted);
     setSortOrder(value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
   if (isFetching) {
     return (
-      <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
+      <div className="flex justify-center items-center min-h-[450px]">
         <Spin tip="Loading" size="large" />
       </div>
     );
   }
+
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div>
@@ -128,84 +125,61 @@ const StoreTemplate = () => {
             </div>
           </div>
           <div className="grid grid-cols-4 gap-6">
-            {filteredProducts?.map((prd, index) => {
-              return (
-                <Card
-                  key={prd?.id}
-                  hoverable
-                  className="w-full border-2 border-gray-200 shadow-lg" // Increased border width and used a darker shade
-                  onClick={() => {
-                    navigate(`${PATH.DETAIL_PRODUCT}/${prd?.slug}`);
-                  }}
-                  cover={
-                    <img
-                      alt={prd?.name}
-                      className="relative z-0 h-48 w-full object-cover cursor-pointer"
-                      src={`${prd?.imageUrl}?t=${new Date().getTime()}`}
-                    />
-                  }
-                >
-                  <div className="p-[2px]">
-                    <h2 className="font-bold min-h-[44px] mb-[5px]">
-                      {prd?.name}
-                    </h2>
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold">
-                        Price:{" "}
-                        <span className="!font-normal text-[16px]">
-                          ${prd?.price}
-                        </span>
-                      </p>
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }, (_, index) => {
-                          const ratingValue = index + 1; // Tạo giá trị rating từ 1 đến 5
-                          return (
-                            <span key={index} className="star-container">
-                              {prd?.averageRating >= ratingValue ? (
-                                <span className="full-star">★</span>
-                              ) : prd?.averageRating >= ratingValue - 0.5 ? (
-                                <span className="half-star">★</span>
-                              ) : (
-                                <span className="empty-star">☆</span>
-                              )}
-                            </span>
-                          );
-                        })}
-                      </div>
+            {paginatedProducts?.map((prd) => (
+              <Card
+                key={prd?.id}
+                hoverable
+                className="w-full border-2 border-gray-200 shadow-lg"
+                onClick={() => navigate(`${PATH.DETAIL_PRODUCT}/${prd?.slug}`)}
+                cover={
+                  <img
+                    alt={prd?.name}
+                    className="relative z-0 h-48 w-full object-cover cursor-pointer"
+                    src={`${prd?.imageUrl}?t=${new Date().getTime()}`}
+                    loading="lazy"
+                  />
+                }
+              >
+                <div className="p-[2px]">
+                  <h2 className="font-bold min-h-[44px] mb-[5px]">
+                    {prd?.name}
+                  </h2>
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">
+                      Price:{" "}
+                      <span className="!font-normal text-[16px]">
+                        ${prd?.price}
+                      </span>
+                    </p>
+                    <div className="flex items-center">
+                      {Array.from({ length: 5 }, (_, index) => {
+                        const ratingValue = index + 1;
+                        return (
+                          <span key={index} className="star-container">
+                            {prd?.averageRating >= ratingValue ? (
+                              <span className="full-star">★</span>
+                            ) : prd?.averageRating >= ratingValue - 0.5 ? (
+                              <span className="half-star">★</span>
+                            ) : (
+                              <span className="empty-star">☆</span>
+                            )}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
-                </Card>
-                // <Card
-                //   className="flex flex-col justify-around col-span-1"
-                //   key={index}
-                //   onClick={() => {
-                //     navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`)
-                //   }}
-                //   cover={<img alt="example" className="max-h-[250px] object-contain mt-[10px] cursor-pointer" src={prd?.imageUrl} />}
-                // >
-                //   <div className="flex justify-center items-center">
-                //     <h1 className="text-[16px]">{prd?.name}</h1>
-                //   </div>
-                //   <div>
-                //     <p>Price: ${prd?.price}</p>
-                //   </div>
-                //   {/* <div className="flex justify-between items-center mt-[20px]">
-                //     <button
-                //       className="border-[1px] hover:bg-black hover:text-white transition-all duration-300 border-gray-300 rounded-[6px] px-[20px] py-[10px]"
-                //       onClick={() => navigate(`${PATH.DETAIL_PRODUCT}/${prd?.id}`)}
-                //     >
-                //       View Detail
-                //     </button>
-                //     <button
-                //       className="bg-black text-white rounded-[6px] px-[20px] py-[10px]"
-                //       onClick={_}
-                //     >
-                //       Buy Now
-                //     </button>
-                //   </div> */}
-                // </Card>
-              );
-            })}
+                </div>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-8 flex justify-center">
+            <Pagination
+              current={currentPage}
+              total={filteredProducts.length}
+              pageSize={pageSize}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+            />
           </div>
         </div>
       </div>
