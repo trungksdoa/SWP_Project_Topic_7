@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Koi_control_application/**'  # Run only if anychange in this folder
   workflow_dispatch:
 
 jobs:
