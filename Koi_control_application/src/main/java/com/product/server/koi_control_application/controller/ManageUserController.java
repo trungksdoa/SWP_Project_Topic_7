@@ -44,9 +44,6 @@ public class ManageUserController {
         return ResponseUtil.createSuccessResponse(userService.getUsers(page, size), "Access granted");
     }
 
-
-
-
     @PostMapping("/{userId}/suspend")
     @Operation(summary = "Suspend user", description = "Suspends a user account")
     public ResponseEntity<BaseResponse> suspendUser(@PathVariable int userId) {

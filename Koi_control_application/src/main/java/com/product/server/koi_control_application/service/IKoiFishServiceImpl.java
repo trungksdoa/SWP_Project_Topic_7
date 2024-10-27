@@ -481,4 +481,3 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         return koiFishList;
     }
 }
-

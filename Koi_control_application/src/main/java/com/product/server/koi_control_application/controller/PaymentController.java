@@ -3,9 +3,9 @@ package com.product.server.koi_control_application.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.enums.OrderCode;
-import com.product.server.koi_control_application.model.PaymentStatus;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.*;
+import com.product.server.koi_control_application.service.MomoPaymentService;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.serviceInterface.IPaymentService;
@@ -24,9 +24,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.product.server.koi_control_application.enums.PaymentCode.*;
+import static com.product.server.koi_control_application.enums.PaymentCode.FAILED;
+import static com.product.server.koi_control_application.enums.PaymentCode.PAID;
 import static com.product.server.koi_control_application.mappingInterface.PaymentMappings.*;
 import static com.product.server.koi_control_application.ultil.PaymentUtil.*;
 import static com.product.server.koi_control_application.ultil.ResponseUtil.WEBSITE_URL;
@@ -43,6 +45,7 @@ public class PaymentController {
     private final IUserService userService;
     private final ICartService cartService;
     private final IPaymentService paymentService;
+    private final MomoPaymentService momoPaymentService;
 
     /*
      * Handle MoMo callback
@@ -50,10 +53,41 @@ public class PaymentController {
      * @return: Hello
      */
     @PostMapping(MOMO_CALLBACK)
-    public String callback(@RequestBody MomoCallbackResponse callbackResponse) {
-        log.info("Received MoMo callback: " + callbackResponse.toString());
+    public ResponseEntity<Void> callback(@RequestBody MomoCallbackResponse callbackResponse) throws Exception {
+        return momoPaymentService.momoCallback(callbackResponse);
+    }
+
+    @GetMapping(MOMO_CHECKING_STATUS)
+    public ResponseEntity<JsonNode> checkOrderStatus(@PathVariable String orderId) throws Exception {
+        // Create signature for the request
+        String requestId = String.valueOf(System.currentTimeMillis());
+        String rawSignature = String.format("accessKey=%s&orderId=%s&partnerCode=%s&requestId=%s",
+                accessKey, orderId, partnerCode, requestId);
+        String signature = hmacSHA256(rawSignature, secretKey);
+
+        // Create request body
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("partnerCode", partnerCode);
+        requestBody.put("requestId", requestId);
+        requestBody.put("orderId", orderId);
+        requestBody.put("lang", "en");
+        requestBody.put("signature", signature);
+
+        String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
+
+        // Send request to MoMo
+        HttpResponse<String> response = sendHttpRequest(jsonBody, MOMO_QUERY_STATUS_ENDPOINT);
+        //Fix it
+        JsonNode responseBody = new ObjectMapper().readTree(response.body());
+
+        //Mapping JsonNode to MomoCallbackResponse
+        MomoCallbackResponse callbackResponse = new ObjectMapper().readValue(responseBody.toString(), MomoCallbackResponse.class);
         handleMomoCallback(callbackResponse);
-        return "Hello";
+
+        // Log the response
+        logResponseDetails(response, responseBody);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     /*
@@ -63,44 +97,8 @@ public class PaymentController {
      * @throws Exception
      */
     @PostMapping(CREATE_MOMO_PAYMENT)
-    public ResponseEntity<JsonNode> createMomoPayment(@RequestBody MomoPaymentRequest mapData) throws Exception {
-        MomoPaymentInfo paymentInfo = getPaymentInfo(mapData);
-        String rawSignature = createRawSignature(paymentInfo);
-        String signature = hmacSHA256(rawSignature, paymentInfo.getSecretKey());
-
-        if (mapData.getMomoProducts() == null || mapData.getMomoProducts().isEmpty()) {
-            mapData.setMomoProducts(new ArrayList<>());
-        }
-        if (mapData.getMomoUserInfo() == null) {
-            mapData.setMomoUserInfo(new MomoUserInfo());
-        }
-
-
-        MomoRequestBody requestBody = createRequestBody(paymentInfo, signature);
-        String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
-
-        HttpResponse<String> response = sendHttpRequest(jsonBody, MOMO_TEST_ENDPOINT);
-        JsonNode responseBody = new ObjectMapper().readTree(response.body());
-        PaymentStatus paymentStatus = PaymentStatus.builder()
-                .userId(Integer.parseInt(mapData.getUserId()))
-                .referenceId(mapData.getOrderId())
-                .referenceType(mapData.getOrderType())
-                .paymentMethod("MOMO")
-                .build();
-
-        if (responseBody.get("resultCode").asInt() != 0) {
-            paymentStatus.setPaymentStatus(FAILED.getValue());
-            paymentStatus.setPaymentDescription(responseBody.get("message").asText());
-        } else {
-            paymentStatus.setPaymentStatus(PENDING.getValue());
-            paymentStatus.setPaymentDescription("Payment using MoMo");
-            paymentStatus.setPaymentGatewayUrl(responseBody.get("shortLink").asText());
-        }
-
-        paymentService.createPaymentStatus(paymentStatus);
-        logResponseDetails(response, responseBody);
-
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    public ResponseEntity<MomoPaymentResponse> createMomoPayment(@RequestBody MomoPaymentRequest mapData) throws Exception {
+        return momoPaymentService.createPayment(mapData);
     }
 
 
