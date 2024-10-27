@@ -113,7 +113,7 @@ const ProductDetail = () => {
 
   if (isFetching) {
     return (
-      <div className="flex justify-center fixed top-0 bottom-0 left-0 right-0 items-center">
+      <div className="flex justify-center items-center min-h-[450px]">
         <Spin tip="Loading" size="large" />
       </div>
     );

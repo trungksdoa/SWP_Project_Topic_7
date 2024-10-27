@@ -147,35 +147,35 @@ const ManageOrder = () => {
         //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
           return (
-            <Tag color="gray" className="!bg-gray-500 !text-white">
+              <Tag color="gray" className="text-[15px] font-bold w-[110px] !bg-gray-500 !text-white text-center justify-center items-center">
               PENDING
             </Tag>
           );
         }
         if (record.status === "CANCELLED") {
           return (
-            <Tag color="red" className="!bg-red-500 !text-white">
+            <Tag color="red" className="text-[15px] font-bold w-[110px] !bg-red-500 !text-white text-center justify-center items-center">
               CANCELLED
             </Tag>
           );
         }
         if (record.status === "SUCCESS") {
           return (
-            <Tag color="green" className="!bg-green-500 !text-white">
+            <Tag color="green" className="text-[15px] font-bold w-[110px] !bg-green-500 !text-white text-center justify-center items-center">
               WAIT FOR SHIPPING
             </Tag>
           );
         }
         if (record.status === "SHIPPING") {
           return (
-            <Tag color="blue" className="!bg-blue-500 !text-white">
+            <Tag color="blue" className="text-[15px] font-bold w-[110px] !bg-blue-500 !text-white text-center justify-center items-center">
               ON DELIVERY
             </Tag>
           );
         }
         if (record.status === "DELIVERED") {
           return (
-            <Tag color="purple" className="!bg-purple-500 !text-white">
+            <Tag color="purple" className="text-[15px] font-bold w-[110px] !bg-purple-500 !text-white text-center justify-center items-center">
               DELIVERED
             </Tag>
           );
@@ -183,7 +183,7 @@ const ManageOrder = () => {
         //COMPLETED
         if (record.status === "COMPLETED") {
           return (
-            <Tag color="orange" className="!bg-orange-500 !text-white">
+            <Tag color="orange" className="text-[15px] font-bold w-[110px] !bg-orange-500 !text-white text-center justify-center items-center">
               COMPLETED
             </Tag>
           );
@@ -194,10 +194,26 @@ const ManageOrder = () => {
       title: "Action",
       key: "action",
       render: (_, record) => {
+        const buttonStyle = {
+          width: '80px',
+          height: '32px',
+          display: 'inline-flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '4px 15px',
+          fontSize: '14px',
+          borderRadius: '2px',
+        };
+
         if (record.status === "SUCCESS") {
           return (
             <Button
-              className="bg-blue-500 text-white hover:!bg-blue-600 hover:!text-white border-none"
+              style={{
+                ...buttonStyle,
+                backgroundColor: '#1890ff',
+                borderColor: '#1890ff',
+                color: 'white',
+              }}
               loading={mutation.isPending}
               onClick={() => handleSendClick(record?.id)}
             >
@@ -212,16 +228,31 @@ const ManageOrder = () => {
           record.status === "COMPLETED"
         ) {
           return (
-            <Button onClick={() => handleViewClick(record?.id)}>View</Button>
+            <Button
+              style={buttonStyle}
+              onClick={() => handleViewClick(record?.id)}
+            >
+              View
+            </Button>
           );
         }
 
         if (record.status === "PENDING") {
-          return <Button>Cancel</Button>;
+          return (
+            <Button
+              style={{
+                ...buttonStyle,
+                backgroundColor: '#ff4d4f',
+                borderColor: '#ff4d4f',
+                color: 'white',
+              }}
+            >
+              Cancel
+            </Button>
+          );
         }
 
         return null;
-        // Nếu không phải SUCCESS, sẽ không hiện button
       },
     },
   ];
@@ -235,7 +266,7 @@ const ManageOrder = () => {
   return (
     <div>
       <Button
-        className="bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
+        className="mb-[15px] bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
         onClick={() => refetch()}
       >
         Refresh Data

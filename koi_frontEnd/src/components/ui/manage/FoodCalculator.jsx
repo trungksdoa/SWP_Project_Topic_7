@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetAllPond } from '../../../hooks/koi/useGetAllPond';
 import { useGetAllKoi } from '../../../hooks/koi/useGetAllKoi';
-import { Button, Modal, Pagination } from 'antd';
+import { useGetFood } from '../../../hooks/koi/useGetFood';
+import { Button, Modal, Pagination, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbComponent from '../BreadcrumbCoponent';
 import dayjs from 'dayjs';
@@ -19,30 +20,50 @@ const FoodCalculator = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const [waterParameters, setWaterParameters] = useState(null);
   const [waterStandard, setWaterStandard] = useState(null);
+  const [foodStandard, setFoodStandard] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
 
   const { data: lstPond, refetch } = useGetAllPond(userId);
   const { data: lstKoi } = useGetAllKoi(userId);
+  const { data: foodData, refetch: refetchFood } = useGetFood(selectedPond?.id);
 
   useEffect(() => {
     refetch();
   }, [refetch]);
 
+  useEffect(() => {
+    if (selectedPond) {
+      refetchFood();
+    }
+  }, [selectedPond, refetchFood]);
+
+  useEffect(() => {
+    if (foodData) {
+      setFoodStandard(foodData);
+    }
+  }, [foodData]);
+
   const handlePondClick = async (pond) => {
     setSelectedPond(pond);
+    setIsLoading(true);
+    setIsModalVisible(true);
     try {
-      const waterParamsRes = await manageWaterServices.getWaterByPondId(pond.id);
-      const waterStandardRes = await manageWaterServices.getWaterStandard(pond.id);
+      const [waterParamsRes, waterStandardRes] = await Promise.all([
+        manageWaterServices.getWaterByPondId(pond.id),
+        manageWaterServices.getWaterStandard(pond.id)
+      ]);
       setWaterParameters(waterParamsRes?.data?.data || null);
       setWaterStandard(waterStandardRes?.data?.data || null);
     } catch (error) {
       console.error("Error fetching water data:", error);
       setWaterParameters(null);
       setWaterStandard(null);
+    } finally {
+      setIsLoading(false);
     }
-    setIsModalVisible(true);
   };
 
   const handleModalClose = () => {
@@ -140,88 +161,94 @@ const FoodCalculator = () => {
           footer={null}
           width={800}
         >
-          <div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="text-xl font-bold text-center">{selectedPond.name}</div>
-              <div className="text-xl font-bold text-center">Koi in pond</div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spin size="large" />
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="flex justify-center items-center ml-4 mr-4">
-                <img
-                  src={selectedPond.imageUrl}
-                  alt={selectedPond.name}
-                  className="w-full h-48 object-cover rounded-lg"
-                />
+          ) : (
+            <div>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="text-xl font-bold text-center">{selectedPond.name}</div>
+                <div className="text-xl font-bold text-center">Koi in pond</div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {lstKoi?.filter(koi => koi.pondId === selectedPond.id).map((koi, index) => (
-                  <div key={index} className="relative text-center">
-                    <div className="w-20 h-20 mx-auto mb-2 overflow-hidden rounded-full shadow-md">
-                      <img
-                        onClick={() => handleClick(koi)}
-                        src={koi.imageUrl}
-                        alt={koi.name}
-                        className="w-full h-full object-cover cursor-pointer"
-                      />
-                    </div>
-                    <h3 className="text-sm cursor-pointer font-semibold truncate" onClick={() => handleClick(koi)}>
-                      {koi.name}
-                    </h3>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-6 ml-4 flex flex-row items-center space-x-2">
-              <div className="font-bold text-lg">Food Calculation:</div>
-              {waterParameters && waterStandard && waterStandard.amountFedStandard !== undefined && waterStandard.amountFedStandard !== 0 ? (
-                <div className="text-lg">
-                  Recommended amount fed of {waterStandard.amountFedStandard} gram
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="flex justify-center items-center ml-4 mr-4">
+                  <img
+                    src={selectedPond.imageUrl}
+                    alt={selectedPond.name}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
                 </div>
-              ) : (
-                <div className="text-lg">Add Koi to pond to calculate food</div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {lstKoi?.filter(koi => koi.pondId === selectedPond.id).map((koi, index) => (
+                    <div key={index} className="relative text-center">
+                      <div className="w-20 h-20 mx-auto mb-2 overflow-hidden rounded-full shadow-md">
+                        <img
+                          onClick={() => handleClick(koi)}
+                          src={koi.imageUrl}
+                          alt={koi.name}
+                          className="w-full h-full object-cover cursor-pointer"
+                        />
+                      </div>
+                      <h3 className="text-sm cursor-pointer font-semibold truncate" onClick={() => handleClick(koi)}>
+                        {koi.name}
+                      </h3>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-6 ml-4 flex flex-row items-center space-x-2">
+                <div className="font-bold text-lg">Food Calculation:</div>
+                {foodStandard && foodStandard.amountFedStandard !== undefined && foodStandard.amountFedStandard !== 0 ? (
+                  <div className="text-lg">
+                    Recommended amount fed of {foodStandard.amountFedStandard} gram
+                  </div>
+                ) : (
+                  <div className="text-lg">Add Koi to pond to calculate food</div>
+                )}
+              </div>
+              {selectedKoi && (
+                <div
+                  id="modal-overlay"
+                  className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+                  onClick={handleOutsideClick}
+                >
+                  <div
+                    className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
+                    style={{ width: 700, maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={handleClose}
+                      className="absolute top-2 right-2 text-2xl font-bold"
+                    >
+                      &times;
+                    </button>
+                    <h2 className="text-2xl font-bold mb-4 text-center">Koi Information</h2>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="flex items-center justify-center"> 
+                        <img
+                          src={imgSrc || selectedKoi.imageUrl}
+                          alt={selectedKoi.name}
+                          className="w-80 h-40 object-cover rounded"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <p className="flex justify-between mb-1"><strong>Name:</strong> <span>{selectedKoi.name}</span></p>
+                        <p className="flex justify-between mb-1"><strong>Variety:</strong> <span>{selectedKoi.variety}</span></p>
+                        <p className="flex justify-between mb-1"><strong>Sex:</strong> <span>{selectedKoi.sex ? 'Female' : 'Male'}</span></p>
+                        <p className="flex justify-between mb-1"><strong>Purchase Price:</strong> <span>{selectedKoi.purchasePrice} VND</span></p>  
+                        <p className="flex justify-between mb-1"><strong>Weight:</strong> <span>{selectedKoi.weight} grams</span></p>
+                        <p className="flex justify-between mb-1"><strong>Length:</strong> <span>{selectedKoi.length} cm</span></p>
+                        <p className="flex justify-between mb-1"><strong>Date of Birth:</strong> <span>{selectedKoi.dateOfBirth ? dayjs(selectedKoi.dateOfBirth).format('YYYY-MM-DD') : 'Unknown'}</span></p>
+                        <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{koiAge !== null ? `${koiAge} days` : 'Unknown'}</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
-            {selectedKoi && (
-              <div
-                id="modal-overlay"
-                className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
-                onClick={handleOutsideClick}
-              >
-                <div
-                  className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
-                  style={{ width: 700, maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    onClick={handleClose}
-                    className="absolute top-2 right-2 text-2xl font-bold"
-                  >
-                    &times;
-                  </button>
-                  <h2 className="text-2xl font-bold mb-4 text-center">Koi Information</h2>
-                  <div className="grid grid-cols-3 gap-6">
-                    <div className="flex items-center justify-center"> 
-                      <img
-                        src={imgSrc || selectedKoi.imageUrl}
-                        alt={selectedKoi.name}
-                        className="w-80 h-40 object-cover rounded"
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <p className="flex justify-between mb-1"><strong>Name:</strong> <span>{selectedKoi.name}</span></p>
-                      <p className="flex justify-between mb-1"><strong>Variety:</strong> <span>{selectedKoi.variety}</span></p>
-                      <p className="flex justify-between mb-1"><strong>Sex:</strong> <span>{selectedKoi.sex ? 'Female' : 'Male'}</span></p>
-                      <p className="flex justify-between mb-1"><strong>Purchase Price:</strong> <span>{selectedKoi.purchasePrice} VND</span></p>  
-                      <p className="flex justify-between mb-1"><strong>Weight:</strong> <span>{selectedKoi.weight} grams</span></p>
-                      <p className="flex justify-between mb-1"><strong>Length:</strong> <span>{selectedKoi.length} cm</span></p>
-                      <p className="flex justify-between mb-1"><strong>Date of Birth:</strong> <span>{selectedKoi.dateOfBirth ? dayjs(selectedKoi.dateOfBirth).format('YYYY-MM-DD') : 'Unknown'}</span></p>
-                      <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{koiAge !== null ? `${koiAge} days` : 'Unknown'}</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </Modal>
       )}
     </div>

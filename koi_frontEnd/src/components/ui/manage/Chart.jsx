@@ -46,11 +46,14 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
       return (
         <div style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc' }}>
-          <p>Age: {label} months</p>
-          <p>Length: {payload[0].value} cm</p>
-          <p>Weight: {payload[1].value} kg</p>
+          <p><strong>Age:</strong> {label} months</p>
+          <p><strong>Length:</strong> {payload[0].value} cm</p>
+          <p><strong>Weight:</strong> {payload[1].value} kg</p>
+          <p><strong>Date:</strong> {formatDate(data.date)}</p>
+
         </div>
       );
     }

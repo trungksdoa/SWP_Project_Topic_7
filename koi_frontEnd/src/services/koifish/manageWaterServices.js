@@ -9,5 +9,6 @@ export const manageWaterServices = {
     getWaterByPondId: (pondId) => api.get(`/api/ponds/parameters/${pondId}`),
     postWaterById: (id, payload) => api.post(`/api/ponds/parameters/${id}`, payload),
     getWaterStandard: (id) => api.get(`/api/ponds/parameters/standard/${id}`),
-    putWaterParameter: (id, payload) => api.put(`/api/ponds/parameters/${id}`, payload)
+    putWaterParameter: (id, payload) => api.put(`/api/ponds/parameters/${id}`, payload),
+    getFoodStandard: (id) => api.get(`/api/ponds/parameters/standard/${id}`)
 };

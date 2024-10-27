@@ -21,9 +21,11 @@ const ManageBlogs = () => {
     isFetching,
   } = useGetBlogsByAuthorId(authorId);
   const mutatetion = useDeleeteBlogById();
+
   useEffect(() => {
     refetch();
   }, []);
+
   const handleDelete = (id) => {
     Modal.confirm({
       title: 'Delete Blog',
@@ -50,13 +52,13 @@ const ManageBlogs = () => {
     }
   };
 
-  // if (isFetching) {
-  //   return (
-  //     <div className="flex justify-center top-0 bottom-0 left-0 right-0 items-center h-full">
-  //       <Spin tip="Loading" size="large" />
-  //     </div>
-  //   );
-  // }
+  if (isFetching) {
+    return (
+      <div className="flex justify-center items-center min-h-[450px]">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
+  }
 
   const truncateText = (text, maxLength) => {
     if (text && text.length > maxLength) {
@@ -139,11 +141,11 @@ const ManageBlogs = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[450px]">
       <div className="flex justify-between items-center mb-6">
         <Button
           className="bg-black text-white hover:bg-gray-800"
-          onClick={() => navigate('/blogs/add')}
+          onClick={() => navigate(PATH.ADD_BLOG)}
         >
           Add Blog
         </Button>
@@ -154,9 +156,15 @@ const ManageBlogs = () => {
         dataSource={lstBlogs} 
         columns={columns} 
         rowKey="id" 
-        pagination={{ pageSize: 10 }}
+        pagination={{
+          pageSize: 5,
+          position: ['bottomCenter'],
+          showSizeChanger: false,
+          showQuickJumper: false,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+        }}
         className="shadow-lg rounded-lg overflow-hidden"
-        bordered={false} // Remove the border
+        bordered={false}
       />
     </div>
   );

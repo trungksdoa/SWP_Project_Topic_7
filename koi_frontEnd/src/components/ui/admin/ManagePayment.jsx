@@ -18,28 +18,39 @@ const ManagePayment = () => {
         let color; // Declare the color variable
         if (payment.referenceType === "product") {
           color = "green";
-          return <Tag color={color}>PAY FOR ORDER</Tag>;
+          return (
+            <div>
+              <Tag color={color} style={{ width: '150px', textAlign: 'center' }}>
+                PAY FOR ORDER
+              </Tag>
+            </div>
+          );
         } else {
           color = "volcano";
-          return <Tag color={color}>PAY FOR UPGRADE</Tag>;
+          return (
+            <div>
+              <Tag color={color} style={{ width: '150px', textAlign: 'center' }}>
+                PAY FOR UPGRADE
+              </Tag>
+            </div>
+          );
         }
       },
     },
     {
-      title: "Payment Method",
+      title: <div style={{ textAlign: 'center' }}>Payment Method</div>,
       dataIndex: "paymentMethod",
       key: "paymentMethod",
-      render: (_, payment) => {
-        const color = "green";
-        return (
-          <Tag color={color} key={payment.paymentMethod}>
+      render: (_, payment) => (
+        <div style={{ textAlign: 'center' }}>
+          <Tag color="green" style={{ width: '120px', textAlign: 'center' }}>
             {payment.paymentMethod}
           </Tag>
-        );
-      },
+        </div>
+      ),
     },
     {
-      title: "Payment Status",
+      title: <div style={{ textAlign: 'center' }}>Payment Status</div>,
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (_, payment) => {
@@ -50,9 +61,11 @@ const ManagePayment = () => {
           color = "orange";
         } else color = "red";
         return (
-          <Tag color={color} key={payment.paymentStatus}>
-            {payment.paymentStatus}
-          </Tag>
+          <div style={{ textAlign: 'center' }}>
+            <Tag color={color} style={{ width: '80px', textAlign: 'center' }}>
+              {payment.paymentStatus}
+            </Tag>
+          </div>
         );
       },
     },

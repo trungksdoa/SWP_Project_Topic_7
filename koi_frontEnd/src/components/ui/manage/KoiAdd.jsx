@@ -106,24 +106,23 @@ const KoiAdd = () => {
 
   return (
     <div> 
-        <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
-            Return
-        </Button>
-        <div className="flex justify-center items-center text-bold text-3xl ">
-            <strong>Add a new Koi</strong>
-        </div>
+      <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
+        Return
+      </Button>
+      <div className="flex justify-center items-center text-bold text-3xl mb-8">
+        <strong>Add a new Koi</strong>
+      </div>
       
       <Form onFinish={formik.handleSubmit} layout="vertical">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 m-8">
-        <div className="flex justify-center items-start">
-        <img
-              src={imgSrc || "placeholder-image-url"} // You might want to add a placeholder image URL
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 m-8">
+          <div className="flex justify-center items-center">
+            <img
+              src={imgSrc || "placeholder-image-url"}
               alt="Koi preview"
               className="w-80 h-80 object-cover rounded-xl mb-4 mr-4"
             />
           </div>
           <div>
-           
             <Form.Item label="Name" className="mb-2">
               <Input
                 name="name"
@@ -169,6 +168,8 @@ const KoiAdd = () => {
                 className="w-full"
               />
             </Form.Item>
+          </div>
+          <div>
             <Form.Item label="Length (cm)" className="mb-2">
               <InputNumber
                 name="length"
@@ -210,13 +211,18 @@ const KoiAdd = () => {
             </Form.Item>
           </div>
         </div>
-        <Form.Item label="Pond" className="mb-2">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="m-8">
+          <div className="flex items-center space-x-4 mb-4 font-bold text-xl">
+            Pond
+          </div>
+          <div className="flex items-center space-x-4 mb-8 overflow-x-auto">
             {lstPond?.map((pond) => (
               <div
                 key={pond.id}
-                className={`text-center cursor-pointer rounded-xl ${
-                  selectedPond === pond.id ? "border-4 border-blue-500" : ""
+                className={`flex-shrink-0 w-48 text-center cursor-pointer rounded-xl transition-all duration-300 ${
+                  pond.id === selectedPond 
+                    ? 'order-first bg-blue-100 border-2 border-blue-500' 
+                    : 'filter grayscale hover:grayscale-0'
                 }`}
                 onClick={() => {
                   formik.setFieldValue("pondId", pond.id);
@@ -226,13 +232,13 @@ const KoiAdd = () => {
                 <img
                   src={pond.imageUrl}
                   alt={pond.name}
-                  className="w-full h-32 object-cover rounded-md"
+                  className="w-full h-28 object-cover rounded-t-xl"
                 />
-                <p className="mt-2">{pond.name}</p>
+                <p className="mt-1 text-sm p-2">{pond.name}</p>
               </div>
             ))}
           </div>
-        </Form.Item>
+        </div>
         <Form.Item className="flex justify-center mt-6">
           <Button
             type="primary"

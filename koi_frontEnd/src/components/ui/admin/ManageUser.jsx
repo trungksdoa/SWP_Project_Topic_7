@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Spin } from "antd";
+import { Button, Table, Spin, Modal } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
@@ -9,6 +9,9 @@ import { PATH } from "../../../constant";
 import { toast } from "react-toastify";
 import { Input, Space, Tag } from "antd";
 import { filter } from "@chakra-ui/react";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { confirm } = Modal;
 
 const { Search } = Input;
 
@@ -25,6 +28,10 @@ const ManageUser = () => {
   const mutate = useDeleteUser();
   const [filteredName, setFilteredName] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [isDeletingSelected, setIsDeletingSelected] = useState(false);
 
   useEffect(() => {
     refetch();
@@ -39,19 +46,30 @@ const ManageUser = () => {
   }, [lstUser]);
 
   const handleDelete = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xoá người dùng này không?")) {
-      setLoadingId(id);
-      mutate.mutate(id, {
-        onSuccess: () => {
-          toast.success("Delete User Successfully!");
-          refetch();
-          setLoadingId(null);
-        },
-        onError: (error) => {
-          toast.error("Delete User Failed!");
-          setLoadingId(null);
-        },
-      });
+    Modal.confirm({
+      title: 'Delete User',
+      content: 'Are you sure you want to delete this user?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        deleteUser(id);
+      },
+    });
+  };
+
+  const deleteUser = async (id) => {
+    setIsDeleting(true);
+    setLoadingId(id);
+    try {
+      await mutate.mutateAsync(id);
+      toast.success("User deleted successfully!");
+      refetch();
+    } catch (error) {
+      toast.error(`Error deleting user: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
+      setLoadingId(null);
     }
   };
 
@@ -70,71 +88,117 @@ const ManageUser = () => {
 
   const columns = [
     {
-      title: "User Name",
+      title: <div style={{ textAlign: 'center' }}>User Name</div>,
       dataIndex: "username",
-      width: "10%",
+      width: "15%",
     },
     {
-      title: "Address",
+      title: <div style={{ textAlign: 'center' }}>Address</div>,
       dataIndex: "address",
-      width: "10%",
-      render: (address) => {
-        if (address) {
-          return <Tag color="blue">{address}</Tag>;
-        }
-        return <Tag color="red">Not Set</Tag>;
-      },
-    },
-    {
-      title: "Image",
-      dataIndex: "avatarUrl",
-      render: (avatarUrl) => (
-        <img className="w-[100px]" src={avatarUrl} alt="user" />
+      width: "20%",
+      render: (address) => (
+        <div style={{ textAlign: 'center' }}>
+          {address ? (
+            <Tag color="blue">{address}</Tag>
+          ) : (
+            <Tag color="red">Not Set</Tag>
+          )}
+        </div>
       ),
-      width: "10%",
     },
     {
-      title: "Email",
+      title: <div style={{ textAlign: 'center' }}>Email</div>,
       dataIndex: "email",
-      width: "10%",
+      width: "20%",
     },
     {
-      title: "ROLE",
+      title: <div style={{ textAlign: 'center' }}>ROLE</div>,
+      width: "70px",
       dataIndex: "id",
       showSorterTooltip: {
         target: "full-header",
       },
       render: (_, record) => {
-        // const hasRoleMember = record?.roles.includes("ROLE_MEMBER"); // true
         const hasRoleAdmin = record?.roles.some(
           (role) => role.name === "ROLE_ADMIN"
         );
         const hasRoleMember = record?.roles.some(
           (role) => role.name === "ROLE_MEMBER"
         );
-        if (hasRoleAdmin) {
-          return <Tag color="red">ADMIN</Tag>;
-        }
-        if (hasRoleMember) {
-          return <Tag color="green">MEMBER</Tag>;
-        }
-        return <Tag color="gray">SHOP</Tag>;
+        
+        return (
+          <div style={{ textAlign: 'center' }}>
+            <Tag
+              color={hasRoleAdmin ? "red" : hasRoleMember ? "green" : "gray"}
+              style={{ width: '70px', textAlign: 'center' }}
+            >
+              {hasRoleAdmin ? "ADMIN" : hasRoleMember ? "MEMBER" : "SHOP"}
+            </Tag>
+          </div>
+        );
       },
-      width: "10%",
     },
     {
-      title: "Action",
+      title: <div style={{ textAlign: 'center' }}>Package</div>,
+      dataIndex: "auserPackage",
+      width: "20%",
+      render: (auserPackage) => {
+        if (!auserPackage?.name) {
+          return <div style={{ textAlign: 'center' }}>No Package</div>;
+        }
+
+        let bgColor = '';
+        switch (auserPackage.name.toLowerCase()) {
+          case 'advanced':
+            bgColor = '#FAF3E1';
+            break;
+          case 'professional':
+            bgColor = '#F5E7C6';
+            break;
+          case 'vip':
+            bgColor = '#FF6D1F';
+            break;
+          case 'svip':
+            bgColor = '#222222';
+            break;
+          default:
+            bgColor = 'transparent';
+        }
+
+        return (
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                border: '1px solid #d9d9d9',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                backgroundColor: bgColor,
+                color: auserPackage.name.toLowerCase() === 'svip' ? 'white' : 'inherit',
+                display: 'inline-block',
+                width: '110px',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontWeight: 'bold',
+              }}
+            >
+              {auserPackage.name}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: <div style={{ textAlign: 'center' }}>Action</div>,
       dataIndex: "",
       key: "x",
       render: (_, user) => {
         return (
-          <div key={user.id}>
+          <div style={{ textAlign: 'center' }}>
             {user.roles.some((role) => role.name === "ROLE_ADMIN") ? (
               <EditOutlined
                 className="mr-[15px]"
-                // onClick={() => {
-                //   navigate(`${PATH.editNguoiDung}/${nguoiDung.id}`);
-                // }}
                 style={{ color: "blue" }}
               />
             ) : (
@@ -142,8 +206,9 @@ const ManageUser = () => {
                 className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
                 onClick={() => handleDelete(user.id)}
                 loading={loadingId === user.id}
+                disabled={isDeleting}
               >
-                Delete
+                {isDeleting && loadingId === user.id ? "Deleting..." : "Delete"}
               </Button>
             )}
           </div>
@@ -167,32 +232,102 @@ const ManageUser = () => {
   //   );
   // }
 
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.roles.some((role) => role.name === "ROLE_ADMIN"),
+    }),
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(true);
+    setSelectedRowKeys(lstUser?.data?.content.map(user => user.id) || []);
+  };
+
+  const handleCancelSelection = () => {
+    setSelectAll(false);
+    setSelectedRowKeys([]);
+  };
+
+  const handleDeleteSelected = () => {
+    confirm({
+      title: 'Delete Selected Users',
+      icon: <ExclamationCircleOutlined />,
+      content: `Are you sure you want to delete ${selectedRowKeys.length} selected user(s)?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        deleteSelectedUsers();
+      },
+    });
+  };
+
+  const deleteSelectedUsers = async () => {
+    setIsDeletingSelected(true);
+    try {
+      for (const id of selectedRowKeys) {
+        await mutate.mutateAsync(id);
+      }
+      toast.success("Selected users deleted successfully!");
+      setSelectedRowKeys([]);
+      refetch();
+    } catch (error) {
+      toast.error(`Error deleting users: ${error.message}`);
+    } finally {
+      setIsDeletingSelected(false);
+    }
+  };
+
   return (
-    <div>
-      <Button
-        className="bg-blue-600 mb-[15px] text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
-        onClick={() => refetch()}
-      >
-        Refresh Data
-      </Button>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="mb-4 flex justify-between items-center">
+        <div>
+          <Button
+            onClick={handleSelectAll}
+            className="mr-2 border-black text-black hover:bg-blue-500 hover:text-white"
+          >
+            Select All Users
+          </Button>
+          <Button
+            onClick={handleCancelSelection}
+            className="mr-2 bg-gray-400 text-white hover:bg-gray-500 hover:text-white"
+          >
+            Cancel Selection
+          </Button>
+          <Button 
+            onClick={handleDeleteSelected} 
+            disabled={selectedRowKeys.length === 0}
+            loading={isDeletingSelected}
+            className="bg-red-600 text-white hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out"
+          >
+            Delete Selected
+          </Button>
+        </div>
+        <span>{`Selected ${selectedRowKeys.length} items`}</span>
+      </div>
+
       <Search
         style={{ marginBottom: "20px" }}
-        placeholder="input search text"
+        placeholder="Search by username"
         allowClear
         size="large"
         onKeyUp={onKeyUp}
       />
+
       <Table
+        rowSelection={rowSelection}
         columns={columns}
         dataSource={data}
+        rowKey="id"
         onChange={onChange}
-        showSorterTooltip={{
-          target: "sorter-icon",
-        }}
         loading={isFetching}
         pagination={{
           current: currentPage,
-          pageSize: 5,
+          pageSize: pageSize,
           total: totalElements,
           showSizeChanger: true,
           showQuickJumper: true,
@@ -203,6 +338,8 @@ const ManageUser = () => {
             setPageSize(pageSize);
           },
         }}
+        className="shadow-lg rounded-lg overflow-hidden"
+        bordered={false}
       />
     </div>
   );
