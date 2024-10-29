@@ -1,11 +1,12 @@
 package com.product.server.koi_control_application.service;
 
-
 import com.product.server.koi_control_application.customException.BadRequestException;
 import com.product.server.koi_control_application.customException.ForbiddenException;
 import com.product.server.koi_control_application.serviceInterface.IImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +29,11 @@ public class ImageServiceImpl implements IImageService {
     public ImageServiceImpl(ClassPathResource imgFile) {
         this.imgFile = imgFile;
     }
+
     private static final String IMAGE_DIR = "image/";
-    private static final String HOST ="https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/";
+    @Value("${app.image.host}")
+    private String imageHost;   
+
     public String uploadImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File không được để trống");
@@ -45,17 +49,16 @@ public class ImageServiceImpl implements IImageService {
 
         Files.write(filePath, file.getBytes());
 
-        return HOST+filename;
-    }
-
-
-    @Override
-    public String getDefaultImage(String resourcesFile){
-        return HOST + resourcesFile;
+        return imageHost + filename;
     }
 
     @Override
-    public List<String> getListImages()  {
+    public String getDefaultImage(String resourcesFile) {
+        return imageHost + resourcesFile;
+    }
+
+    @Override
+    public List<String> getListImages() {
         List<String> imageNames = new ArrayList<>();
         Path dirPath = Paths.get(IMAGE_DIR);
 
@@ -75,10 +78,12 @@ public class ImageServiceImpl implements IImageService {
     public String getFileName(String url) {
         return url.substring(url.lastIndexOf("/") + 1);
     }
+
     @Override
     public InputStream getImage() throws IOException {
         return imgFile.getInputStream();
     }
+
     @Override
     public boolean imageExists() {
         return imgFile.exists();
@@ -92,7 +97,8 @@ public class ImageServiceImpl implements IImageService {
         }
 
         if (filename == null) {
-            throw new BadRequestException("Cannot mapping property in class to get filename, please send correct and enough property");
+            throw new BadRequestException(
+                    "Cannot mapping property in class to get filename, please send correct and enough property");
         }
 
         filename = filename.substring(filename.lastIndexOf("/") + 1);
@@ -100,7 +106,7 @@ public class ImageServiceImpl implements IImageService {
         log.info("Updating image: " + filename);
 
         // Sử dụng ClassPathResource để kiểm tra sự tồn tại của file
-         imgFile = new ClassPathResource(IMAGE_DIR + filename);
+        imgFile = new ClassPathResource(IMAGE_DIR + filename);
         if (!imgFile.exists()) {
             throw new IOException("Image not found: " + filename);
         }
@@ -115,7 +121,7 @@ public class ImageServiceImpl implements IImageService {
         // Write the new file
         Files.write(newImagePath, file.getBytes());
 
-        return HOST + newFilename;
+        return imageHost + newFilename;
     }
 
     private String generateNewFilename(String oldFilename) {
@@ -123,7 +129,7 @@ public class ImageServiceImpl implements IImageService {
         // For example, you can use a timestamp or UUID
         String extension = oldFilename.substring(oldFilename.lastIndexOf("."));
         String baseName = oldFilename.substring(0, oldFilename.lastIndexOf("."));
-        return baseName + "_" + System.currentTimeMillis() + extension;
+        return baseName + "_" + System.currentTimeMillis() + "_" + extension;
     }
 
     @Override
@@ -132,4 +138,3 @@ public class ImageServiceImpl implements IImageService {
         Files.deleteIfExists(filePath);
     }
 }
-

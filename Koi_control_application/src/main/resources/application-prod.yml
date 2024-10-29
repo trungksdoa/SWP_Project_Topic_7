@@ -1,10 +1,9 @@
 # Application specific configs
 app:
-
   image:
-    host: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/
+    host: ${serverHost}/api/image/
   jwt:
-    secret: SecretKeyToGenJWTs
+    secret: ${jwtSecrect}
   schedule:
     task:
       update-order-status:
@@ -12,14 +11,17 @@ app:
 
 # Spring Framework configs
 spring:
+  profiles:
+    active: prod
+
   application:
     name: Koi_control_application
 
   # Database config
   datasource:
-    url: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306/koicontrol
-    username: adminuser
-    password: g#H-GthWyfq_2bKs;7'R9}
+    url: ${mysqlUrl}
+    username: ${mysqlUsername}
+    password: ${mysqlPassword}
 
   # JPA config
   jpa:
@@ -30,13 +32,22 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
+  cloud:
+    azure:
+      keyvault:
+        secret:
+          property-sources[0]:
+            endpoint: https://secrect.vault.azure.net/
+      profile:
+        tenant-id: ${tenant-id}  # Tenant ID từ Azure AD
+      credential:
+        managed-identity-enabled: true
   # Mail config
   mail:
     host: smtp.gmail.com
     port: 587
     username: trungvhse182490@fpt.edu.vn
-    password: upivsinlboafdhdr
+    password: ${googlePwd}
     properties:
       mail:
         smtp:
@@ -58,16 +69,6 @@ spring:
   web:
     resources:
       add-mappings: false
-  cloud:
-    azure:
-      keyvault:
-        secret:
-          endpoint: https://secrect.vault.azure.net/
-      profile:
-        tenant-id: 447080b4-b9c6-4b0b-92fd-b543a68b4e97  # Tenant ID từ Azure AD
-      credential:
-        managed-identity:
-          enabled: true
 
 # Server configs
 server:
@@ -90,7 +91,7 @@ openapi:
       email: trungksdoa@gmail.com
     api-docs: /v3/api-docs
     servers:
-      prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
+      prod: ${serverHost}
       dev: http://localhost:8080
 
 # Monitoring configs

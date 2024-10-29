@@ -17,7 +17,7 @@ import java.util.List;
 
 @Configuration
 public class OpenAPIConfig {
-    @Value("${openapi.service.tilte}")
+    @Value("${openapi.service.title}")
     private String title;
 
     @Value("${openapi.service.version}")
