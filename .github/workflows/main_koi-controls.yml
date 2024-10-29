@@ -34,7 +34,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -refresh-dependencies
         working-directory: ./Koi_control_application
-        
+
         env:  
           SPRING_PROFILES_ACTIVE: prod
           
@@ -65,3 +65,5 @@ jobs:
           slot-name: 'Production'
           package: '*-SNAPSHOT.jar'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2C87E69868144C538DB8781A4F2595C5 }}
+          app-settings:
+            SPRING_PROFILES_ACTIVE=prod

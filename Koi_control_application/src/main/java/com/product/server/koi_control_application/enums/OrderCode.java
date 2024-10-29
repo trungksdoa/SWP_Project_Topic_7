@@ -8,7 +8,7 @@ public enum OrderCode {
     CANCELLED("CANCELLED"),
 
     @Schema(description = "Order has been successfully completed")
-    SUCCESS("SUCCESS"),
+    SUCCESS("SUCCESS_PAYMENT"),
 
     @Schema(description = "Order is being shipped")
     SHIPPING("SHIPPING"),
