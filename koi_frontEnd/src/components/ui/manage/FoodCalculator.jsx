@@ -76,10 +76,10 @@ const FoodCalculator = () => {
 
   const handleClick = (koi) => {
     setSelectedKoi(koi);
-    // Calculate koi age
+    // Calculate koi age in months
     if (koi.dateOfBirth) {
-      const age = dayjs().diff(dayjs(koi.dateOfBirth), 'day');
-      setKoiAge(age);
+      const ageInMonths = dayjs().diff(dayjs(koi.dateOfBirth), 'month');
+      setKoiAge(ageInMonths);
     } else {
       setKoiAge(null);
     }
@@ -241,7 +241,10 @@ const FoodCalculator = () => {
                         <p className="flex justify-between mb-1"><strong>Weight:</strong> <span>{selectedKoi.weight} grams</span></p>
                         <p className="flex justify-between mb-1"><strong>Length:</strong> <span>{selectedKoi.length} cm</span></p>
                         <p className="flex justify-between mb-1"><strong>Date of Birth:</strong> <span>{selectedKoi.dateOfBirth ? dayjs(selectedKoi.dateOfBirth).format('YYYY-MM-DD') : 'Unknown'}</span></p>
-                        <p className="flex justify-between mb-1"><strong>Age:</strong> <span>{koiAge !== null ? `${koiAge} days` : 'Unknown'}</span></p>
+                        <p className="flex justify-between mb-1">
+                          <strong>Age:</strong> 
+                          <span>{koiAge !== null ? `${koiAge} months` : 'Unknown'}</span>
+                        </p>
                       </div>
                     </div>
                   </div>

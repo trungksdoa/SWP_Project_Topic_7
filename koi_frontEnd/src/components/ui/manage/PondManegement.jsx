@@ -388,19 +388,7 @@ const PondManagement = () => {
       />
         <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
           <strong>My Pond</strong>
-        </div>
-      {/* Add Koi message */}
-      {lstPond?.length > 0 && (!lstKoi || lstKoi.length === 0) && (
-        <div className="flex flex-row items-center justify-center space-x-4">
-          <div className="text-lg">You have no Koi</div>
-          <Button 
-            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
-            onClick={() => navigate('/add-koi')}
-          >
-            Add a Koi
-          </Button>
-        </div>
-      )}
+        </div>      
 
       <div className="flex justify-between items-center mx-4 my-6">
         <div className="flex justify-start items-center w-1/3">
@@ -659,8 +647,10 @@ const PondManagement = () => {
                   handleDeleteClick(selectedPond.id);
                 }}
                 className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold ml-2"
+                loading={isDeleting}
+                disabled={isDeleting}
               >
-                Delete Pond
+                {isDeleting ? 'Deleting...' : 'Delete Pond'}
               </Button>
             </div>
           </div>
