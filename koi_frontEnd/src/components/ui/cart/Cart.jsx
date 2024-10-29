@@ -65,13 +65,11 @@ const Cart = () => {
   const mutate = useDeleteProductsInCarts();
 
   const handleDeleteCart = (productId, quantity) => {
-    console.log("productId", productId);
     if (window.confirm("Do you want to delete this item? YES or NO")) {
       mutate.mutate(
         { productId, userId: userLogin?.id, quantity },
         {
           onSuccess: (response) => {
-            console.log("API Response:", response);
             toast.success("Delete product in cart successfully!");
             refetch();
           },
@@ -87,33 +85,6 @@ const Cart = () => {
   const totalItems = carts?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalPrice =
     carts?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
-
-  // lstPrd?.map((prd) => {
-  //   totalItems += prd?.quantity;
-  //   totalPrice += prd?.quantity * prd?.price;
-  // });
-
-  // useEffect(() => {
-  //   if (carts) {
-  //     const productIdList = carts.map((prd) => prd?.productId);
-
-  //     Promise.all(
-  //       productIdList.map((id) =>
-  //         dispatch(manageProductThunks.getProductThunk(id)).unwrap()
-  //       )
-  //     )
-  //       .then((results) => {
-  //         const updatedProducts = results.map((product, index) => ({
-  //           ...product,
-  //           quantity: carts[index]?.quantity, // Add quantity from carts
-  //         }));
-  //         setLstPrd(updatedProducts);
-  //       })
-  //       .catch((err) => {
-  //         // Handle error
-  //       });
-  //   }
-  // }, [carts]);
 
   if (carts?.length === 0) {
     return (

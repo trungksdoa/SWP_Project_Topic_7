@@ -47,7 +47,6 @@ const AddBlogs = () => {
 
       // Debug to see FormData
       for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]); // Debugging purpose
       }
 
       // Gửi mutation hoặc gọi API tại đây

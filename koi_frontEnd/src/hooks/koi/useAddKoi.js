@@ -4,7 +4,6 @@ import { manageKoiFishServices } from "../../services/koifish/manageKoiFishServi
 export const useAddKoi = () => {
   return useMutation({
     mutationFn: (formData) => {
-      console.log("FormData in useAddKoi:", formData); // Add this line for debugging
       return manageKoiFishServices.addKoi(formData);
     },
     onError: (error) => {

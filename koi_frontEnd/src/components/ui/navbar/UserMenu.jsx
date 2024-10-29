@@ -108,7 +108,6 @@ export const UserMenu = () => {
     // If user is logged in
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
-        console.log("a");
         return (
           <div className="flex flex-col" key="admin">
             <NavLink

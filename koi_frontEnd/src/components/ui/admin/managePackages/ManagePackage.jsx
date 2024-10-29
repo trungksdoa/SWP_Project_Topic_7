@@ -3,77 +3,59 @@ import { Button, Table, Spin } from "antd";
 import { useGetPackage } from "../../../../hooks/admin/managePackages/useGetPackage";
 import { PATH } from "../../../../constant";
 import { useNavigate } from "react-router-dom";
-import { useDeletePackage } from '../../../../hooks/admin/managePackages/useDeletePackage'
+import { useDeletePackage } from "../../../../hooks/admin/managePackages/useDeletePackage";
 const ManagePackage = () => {
   const { data: lstPackage, refetch, isFetching } = useGetPackage();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState(null);
-  const mutate = useDeletePackage()
+  const mutate = useDeletePackage();
 
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this package?")) {
-      setDeletingId(id); 
-      mutate.mutate(id, {
-        onSuccess: () => {
-          toast.success("Delete package successfully!");
-          refetch();
-          setDeletingId(null); 
-        },
-        onError: () => {
-          toast.error("Delete package failed!");
-          setDeletingId(null);
-        },
-      });
-    }
-  }
   useEffect(() => {
-    refetch()
-  }, [])
-
+    refetch();
+  }, []);
 
   const columns = [
     {
-        title: "ID",
-        dataIndex: "id"
+      title: "ID",
+      dataIndex: "id",
     },
     {
       title: "Name",
       dataIndex: "name",
       render: (text, record) => {
-        let bgColor = '';
+        let bgColor = "";
         switch (record.name.toLowerCase()) {
-          case 'advanced':
-            bgColor = '#FAF3E1';
+          case "advanced":
+            bgColor = "#FAF3E1";
             break;
-          case 'professional':
-            bgColor = '#F5E7C6';
+          case "professional":
+            bgColor = "#F5E7C6";
             break;
-          case 'vip':
-            bgColor = '#FF6D1F';
+          case "vip":
+            bgColor = "#FF6D1F";
             break;
-          case 'svip':
-            bgColor = '#222222';
+          case "svip":
+            bgColor = "#222222";
             break;
           default:
-            bgColor = 'transparent';
+            bgColor = "transparent";
         }
-        
+
         return (
           <div
             style={{
-              border: '1px solid #d9d9d9',
-              padding: '4px 8px',
-              borderRadius: '4px',
+              border: "1px solid #d9d9d9",
+              padding: "4px 8px",
+              borderRadius: "4px",
               backgroundColor: bgColor,
-              color: record.name.toLowerCase() === 'svip' ? 'white' : 'inherit',
-              display: 'inline-block',
-              width: '110px',
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontWeight: 'bold',
+              color: record.name.toLowerCase() === "svip" ? "white" : "inherit",
+              display: "inline-block",
+              width: "110px",
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "bold",
             }}
           >
             {text}
@@ -94,31 +76,23 @@ const ManagePackage = () => {
       dataIndex: "price",
     },
     {
-        title: "Action",
-        render: (_, pkg) => (
-          <div key={pkg.id}>
-            <Button
-              onClick={() => {
-                navigate(`${PATH.EDIT_PACKAGE}/${pkg?.id}`);
-              }}
-              className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
-            >
-              Edit
-            </Button>
-            <Button
-            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
-              onClick={() => handleDelete(pkg?.id)}
-              loading={deletingId === pkg?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
-              disabled={deletingId === pkg?.id} // Vô hiệu hóa nút nếu đang xóa
-            >
-              Delete
-            </Button>
-          </div>
-        ),
-        width: "15%",
-      },
+      title: "Action",
+      render: (_, pkg) => (
+        <div key={pkg.id}>
+          <Button
+            onClick={() => {
+              navigate(`${PATH.EDIT_PACKAGE}/${pkg?.id}`);
+            }}
+            className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
+          >
+            Edit
+          </Button>
+        </div>
+      ),
+      width: "15%",
+    },
   ];
-  const data = lstPackage
+  const data = lstPackage;
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
   };
@@ -155,8 +129,8 @@ const styles = `
   }
 `;
 
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style');
+if (typeof document !== "undefined") {
+  const styleElement = document.createElement("style");
   styleElement.innerHTML = styles;
   document.head.appendChild(styleElement);
 }

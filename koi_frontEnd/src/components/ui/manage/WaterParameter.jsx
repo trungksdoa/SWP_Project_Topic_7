@@ -50,8 +50,10 @@ const WaterParameter = () => {
   const { data: waterStandards, refetchStandard } = useGetWaterStandard(
     selectedPond?.id
   );
+  const { data: lstPond, refetch, isFetching } = useGetAllPond(userId); // Lấy danh sách hồ
   const [saltMessage, setSaltMessage] = useState(""); // Thêm state để lưu thông báo muối
-  const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] = useState(false);
+  const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] =
+    useState(false);
   const handleGoToStore = () => {
     setShowStore(true);
   };
@@ -68,7 +70,6 @@ const WaterParameter = () => {
     setError(newError);
   };
 
-  const { data: lstPond, refetch } = useGetAllPond(userId); // Lấy danh sách hồ
   const handleChangeDatePicker = (date) => {
     if (date) {
       formik.setFieldValue("birthday", date.format("DD/MM/YYYY"));
@@ -163,6 +164,7 @@ const WaterParameter = () => {
 
   // Formik để xử lý form nhập liệu water parameters
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       nitriteNO2: 0,
       nitrateNO3: 0,
@@ -187,6 +189,7 @@ const WaterParameter = () => {
         {
           onSuccess: () => {
             toast.success("Update Water Parameter Success !");
+            setWaterParameters(data);
             refetch();
             refetchStandard();
           },
@@ -298,9 +301,12 @@ const WaterParameter = () => {
     }
   }, [waterParameters, waterStandard]);
 
-  // Render danh sách hồ
-  if (!lstPond) {
-    return <div>Loading...</div>;
+  if (isFetching) {
+    return (
+      <div className="flex justify-center items-center min-h-[450px]">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
   }
 
   return (
@@ -320,7 +326,7 @@ const WaterParameter = () => {
               src={pond.imageUrl}
               alt={pond.name}
               className="w-full h-48 object-cover cursor-pointer" // Updated this line
-              />
+            />
             <h3
               className="text-lg mt-2 cursor-pointer"
               onClick={() => handleClick(pond)}
@@ -353,7 +359,7 @@ const WaterParameter = () => {
                 className="w-80 h-80 object-cover rounded-[8px] shadow-lg"
               />
             </div>
-            
+
             {/* Right column: Content */}
             <div className="w-1/2 flex flex-col justify-center items-center">
               {/* First row: No water parameter and Add Water Parameter button */}
@@ -376,7 +382,9 @@ const WaterParameter = () => {
         ) : (
           <div className="">
             <div className="flex justify-around">
-              <div className="mr-6 w-1/4 items-start"> {/* Reduced width to 25% */}
+              <div className="mr-6 w-1/4 items-start">
+                {" "}
+                {/* Reduced width to 25% */}
                 <img
                   src={selectedPond.imageUrl}
                   alt={selectedPond.name}
@@ -389,7 +397,9 @@ const WaterParameter = () => {
                 onFinish={formik.handleSubmit}
               >
                 <div className="flex items-center mb-2">
-                  <h3 className="text-lg font-semibold mr-4">Edit Water Parameter</h3>
+                  <h3 className="text-lg font-semibold mr-4">
+                    Edit Water Parameter
+                  </h3>
                   <Form.Item className="mb-0">
                     <Checkbox onChange={handleEditToggle}></Checkbox>
                   </Form.Item>
@@ -401,7 +411,7 @@ const WaterParameter = () => {
                       <Form.Item label="Nitrite NO2 (mg/L)" className="mb-2">
                         <Input
                           name="nitriteNO2"
-                          value={formik.values.nitriteNO2 || ""}
+                          value={formik.values.nitriteNO2}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -409,7 +419,7 @@ const WaterParameter = () => {
                       <Form.Item label="Nitrate NO3 (mg/L)" className="mb-2">
                         <Input
                           name="nitrateNO3"
-                          value={formik.values.nitrateNO3 || ""}
+                          value={formik.values.nitrateNO3}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -417,7 +427,7 @@ const WaterParameter = () => {
                       <Form.Item label="Ammonium NH4 (mg/L)" className="mb-2">
                         <Input
                           name="ammoniumNH4"
-                          value={formik.values.ammoniumNH4 || ""}
+                          value={formik.values.ammoniumNH4}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -425,7 +435,7 @@ const WaterParameter = () => {
                       <Form.Item label="Hardness GH (ppm)" className="mb-2">
                         <Input
                           name="hardnessGH"
-                          value={formik.values.hardnessGH || ""}
+                          value={formik.values.hardnessGH}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -433,7 +443,7 @@ const WaterParameter = () => {
                       <Form.Item label="Salt (ppm)" className="mb-2">
                         <Input
                           name="salt"
-                          value={formik.values.salt || ""}
+                          value={formik.values.salt}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -441,17 +451,20 @@ const WaterParameter = () => {
                       <Form.Item label="Temperature (°C)" className="mb-2">
                         <Input
                           name="temperature"
-                          value={formik.values.temperature || ""}
+                          value={formik.values.temperature}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
                     </div>
                     <div>
-                      <Form.Item label="Carbonate Hardness KH (ppm)" className="mb-2">
+                      <Form.Item
+                        label="Carbonate Hardness KH (ppm)"
+                        className="mb-2"
+                      >
                         <Input
                           name="carbonateHardnessKH"
-                          value={formik.values.carbonateHardnessKH || ""}
+                          value={formik.values.carbonateHardnessKH}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -459,7 +472,7 @@ const WaterParameter = () => {
                       <Form.Item label="CO2 (ppm)" className="mb-2">
                         <Input
                           name="co2"
-                          value={formik.values.co2 || ""}
+                          value={formik.values.co2}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
@@ -467,37 +480,61 @@ const WaterParameter = () => {
                       <Form.Item label="Total Chlorines (ppm)" className="mb-2">
                         <Input
                           name="totalChlorines"
-                          value={formik.values.totalChlorines || ""}
+                          value={formik.values.totalChlorines}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
-                      <Form.Item label="Last Cleaned At" className="mb-2">
+                      <Form.Item label="Last Cleaned At" className="mb-2 hidden">
                         <DatePicker
+                          disabled
                           name="lastCleanedAt"
-                          value={formik.values.lastCleanedAt ? dayjs(formik.values.lastCleanedAt) : null}
-                          onChange={(date) => formik.setFieldValue("lastCleanedAt", date ? date.format("YYYY-MM-DD") : null)}
-                          style={{ width: '75%' }}
+                          value={
+                            formik.values.lastCleanedAt
+                              ? dayjs(formik.values.lastCleanedAt)
+                              : null
+                          }
+                          onChange={(date) =>
+                            formik.setFieldValue(
+                              "lastCleanedAt",
+                              date ? date.format("YYYY-MM-DD") : null
+                            )
+                          }
+                          style={{ width: "75%" }}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         />
                       </Form.Item>
                       <Form.Item label="Cleaned Day Count" className="mb-2">
                         <Input
                           name="cleanedDayCount"
-                          value={formik.values.cleanedDayCount || ""}
+                          value={formik.values.cleanedDayCount}
                           onChange={formik.handleChange}
-                          style={{ width: '75%' }}
+                          style={{ width: "75%" }}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         />
                       </Form.Item>
                       <Form.Item label="pH" className="mb-2">
                         <Input
                           name="ph"
-                          value={formik.values.ph || ""}
+                          value={formik.values.ph}
                           onChange={formik.handleChange}
-                          style={{ width: '75%' }}
+                          style={{ width: "75%" }}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         />
+                      </Form.Item>
+                      <Form.Item label="Last Cleaned" className="mb-2">
+                        <Checkbox
+                          name="lastCleaned"
+                          checked={formik.values.lastCleaned}
+                          onChange={(e) =>
+                            formik.setFieldValue(
+                              "lastCleaned",
+                              e.target.checked
+                            )
+                          }
+                        >
+                          Last Cleaned
+                        </Checkbox>
                       </Form.Item>
                     </div>
                   </div>
@@ -550,7 +587,7 @@ const WaterParameter = () => {
                     </Draggable>
                   )}
                   width="60%" // Increased from default (usually 520px) to 80% of screen width
-                  bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }} // Added to enable scrolling if content is too long
+                  bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }} // Added to enable scrolling if content is too long
                   centered // Add this prop to center the modal
                   style={{ top: 20 }} // Add some top margin to prevent it from being flush against the top of the screen
                 >
@@ -686,9 +723,12 @@ const WaterParameter = () => {
                   {checkKoiExistence() && <div>{checkKoiExistence()}</div>}
                   <div>
                     <p>
-                      You can check out products that can improve your pond at the store.
+                      You can check out products that can improve your pond at
+                      the store.
                     </p>
-                    <div className="mt-4 flex justify-center"> {/* Added container with centering */}
+                    <div className="mt-4 flex justify-center">
+                      {" "}
+                      {/* Added container with centering */}
                       <Button
                         onClick={() => {
                           window.open(PATH.STORE, "_blank");
@@ -712,7 +752,7 @@ const WaterParameter = () => {
         onCancel={() => setIsAddWaterParaModalVisible(false)}
         footer={null}
         width="60%" // Increased width for better responsiveness
-        bodyStyle={{ maxHeight: '80vh', overflowY: 'auto' }} // Added scrolling for tall content
+        bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Added scrolling for tall content
         centered // Centers the modal vertically
         className="custom-modal"
       >

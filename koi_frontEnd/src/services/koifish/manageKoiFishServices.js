@@ -13,12 +13,10 @@ export const manageKoiFishServices = {
             const response = await api.put(url, payload);
             return response.data;
         } catch (error) {
-            console.error('Error in updateKoi:', error.response || error);
             throw error;
         }
     },
     addKoi: async (payload) => {
-        console.log("Payload received in addKoi:", payload); // Add this line for debugging
 
         // Check if payload is already a FormData object
         if (payload instanceof FormData) {
@@ -67,7 +65,6 @@ export const manageKoiFishServices = {
     deleteKoi: (id) => api.delete(`/${id}`),
     updateKoiPond: (id, payload) => api.put(`/${id}`, payload),
     addGrowth: async (id, payload, isNew = true) => {
-        console.log("Payload received in addGrowth:", payload);
 
         const formData = new FormData();
         
@@ -94,12 +91,8 @@ export const manageKoiFishServices = {
             throw error.response?.data || error.message;
         }
     },
-    getGrowth: async (id) => {
-        try {
-          const response = await api.get(`/growthUpHistory/${id}`);
-          return response.data;
-        } catch (error) {
-          throw error.response?.data || error.message;
-        }
+    getGrowth: (id) => {
+        console.log(id)
+       return api.get(`/growthUpHistory/${id}`);
     }
 }

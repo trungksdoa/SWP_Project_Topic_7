@@ -26,15 +26,12 @@ const PackagesComponent = () => {
     const payload = {
       packageId: packageId, // Cập nhật packageId vào payload
     };
-    console.log(payload);
     // Gọi mutation để post package
     mutation.mutate(payload, {
       onSuccess: (res) => {
-        console.log(res);
         window.location.href = res?.data?.data?.shortLink;
       },
       onError: (res) => {
-        console.log(res);
       },
     });
   };

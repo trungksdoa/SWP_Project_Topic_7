@@ -104,7 +104,6 @@ const ProductDetail = () => {
           toast.success("Product added to cart");
         },
         onError: (error) => {
-          console.log(error);
           toast.error(error?.response?.data?.message);
         },
       });

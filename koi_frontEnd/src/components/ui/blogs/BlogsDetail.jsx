@@ -5,8 +5,6 @@ import { useGetBlogBySlug } from "../../../hooks/blogs/useGetBlogBySlug";
 const BlogsDetail = () => {
   const { slug } = useParams();
   const { data: blog } = useGetBlogBySlug(slug);
-  console.log(blog);
-  console.log(blog?.contentTop);
 
   return (
     <div
@@ -34,7 +32,11 @@ const BlogsDetail = () => {
           ></div>
         </div>
         <div className="flex justify-end">
-          <img className="rounded-[12px] object-contain" src={blog?.bodyImageUrl} alt="" />
+          <img
+            className="rounded-[12px] object-contain"
+            src={blog?.bodyImageUrl}
+            alt=""
+          />
         </div>
       </div>
       <div className="mb-[60px]">

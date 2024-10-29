@@ -19,8 +19,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const KoiUpdate = () => {
   const { id } = useParams();
-  
   const location = useLocation();
+  console.log(id)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [imgSrc, setImgSrc] = useState("");
@@ -46,6 +46,7 @@ const KoiUpdate = () => {
   const deleteGrowthMutation = useDeleteGrowth();
   const [allGrowthSelected, setAllGrowthSelected] = useState(false);
   const [isLoadingGrowthList, setIsLoadingGrowthList] = useState(false);
+  console.log(growthData)
 
   const koi = location.state?.koi;
 
@@ -279,7 +280,8 @@ const KoiUpdate = () => {
     }
   };
 
-  const showGrowthList = async () => {
+  const showGrowthList = async (id) => {
+    console.log(id)
     setIsLoadingGrowthList(true);
     setIsGrowthListVisible(true);
     try {
@@ -506,7 +508,9 @@ const KoiUpdate = () => {
           <div className="flex justify-end">
             <span 
               className="text-blue-500 underline cursor-pointer"
-              onClick={showGrowthList}
+              onClick={() => {
+                showGrowthList(id)
+              }}
             >
               Growth List
             </span>

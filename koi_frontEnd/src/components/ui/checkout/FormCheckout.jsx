@@ -9,10 +9,8 @@ import { PATH } from "../../../constant";
 
 const FormCheckout = ({ totalItems, totalPrice }) => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  console.log(totalItems);
   const mutation = usePostOrder();
   const navigate = useNavigate();
-  console.log(window.location.href);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -22,10 +20,8 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
       address: "",
     },
     onSubmit: (values) => {
-      console.log(values);
       mutation.mutate(values, {
         onSuccess: (res) => {
-          console.log(res?.data?.data);
           window.location.href = res?.data?.data?.shortLink;
         },
       });
@@ -89,7 +85,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
           </span>
           <span>
             Total Price:{" "}
-            <span className="text-orange-500 font-bold">$ {totalPrice}</span>{" "}
+            <span className="text-orange-500 font-bold">{totalPrice} VND</span>{" "}
           </span>
         </div>
        <div className="text-right mt-[15px]">

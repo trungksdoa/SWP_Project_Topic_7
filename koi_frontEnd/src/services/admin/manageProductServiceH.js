@@ -14,8 +14,6 @@ export const manageProductServiceH = {
   deleteProduct: (id) => api.delete(`/${id}`),
   addProduct: (payload) => api.post("", payload),
   editProduct: (id, payload) => {
-    console.log(id);
-    console.log(payload);
     return api.put(`/${id}`, payload);
   },
   getTopSaleProduct: (startDate, endDate) =>

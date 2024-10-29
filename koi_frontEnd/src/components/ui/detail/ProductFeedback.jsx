@@ -10,7 +10,6 @@ import { Button } from "antd";
 
 const ProductFeedback = ({ prdId }) => {
   const { data: feedbacks, refetch } = useGetFeedbackById(prdId);
-  console.log(feedbacks)
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const mutation = usePostFeedBack();
   const { t } = useTranslation();

@@ -45,7 +45,6 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (totalSalesData && totalSalesData.data) {
 
-      console.log(totalSalesData.data)
       const total = totalSalesData.data.reduce(
         (sum, item) => sum + item.count,
         0
