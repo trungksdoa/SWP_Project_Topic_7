@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Layout,
   Typography,
@@ -7,20 +7,20 @@ import {
   Col,
   Statistic,
   DatePicker,
+  Space,
 } from "antd";
 import {
   UserOutlined,
   ShoppingCartOutlined,
   DollarOutlined,
   RiseOutlined,
-  FallOutlined,
 } from "@ant-design/icons";
 import UserDataChart from "./UserChart.jsx";
 import ProductChart from "./ProductChart.jsx";
 import OrderChart from "./OrderChart.jsx";
 import dayjs from "dayjs";
-
 import { useGetTotalSales } from "../../hooks/order/useGetTotalSales";
+
 const { Content } = Layout;
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -31,11 +31,12 @@ const AdminDashboard = () => {
   const [totalSales, setTotalSales] = useState(0);
   const defaultStartDate = useMemo(() => dayjs("2024-09-01"), []);
   const [dateRange, setDateRange] = useState([defaultStartDate, dayjs()]);
+  const [topProduct, setTopProduct] = useState({ name: "", value: 0 });
+  const [averageUsersPerDay, setAverageUsersPerDay] = useState(0);
 
   const {
     data: totalSalesData,
     isLoading,
-    isError,
     refetch,
   } = useGetTotalSales(
     dateRange[0].format("YYYY/MM/DD"),
@@ -43,9 +44,7 @@ const AdminDashboard = () => {
   );
 
   useEffect(() => {
-    if (totalSalesData && totalSalesData.data) {
-
-      console.log(totalSalesData.data)
+    if (totalSalesData?.data) {
       const total = totalSalesData.data.reduce(
         (sum, item) => sum + item.count,
         0
@@ -54,114 +53,119 @@ const AdminDashboard = () => {
     }
   }, [totalSalesData]);
 
-  const [topProduct, setTopProduct] = useState({ name: "", value: 0 });
-  const [averageUsersPerDay, setAverageUsersPerDay] = useState(0);
-
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
     refetch();
   };
 
-  const handleTotalOrdersChange = (newTotalOrders) => {
-    setTotalOrders(newTotalOrders);
-  };
-
-  const handleTotalUsersChange = (newTotalUsers) => {
-    setTotalUsers(newTotalUsers);
-  };
-
-  const handleTopProductChange = (newTopProduct) => {
-    setTopProduct(newTopProduct);
-  };
-
-  const handleAverageUsersPerDayChange = (newAverage) => {
-    setAverageUsersPerDay(newAverage);
-  };
+  const StatCard = ({ title, value, prefix, suffix, loading }) => (
+    <Card 
+      hoverable 
+      className="dashboard-stat-card"
+      style={{
+        height: "100%",
+        borderRadius: "8px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+      }}
+    >
+      <Statistic
+        title={<span style={{ fontSize: "16px", color: "#666" }}>{title}</span>}
+        value={value}
+        prefix={prefix}
+        suffix={suffix}
+        loading={loading}
+        valueStyle={{ color: "#1890ff", fontSize: "24px" }}
+      />
+    </Card>
+  );
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
       <Content style={{ padding: "24px" }}>
-        <Title level={2}>Admin Dashboard</Title>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
+            <RangePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              style={{ width: "300px" }}
+            />
+          </div>
 
-        <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
-          <Col xs={24} sm={8} md={6}>
-            <Card>
-              <Statistic
-                title="Total Users"
-                value={totalUsers}
-                prefix={<UserOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Card>
-              <Statistic
+          <Row gutter={[24, 24]}>
+            <Col xs={24} sm={12} lg={8}>
+              <StatCard
                 title="Total Orders"
                 value={totalOrders}
-                prefix={<ShoppingCartOutlined />}
+                prefix={<ShoppingCartOutlined style={{ fontSize: "24px" }} />}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Card>
-              <Statistic
+            </Col>
+            <Col xs={24} sm={12} lg={8}>
+              <StatCard
                 title="Total Sales"
-                // Format vnd
-                value={totalSales.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
-                prefix={<DollarOutlined />}
-                precision={2}
+                value={totalSales.toLocaleString("vi-VN", { 
+                  style: "currency", 
+                  currency: "VND" 
+                })}
+                prefix={<DollarOutlined style={{ fontSize: "24px" }} />}
+                loading={isLoading}
               />
-              <RangePicker
-                value={dateRange}
-                onChange={handleDateRangeChange}
-                style={{ marginTop: "10px" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Card>
-              <Statistic
-                title="Avg Users/Day"
-                value={averageUsersPerDay}
-                prefix={<RiseOutlined />}
-                precision={0}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8} md={6}>
-            <Card>
-              <Statistic
+            </Col>
+            <Col xs={24} sm={12} lg={8}>
+              <StatCard
                 title="Top Product"
                 value={topProduct.name}
                 suffix={`(${topProduct.value} sales)`}
+                prefix={<RiseOutlined style={{ fontSize: "24px" }} />}
               />
-            </Card>
-          </Col>
-        </Row>
+            </Col>
+          </Row>
 
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
-            <Card title="User Growth" style={{ marginBottom: "16px" }}>
-              <UserDataChart
-                onTotalUsersChange={handleTotalUsersChange}
-                onAverageUsersPerDayChange={handleAverageUsersPerDayChange}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} lg={12}>
-            <Card title="Product Sales" style={{ marginBottom: "16px" }}>
-              <ProductChart onTopProductChange={handleTopProductChange} />
-            </Card>
-          </Col>
-        </Row>
+          <Row>
+            <Col span={24}>
+              <Card 
+                title="User Growth" 
+                style={{ 
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                <UserDataChart
+                  onTotalUsersChange={setTotalUsers}
+                  onAverageUsersPerDayChange={setAverageUsersPerDay}
+                />
+              </Card>
+            </Col>
+          </Row>
 
-        <Row>
-          <Col span={24}>
-            <Card title="Order Statistics">
-              <OrderChart onTotalOrdersChange={handleTotalOrdersChange} />
-            </Card>
-          </Col>
-        </Row>
+          <Row>
+            <Col span={24}>
+              <Card 
+                title="Product Sales" 
+                style={{ 
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                }}
+              >
+                <ProductChart onTopProductChange={setTopProduct} />
+              </Card>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={24}>
+              <Card 
+                title="Order Statistics"
+                style={{ 
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                }}
+              >
+                <OrderChart onTotalOrdersChange={setTotalOrders} />
+              </Card>
+            </Col>
+          </Row>
+        </Space>
       </Content>
     </Layout>
   );

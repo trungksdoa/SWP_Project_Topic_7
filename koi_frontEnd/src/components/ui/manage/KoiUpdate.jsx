@@ -16,6 +16,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import KoiGrowthChart from './Chart';
 import { useDeleteGrowth } from "../../../hooks/koi/useDeleteGrowth";
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Modal as AntModal } from 'antd';
 
 const KoiUpdate = () => {
   const { id } = useParams();
@@ -46,6 +48,7 @@ const KoiUpdate = () => {
   const deleteGrowthMutation = useDeleteGrowth();
   const [allGrowthSelected, setAllGrowthSelected] = useState(false);
   const [isLoadingGrowthList, setIsLoadingGrowthList] = useState(false);
+  const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
 
   const koi = location.state?.koi;
 
@@ -74,9 +77,10 @@ const KoiUpdate = () => {
       setSelectedPond(koi.pondId);
       calculateAge(koi.dateOfBirth);
       setCurrentDay(koi.date ? dayjs(koi.date) : dayjs());
+      refetchAllKoi();
+      refetchGrowthData();
     }
-    refetchAllKoi();
-  }, [koi, refetchAllKoi]);
+  }, [koi, refetchAllKoi, refetchGrowthData]);
 
 
   const calculateAge = (birthDate) => {
@@ -90,18 +94,8 @@ const KoiUpdate = () => {
     }
   };
 
-  const handleViewChart = async () => {
-    try {
-      await refetchGrowthData();
-      if (!growthData || growthData.length === 0) {
-        toast.info("No growth data available. Please add growth history first.");
-      } else {
-        setIsModalVisible(true);
-      }
-    } catch (error) {
-      console.error("Error refetching growth data:", error);
-      toast.error("Failed to fetch growth data");
-    }
+  const handleViewChart = () => {
+    setIsModalVisible(true);
   };
 
   const handleModalClose = () => {
@@ -279,17 +273,14 @@ const KoiUpdate = () => {
     }
   };
 
-  const showGrowthList = async () => {
+  const showGrowthList = () => {
     setIsLoadingGrowthList(true);
-    setIsGrowthListVisible(true);
-    try {
-      await queryClient.refetchQueries(['growth', id]);
-    } catch (error) {
-      console.error("Error fetching growth data:", error);
-      toast.error("Failed to fetch growth data");
-    } finally {
-      setIsLoadingGrowthList(false);
+    if (!growthData || growthData.length === 0) {
+      toast.info("No growth data available. Please add growth history first.");
+    } else {
+      setIsGrowthListVisible(true);
     }
+    setIsLoadingGrowthList(false);
   };
 
   const hideGrowthList = () => {
@@ -320,41 +311,44 @@ const KoiUpdate = () => {
     });
   };
 
-  const handleDeleteSelectedGrowths = () => {
-    if (selectedGrowths.length === 0) {
-      toast.info("No growth entries selected for deletion.");
-      return;
-    }
-
-    Modal.confirm({
+  const handleDeleteSelectedGrowths = async () => {
+    AntModal.confirm({
       title: 'Delete Growth History',
-      icon: <ExclamationCircleOutlined />,
-      content: `Are you sure you want to delete ${selectedGrowths.length} growth ${selectedGrowths.length === 1 ? 'entry' : 'entries'}?`,
-      okText: 'Yes',
+      content: `Are you sure you want to delete these growth history? This action cannot be undone.`,
+      okText: 'Delete',
       okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        deleteSelectedGrowths();
+      cancelText: 'Cancel',
+      onOk: async () => {
+        setIsDeletingMultiple(true);
+        try {
+          await deleteSelectedGrowths();
+          hideGrowthList();
+        } finally {
+          setIsDeletingMultiple(false);
+        }
       },
     });
   };
 
   const deleteSelectedGrowths = async () => {
+    setIsDeletingMultiple(true);
     try {
       for (const growthId of selectedGrowths) {
         await deleteGrowthMutation.mutateAsync(growthId);
       }
-      toast.success(`Successfully deleted ${selectedGrowths.length} growth ${selectedGrowths.length === 1 ? 'entry' : 'entries'}!`);
-      queryClient.invalidateQueries(['growth', id]);
+      await refetchGrowthData();
+      toast.success(`Successfully deleted ${selectedGrowths.length} growth history!`);
       setSelectedGrowths([]);
     } catch (error) {
       toast.error(`Error deleting growth entries: ${error.message}`);
+    } finally {
+      setIsDeletingMultiple(false);
     }
   };
 
   return (
     <div>
-      <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
+      <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-4">
         Return
       </Button>
       <div className="flex justify-center items-center text-bold text-3xl">
@@ -516,7 +510,7 @@ const KoiUpdate = () => {
           <div className="flex items-center space-x-4 mb-4 ml-8 font-bold text-xl">
             Pond
           </div>
-          <div className="flex items-center space-x-4 mb-8 ml-8 overflow-x-auto">
+          <div className="flex items-center gap-8 mb-8 ml-8 overflow-x-auto">
             {lstPond?.map((pond) => (
               <div
                 key={pond.id}
@@ -604,7 +598,7 @@ const KoiUpdate = () => {
             </Checkbox>
             <Button
               onClick={handleCancelSelectGrowth}
-              disabled={selectedGrowths.length === 0}
+              disabled={selectedGrowths.length === 0 || isDeletingMultiple}
               className="mr-2"
             >
               Cancel
@@ -613,9 +607,13 @@ const KoiUpdate = () => {
               type="primary" 
               danger
               onClick={handleDeleteSelectedGrowths}
-              disabled={selectedGrowths.length === 0}
+              disabled={selectedGrowths.length === 0 || isDeletingMultiple}
+              icon={isDeletingMultiple ? <LoadingOutlined /> : <DeleteOutlined />}
             >
-              Delete History
+              {isDeletingMultiple 
+                ? `Deleting ${selectedGrowths.length} entries...` 
+                : `Delete History (${selectedGrowths.length})`
+              }
             </Button>
           </div>
         </div>
