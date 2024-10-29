@@ -395,9 +395,9 @@ const KoiManegement = () => {
       
       {lstPond?.length === 0 ? (
          <div className="flex flex-row items-center justify-center space-x-4">
-         <div className="text-lg">You have no Koi</div>
+         <div className="text-lg">You have no pond</div>
          <Button 
-           className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
+           className="w-50 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
            onClick={() => navigate('/pond-management')}
           >
             {t("Create a pond first!")}
@@ -548,7 +548,7 @@ const KoiManegement = () => {
                     <img
                       src={selectedKoi.imageUrl}
                       alt={selectedKoi.name}
-                      className="w-full h-auto object-cover rounded-lg"
+                      className="w-80 h-80 object-cover rounded-lg"
                     />
                   </div>
                   <div className="md:w-1/2 mt-4 md:mt-0">
