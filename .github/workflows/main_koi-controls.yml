@@ -34,7 +34,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -refresh-dependencies
         working-directory: ./Koi_control_application
-
+        
+        env:  
+          SPRING_PROFILES_ACTIVE: prod
+          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
