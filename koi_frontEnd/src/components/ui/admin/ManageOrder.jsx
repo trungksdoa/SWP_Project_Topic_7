@@ -114,18 +114,22 @@ const ManageOrder = () => {
     {
       title: "Order ID",
       dataIndex: "id",
+      align: 'center',
     },
     {
       title: "Full Name",
       dataIndex: "fullName",
+      align: 'center',
     },
     {
       title: "Address",
       dataIndex: "address",
+      align: 'center',
     },
     {
       title: "Total Amount",
       dataIndex: "totalAmount",
+      align: 'center',
       render: (totalAmount) => (
         `${new Intl.NumberFormat("vi-VN", {
           style: "currency",
@@ -136,6 +140,7 @@ const ManageOrder = () => {
     {
       title: "Date order",
       dataIndex: "createdAt",
+      align: 'center',
       render: (createdAt) => {
         return new Date(createdAt).toLocaleString();
       },
@@ -143,39 +148,40 @@ const ManageOrder = () => {
     {
       title: "Status",
       dataIndex: "status",
+      align: 'center',
       render: (_, record) => {
         //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
           return (
-            <Tag color="gray" className="w-[100px] !bg-gray-500 !text-white text-center">
+              <Tag color="gray" className="text-[13px] font-bold w-[150px] !bg-gray-500 !text-white text-center justify-center items-center">
               PENDING
             </Tag>
           );
         }
         if (record.status === "CANCELLED") {
           return (
-            <Tag color="red" className="w-[100px] !bg-red-500 !text-white text-center">
+            <Tag color="red" className="text-[13px] font-bold w-[150px] !bg-red-500 !text-white text-center justify-center items-center">
               CANCELLED
             </Tag>
           );
         }
         if (record.status === "SUCCESS") {
           return (
-            <Tag color="green" className="w-[100px] !bg-green-500 !text-white text-center">
+            <Tag color="green" className="text-[13px] font-bold w-[150px] !bg-green-500 !text-white text-center justify-center items-center">
               WAIT FOR SHIPPING
             </Tag>
           );
         }
         if (record.status === "SHIPPING") {
           return (
-            <Tag color="blue" className="w-[100px] !bg-blue-500 !text-white text-center">
+            <Tag color="blue" className="text-[13px] font-bold w-[150px] !bg-blue-500 !text-white text-center justify-center items-center">
               ON DELIVERY
             </Tag>
           );
         }
         if (record.status === "DELIVERED") {
           return (
-            <Tag color="purple" className="w-[100px] !bg-purple-500 !text-white text-center">
+            <Tag color="purple" className="text-[13px] font-bold w-[150px] !bg-purple-500 !text-white text-center justify-center items-center">
               DELIVERED
             </Tag>
           );
@@ -183,7 +189,7 @@ const ManageOrder = () => {
         //COMPLETED
         if (record.status === "COMPLETED") {
           return (
-            <Tag color="orange" className="w-[100px] !bg-orange-500 !text-white text-center">
+            <Tag color="orange" className="text-[13px] font-bold w-[150px] !bg-orange-500 !text-white text-center justify-center items-center">
               COMPLETED
             </Tag>
           );
@@ -193,11 +199,29 @@ const ManageOrder = () => {
     {
       title: "Action",
       key: "action",
+      align: 'center',
       render: (_, record) => {
+        const buttonStyle = {
+          width: '80px',
+          height: '32px',
+          display: 'inline-flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '4px 15px',
+          fontSize: '13px',
+          borderRadius: '2px',
+          textAlign: 'center',
+        };
+
         if (record.status === "SUCCESS") {
           return (
             <Button
-              className="bg-blue-500 text-white hover:!bg-blue-600 hover:!text-white border-none"
+              style={{
+                ...buttonStyle,
+                backgroundColor: '#1890ff',
+                borderColor: '#1890ff',
+                color: 'white',
+              }}
               loading={mutation.isPending}
               onClick={() => handleSendClick(record?.id)}
             >
@@ -212,16 +236,31 @@ const ManageOrder = () => {
           record.status === "COMPLETED"
         ) {
           return (
-            <Button onClick={() => handleViewClick(record?.id)}>View</Button>
+            <Button
+              style={buttonStyle}
+              onClick={() => handleViewClick(record?.id)}
+            >
+              View
+            </Button>
           );
         }
 
         if (record.status === "PENDING") {
-          return <Button>Cancel</Button>;
+          return (
+            <Button
+              style={{
+                ...buttonStyle,
+                backgroundColor: '#ff4d4f',
+                borderColor: '#ff4d4f',
+                color: 'white',
+              }}
+            >
+              Cancel
+            </Button>
+          );
         }
 
         return null;
-        // Nếu không phải SUCCESS, sẽ không hiện button
       },
     },
   ];

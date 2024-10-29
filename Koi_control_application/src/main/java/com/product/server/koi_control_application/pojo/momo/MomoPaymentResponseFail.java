@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MomoResponseOrderFail {
+public class MomoPaymentResponseFail {
     private int resultCode;
     private String message;
     private long responseTime;

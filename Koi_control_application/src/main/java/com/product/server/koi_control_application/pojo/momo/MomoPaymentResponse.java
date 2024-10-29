@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MomoResponseOrderSuccess {
+public class MomoPaymentResponse {
     private String partnerCode;
     private String requestId;
     private String orderId;

@@ -2,6 +2,7 @@ package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.customException.AlreadyExistedException;
 import com.product.server.koi_control_application.customException.NotFoundException;
+import com.product.server.koi_control_application.customException.TransactionException;
 import com.product.server.koi_control_application.model.KoiFish;
 import com.product.server.koi_control_application.model.KoiGrowthHistory;
 import com.product.server.koi_control_application.model.Pond;
@@ -52,9 +53,11 @@ public class IKoiFishServiceImpl implements IKoiFishService {
             throw new AlreadyExistedException("KoiFish name existed.");
 
         if (iPackageService.checkFishLimit(koiFish.getUserId(), user.getAUserPackage()))
-            throw new NotFoundException("User package limit exceeded.");
+            throw new TransactionException("User package limit exceeded.");
+
         koiFish.setInPondFrom(koiFish.getDate());
         KoiFish saved = koiFishRepository.save(koiFish);
+
         koiGrowthHistoryRepository.save(KoiGrowthHistory.builder()
                 .koiId(saved.getId())
                 .isFirstMeasurement(true)
@@ -66,8 +69,9 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .dateOfBirth(saved.getDateOfBirth())
                 .build());
         evaluateAndUpdateKoiGrowthStatus(saved.getId());
-        return getKoiFishsaved(saved.getId());
+        return handleEvaluation(saved);
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -376,6 +380,7 @@ public class IKoiFishServiceImpl implements IKoiFishService {
             koiFishRepository.save(koiFish);
             return;
         }
+
         boolean hasSlowGrowth = false;
         boolean hasFastGrowth = false;
         boolean hasNormalGrowth = false;
@@ -405,8 +410,8 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         }
         koiFish.setStatus(finalStatus);
         koiFishRepository.save(koiFish);
-
     }
+
     @Override
     public int getLastestKoigrownId(int koiId){
         List<KoiGrowthHistory> koiGrowthHistories = koiGrowthHistoryRepository.findAllByKoiId(koiId);
@@ -480,5 +485,10 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         }
         return koiFishList;
     }
-}
 
+    public KoiFish handleEvaluation(KoiFish koiFish) {
+        evaluateAndUpdateKoiFishStatus(koiFish);
+        koiFish.countageMonth();
+        return koiFishRepository.save(koiFish);
+    }
+}

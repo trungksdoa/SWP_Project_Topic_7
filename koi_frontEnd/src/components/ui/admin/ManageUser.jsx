@@ -9,6 +9,9 @@ import { PATH } from "../../../constant";
 import { toast } from "react-toastify";
 import { Input, Space, Tag } from "antd";
 import { filter } from "@chakra-ui/react";
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { confirm } = Modal;
 
 const { Search } = Input;
 
@@ -26,6 +29,9 @@ const ManageUser = () => {
   const [filteredName, setFilteredName] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [isDeletingSelected, setIsDeletingSelected] = useState(false);
 
   useEffect(() => {
     refetch();
@@ -57,12 +63,12 @@ const ManageUser = () => {
     {
       title: <div style={{ textAlign: 'center' }}>User Name</div>,
       dataIndex: "username",
-      width: "10%",
+      width: "15%",
     },
     {
       title: <div style={{ textAlign: 'center' }}>Address</div>,
       dataIndex: "address",
-      width: "10%",
+      width: "20%",
       render: (address) => (
         <div style={{ textAlign: 'center' }}>
           {address ? (
@@ -76,7 +82,7 @@ const ManageUser = () => {
     {
       title: <div style={{ textAlign: 'center' }}>Email</div>,
       dataIndex: "email",
-      width: "10%",
+      width: "20%",
     },
     {
       title: <div style={{ textAlign: 'center' }}>ROLE</div>,
@@ -96,20 +102,19 @@ const ManageUser = () => {
         return (
           <div style={{ textAlign: 'center' }}>
             <Tag
-              color={hasRoleAdmin ? "red" : hasRoleMember ? "green" : "gray"}
-              style={{ width: '70px', textAlign: 'center' }}
+              color={hasRoleAdmin ? "red" : hasRoleMember ? "green" : "blue"}
+              style={{ width: '100px', textAlign: 'center' }}
             >
-              {hasRoleAdmin ? "ADMIN" : hasRoleMember ? "MEMBER" : "SHOP"}
+              {hasRoleAdmin ? "ADMIN" : hasRoleMember ? "MEMBER" : "CONTRIBUTOR"}
             </Tag>
           </div>
         );
       },
-      width: "10%",
     },
     {
       title: <div style={{ textAlign: 'center' }}>Package</div>,
       dataIndex: "auserPackage",
-      width: "10%",
+      width: "20%",
       render: (auserPackage) => {
         if (!auserPackage?.name) {
           return <div style={{ textAlign: 'center' }}>No Package</div>;
@@ -189,21 +194,92 @@ const ManageUser = () => {
   //   );
   // }
 
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.roles.some((role) => role.name === "ROLE_ADMIN"),
+    }),
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(true);
+    setSelectedRowKeys(lstUser?.data?.content.map(user => user.id) || []);
+  };
+
+  const handleCancelSelection = () => {
+    setSelectAll(false);
+    setSelectedRowKeys([]);
+  };
+
+  const handleDeleteSelected = () => {
+    confirm({
+      title: 'Delete Selected Users',
+      icon: <ExclamationCircleOutlined />,
+      content: `Are you sure you want to delete ${selectedRowKeys.length} selected user(s)?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        deleteSelectedUsers();
+      },
+    });
+  };
+
+  const deleteSelectedUsers = async () => {
+    setIsDeletingSelected(true);
+    try {
+      for (const id of selectedRowKeys) {
+        await mutate.mutateAsync(id);
+      }
+      toast.success("Selected users deleted successfully!");
+      setSelectedRowKeys([]);
+      refetch();
+    } catch (error) {
+      toast.error(`Error deleting users: ${error.message}`);
+    } finally {
+      setIsDeletingSelected(false);
+    }
+  };
+
   return (
-    <div>
-      <Button
-        className="bg-blue-600 mb-[15px] text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
-        onClick={() => refetch()}
-      >
-        Refresh Data
-      </Button>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="mb-4 flex justify-between items-center">
+        <div>
+          <Button
+            onClick={handleSelectAll}
+            className="mr-2 border-black text-black hover:bg-blue-500 hover:text-white"
+          >
+            Select All Users
+          </Button>
+          <Button
+            onClick={handleCancelSelection}
+            className="mr-2 bg-gray-400 text-white hover:bg-gray-500 hover:text-white"
+          >
+            Cancel Selection
+          </Button>
+          <Button 
+            onClick={handleDeleteSelected} 
+            disabled={selectedRowKeys.length === 0}
+            loading={isDeletingSelected}
+            className="bg-red-600 text-white hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out"
+          >
+            Delete Selected
+          </Button>
+        </div>
+        <span>{`Selected ${selectedRowKeys.length} items`}</span>
+      </div>
+
       <Search
         style={{ marginBottom: "20px" }}
-        placeholder="input search text"
+        placeholder="Search by username"
         allowClear
         size="large"
         onKeyUp={onKeyUp}
       />
+
       <Table
         columns={columns.map(column => {
           if (column.title === "Action") {
@@ -222,10 +298,8 @@ const ManageUser = () => {
           return column;
         })}
         dataSource={data}
+        rowKey="id"
         onChange={onChange}
-        showSorterTooltip={{
-          target: "sorter-icon",
-        }}
         loading={isFetching}
         pagination={{
           current: currentPage,
@@ -240,6 +314,8 @@ const ManageUser = () => {
             setPageSize(pageSize);
           },
         }}
+        className="shadow-lg rounded-lg overflow-hidden"
+        bordered={false}
       />
     </div>
   );

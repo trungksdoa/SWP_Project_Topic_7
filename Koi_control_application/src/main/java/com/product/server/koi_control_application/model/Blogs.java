@@ -64,7 +64,7 @@ public class Blogs {
         if (this.slug == null || this.slug.isEmpty()) {
             this.slug = SlugGenerator.toSlug(this.title);
         }
-        isApproved = false;
+        isApproved = true;
     }
 
     @PreUpdate

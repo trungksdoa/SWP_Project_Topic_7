@@ -41,8 +41,8 @@ const PondManagement = () => {
   const [isMovingFish, setIsMovingFish] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pondsPerPage = 8;
-  const [sortCriteria, setSortCriteria] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortCriteria, setSortCriteria] = useState('dateCreated');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [koiInSelectedPond, setKoiInSelectedPond] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -309,28 +309,32 @@ const PondManagement = () => {
     return [...lstPond].sort((a, b) => {
       let comparison = 0;
       switch (sortCriteria) {
+        case 'dateCreated':
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          comparison = dateB - dateA;
+          break;
         case 'name':
           comparison = a.name.localeCompare(b.name);
           break;
         case 'length':
-          comparison = a.length - b.length;
+          comparison = parseFloat(b.length) - parseFloat(a.length);
           break;
         case 'width':
-          comparison = a.width - b.width;
+          comparison = parseFloat(b.width) - parseFloat(a.width);
           break;
         case 'depth':
-          comparison = a.depth - b.depth;
-          break;
-        case 'dateCreated':
-          comparison = new Date(a.createdAt) - new Date(b.createdAt);
+          comparison = parseFloat(b.depth) - parseFloat(a.depth);
           break;
         case 'koiAmount':
-          comparison = a.fishCount - b.fishCount;
+          comparison = b.fishCount - a.fishCount;
           break;
         default:
           comparison = 0;
       }
-      return sortOrder === 'asc' ? comparison : -comparison;
+      return sortCriteria === 'dateCreated' 
+        ? comparison 
+        : (sortOrder === 'asc' ? comparison : -comparison);
     });
   }, [lstPond, sortCriteria, sortOrder]);
 
@@ -383,19 +387,7 @@ const PondManagement = () => {
       />
         <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
           <strong>My Pond</strong>
-        </div>
-      {/* Add Koi message */}
-      {lstPond?.length > 0 && (!lstKoi || lstKoi.length === 0) && (
-        <div className="flex flex-row items-center justify-center space-x-4">
-          <div className="text-lg">You have no Koi</div>
-          <Button 
-            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
-            onClick={() => navigate('/add-koi')}
-          >
-            Add a Koi
-          </Button>
-        </div>
-      )}
+        </div>      
 
       <div className="flex justify-between items-center mx-4 my-6">
         <div className="flex justify-start items-center w-1/3">
@@ -427,15 +419,15 @@ const PondManagement = () => {
         <div className="flex justify-end items-center w-1/3">
           <Space>
             <Select
-              defaultValue="name"
+              value={sortCriteria}
               style={{ width: 120 }}
               onChange={handleSortChange}
             >
+              <Option value="dateCreated">Date Created</Option>
               <Option value="name">Name</Option>
               <Option value="length">Length</Option>
               <Option value="width">Width</Option>
               <Option value="depth">Depth</Option>
-              <Option value="dateCreated">Date Created</Option>
               <Option value="koiAmount">Koi Amount</Option>
             </Select>
             <Button onClick={toggleSortOrder}>
@@ -654,8 +646,10 @@ const PondManagement = () => {
                   handleDeleteClick(selectedPond.id);
                 }}
                 className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold ml-2"
+                loading={isDeleting}
+                disabled={isDeleting}
               >
-                Delete Pond
+                {isDeleting ? 'Deleting...' : 'Delete Pond'}
               </Button>
             </div>
           </div>

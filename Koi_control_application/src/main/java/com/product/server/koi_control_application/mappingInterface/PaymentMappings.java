@@ -5,4 +5,5 @@ public interface PaymentMappings {
     String MOMO_CALLBACK = "/callback";
     String CREATE_MOMO_PAYMENT = "/create-momo-payment";
     String MOMO_REDIRECT = "/redirect-momo-callback/";
+    String MOMO_CHECKING_STATUS = "/check/{orderId}";
 }

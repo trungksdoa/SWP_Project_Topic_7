@@ -1,0 +1,122 @@
+# Application specific configs
+app:
+  image:
+    host: ${serverHost}/api/image/
+  jwt:
+    secret: ${jwtSecrect}
+  schedule:
+    task:
+      update-order-status:
+        cron: 0 0 1 * * ? # 1h AM
+
+# Spring Framework configs
+spring:
+  profiles:
+    active: prod
+
+  application:
+    name: Koi_control_application
+
+  # Database config
+  datasource:
+    url: ${mysqlUrl}
+    username: ${mysqlUsername}
+    password: ${mysqlPassword}
+
+  # JPA config
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+  cloud:
+    azure:
+      keyvault:
+        secret:
+          property-sources[0]:
+            endpoint: https://secrect.vault.azure.net/
+      profile:
+        tenant-id: ${tenant-id}  # Tenant ID từ Azure AD
+      credential:
+        managed-identity-enabled: true
+  # Mail config
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: trungvhse182490@fpt.edu.vn
+    password: ${googlePwd}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # File upload config
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+  # Jackson config
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+
+  # Web config
+  web:
+    resources:
+      add-mappings: false
+
+# Server configs
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+# API Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+
+openapi:
+  service:
+    title: Koi Control Application
+    description: Koi Control Application
+    version: 1.0.0
+    contact:
+      name: Koi Control Application
+      email: trungksdoa@gmail.com
+    api-docs: /v3/api-docs
+    servers:
+      prod: ${serverHost}
+      dev: http://localhost:8080
+
+# Monitoring configs
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Logging configs
+logging:
+  level:
+    org.springframework.web: DEBUG
+    com.product.server.koi_control_application: DEBUG
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE

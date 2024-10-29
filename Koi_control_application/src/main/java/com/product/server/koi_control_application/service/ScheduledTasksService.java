@@ -27,6 +27,18 @@ public class ScheduledTasksService {
         log.info("Simulator  {} orders from SHIPPING to DELIVERED status", updatedCount);
     }
 
+    //Runs at 24:00 every day
+//    @Scheduled(cron = "0 0 0 * * *")
+//    @Transactional
+//    public void updatePendingOrders() {
+//        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+//        int updatedCount = orderRepository.updateOrderStatusForOldOrders(
+//                OrderCode.COMPLETED.getValue(),
+//                OrderCode.DELIVERED.getValue(),
+//                sevenDaysAgo
+//        );
+//        log.info("Updated {} orders from DELIVERED to COMPLETED status", updatedCount);
+//    }
 //    @Scheduled(cron = "${app.schedule.task.update-order-status.cron}") // Runs at 1:00 AM every day
 //    @Transactional
 //    public void updatePendingOrders() {

@@ -23,6 +23,7 @@
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "codeceptjs": "^3.6.7",
+    "country-flag-icons": "^1.5.13",
     "dayjs": "^1.11.13",
     "formik": "^2.4.6",
     "framer-motion": "^11.5.4",

@@ -9,5 +9,6 @@ export const managePackageServiceH = {
     getPackage: () => api.get("/list"),
     getPackageById: (id) => api.get(`/${id}`),
     putPackage: (id, payload) => api.put(`/${id}`, payload),
-    deletePackage: (id) => api.delete(`/${id}`)
+    deletePackage: (id) => api.delete(`/${id}`),
+    addPackage: (payload) => api.post(``, payload) // Remove the slash before the empty string
 }

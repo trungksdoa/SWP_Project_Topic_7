@@ -1,16 +1,36 @@
-import React from "react";
-import { Spin, Checkbox, Col, Row, Card, Select } from "antd";
+import React, { useState } from "react";
+import { Card, Pagination } from "antd";
 import { useGetAllBlogs } from "../../../hooks/blogs/useGetAllBlogs";
 import { PATH } from "../../../constant";
 import { useNavigate } from "react-router-dom";
 
 const BlogComponent = () => {
   const { data: lstBlogs } = useGetAllBlogs();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 8;
+
+  const handleBlogClick = (slug) => {
+    // Reset scroll position before navigating
+    window.scrollTo(0, 0);
+    navigate(`${PATH.BLOG_DETAIL}/${slug}`);
+  };
+
+  const indexOfLastBlog = currentPage * blogsPerPage;
+  const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
+  const currentBlogs = lstBlogs?.slice(indexOfFirstBlog, indexOfLastBlog);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="my-[60px] container mx-auto">
+    <div className="container mx-auto mb-10 min-h-[450px]">
+      <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mb-6">
+        <strong>Blogs</strong>
+      </div>
       <div className="grid lg:grid-cols-4 md:grid-cols-3 gap-[30px] grid-cols-2">
-        {lstBlogs?.map((blogs, index) => {
+        {currentBlogs?.map((blogs) => {
           return (
             <Card
               key={blogs?.id}
@@ -20,15 +40,15 @@ const BlogComponent = () => {
                 border: "1px solid #ccc",
                 overflow: "hidden",
               }}
-              onClick={() => {
-                navigate(`${PATH.BLOG_DETAIL}/${blogs?.slug}`);
-              }}
+              onClick={() => handleBlogClick(blogs?.slug)}
               cover={
-                <img
-                  alt={blogs?.title}
-                  className="relative z-0 max-h-[250px] object-contain cursor-pointer"
-                  src={`${blogs?.headerImageUrl}?t=${new Date().getTime()}`}
-                />
+                <div className="h-[200px] overflow-hidden">
+                  <img
+                    alt={blogs?.title}
+                    className="w-full h-full object-cover cursor-pointer"
+                    src={`${blogs?.headerImageUrl}?t=${new Date().getTime()}`}
+                  />
+                </div>
               }
             >
               <div className="p-[2px]">
@@ -44,6 +64,15 @@ const BlogComponent = () => {
             </Card>
           );
         })}
+      </div>
+      <div className="flex justify-center mt-8">
+        <Pagination
+          current={currentPage}
+          total={lstBlogs?.length || 0}
+          pageSize={blogsPerPage}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
       </div>
     </div>
   );

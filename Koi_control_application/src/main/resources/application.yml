@@ -1,31 +1,99 @@
+# Application specific configs
 app:
+
+  image:
+    host: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/
   jwt:
     secret: SecretKeyToGenJWTs
   schedule:
-     task:
-       update-order-status:
-         cron: 0 0 1 * * ? # 1h AM
-#         cron: 0 0 1 * * ? # 1h AM
+    task:
+      update-order-status:
+        cron: 0 0 1 * * ? # 1h AM
 
+# Spring Framework configs
+spring:
+  application:
+    name: Koi_control_application
 
+  # Database config
+  datasource:
+    url: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306/koicontrol
+    username: adminuser
+    password: g#H-GthWyfq_2bKs;7'R9}
 
+  # JPA config
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Mail config
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: trungvhse182490@fpt.edu.vn
+    password: upivsinlboafdhdr
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # File upload config
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+  # Jackson config
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+
+  # Web config
+  web:
+    resources:
+      add-mappings: false
+  cloud:
+    azure:
+      keyvault:
+        secret:
+          endpoint: https://secrect.vault.azure.net/
+      profile:
+        tenant-id: 447080b4-b9c6-4b0b-92fd-b543a68b4e97  # Tenant ID từ Azure AD
+      credential:
+        managed-identity:
+          enabled: true
+
+# Server configs
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+# API Documentation
 springdoc:
   api-docs:
     path: /api-docs
 
 openapi:
   service:
-    tilte: Koi Control Application
+    title: Koi Control Application
     description: Koi Control Application
     version: 1.0.0
     contact:
       name: Koi Control Application
-      email: "trungksdoa@gmail.com"
+      email: trungksdoa@gmail.com
     api-docs: /v3/api-docs
     servers:
       prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
-      dev:  http://localhost:8080 
+      dev: http://localhost:8080
 
+# Monitoring configs
 management:
   endpoints:
     web:
@@ -39,36 +107,7 @@ management:
       export:
         enabled: true
 
-spring:
-  jackson:
-    time-zone= Asia/Ho_Chi_Minh
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
-  web:
-    resources:
-      add-mappings: false
-
-  application:
-    name: Koi_control_application
-  datasource:
-    url: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306/koicontrol
-    username: adminuser
-    password: g#H-GthWyfq_2bKs;7'R9}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    database-platform: org.hibernate.dialect.MySQLDialect
-    properties:
-      hibernate:
-        format_sql: true
-
-server:
-  error:
-    whitelabel:
-      enabled: false
+# Logging configs
 logging:
   level:
     org.springframework.web: DEBUG
@@ -80,4 +119,3 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
-

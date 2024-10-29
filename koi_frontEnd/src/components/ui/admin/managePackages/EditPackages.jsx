@@ -1,50 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetPackageById } from "../../../../hooks/admin/managePackages/useGetPackageById";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Radio } from "antd";
+import { Button, Form, Input, InputNumber, Radio, Modal } from "antd";
 import { toast } from "react-toastify";
 import { usePutPackage } from "../../../../hooks/admin/managePackages/usePutPackage";
-import { PATH } from "../../../../constant";
 import { managePackageServiceH } from "../../../../services/admin/managePackageServiceH";
 
-const EditPackages = () => {
-  const { id: packageId } = useParams();
-  const parseId = parseInt(packageId);
-  // const { data: packages } = useGetPackageById(parseId);
+const EditPackages = ({ visible, onCancel, packageId, onSuccess }) => {
   const [packages, setPackages] = useState(null);
   const mutation = usePutPackage();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    managePackageServiceH
-      .getPackageById(parseId)
-      .then((res) => {
-        setPackages(res?.data?.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [parseId]);
+    if (packageId) {
+      managePackageServiceH
+        .getPackageById(packageId)
+        .then((res) => {
+          setPackages(res?.data?.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [packageId]);
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      id: parseId,
+      id: packageId,
       name: packages?.name || "",
       fishSlots: packages?.fishSlots || "",
       pondSlots: packages?.pondSlots || "",
       price: packages?.price || "",
-      isDefault: true,
+      isDefault: packages?.isDefault || false,
     },
     onSubmit: (values) => {
       mutation.mutate(
-        { id: parseId, payload: values },
+        { id: packageId, payload: values },
         {
           onSuccess: () => {
-            navigate(PATH.MANAGE_PACKAGE);
-            toast.success("Update Package Successfully !");
-            formik.resetForm();
+            toast.success("Update Package Successfully!");
+            onSuccess();
+            onCancel();
           },
         }
       );
@@ -52,40 +47,51 @@ const EditPackages = () => {
   });
 
   return (
-    <div>
+    <Modal
+      visible={visible}
+      onCancel={onCancel}
+      footer={null}
+      width={400}
+    >
+      <h1 className="text-xl font-bold mb-4">Edit Package</h1>
       <Form
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
-        layout="horizontal"
-        style={{ maxWidth: 600 }}
-        onSubmitCapture={formik.handleSubmit}
+        layout="horizonta"
+        onFinish={formik.handleSubmit}
+        labelCol={{ span: 10 }} // Adjust label column span for layout
+        wrapperCol={{ span: 10 }} // Adjust wrapper column span for layout
+        labelAlign="left" // Align labels to the right
+        
       >
         <Form.Item label="Name">
           <Input
             onChange={formik.handleChange}
             name="name"
             value={formik.values.name}
+            style={{ width: '100%' }} // Ensure full width
           />
         </Form.Item>
-        <Form.Item label="fishSlots">
+        <Form.Item label="Fish Slots">
           <InputNumber
             onChange={(value) => formik.setFieldValue("fishSlots", value)}
             value={formik.values.fishSlots}
+            style={{ width: '100%' }} // Ensure full width
           />
         </Form.Item>
-        <Form.Item label="pondSlots">
+        <Form.Item label="Pond Slots">
           <InputNumber
             onChange={(value) => formik.setFieldValue("pondSlots", value)}
             value={formik.values.pondSlots}
+            style={{ width: '100%' }} // Ensure full width
           />
         </Form.Item>
-        <Form.Item label="price">
+        <Form.Item label="Price">
           <InputNumber
             onChange={(value) => formik.setFieldValue("price", value)}
             value={formik.values.price}
+            style={{ width: '100%' }} // Ensure full width
           />
         </Form.Item>
-        <Form.Item label="isDefault">
+        <Form.Item label="Is Default">
           <Radio.Group
             name="isDefault"
             onChange={(e) => formik.setFieldValue("isDefault", e.target.value)}
@@ -96,21 +102,17 @@ const EditPackages = () => {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item label="Action">
+        <Form.Item wrapperCol={{ offset: 8, span: 10 }}>
           <Button
             loading={mutation.isPending}
-            style={{
-              backgroundColor: "#90c63f",
-              padding: "10px 0",
-              width: 140,
-            }}
+            type="primary"
             htmlType="submit"
           >
             Update Package
           </Button>
         </Form.Item>
       </Form>
-    </div>
+    </Modal>
   );
 };
 

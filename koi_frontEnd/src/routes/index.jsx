@@ -37,12 +37,13 @@ import AddBlogsPage from "../pages/AddBlogsPage";
 import ManageOrder from "../components/ui/admin/ManageOrder";
 import ManagePayment from "../components/ui/admin/ManagePayment";
 import WaterParameterPage from "../pages/WaterParameterPage";
-import KoiAdd from "../components/ui/manage/KoiAdd";
 import KoiUpdate from "../components/ui/manage/KoiUpdate";
 import KoiMove from "../components/ui/manage/KoiMove";
 import Endpoint from "../components/ui/Endpoint";
 import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import AdminDashboard from "../components/ui/AdminDashboard";
+import ManageAdminBlog from "../components/ui/admin/manageAdminBlog";
+
 const router = [
   {
     element: <MainLayout />,
@@ -147,10 +148,6 @@ const router = [
         element: <KoiMove />,
       },
       {
-        path: "/add-koi",
-        element: <KoiAdd />,
-      },
-      {
         path: "/update-koi/:id",
         element: <KoiUpdate />,
       },
@@ -206,6 +203,10 @@ const router = [
           {
             path: PATH.MANAGE_PAYMENT_STATUS,
             element: <ManagePayment />
+          },
+          {
+            path: PATH.ADMIN_BLOG,
+            element: <ManageAdminBlog />
           }
         ],
       },

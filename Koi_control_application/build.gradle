@@ -26,6 +26,9 @@ repositories {
 
 dependencies {
     //Redis
+    implementation 'com.azure.spring:spring-cloud-azure-starter-keyvault-secrets:5.17.1'
+    implementation 'com.azure.spring:spring-cloud-azure-starter:5.17.1'
+
 //    implementation 'com.redisom:redis-om-spring:1.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -56,6 +59,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 tasks.named('test') {

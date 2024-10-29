@@ -241,6 +241,29 @@ const AdminTemplate = () => {
             </Menu.Item>
             <Menu.Item
               className="text-white"
+              key={11}
+              icon={
+                <UnorderedListOutlined
+                  style={{
+                    color: selectedKeys.includes(PATH.ADMIN_BLOG)
+                      ? "orange"
+                      : "white",
+                  }}
+                />
+              }
+            >
+              <NavLink
+                key={8}
+                to={PATH.ADMIN_BLOG}  
+                className={({ isActive }) =>
+                  isActive ? "!text-orange-500" : "!text-white"
+                }
+              >
+                {t("Manage Blog")}
+              </NavLink>
+            </Menu.Item>
+            <Menu.Item
+              className="text-white"
               key={12}
               icon={
                 <HomeFilled

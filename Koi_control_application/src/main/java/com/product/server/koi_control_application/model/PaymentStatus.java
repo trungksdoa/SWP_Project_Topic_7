@@ -17,6 +17,7 @@ public class PaymentStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String momoOrderId;
     private String referenceId; // Có thể là orderId hoặc packageId
     private String referenceType; // "OrderCode" hoặc "PACKAGE"
     private String paymentMethod;

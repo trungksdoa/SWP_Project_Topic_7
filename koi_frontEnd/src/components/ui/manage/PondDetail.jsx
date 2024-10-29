@@ -670,7 +670,7 @@ const PondDetail = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-8">
+            <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300">
                 Return
             </Button>
             <div className="flex justify-center items-center text-bold text-3xl">
@@ -870,7 +870,7 @@ const PondDetail = () => {
                     >
                         <button
                             onClick={handleClose}
-                            className="absolute top-2 right-2 text-2xl font-bold"
+                            className="absolute top-2 right-4 text-2xl font-bold"
                         >
                             &times;
                         </button>
@@ -880,7 +880,7 @@ const PondDetail = () => {
                                 <img
                                     src={imgSrc || selectedKoi.imageUrl}
                                     alt={selectedKoi.name}
-                                    className="w-full h-auto object-cover rounded"
+                                    className="w-80 h-40 object-cover rounded"
                                 />
                             </div>
                             <div className="col-span-2">
@@ -951,28 +951,28 @@ const PondDetail = () => {
                     onClick={handleCloseAddKoiModal}
                 >
                     <div
-                        className="relative bg-white p-8 rounded-lg shadow-lg flex flex-col"
-                        style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}
+                        className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col"
+                        style={{ width: '90%', maxWidth: '800px', height: 'auto' }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={handleCloseAddKoiModal}
-                            className="absolute top-2 right-2 text-2xl font-bold"
+                            className="absolute top-2 right-4 text-2xl font-bold"
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold mb-6 text-center">Add New Koi</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-center">Add New Koi</h2>
                         <Form onFinish={addKoiFormik.handleSubmit} layout="vertical">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="flex justify-center items-center">
                                     <img
                                         src={newKoiImgSrc || "placeholder-image-url"}
                                         alt="New Koi preview"
-                                        className="w-80 h-80 object-cover rounded-xl mb-4 mr-4"
+                                        className="w-60 h-60 object-cover rounded-xl"
                                     />
                                 </div>
                                 <div>
-                                    <Form.Item label="Name" className="mb-2">
+                                    <Form.Item label="Name" className="mb-1">
                                         <Input
                                             name="name"
                                             value={addKoiFormik.values.name}
@@ -980,7 +980,7 @@ const PondDetail = () => {
                                             className="w-full"
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Variety" className="mb-2">
+                                    <Form.Item label="Variety" className="mb-1">
                                         <Input
                                             name="variety"
                                             value={addKoiFormik.values.variety}
@@ -988,7 +988,7 @@ const PondDetail = () => {
                                             className="w-full"
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Sex" className="mb-2">
+                                    <Form.Item label="Sex" className="mb-1">
                                         <Select
                                             name="sex"
                                             value={addKoiFormik.values.sex}
@@ -999,7 +999,7 @@ const PondDetail = () => {
                                             <Select.Option value={false}>Male</Select.Option>
                                         </Select>
                                     </Form.Item>
-                                    <Form.Item label="Purchase Price (VND)" className="mb-2">
+                                    <Form.Item label="Purchase Price (VND)" className="mb-1">
                                         <InputNumber
                                             name="purchasePrice"
                                             min={0}
@@ -1008,7 +1008,9 @@ const PondDetail = () => {
                                             className="w-full"
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Weight (grams)" className="mb-2">
+                                </div>
+                                <div>
+                                    <Form.Item label="Weight (grams)" className="mb-1">
                                         <InputNumber
                                             name="weight"
                                             min={0}
@@ -1017,7 +1019,7 @@ const PondDetail = () => {
                                             className="w-full"
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Length (centimeters)" className="mb-2">
+                                    <Form.Item label="Length (centimeters)" className="mb-1">
                                         <InputNumber
                                             name="length"
                                             min={0}
@@ -1026,7 +1028,7 @@ const PondDetail = () => {
                                             className="w-full"
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Date of Birth" className="mb-2">
+                                    <Form.Item label="Date of Birth" className="mb-1">
                                         <DatePicker
                                             name="dateOfBirth"
                                             value={addKoiFormik.values.dateOfBirth ? dayjs(addKoiFormik.values.dateOfBirth) : null}
@@ -1035,7 +1037,7 @@ const PondDetail = () => {
                                             disabledDate={(current) => current && current > dayjs().endOf('day')}
                                         />
                                     </Form.Item>
-                                    <Form.Item label="Image">
+                                    <Form.Item label="Image" className="mb-1">
                                         <input
                                             type="file"
                                             accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
@@ -1044,11 +1046,11 @@ const PondDetail = () => {
                                     </Form.Item>
                                 </div>
                             </div>
-                            <Form.Item className="flex justify-center mt-6">
+                            <Form.Item className="flex justify-center mt-4 mb-0">
                                 <Button
                                     type="primary"
                                     htmlType="submit"
-                                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
+                                    className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold text-xl"
                                     loading={addKoiMutation.isPending}
                                 >
                                     Add Koi

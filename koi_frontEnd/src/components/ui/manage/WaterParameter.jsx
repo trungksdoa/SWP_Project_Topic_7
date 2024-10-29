@@ -50,7 +50,7 @@ const WaterParameter = () => {
   const { data: waterStandards, refetchStandard } = useGetWaterStandard(
     selectedPond?.id
   );
-  const { data: lstPond, refetch, isFetching } = useGetAllPond(userId); // Lấy danh sách hồ
+  const { data: lstPond, refetch } = useGetAllPond(userId); // Lấy danh sách hồ
   const [saltMessage, setSaltMessage] = useState(""); // Thêm state để lưu thông báo muối
   const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] =
     useState(false);
@@ -164,7 +164,6 @@ const WaterParameter = () => {
 
   // Formik để xử lý form nhập liệu water parameters
   const formik = useFormik({
-    enableReinitialize: true,
     initialValues: {
       nitriteNO2: 0,
       nitrateNO3: 0,
@@ -189,7 +188,6 @@ const WaterParameter = () => {
         {
           onSuccess: () => {
             toast.success("Update Water Parameter Success !");
-            setWaterParameters(data);
             refetch();
             refetchStandard();
           },
@@ -301,12 +299,9 @@ const WaterParameter = () => {
     }
   }, [waterParameters, waterStandard]);
 
-  if (isFetching) {
-    return (
-      <div className="flex justify-center items-center min-h-[450px]">
-        <Spin tip="Loading" size="large" />
-      </div>
-    );
+  // Render danh sách hồ
+  if (!lstPond) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -487,7 +482,6 @@ const WaterParameter = () => {
                       </Form.Item>
                       <Form.Item label="Last Cleaned At" className="mb-2 hidden">
                         <DatePicker
-                          disabled
                           name="lastCleanedAt"
                           value={
                             formik.values.lastCleanedAt

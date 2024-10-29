@@ -40,4 +40,5 @@ export const PATH = {
   ADD_BLOG: '/blogs/manageblogs/add',
   MANAGE_ORDER: "/admin/manage-order",
   MANAGE_PAYMENT_STATUS: '/admin/manage-payment-status',
+  ADMIN_BLOG: '/admin/manage-admin-blog',
 };

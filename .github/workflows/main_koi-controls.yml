@@ -4,12 +4,18 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Koi_control_application/**'  # Run only if anychange in this folder
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
+    # //change here
+    env:
+      SPRING_PROFILES_ACTIVE: prod
+    # //========
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +35,13 @@ jobs:
         run: ./gradlew clean --build-cache
         working-directory: ./Koi_control_application
         
+
+      
       - name: Build with Gradle
         run: ./gradlew build -refresh-dependencies
         working-directory: ./Koi_control_application
-
+        
+          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -60,3 +69,9 @@ jobs:
           slot-name: 'Production'
           package: '*-SNAPSHOT.jar'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2C87E69868144C538DB8781A4F2595C5 }}
+
+          # //change here
+          app-settings: |
+            SPRING_PROFILES_ACTIVE=prod
+            JAVA_OPTS="-Dspring.profiles.active=prod"
+          # //========
