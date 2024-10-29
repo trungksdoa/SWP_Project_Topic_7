@@ -4,16 +4,16 @@ import { sleep } from "../../utils/sleep";
 
 export const useGetGrowth = (koiId) => {
   const q = useQuery({
-    queryKey: ['growthHistory', koiId],
+    queryKey: ['growth', koiId],
     queryFn: async () => {
       await sleep(1000);
       const result = await manageKoiFishServices.getGrowth(koiId);
       console.log("Growth data fetched:", result.data);
       return result.data;
     },
-    enabled: false, // Don't fetch automatically
-    staleTime: Infinity, // Prevent automatic refetches
-    cacheTime: Infinity, // Keep the data cached indefinitely
+    enabled: !!koiId, // Enable when koiId is available
+    staleTime: 300000, // 5 minutes
+    cacheTime: 3600000, // 1 hour
   });
   
   return {
