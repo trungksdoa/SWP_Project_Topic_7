@@ -10,6 +10,12 @@ const BlogComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 8;
 
+  const handleBlogClick = (slug) => {
+    // Reset scroll position before navigating
+    window.scrollTo(0, 0);
+    navigate(`${PATH.BLOG_DETAIL}/${slug}`);
+  };
+
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
   const currentBlogs = lstBlogs?.slice(indexOfFirstBlog, indexOfLastBlog);
@@ -34,9 +40,7 @@ const BlogComponent = () => {
                 border: "1px solid #ccc",
                 overflow: "hidden",
               }}
-              onClick={() => {
-                navigate(`${PATH.BLOG_DETAIL}/${blogs?.slug}`);
-              }}
+              onClick={() => handleBlogClick(blogs?.slug)}
               cover={
                 <div className="h-[200px] overflow-hidden">
                   <img

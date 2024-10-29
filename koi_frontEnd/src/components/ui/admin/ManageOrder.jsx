@@ -114,18 +114,22 @@ const ManageOrder = () => {
     {
       title: "Order ID",
       dataIndex: "id",
+      align: 'center',
     },
     {
       title: "Full Name",
       dataIndex: "fullName",
+      align: 'center',
     },
     {
       title: "Address",
       dataIndex: "address",
+      align: 'center',
     },
     {
       title: "Total Amount",
       dataIndex: "totalAmount",
+      align: 'center',
       render: (totalAmount) => (
         `${new Intl.NumberFormat("vi-VN", {
           style: "currency",
@@ -136,6 +140,7 @@ const ManageOrder = () => {
     {
       title: "Date order",
       dataIndex: "createdAt",
+      align: 'center',
       render: (createdAt) => {
         return new Date(createdAt).toLocaleString();
       },
@@ -143,39 +148,40 @@ const ManageOrder = () => {
     {
       title: "Status",
       dataIndex: "status",
+      align: 'center',
       render: (_, record) => {
         //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
           return (
-              <Tag color="gray" className="text-[15px] font-bold w-[110px] !bg-gray-500 !text-white text-center justify-center items-center">
+              <Tag color="gray" className="text-[13px] font-bold w-[150px] !bg-gray-500 !text-white text-center justify-center items-center">
               PENDING
             </Tag>
           );
         }
         if (record.status === "CANCELLED") {
           return (
-            <Tag color="red" className="text-[15px] font-bold w-[110px] !bg-red-500 !text-white text-center justify-center items-center">
+            <Tag color="red" className="text-[13px] font-bold w-[150px] !bg-red-500 !text-white text-center justify-center items-center">
               CANCELLED
             </Tag>
           );
         }
         if (record.status === "SUCCESS") {
           return (
-            <Tag color="green" className="text-[15px] font-bold w-[110px] !bg-green-500 !text-white text-center justify-center items-center">
+            <Tag color="green" className="text-[13px] font-bold w-[150px] !bg-green-500 !text-white text-center justify-center items-center">
               WAIT FOR SHIPPING
             </Tag>
           );
         }
         if (record.status === "SHIPPING") {
           return (
-            <Tag color="blue" className="text-[15px] font-bold w-[110px] !bg-blue-500 !text-white text-center justify-center items-center">
+            <Tag color="blue" className="text-[13px] font-bold w-[150px] !bg-blue-500 !text-white text-center justify-center items-center">
               ON DELIVERY
             </Tag>
           );
         }
         if (record.status === "DELIVERED") {
           return (
-            <Tag color="purple" className="text-[15px] font-bold w-[110px] !bg-purple-500 !text-white text-center justify-center items-center">
+            <Tag color="purple" className="text-[13px] font-bold w-[150px] !bg-purple-500 !text-white text-center justify-center items-center">
               DELIVERED
             </Tag>
           );
@@ -183,7 +189,7 @@ const ManageOrder = () => {
         //COMPLETED
         if (record.status === "COMPLETED") {
           return (
-            <Tag color="orange" className="text-[15px] font-bold w-[110px] !bg-orange-500 !text-white text-center justify-center items-center">
+            <Tag color="orange" className="text-[13px] font-bold w-[150px] !bg-orange-500 !text-white text-center justify-center items-center">
               COMPLETED
             </Tag>
           );
@@ -193,6 +199,7 @@ const ManageOrder = () => {
     {
       title: "Action",
       key: "action",
+      align: 'center',
       render: (_, record) => {
         const buttonStyle = {
           width: '80px',
@@ -201,8 +208,9 @@ const ManageOrder = () => {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '4px 15px',
-          fontSize: '14px',
+          fontSize: '13px',
           borderRadius: '2px',
+          textAlign: 'center',
         };
 
         if (record.status === "SUCCESS") {
