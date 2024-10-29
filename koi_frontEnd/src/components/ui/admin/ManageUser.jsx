@@ -129,10 +129,10 @@ const ManageUser = () => {
         return (
           <div style={{ textAlign: 'center' }}>
             <Tag
-              color={hasRoleAdmin ? "red" : hasRoleMember ? "green" : "gray"}
-              style={{ width: '70px', textAlign: 'center' }}
+              color={hasRoleAdmin ? "red" : hasRoleMember ? "green" : "blue"}
+              style={{ width: '100px', textAlign: 'center' }}
             >
-              {hasRoleAdmin ? "ADMIN" : hasRoleMember ? "MEMBER" : "SHOP"}
+              {hasRoleAdmin ? "ADMIN" : hasRoleMember ? "MEMBER" : "CONTRIBUTOR"}
             </Tag>
           </div>
         );
