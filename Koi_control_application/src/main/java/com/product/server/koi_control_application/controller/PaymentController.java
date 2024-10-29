@@ -57,38 +57,38 @@ public class PaymentController {
         return momoPaymentService.momoCallback(callbackResponse);
     }
 
-    @GetMapping(MOMO_CHECKING_STATUS)
-    public ResponseEntity<JsonNode> checkOrderStatus(@PathVariable String orderId) throws Exception {
-        // Create signature for the request
-        String requestId = String.valueOf(System.currentTimeMillis());
-        String rawSignature = String.format("accessKey=%s&orderId=%s&partnerCode=%s&requestId=%s",
-                accessKey, orderId, partnerCode, requestId);
-        String signature = hmacSHA256(rawSignature, secretKey);
-
-        // Create request body
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("partnerCode", partnerCode);
-        requestBody.put("requestId", requestId);
-        requestBody.put("orderId", orderId);
-        requestBody.put("lang", "en");
-        requestBody.put("signature", signature);
-
-        String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
-
-        // Send request to MoMo
-        HttpResponse<String> response = sendHttpRequest(jsonBody, MOMO_QUERY_STATUS_ENDPOINT);
-        //Fix it
-        JsonNode responseBody = new ObjectMapper().readTree(response.body());
-
-        //Mapping JsonNode to MomoCallbackResponse
-        MomoCallbackResponse callbackResponse = new ObjectMapper().readValue(responseBody.toString(), MomoCallbackResponse.class);
-        handleMomoCallback(callbackResponse);
-
-        // Log the response
-        logResponseDetails(response, responseBody);
-
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
-    }
+//    @GetMapping(MOMO_CHECKING_STATUS)
+//    public ResponseEntity<JsonNode> checkOrderStatus(@PathVariable String orderId) throws Exception {
+//        // Create signature for the request
+//        String requestId = String.valueOf(System.currentTimeMillis());
+//        String rawSignature = String.format("accessKey=%s&orderId=%s&partnerCode=%s&requestId=%s",
+//                accessKey, orderId, partnerCode, requestId);
+//        String signature = hmacSHA256(rawSignature, secretKey);
+//
+//        // Create request body
+//        Map<String, String> requestBody = new HashMap<>();
+//        requestBody.put("partnerCode", partnerCode);
+//        requestBody.put("requestId", requestId);
+//        requestBody.put("orderId", orderId);
+//        requestBody.put("lang", "en");
+//        requestBody.put("signature", signature);
+//
+//        String jsonBody = new ObjectMapper().writeValueAsString(requestBody);
+//
+//        // Send request to MoMo
+//        HttpResponse<String> response = sendHttpRequest(jsonBody, MOMO_QUERY_STATUS_ENDPOINT);
+//        //Fix it
+//        JsonNode responseBody = new ObjectMapper().readTree(response.body());
+//
+//        //Mapping JsonNode to MomoCallbackResponse
+//        MomoCallbackResponse callbackResponse = new ObjectMapper().readValue(responseBody.toString(), MomoCallbackResponse.class);
+//        handleMomoCallback(callbackResponse);
+//
+//        // Log the response
+//        logResponseDetails(response, responseBody);
+//
+//        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+//    }
 
     /*
      * Create MoMo payment
@@ -127,7 +127,7 @@ public class PaymentController {
             callbackResponse.setExtraData(extraData);
             callbackResponse.setSignature(signature);
 
-            handleMomoCallback(callbackResponse);
+            momoPaymentService.momoCallback(callbackResponse);
 
             // Chuyển hướng người dùng đến trang kết quả thanh toán trên website của bạn
             return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(WEBSITE_URL + "/payment-success/?orderId=" + orderId + "&resultCode=" + resultCode + "&message=" + message + "&orderType=" + orderType)).build();
@@ -137,152 +137,4 @@ public class PaymentController {
         }
     }
 
-    /**
-     * Handles the MoMo callback response.
-     * <p>
-     * This method processes the callback response received from MoMo payment gateway.
-     * It updates the order status based on the payment result and performs necessary actions
-     * such as refunding the payment or updating the user's package.
-     * </p>
-     *
-     * @param callbackResponse the MoMo callback response containing details of the payment transaction
-     */
-    private void handleMomoCallback(MomoCallbackResponse callbackResponse) {
-        log.info("Received MoMo callback: " + callbackResponse.toString());
-
-        // Split the orderId to extract orderId, orderType, and userId
-        String[] orderIdParts = callbackResponse.getOrderId().split("-");
-        String orderId = orderIdParts[0];
-        String orderType = orderIdParts[1];
-        String userId = orderIdParts[2];
-
-        try {
-            // Check if the payment was successful
-            if (callbackResponse.getResultCode() == 0) {
-                if (orderType.equals("product")) {
-                    // If the order is already marked as paid, return
-                    if (orderService.getOrderById(Integer.parseInt(orderId)).getStatus().equals(OrderCode.SUCCESS.getValue())) {
-                        return;
-                    }
-
-                    /*
-                     * Update the payment status to PAID
-                     */
-                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, PAID.getValue());
-
-
-                    /*
-                     * Update the order status to PAID
-                     */
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderCode.SUCCESS.getValue());
-
-
-                    /*
-                     * Clear the cart
-                     */
-                    cartService.clearCart(Integer.parseInt(userId));
-                    log.info("Order " + callbackResponse.getOrderId() + " has been paid successfully");
-                } else {
-                    // Handle package addition for the user
-                    UserPackage userPackage = new UserPackage();
-                    userPackage.setId(Integer.parseInt(orderId));
-
-                    userService.addPackage(Integer.parseInt(userId), userPackage);
-                    log.info("User " + userId + " has been added package successfully");
-                }
-            } else {
-                // Handle failed payment
-                if (orderType.equals("product")) {
-                    orderService.updateOrderStatus(Integer.parseInt(orderId), OrderCode.CANCELLED.getValue());
-                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
-                    log.info("Order " + callbackResponse.getOrderId() + " has been canceled");
-                } else {
-                    paymentService.updatePaymentStatus(Integer.parseInt(orderId), orderType, FAILED.getValue());
-                    log.info("User " + userId + " has not been added package yet");
-                }
-            }
-        } catch (Exception ex) {
-            // Log any errors that occur during the callback handling
-            log.error("Error while handling MoMo callback: " + ex.getMessage());
-        }
-    }
-
-    /*
-     * Get payment info
-     * @param request: payment request
-     * @return: payment info
-     */
-    private MomoPaymentInfo getPaymentInfo(MomoPaymentRequest request) {
-        return MomoPaymentInfo.builder().accessKey(accessKey).secretKey(secretKey)
-                .orderInfo(request.getOrderInfo())
-                .partnerCode(partnerCode)
-                .redirectUrl(redirectUrl)
-                .ipnUrl(ifnUrl)
-                .requestType(requestType)
-                .amount(request.getAmount())
-                .orderId(request.getOrderId() + "-" + request.getOrderType() + "-" + request.getUserId() + "-" + System.currentTimeMillis()).requestId(System.currentTimeMillis() + "").extraData("").orderGroupId("").items(request.getMomoProducts()).userInfo(request.getMomoUserInfo()).lang("en").orderExpireTime(30).build();
-    }
-
-    /*
-     * Create a raw signature from the payment info
-     * @param info: payment info
-     * @return: raw signature
-     */
-    private String createRawSignature(MomoPaymentInfo info) {
-        return String.format("accessKey=%s&amount=%s&extraData=%s&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%s&requestType=%s", info.getAccessKey(), info.getAmount(), info.getExtraData(), info.getIpnUrl(), info.getOrderId(), info.getOrderInfo(), info.getPartnerCode(), info.getRedirectUrl(), info.getRequestId(), info.getRequestType());
-    }
-
-
-    /*
-     * Create a request body for the payment
-     * @param momoPaymentInfo: payment info
-     * @param signature: signature of the payment
-     * @return: request body
-     */
-    private MomoRequestBody createRequestBody(MomoPaymentInfo momoPaymentInfo, String signature) {
-        return MomoRequestBody.builder().partnerCode(momoPaymentInfo.getPartnerCode()).storeName("FPT WIFI LỎ").storeId("MomoTestStore").requestId(momoPaymentInfo.getRequestId()).amount(momoPaymentInfo.getAmount()).orderId(momoPaymentInfo.getOrderId()).orderInfo(momoPaymentInfo.getOrderInfo()).redirectUrl(momoPaymentInfo.getRedirectUrl()).ipnUrl(momoPaymentInfo.getIpnUrl()).lang(momoPaymentInfo.getLang()).requestType(momoPaymentInfo.getRequestType()).autoCapture(true).extraData(momoPaymentInfo.getExtraData()).orderGroupId(momoPaymentInfo.getOrderGroupId()).signature(signature).userInfo(momoPaymentInfo.getUserInfo()).items(momoPaymentInfo.getItems()).lang(momoPaymentInfo.getLang()).orderExpireTime(30).build();
-    }
-
-
-    /*
-     * Log response details
-     */
-    private void logResponseDetails(HttpResponse<String> response, JsonNode responseBody) {
-        log.info("Status: " + response.statusCode());
-        log.info("Headers: " + response.headers());
-        log.info("Body: " + response.body());
-        log.info("resultCode: " + responseBody.get("resultCode"));
-    }
-
-    /*
-     * Create HMAC SHA256 signature
-     * @param data: data to sign
-     * @param key: secret key
-     * @return: signature
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     */
-    private static String hmacSHA256(String data, String key) throws NoSuchAlgorithmException, InvalidKeyException {
-        Mac sha256 = Mac.getInstance(HMAC_SHA256);
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), HMAC_SHA256);
-        sha256.init(secretKey);
-        byte[] hash = sha256.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hash);
-    }
-
-
-    /*
-     * Convert bytes to hex
-     * @param hash: bytes to convert
-     * @return: hex string
-     */
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
 }

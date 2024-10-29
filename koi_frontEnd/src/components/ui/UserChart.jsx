@@ -26,36 +26,21 @@ import { useGetUserGrowth } from "../../hooks/user/useGetUserGrowth";
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
-const UserDataChart = ({ onTotalUsersChange, onAverageUsersPerDayChange }) => {
+const UserDataChart = ({ dateRange,onDateRangeChange, userData, isLoading, isError, refetch }) => {
   const defaultStartDate = dayjs("2024-09-01");
-  const [dateRange, setDateRange] = useState([defaultStartDate, dayjs()]);
   const [chartData, setChartData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
-  
-  const {
-    data: userGrowthData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetUserGrowth(
-    dateRange[0].format("YYYY/MM/DD"),
-    dateRange[1].format("YYYY/MM/DD")
-  );
-
   useEffect(() => {
-    if (userGrowthData) {
-      const formattedData = userGrowthData.data.map((item) => ({
+    if (userData) {
+      const formattedData = userData.data.map((item) => ({
         date: dayjs(item.date).format("YYYY-MM-DD"),
         count: item.count,
       }));
       setChartData(formattedData);
       setFilteredData(formattedData);
-
-      onTotalUsersChange(totalUsers);
-      onAverageUsersPerDayChange(averageUsersPerDay);
     }
-  }, [userGrowthData, onTotalUsersChange, onAverageUsersPerDayChange]);
+  }, [userData]);
 
   const handleDateRangeChange = (dates) => {
     if (dates && dates.length === 2) {
@@ -64,6 +49,7 @@ const UserDataChart = ({ onTotalUsersChange, onAverageUsersPerDayChange }) => {
         dayjs(item.date).isBetween(dates[0], dates[1], null, "[]")
       );
       setFilteredData(filtered);
+      onDateRangeChange(dates);
     }
   };
 
@@ -91,11 +77,10 @@ const UserDataChart = ({ onTotalUsersChange, onAverageUsersPerDayChange }) => {
         { label: "All Time", value: [defaultStartDate, dayjs()] },
   ];
 
+
+
   return (
     <div>
-      <Title level={2} style={{ marginBottom: "24px", color: "#1890ff" }}>
-        User Growth
-      </Title>
       <Row justify="center" style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={24} md={20} lg={16} xl={12}>
           <Space size={12} style={{ width: "100%", justifyContent: "center" }}>
@@ -105,11 +90,6 @@ const UserDataChart = ({ onTotalUsersChange, onAverageUsersPerDayChange }) => {
               format="YYYY/MM/DD"
               style={{ width: "calc(100% - 6px)" }} // Adjusted width
               presets={rangePresets}
-              onCalendarChange={(dates) => {
-                if (dates && dates.length === 2) {
-                  setDateRange(dates);
-                }
-              }}
             />
             <Button
               type="primary"
@@ -125,7 +105,7 @@ const UserDataChart = ({ onTotalUsersChange, onAverageUsersPerDayChange }) => {
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <Card title="Total Users" className="stat-card">
-            <Title level={4}>100</Title>
+            <Title level={4}>{totalUsers}</Title>
           </Card>
           <Card
             style={{ marginTop: "10px" }}

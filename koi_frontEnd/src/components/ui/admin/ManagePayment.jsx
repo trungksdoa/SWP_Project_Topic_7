@@ -50,6 +50,11 @@ const ManagePayment = () => {
       ),
     },
     {
+      title: <div style={{ textAlign: 'center' }}>Payment Date</div>,
+      dataIndex: "paymentDate",
+      key: "paymentDate",
+    },
+    {
       title: <div style={{ textAlign: 'center' }}>Payment Status</div>,
       dataIndex: "paymentStatus",
       key: "paymentStatus",
@@ -70,7 +75,12 @@ const ManagePayment = () => {
       },
     },
   ];
-  const data = lstStatus;
+  
+  const data = lstStatus?.sort((a, b) => 
+    new Date(b.paymentDate) - new Date(a.paymentDate)
+  );
+
+
   return (
     <div>
       <Table columns={columns} dataSource={data} />

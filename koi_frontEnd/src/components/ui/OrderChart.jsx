@@ -21,82 +21,75 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import dayjs from "dayjs";
-import { useGetOrderStatusChart } from "../../hooks/order/useGetOrderStatusChart";
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
-const OrderChart = ({onTotalOrdersChange}) => {
+const OrderChart = ({dateRange, onDateRangeChange, onTotalOrdersChange, orderData, isLoading, isError, refetch}) => {
   const defaultStartDate = useMemo(() => dayjs("2024-09-01"), []);
-  const [dateRange, setDateRange] = useState([defaultStartDate, dayjs()]);
   const [chartData, setChartData] = useState([]);
 
-  const {
-    data: orderStatusData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetOrderStatusChart(
-    dateRange[0].format("YYYY/MM/DD"),
-    dateRange[1].format("YYYY/MM/DD")
-  );
+  const formatData = useMemo(() => {
+    if (!orderData?.data) return [];
+    
+    const formattedData = orderData.data.reduce((acc, item) => {
+      const date = dayjs(item.date).format("YYYY-MM-DD");
+      if (!acc[date]) {
+        acc[date] = { date, CANCELLED: 0, COMPLETED: 0 };
+      }
+      acc[date][item.label] = item.count;
+      return acc;
+    }, {});
+
+    // Add padding dates if only 1 record
+    const values = Object.values(formattedData);
+    if (values.length === 1) {
+      const onlyDate = dayjs(values[0].date);
+      const prevDate = onlyDate.subtract(1, 'day').format('YYYY-MM-DD');
+      const nextDate = onlyDate.add(1, 'day').format('YYYY-MM-DD');
+      
+      formattedData[prevDate] = { date: prevDate, CANCELLED: 0, COMPLETED: 0 };
+      formattedData[nextDate] = { date: nextDate, CANCELLED: 0, COMPLETED: 0 };
+    }
+
+    return Object.values(formattedData).sort((a, b) => 
+      dayjs(a.date).diff(dayjs(b.date))
+    );
+  }, [orderData]);
 
   useEffect(() => {
-    if (orderStatusData) {
-      const formattedData = orderStatusData.data.reduce((acc, item) => {
-        const date = dayjs(item.date).format("YYYY-MM-DD");
-        if (!acc[date]) {
-          acc[date] = { date, CANCELLED: 0, COMPLETED: 0 };
-        }
-        if (item.label === "CANCELLED") {
-          acc[date].CANCELLED = item.count;
-        } else if (item.label === "COMPLETED") {
-          acc[date].COMPLETED = item.count;
-        }
-        return acc;
-      }, {});
-
-      const sortedData = Object.values(formattedData).sort((a, b) =>
-        dayjs(a.date).diff(dayjs(b.date))
-      );
-
-      setChartData(sortedData);
-
-      onTotalOrdersChange(totalOrders);
+    if (orderData) {
+      setChartData(formatData);
     }
-  }, [orderStatusData, onTotalOrdersChange]);
+  }, [orderData, formatData]);
 
-  const totalOrders = useMemo(() => {
-    return chartData.reduce((sum, item) => sum + item.CANCELLED + item.COMPLETED, 0);
-  }, [chartData]);
+  const totalOrders = useMemo(() => 
+    chartData.reduce((sum, item) => sum + item.CANCELLED + item.COMPLETED, 0),
+    [chartData]
+  );
+
+  const { cancelledOrders, completedOrders } = useMemo(() => ({
+    cancelledOrders: chartData.reduce((sum, item) => sum + (item.CANCELLED || 0), 0),
+    completedOrders: chartData.reduce((sum, item) => sum + (item.COMPLETED || 0), 0)
+  }), [chartData]);
+
+  useEffect(() => {
+    onTotalOrdersChange(totalOrders);
+  }, [totalOrders, onTotalOrdersChange]);
 
   const handleDateRangeChange = (dates) => {
-    if (dates && dates.length === 2) {
+    if (dates?.length === 2) {
       setDateRange(dates);
+      onDateRangeChange(dates);
     }
   };
 
-  const formatXAxis = (tickItem) => {
-    return dayjs(tickItem).format("MMM DD");
-  };
+  const formatXAxis = (tickItem) => dayjs(tickItem).format("MMM DD");
 
-  const disabledDate = (current) => {
-    return current && current > dayjs().endOf("day");
-  };
+  const disabledDate = (current) => current && current > dayjs().endOf("day");
 
   if (isLoading) return <Spin size="large" />;
   if (isError) return <div>Error loading data. Please try again later.</div>;
-
-
-
-  const cancelledOrders = chartData.reduce(
-    (sum, item) => sum + (item.CANCELLED || 0),
-    0
-  );
-  const completedOrders = chartData.reduce(
-    (sum, item) => sum + (item.COMPLETED || 0),
-    0
-  );
 
   const rangePresets = [
     { label: "Last 7 Days", value: [dayjs().subtract(6, "day"), dayjs()] },
@@ -106,7 +99,7 @@ const OrderChart = ({onTotalOrdersChange}) => {
       value: [dayjs().startOf("month"), dayjs().endOf("month")],
     },
     {
-      label: "Last Month",
+      label: "Last Month", 
       value: [
         dayjs().subtract(1, "month").startOf("month"),
         dayjs().subtract(1, "month").endOf("month"),
@@ -114,18 +107,23 @@ const OrderChart = ({onTotalOrdersChange}) => {
     },
     { label: "Last 3 Months", value: [dayjs().subtract(3, "month"), dayjs()] },
     { label: "Last 6 Months", value: [dayjs().subtract(6, "month"), dayjs()] },
-    {
-      label: "Last 12 Months",
-      value: [dayjs().subtract(12, "month"), dayjs()],
-    },
+    { label: "Last 12 Months", value: [dayjs().subtract(12, "month"), dayjs()] },
     { label: "All Time", value: [defaultStartDate, dayjs()] },
   ];
 
+  const chartConfig = {
+    CANCELLED: {
+      fill: "#ff4d4f",
+      name: "Cancelled Orders"
+    },
+    COMPLETED: {
+      fill: "#52c41a", 
+      name: "Completed Orders"
+    }
+  };
+
   return (
     <div>
-      <Title level={2} style={{ marginBottom: "24px", color: "#1890ff" }}>
-        Order Statistics
-      </Title>
       <Row justify="center" style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={24} md={20} lg={16} xl={12}>
           <Space size={12} style={{ width: "100%", justifyContent: "center" }}>
@@ -186,18 +184,16 @@ const OrderChart = ({onTotalOrdersChange}) => {
                   formatter={(value, name) => [`${value} Orders`, name]}
                 />
                 <Legend />
-                <Bar
-                  dataKey="CANCELLED"
-                  fill="#ff4d4f"
-                  name="Cancelled Orders"
-                  stackId="a"
-                />
-                <Bar
-                  dataKey="COMPLETED"
-                  fill="#52c41a"
-                  name="Completed Orders"
-                  stackId="a"
-                />
+                {Object.entries(chartConfig).map(([key, config]) => (
+                  <Bar
+                    key={key}
+                    dataKey={key}
+                    fill={config.fill}
+                    name={config.name}
+                    stackId="a"
+                    maxBarSize={50} // Add max bar size to prevent too wide bars
+                  />
+                ))}
               </ComposedChart>
             </ResponsiveContainer>
           </Card>

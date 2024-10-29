@@ -182,7 +182,7 @@ const RegisterForm = ({ showModalLogin, onRegisterSuccess }) => {
               }}
             >
               <Radio className="mr-[100px]" value="ROLE_MEMBER">Member</Radio>
-              <Radio value="ROLE_SHOP">Contributor</Radio>
+              <Radio value="ROLE_CONTRIBUTOR">Contributor</Radio>
             </Radio.Group>
           )}
           rules={{ required: "Please select a role" }}
