@@ -48,7 +48,7 @@ const KoiUpdate = () => {
   const deleteGrowthMutation = useDeleteGrowth();
   const [allGrowthSelected, setAllGrowthSelected] = useState(false);
   const [isLoadingGrowthList, setIsLoadingGrowthList] = useState(false);
-  console.log(growthData)
+  const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
 
   const koi = location.state?.koi;
 
