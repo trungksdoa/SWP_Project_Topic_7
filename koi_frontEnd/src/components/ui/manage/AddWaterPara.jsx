@@ -5,13 +5,27 @@ import { useFormik } from "formik";
 import { usePostWaterParameter } from "../../../hooks/koi/ usePostWaterParameter";
 import { toast } from "react-toastify";
 
+const calculateDaysBetween = (date1) => {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const firstDate = new Date(date1);
+  const secondDate = new Date();
+  firstDate.setHours(0, 0, 0, 0);
+  secondDate.setHours(0, 0, 0, 0);
+  return Math.round((secondDate - firstDate) / oneDay);
+};
+
 const AddWaterPara = ({ selectedPond, onSuccess }) => {
   const mutation = usePostWaterParameter();
   const handleChangeDatePicker = (date) => {
     if (date) {
-      formik.setFieldValue("lastCleanedAt", date.format("YYYY-MM-DD"));
+      const formattedDate = date.format("YYYY-MM-DD");
+      const dayCount = calculateDaysBetween(formattedDate);
+      formik.setFieldValue("lastCleanedAt", formattedDate);
+      formik.setFieldValue("cleanedDayCount", dayCount);
     } else {
-      formik.setFieldValue("lastCleanedAt", null);
+      const currentDate = dayjs().format("YYYY-MM-DD");
+      formik.setFieldValue("lastCleanedAt", currentDate);
+      formik.setFieldValue("cleanedDayCount", 0);
     }
   };
   const formik = useFormik({
@@ -26,8 +40,6 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
       co2: "",
       totalChlorines: "",
       pondId: selectedPond?.id || 0,
-      lastCleanedAt: "2024-10-03",
-      cleanedDayCount: "",
       ph: "",
     },
     validate: (values) => {
@@ -43,31 +55,42 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
         "carbonateHardnessKH",
         "co2",
         "totalChlorines",
-        "cleanedDayCount",
         "ph",
       ];
       numericFields.forEach((field) => {
-        if (!values[field]) {
-          // Check if the field is empty
-          errors[field] = "Field cannot be empty"; // Error message for empty fields
-        } else if (isNaN(values[field])) {
+        if (isNaN(values[field])) {
           // Check if the field is not a number
-          errors[field] = "Must be a number"; // Error message for non-numeric values
+          errors[field] = "Must be a number";
         }
       });
       return errors;
     },
     onSubmit: (values) => {
-      const payload = {
-        ...values,
-        amountFed: 0, // Always set amountFed to 0
+      // Convert all string values to numbers
+      const numericPayload = {
+        nitriteNO2: Number(values.nitriteNO2),
+        nitrateNO3: Number(values.nitrateNO3),
+        ammoniumNH4: Number(values.ammoniumNH4),
+        hardnessGH: Number(values.hardnessGH),
+        salt: Number(values.salt),
+        temperature: Number(values.temperature),
+        carbonateHardnessKH: Number(values.carbonateHardnessKH),
+        co2: Number(values.co2),
+        totalChlorines: Number(values.totalChlorines),
+        ph: Number(values.ph),
+        amountFed: 0,
+        pondId: selectedPond?.id
       };
+
       mutation.mutate(
-        { id: selectedPond?.id, payload },
+        { id: selectedPond?.id, payload: numericPayload },
         {
           onSuccess: () => {
-            toast.success("Add Water Parameter Successfully !");
-            onSuccess(); // Call the onSuccess callback
+            toast.success("Add Water Parameter Successfully!");
+            onSuccess();
+          },
+          onError: (error) => {
+            toast.error(error.message || "Failed to add water parameter");
           },
         }
       );
@@ -76,6 +99,12 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
 
   return (
     <div className="mt-[8px] w-full z-50 justify-center items-center">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {selectedPond?.name || "Selected Pond"}
+        </h2>
+      </div>
+
       <Form
         layout="vertical"
         style={{ width: "100%" }}
@@ -83,91 +112,149 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
       >
         <div className="grid grid-cols-2 gap-4 mb-2">
           <div>
-            <Form.Item label="Nitrite NO2 (mg/L)" className="mb-2">
+            <Form.Item 
+              label="Nitrite NO2 (mg/L)" 
+              className="mb-2"
+              validateStatus={formik.errors.nitriteNO2 ? "error" : ""}
+              help={formik.errors.nitriteNO2}
+            >
               <Input
                 name="nitriteNO2"
                 value={formik.values.nitriteNO2}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Nitrate NO3 (mg/L)" className="mb-2">
+            <Form.Item 
+              label="Nitrate NO3 (mg/L)" 
+              className="mb-2"
+              validateStatus={formik.errors.nitrateNO3 ? "error" : ""}
+              help={formik.errors.nitrateNO3}
+            >
               <Input
                 name="nitrateNO3"
                 value={formik.values.nitrateNO3}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Ammonium NH4 (mg/L)" className="mb-2">
+            <Form.Item 
+              label="Ammonium NH4 (mg/L)" 
+              className="mb-2"
+              validateStatus={formik.errors.ammoniumNH4 ? "error" : ""}
+              help={formik.errors.ammoniumNH4}
+            >
               <Input
                 name="ammoniumNH4"
                 value={formik.values.ammoniumNH4}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Hardness GH (ppm)" className="mb-2">
+            <Form.Item 
+              label="Hardness GH (ppm)" 
+              className="mb-2"
+              validateStatus={formik.errors.hardnessGH ? "error" : ""}
+              help={formik.errors.hardnessGH}
+            >
               <Input
                 name="hardnessGH"
                 value={formik.values.hardnessGH}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Salt (ppm)" className="mb-2">
+            <Form.Item 
+              label="Salt (ppm)" 
+              className="mb-2"
+              validateStatus={formik.errors.salt ? "error" : ""}
+              help={formik.errors.salt}
+            >
               <Input
                 name="salt"
                 value={formik.values.salt}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Temperature (°C)" className="mb-2">
+            {/* <Form.Item 
+              label="Temperature (°C)" 
+              className="mb-2"
+              validateStatus={formik.errors.temperature ? "error" : ""}
+              help={formik.errors.temperature}
+            >
               <Input
                 name="temperature"
                 value={formik.values.temperature}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
-            </Form.Item>
+            </Form.Item> */}
           </div>
           <div>
-            <Form.Item label="Carbonate Hardness KH (ppm)" className="mb-2">
+            <Form.Item 
+              label="Carbonate Hardness KH (ppm)" 
+              className="mb-2"
+              validateStatus={formik.errors.carbonateHardnessKH ? "error" : ""}
+              help={formik.errors.carbonateHardnessKH}
+            >
               <Input
                 name="carbonateHardnessKH"
                 value={formik.values.carbonateHardnessKH}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="CO2 (ppm)" className="mb-2">
+            <Form.Item 
+              label="CO2 (ppm)" 
+              className="mb-2"
+              validateStatus={formik.errors.co2 ? "error" : ""}
+              help={formik.errors.co2}
+            >
               <Input
                 name="co2"
                 value={formik.values.co2}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Total Chlorines (ppm)" className="mb-2">
+            <Form.Item 
+              label="Total Chlorines (ppm)" 
+              className="mb-2"
+              validateStatus={formik.errors.totalChlorines ? "error" : ""}
+              help={formik.errors.totalChlorines}
+            >
               <Input
                 name="totalChlorines"
                 value={formik.values.totalChlorines}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="Last Cleaned At" className="mb-2">
-              <DatePicker
-                name="lastCleanedAt"
-                value={formik.values.lastCleanedAt ? dayjs(formik.values.lastCleanedAt) : null}
-                onChange={handleChangeDatePicker}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-            <Form.Item label="Cleaned Day Count" className="mb-2">
+            <Form.Item 
+              label="Temperature (°C)" 
+              className="mb-2"
+              validateStatus={formik.errors.temperature ? "error" : ""}
+              help={formik.errors.temperature}
+            >
               <Input
-                name="cleanedDayCount"
-                value={formik.values.cleanedDayCount}
+                name="temperature"
+                value={formik.values.temperature}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
-            <Form.Item label="pH" className="mb-2">
+            <Form.Item 
+              label="pH" 
+              className="mb-2"
+              validateStatus={formik.errors.ph ? "error" : ""}
+              help={formik.errors.ph}
+            >
               <Input
                 name="ph"
                 value={formik.values.ph}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </Form.Item>
           </div>
@@ -175,11 +262,12 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
         <div className="flex justify-center mt-4">
           <Form.Item>
             <Button
-            className="bg-black text-white font-bold text-lg hover:!text-white hover:!bg-black"
-            htmlType="submit"
-            loading={mutation.isPending}
-          >
-            Add New
+              className="bg-black text-white font-bold text-lg hover:!text-white hover:!bg-black"
+              htmlType="submit"
+              loading={mutation.isPending}
+              disabled={Object.keys(formik.errors).length > 0}
+            >
+              Add New
             </Button>
           </Form.Item>
         </div>

@@ -52,7 +52,7 @@ const KoiUpdate = () => {
 
   const koi = location.state?.koi;
 
-  const { refetch: refetchAllKoi } = useGetAllKoi(userId);
+  const { data: lstKoi, refetch: refetchKoi, isFetching } = useGetAllKoi(userId);
 
   const getStatusText = (status) => {
     switch (status) {
@@ -77,10 +77,10 @@ const KoiUpdate = () => {
       setSelectedPond(koi.pondId);
       calculateAge(koi.dateOfBirth);
       setCurrentDay(koi.date ? dayjs(koi.date) : dayjs());
-      refetchAllKoi();
+      refetchKoi();
       refetchGrowthData();
     }
-  }, [koi, refetchAllKoi, refetchGrowthData]);
+  }, [koi, refetchKoi, refetchGrowthData]);
 
 
   const calculateAge = (birthDate) => {
@@ -163,12 +163,13 @@ const KoiUpdate = () => {
 
       try {
         await updateKoiMutation.mutateAsync(
-          { id: id, payload: formData, isNew: false },
+          { id: id, payload: formData },
           {
             onSuccess: (updatedKoi) => {
               dispatch(manageKoiActions.updateKoi(updatedKoi));
               toast.success("Koi updated successfully");
-              refetchAllKoi();
+              refetchKoi();
+              refetchGrowthData();
             },
           }
         );
@@ -206,6 +207,7 @@ const KoiUpdate = () => {
     try {
       await deleteKoiMutation.mutateAsync(koiId);
       toast.success("Koi deleted successfully!");
+      refetchKoi();
       navigate('/koi-management');
     } catch (error) {
       toast.error(`Error deleting koi: ${error.message}`);
@@ -254,8 +256,8 @@ const KoiUpdate = () => {
         {
           onSuccess: () => {
             toast.success("Growth data added successfully");
-            queryClient.invalidateQueries(['growth', id]);
-            queryClient.invalidateQueries(['allKoi', userId]);
+            refetchKoi();
+            refetchGrowthData();
           },
           onError: (error) => {
             console.error("Error adding growth data:", error);

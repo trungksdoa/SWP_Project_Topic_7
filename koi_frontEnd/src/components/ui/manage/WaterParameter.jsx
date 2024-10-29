@@ -28,6 +28,14 @@ import { useGetWaterStandard } from "../../../hooks/koi/useGetWaterStandard.js";
 import { useTranslation } from "react-i18next";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 
+// Add helper function at the top of the file
+const calculateDaysBetween = (date1) => {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const firstDate = new Date(date1);
+  const secondDate = new Date();
+  return Math.round((secondDate - firstDate) / oneDay);
+};
+
 const WaterParameter = () => {
   const { t } = useTranslation();
   const [selectedPond, setSelectedPond] = useState(null); // Hồ được chọn
@@ -68,7 +76,7 @@ const WaterParameter = () => {
     setError(newError);
   };
 
-  const { data: lstPond, refetch } = useGetAllPond(userId); // Lấy danh sách hồ
+  const { data: lstPond, refetch, isFetching } = useGetAllPond(userId); // Lấy danh sách hồ
   const handleChangeDatePicker = (date) => {
     if (date) {
       formik.setFieldValue("birthday", date.format("DD/MM/YYYY"));
@@ -124,10 +132,25 @@ const WaterParameter = () => {
     setVisible(false);
   };
 
-  // Hàm xử lý khi click vào hồ để hiển thị Modal
-  const handleClick = (pond) => {
+  // Modify the handleClick function to fetch water data
+  const handleClick = async (pond) => {
     setSelectedPond(pond);
     setIsModalVisible(true);
+    
+    try {
+      setLoading(true);
+      const waterParamsRes = await manageWaterServices.getWaterByPondId(pond.id);
+      const waterStandardRes = await manageWaterServices.getWaterStandard(pond.id);
+
+      setWaterParameters(waterParamsRes?.data?.data || null);
+      setWaterStandard(waterStandardRes?.data?.data || null);
+    } catch (error) {
+      console.error("Error fetching water data:", error);
+      setWaterParameters(null);
+      setWaterStandard(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Add this function to check if koi exists in the selected pond
@@ -175,18 +198,37 @@ const WaterParameter = () => {
       totalChlorines: 0,
       amountFed: 0,
       pondId: 0,
-      lastCleanedAt: "2024-10-03",
+      lastCleanedAt: dayjs().format("YYYY-MM-DD"),
       cleanedDayCount: 0,
       ph: 0,
       lastCleaned: false,
     },
     onSubmit: (values) => {
-      console.log(values);
+      // Convert all string values to numbers except lastCleanedAt
+      const numericPayload = {
+        ...values,
+        nitriteNO2: Number(values.nitriteNO2),
+        nitrateNO3: Number(values.nitrateNO3),
+        ammoniumNH4: Number(values.ammoniumNH4),
+        hardnessGH: Number(values.hardnessGH),
+        salt: Number(values.salt),
+        temperature: Number(values.temperature),
+        carbonateHardnessKH: Number(values.carbonateHardnessKH),
+        co2: Number(values.co2),
+        totalChlorines: Number(values.totalChlorines),
+        ph: Number(values.ph),
+        cleanedDayCount: Number(values.cleanedDayCount),
+        amountFed: Number(values.amountFed || 0),
+        // Ensure lastCleanedAt is in the correct format
+        lastCleanedAt: dayjs(values.lastCleanedAt).format("YYYY-MM-DD"),
+        pondId: waterParameters?.pondId
+      };
+      
       mutation.mutate(
-        { id: waterParameters?.pondId, payload: values },
+        { id: waterParameters?.pondId, payload: numericPayload },
         {
           onSuccess: () => {
-            toast.success("Update Water Parameter Success !");
+            toast.success("Update Water Parameter Success!");
             refetch();
             refetchStandard();
           },
@@ -198,22 +240,15 @@ const WaterParameter = () => {
   // Cập nhật formik với dữ liệu waterParameters từ server
   useEffect(() => {
     if (waterParameters) {
-      formik.setValues({
-        nitriteNO2: waterParameters.nitriteNO2 || 0,
-        nitrateNO3: waterParameters.nitrateNO3 || 0,
-        ammoniumNH4: waterParameters.ammoniumNH4 || 0,
-        hardnessGH: waterParameters.hardnessGH || 0,
-        salt: waterParameters.salt || 0,
-        temperature: waterParameters.temperature || 0,
-        carbonateHardnessKH: waterParameters.carbonateHardnessKH || 0,
-        co2: waterParameters.co2 || 0,
-        totalChlorines: waterParameters.totalChlorines || 0,
-        amountFed: waterParameters.amountFed || 0,
-        pondId: waterParameters.pondId || 0,
-        lastCleanedAt: waterParameters.lastCleanedAt || "2024-10-03",
-        cleanedDayCount: waterParameters.cleanedDayCount || 0,
-        ph: waterParameters.ph || 0,
-      });
+      const formattedValues = {
+        ...waterParameters,
+        // Ensure lastCleanedAt is properly formatted
+        lastCleanedAt: waterParameters.lastCleanedAt ? 
+          dayjs(waterParameters.lastCleanedAt).format("YYYY-MM-DD") : 
+          dayjs().format("YYYY-MM-DD"),
+        cleanedDayCount: waterParameters.cleanedDayCount || 0
+      };
+      formik.setValues(formattedValues);
     }
   }, [waterParameters]);
 
@@ -298,6 +333,40 @@ const WaterParameter = () => {
     }
   }, [waterParameters, waterStandard]);
 
+  // Add loading spinner for the whole page
+  if (isFetching) {
+    return (
+      <div className="flex justify-center items-center min-h-[450px]">
+        <Spin tip="Loading" size="large" />
+      </div>
+    );
+  }
+
+  // Update the success handler to also fetch the latest water parameters
+  const handleAddWaterParaSuccess = async () => {
+    setIsAddWaterParaModalVisible(false);
+    
+    if (selectedPond) {
+      try {
+        setLoading(true);
+        const waterParamsRes = await manageWaterServices.getWaterByPondId(selectedPond.id);
+        const waterStandardRes = await manageWaterServices.getWaterStandard(selectedPond.id);
+
+        setWaterParameters(waterParamsRes?.data?.data || null);
+        setWaterStandard(waterStandardRes?.data?.data || null);
+      } catch (error) {
+        console.error("Error fetching water data:", error);
+        setWaterParameters(null);
+        setWaterStandard(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    refetch();
+    refetchStandard();
+  };
+
   // Render danh sách hồ
   if (!lstPond) {
     return <div>Loading...</div>;
@@ -336,51 +405,64 @@ const WaterParameter = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
-        width="80%"
+        width="60%"
         className="custom-modal"
       >
         {loading ? (
-          <Spin />
-        ) : !waterParameters ||
-          waterParameters === null ||
-          Object.keys(waterParameters).length === 0 ? (
-          <div className="flex w-80%">
-            {/* Left column: Image */}
-            <div className="w-1/2 pr-4 flex items-start justify-center">
-              <img
-                src={selectedPond?.imageUrl}
-                alt={selectedPond?.name}
-                className="w-80 h-80 object-cover rounded-[8px] shadow-lg"
-              />
-            </div>
-            
-            {/* Right column: Content */}
-            <div className="w-1/2 flex flex-col justify-center items-center">
-              {/* First row: No water parameter and Add Water Parameter button */}
+          <div className="flex justify-center items-center min-h-[400px]">
+            <Spin size="large" tip="Loading..." />
+          </div>
+        ) : !waterParameters ? (
+          <div className="flex">
+            {/* Left Column - Pond Info */}
+            <div className="w-1/2 pr-6 justify-center items-center">
               <div className="text-center">
-                <h2 className="font-bold text-[24px] mb-4">
-                  No water parameters available
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                  {selectedPond?.name || "Selected Pond"}
                 </h2>
-                <Button
-                  onClick={() => {
-                    setIsAddWaterParaModalVisible(true);
-                    setIsModalVisible(false);
-                  }}
-                  className="bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none"
-                >
-                  Add Water Parameter
-                </Button>
+                <div className="w-80 h-80 justify-center items-center mx-auto">
+                  <img
+                    src={selectedPond?.imageUrl}
+                    alt={selectedPond?.name}
+                    className="w-80 h-80 object-cover rounded-[8px] shadow-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Content */}
+            <div className="w-1/2 flex items-center justify-center">
+              <div className="text-center">
+                <h3 className="font-bold text-xl text-gray-700 mb-4">
+                No water parameters available
+              </h3>
+              <Button
+                onClick={() => {
+                  setIsAddWaterParaModalVisible(true);
+                  setIsModalVisible(false);
+                }}
+                className="bg-black text-white hover:!bg-black hover:!text-white hover:!border-none border-none px-6 py-2 h-auto"
+              >
+                Add Water Parameter
+              </Button>
               </div>
             </div>
           </div>
         ) : (
           <div className="">
+            {/* Add pond name heading */}
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {selectedPond?.name || "Selected Pond"}
+              </h2>
+            </div>
+            
             <div className="flex justify-around">
               <div className="mr-6 w-1/4 items-start"> {/* Reduced width to 25% */}
                 <img
                   src={selectedPond.imageUrl}
                   alt={selectedPond.name}
-                  className="w-80 h-80 object-cover shadow-lg" // Reduced height to 48 (12rem)
+                  className="w-80 h-80 object-cover shadow-lg ml-5" // Reduced height to 48 (12rem)
                 />
               </div>
               <Form
@@ -438,14 +520,14 @@ const WaterParameter = () => {
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
-                      <Form.Item label="Temperature (°C)" className="mb-2">
+                      {/* <Form.Item label="Temperature (°C)" className="mb-2">
                         <Input
                           name="temperature"
                           value={formik.values.temperature || ""}
                           onChange={formik.handleChange}
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
                     <div>
                       <Form.Item label="Carbonate Hardness KH (ppm)" className="mb-2">
@@ -472,22 +554,43 @@ const WaterParameter = () => {
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
-                      <Form.Item label="Last Cleaned At" className="mb-2">
+                      {/* <Form.Item label="Last Cleaned At" className="mb-2">
                         <DatePicker
                           name="lastCleanedAt"
-                          value={formik.values.lastCleanedAt ? dayjs(formik.values.lastCleanedAt) : null}
-                          onChange={(date) => formik.setFieldValue("lastCleanedAt", date ? date.format("YYYY-MM-DD") : null)}
+                          value={dayjs(formik.values.lastCleanedAt)}
+                          onChange={(date) => {
+                            if (date) {
+                              const formattedDate = date.format("YYYY-MM-DD");
+                              const dayCount = calculateDaysBetween(formattedDate);
+                              formik.setFieldValue("lastCleanedAt", formattedDate);
+                              formik.setFieldValue("cleanedDayCount", dayCount);
+                            } else {
+                              const currentDate = dayjs().format("YYYY-MM-DD");
+                              formik.setFieldValue("lastCleanedAt", currentDate);
+                              formik.setFieldValue("cleanedDayCount", 0);
+                            }
+                          }}
+                          disabledDate={(current) => current && current.isAfter(dayjs())}
                           style={{ width: '75%' }}
+                          format="YYYY-MM-DD"
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         />
                       </Form.Item>
                       <Form.Item label="Cleaned Day Count" className="mb-2">
                         <Input
                           name="cleanedDayCount"
-                          value={formik.values.cleanedDayCount || ""}
+                          value={formik.values.cleanedDayCount.toString()} // Force string conversion
+                          disabled={true}
+                          style={{ width: '75%', backgroundColor: '#f5f5f5' }}
+                          className="rounded-md border-gray-300 shadow-sm"
+                        />
+                      </Form.Item> */}
+                      <Form.Item label="Temperature (°C)" className="mb-2">
+                        <Input
+                          name="temperature"
+                          value={formik.values.temperature || ""}
                           onChange={formik.handleChange}
-                          style={{ width: '75%' }}
-                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
                       <Form.Item label="pH" className="mb-2">
@@ -711,29 +814,32 @@ const WaterParameter = () => {
         visible={isAddWaterParaModalVisible}
         onCancel={() => setIsAddWaterParaModalVisible(false)}
         footer={null}
-        width="60%" // Increased width for better responsiveness
-        bodyStyle={{ maxHeight: '80vh', overflowY: 'auto' }} // Added scrolling for tall content
-        centered // Centers the modal vertically
+        width="60%"
+        bodyStyle={{ maxHeight: '80vh', overflowY: 'auto' }}
+        centered
         className="custom-modal"
       >
-        <div className="flex flex-col md:flex-row items-start md:items-center">
-          <div className="w-full md:w-1/3 mb-4 md:mb-0 md:pr-4 items-start">
-            <img
-              src={selectedPond?.imageUrl}
-              alt={selectedPond?.name}
-              className="w-full h-auto object-cover rounded-lg shadow-lg"
-            />
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <Spin size="large" tip="Loading..." />
           </div>
-          <div className="w-full md:w-2/3">
-            <AddWaterPara
-              selectedPond={selectedPond}
-              onSuccess={() => {
-                setIsAddWaterParaModalVisible(false);
-                refetch();
-              }}
-            />
+        ) : (
+          <div className="flex flex-col md:flex-row items-start md:items-center">
+            <div className="w-full md:w-1/3 mb-4 md:mb-0 md:pr-4 items-start">
+              <img
+                src={selectedPond?.imageUrl}
+                alt={selectedPond?.name}
+                className="w-full h-auto object-cover rounded-lg shadow-lg"
+              />
+            </div>
+            <div className="w-full md:w-2/3">
+              <AddWaterPara
+                selectedPond={selectedPond}
+                onSuccess={handleAddWaterParaSuccess}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </Modal>
     </div>
   );
