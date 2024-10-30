@@ -24,7 +24,8 @@
 
 # Software Requirements Specification
 **Bảng tiếng Anh**
-https://docs.google.com/document/d/1HKfBEotqObef0dy35_1HfDrHigzk_2COVF-1pXqfk2o/edit?usp=sharing
+[another.docx](https://github.com/user-attachments/files/17564894/another.docx)
+
 
 **Bảng tiếng Việt**
 
