@@ -22,7 +22,7 @@ const HistoryOrder = () => {
   const [lstCompleted, setLstCompleted] = useState([]);
   useEffect(() => {
     const paidOrders =
-      lstOrder?.filter((order) => order?.status === "SUCCESS") || [];
+      lstOrder?.filter((order) => order?.status === "SUCCESS_PAYMENT") || [];
     const pendingOrders =
       lstOrder?.filter((order) => order?.status === "PENDING") || [];
     const cancelledOrders =

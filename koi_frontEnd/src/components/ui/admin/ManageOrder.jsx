@@ -165,7 +165,7 @@ const ManageOrder = () => {
             </Tag>
           );
         }
-        if (record.status === "SUCCESS") {
+        if (record.status === "SUCCESS_PAYMENT") {
           return (
             <Tag color="green" className="text-[13px] font-bold w-[150px] !bg-green-500 !text-white text-center justify-center items-center">
               WAIT FOR SHIPPING
