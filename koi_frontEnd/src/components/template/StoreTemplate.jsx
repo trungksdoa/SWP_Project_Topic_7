@@ -148,7 +148,7 @@ const StoreTemplate = () => {
                     <p className="font-semibold">
                       Price:{" "}
                       <span className="!font-normal text-[16px]">
-                        ${prd?.price}
+                        {prd?.price} VND
                       </span>
                     </p>
                     <div className="flex items-center">

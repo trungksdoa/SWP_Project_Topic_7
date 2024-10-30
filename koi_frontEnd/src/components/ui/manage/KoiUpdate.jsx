@@ -21,8 +21,8 @@ import { Modal as AntModal } from 'antd';
 
 const KoiUpdate = () => {
   const { id } = useParams();
-  
   const location = useLocation();
+  console.log(id)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [imgSrc, setImgSrc] = useState("");
@@ -275,7 +275,8 @@ const KoiUpdate = () => {
     }
   };
 
-  const showGrowthList = () => {
+  const showGrowthList = async (id) => {
+    console.log(id)
     setIsLoadingGrowthList(true);
     if (!growthData || growthData.length === 0) {
       toast.info("No growth data available. Please add growth history first.");
@@ -502,7 +503,9 @@ const KoiUpdate = () => {
           <div className="flex justify-end">
             <span 
               className="text-blue-500 underline cursor-pointer"
-              onClick={showGrowthList}
+              onClick={() => {
+                showGrowthList(id)
+              }}
             >
               Growth List
             </span>

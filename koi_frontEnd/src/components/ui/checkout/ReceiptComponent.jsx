@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { manageOrderServices } from "../../../services/manageOderServices";
 
 const ReceiptComponent = ({ selectedOrder }) => {
-  console.log(selectedOrder);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   useEffect(() => {
     manageOrderServices.getOrderById(selectedOrder?.id);

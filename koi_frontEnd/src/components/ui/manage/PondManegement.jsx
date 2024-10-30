@@ -49,7 +49,6 @@ const PondManagement = () => {
 
   const { data: lstKoi } = useGetAllKoi(userId);
   const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
-  console.log(lstPond);
   const mutation = useUpdatePond();
   const addPondMutation = useAddPond();
 

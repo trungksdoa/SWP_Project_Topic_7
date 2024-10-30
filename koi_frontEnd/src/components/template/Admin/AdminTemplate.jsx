@@ -48,8 +48,13 @@ const AdminTemplate = () => {
   };
 
   const getSectionName = (pathname) => {
-    const path = pathname.split('/').pop();
-    return t(path.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '));
+    const path = pathname.split("/").pop();
+    return t(
+      path
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    );
   };
 
   return (
@@ -283,8 +288,24 @@ const AdminTemplate = () => {
           </Menu>
         </Sider>
         <Layout>
-          <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px' }}>
-            <h2 style={{ color: 'black', margin: 0, fontSize: '27px', fontWeight: 'bold' }}>{getSectionName(location.pathname)}</h2>
+          <Header
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0 24px",
+            }}
+          >
+            <h2
+              style={{
+                color: "black",
+                margin: 0,
+                fontSize: "27px",
+                fontWeight: "bold",
+              }}
+            >
+              {getSectionName(location.pathname)}
+            </h2>
             <Button
               className="bg-black text-white hover:!text-white hover:!bg-black"
               onClick={() => {

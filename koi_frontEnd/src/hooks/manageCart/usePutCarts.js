@@ -4,8 +4,6 @@ import { manageCartService } from "../../services/manageCartServices";
 export const usePutCarts = () => {
     return useMutation({
         mutationFn: ({id, payload}) => {
-            console.log(id)
-            console.log("payload:: " , payload)
             return manageCartService.putCart(id, payload)
         }
     })

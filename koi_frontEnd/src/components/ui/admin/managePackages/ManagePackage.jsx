@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table, Spin, Modal } from "antd";
 import { useGetPackage } from "../../../../hooks/admin/managePackages/useGetPackage";
-import { useDeletePackage } from '../../../../hooks/admin/managePackages/useDeletePackage'
+import { useDeletePackage } from "../../../../hooks/admin/managePackages/useDeletePackage";
 import { toast } from "react-toastify";
 import EditPackages from "./EditPackages";
 import AddPackage from "../managePackages/AddPackage";
@@ -16,39 +16,39 @@ const ManagePackage = () => {
   const [nextId, setNextId] = useState(0);
 
   useEffect(() => {
-    refetch()
-  }, [])
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (lstPackage && lstPackage.length > 0) {
-      const maxId = Math.max(...lstPackage.map(pkg => pkg.id));
+      const maxId = Math.max(...lstPackage.map((pkg) => pkg.id));
       setNextId(maxId + 1);
     }
   }, [lstPackage]);
 
-  const handleDelete = (id) => {
-    Modal.confirm({
-        title: 'Delete Package',
-        content: 'Are you sure you want to delete this package?',
-        okText: 'Yes',
-        okType: 'danger',
-        cancelText: 'No',
-        onOk() {
-            setDeletingId(id);
-            mutate.mutate(id, {
-                onSuccess: () => {
-                    toast.success("Delete package successfully!");
-                    refetch();
-                    setDeletingId(null);
-                },
-                onError: () => {
-                    toast.error("Delete package failed!");
-                    setDeletingId(null);
-                },
-            });
-        },
-    });
-  }
+  // const handleDelete = (id) => {
+  //   Modal.confirm({
+  //       title: 'Delete Package',
+  //       content: 'Are you sure you want to delete this package?',
+  //       okText: 'Yes',
+  //       okType: 'danger',
+  //       cancelText: 'No',
+  //       onOk() {
+  //           setDeletingId(id);
+  //           mutate.mutate(id, {
+  //               onSuccess: () => {
+  //                   toast.success("Delete package successfully!");
+  //                   refetch();
+  //                   setDeletingId(null);
+  //               },
+  //               onError: () => {
+  //                   toast.error("Delete package failed!");
+  //                   setDeletingId(null);
+  //               },
+  //           });
+  //       },
+  //   });
+  // }
 
   const handleEdit = (packageId) => {
     setEditingPackageId(packageId);
@@ -66,48 +66,48 @@ const ManagePackage = () => {
 
   const columns = [
     {
-        title: "ID",
-        dataIndex: "id",
-        align: "center",
-        width: "10%"
+      title: "ID",
+      dataIndex: "id",
+      align: "center",
+      width: "10%",
     },
     {
       title: "Name",
       dataIndex: "name",
       render: (text, record) => {
-        let bgColor = '';
+        let bgColor = "";
         switch (record.name.toLowerCase()) {
-          case 'advanced':
-            bgColor = '#FAF3E1';
+          case "advanced":
+            bgColor = "#FAF3E1";
             break;
-          case 'professional':
-            bgColor = '#F5E7C6';
+          case "professional":
+            bgColor = "#F5E7C6";
             break;
-          case 'vip':
-            bgColor = '#FF6D1F';
+          case "vip":
+            bgColor = "#FF6D1F";
             break;
-          case 'svip':
-            bgColor = '#222222';
+          case "svip":
+            bgColor = "#222222";
             break;
           default:
-            bgColor = 'transparent';
+            bgColor = "transparent";
         }
-        
+
         return (
           <div
             style={{
-              border: '1px solid #d9d9d9',
-              padding: '4px 8px',
-              borderRadius: '4px',
+              border: "1px solid #d9d9d9",
+              padding: "4px 8px",
+              borderRadius: "4px",
               backgroundColor: bgColor,
-              color: record.name.toLowerCase() === 'svip' ? 'white' : 'inherit',
-              display: 'inline-block',
-              width: '110px',
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontWeight: 'bold',
+              color: record.name.toLowerCase() === "svip" ? "white" : "inherit",
+              display: "inline-block",
+              width: "110px",
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: "bold",
             }}
           >
             {text}
@@ -128,29 +128,21 @@ const ManagePackage = () => {
       dataIndex: "price",
     },
     {
-        title: "Action",
-        render: (_, pkg) => (
-          <div key={pkg.id}>
-            <Button
-              onClick={() => handleEdit(pkg?.id)}
-              className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
-            >
-              Edit
-            </Button>
-            <Button
-            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
-              onClick={() => handleDelete(pkg?.id)}
-              loading={deletingId === pkg?.id}
-              disabled={deletingId === pkg?.id}
-            >
-              Delete
-            </Button>
-          </div>
-        ),
-        width: "15%",
-      },
+      title: "Action",
+      render: (_, pkg) => (
+        <div key={pkg.id}>
+          <Button
+            onClick={() => handleEdit(pkg?.id)}
+            className="w-[70px] mr-[30px] bg-green-400 text-white hover:!bg-green-500 hover:!text-white mb-2"
+          >
+            Edit
+          </Button>
+        </div>
+      ),
+      width: "15%",
+    },
   ];
-  const data = lstPackage
+  const data = lstPackage;
   const onChange = (pagination, filters, sorter, extra) => {
     console.log("params", pagination, filters, sorter, extra);
   };
@@ -165,12 +157,12 @@ const ManagePackage = () => {
 
   return (
     <div>
-      <Button
+      {/* <Button
         className="bg-orange-500 mb-4 text-white px-4 py-2 rounded-md"
         onClick={() => setAddModalVisible(true)}
       >
         Add new package
-      </Button>
+      </Button> */}
       <Table
         columns={columns}
         dataSource={data}
@@ -206,8 +198,8 @@ const styles = `
   }
 `;
 
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style');
+if (typeof document !== "undefined") {
+  const styleElement = document.createElement("style");
   styleElement.innerHTML = styles;
   document.head.appendChild(styleElement);
 }

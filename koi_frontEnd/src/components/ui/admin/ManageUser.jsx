@@ -45,33 +45,6 @@ const ManageUser = () => {
     }
   }, [lstUser]);
 
-  const handleDelete = (id) => {
-    Modal.confirm({
-      title: 'Delete User',
-      content: 'Are you sure you want to delete this user?',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        deleteUser(id);
-      },
-    });
-  };
-
-  const deleteUser = async (id) => {
-    setIsDeleting(true);
-    setLoadingId(id);
-    try {
-      await mutate.mutateAsync(id);
-      toast.success("User deleted successfully!");
-      refetch();
-    } catch (error) {
-      toast.error(`Error deleting user: ${error.message}`);
-    } finally {
-      setIsDeleting(false);
-      setLoadingId(null);
-    }
-  };
 
   // const filteredUsers = lstUser?.filter((user) =>
   //   user.roles.some((role) => role.name === "ROLE_MEMBER")
@@ -196,21 +169,10 @@ const ManageUser = () => {
       render: (_, user) => {
         return (
           <div style={{ textAlign: 'center' }}>
-            {user.roles.some((role) => role.name === "ROLE_ADMIN") ? (
-              <EditOutlined
+            <EditOutlined
                 className="mr-[15px]"
                 style={{ color: "blue" }}
               />
-            ) : (
-              <Button
-                className="bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
-                onClick={() => handleDelete(user.id)}
-                loading={loadingId === user.id}
-                disabled={isDeleting}
-              >
-                {isDeleting && loadingId === user.id ? "Deleting..." : "Delete"}
-              </Button>
-            )}
           </div>
         );
       },
@@ -319,8 +281,22 @@ const ManageUser = () => {
       />
 
       <Table
-        rowSelection={rowSelection}
-        columns={columns}
+        columns={columns.map(column => {
+          if (column.title === "Action") {
+            return {
+              ...column,
+              render: (_, user) => (
+                <div key={user.id}>
+                   <EditOutlined
+                      className="mr-[15px]"
+                      style={{ color: "blue" }}
+                    />
+                </div>
+              ),
+            };
+          }
+          return column;
+        })}
         dataSource={data}
         rowKey="id"
         onChange={onChange}

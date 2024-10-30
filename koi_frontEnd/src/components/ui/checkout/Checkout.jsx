@@ -15,7 +15,6 @@ const Checkout = () => {
     totalItems += prd?.quantity;
   });
 
-  console.log(lstPrd);
   useEffect(() => {
     if (carts) {
       const productIdList = carts.map((prd) => prd?.productId);
@@ -71,7 +70,6 @@ const Checkout = () => {
           alt={product.name}
           className="w-20 h-20 mr-2"
         />{" "}
-        {/* Added image */}
         {product.name}
       </div>
     ),
@@ -89,13 +87,9 @@ const Checkout = () => {
         Shipping fee: FREE
         <br />
         <br />
-        Total: {new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(totalPrice)}
       </div>
 
-      <FormCheckout totalItems={totalItems} />
+      <FormCheckout totalItems={totalItems} totalPrice={totalPrice} />
     </div>
   );
 };
