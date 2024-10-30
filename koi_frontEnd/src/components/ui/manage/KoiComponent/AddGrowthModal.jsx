@@ -3,7 +3,7 @@ import { Modal, Form, DatePicker, InputNumber, Select, Button } from "antd";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
-import { useAddGrowth } from "../../../hooks/koi/useAddGrowth";
+import { useAddGrowth } from "../../../../hooks/koi/useAddGrowth";
 const AddGrowthModal = ({
   fishId,
   isVisible,

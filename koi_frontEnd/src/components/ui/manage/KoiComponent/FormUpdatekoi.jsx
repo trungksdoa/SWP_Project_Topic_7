@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   Form,
   Input,
@@ -21,16 +22,26 @@ import {
   VerticalAlignBottomOutlined,
   AreaChartOutlined,
   UploadOutlined,
+  BulbOutlined,
+  CalculatorOutlined,
 } from "@ant-design/icons";
 const { Title, Text } = Typography;
 import PropTypes from "prop-types";
-import { manageKoiActions } from "../../../store/manageKoi/slice";
-import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
-import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
+import { manageKoiActions } from "../../../../store/manageKoi/slice";
+import { useUpdateKoi } from "../../../../hooks/koi/useUpdateKoi";
+import { useDeleteKoi } from "../../../../hooks/koi/useDeleteKoi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
+
+// Custom modal style to center it
+const modalStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
 const FormKoiUpdate = ({
   koi,
   pond,
@@ -58,6 +69,7 @@ const FormKoiUpdate = ({
       Modal.confirm({
         title: "Update Koi",
         content: "Are you sure you want to update this koi?",
+        centered: true,
         onOk: async () => {
           const formData = new FormData();
           const updatedKoi = {
@@ -158,7 +170,6 @@ const FormKoiUpdate = ({
   };
 
   // Handle delete
-
   const handleDeleteClick = () => {
     Modal.confirm({
       title: "Delete Koi",
@@ -166,6 +177,7 @@ const FormKoiUpdate = ({
       okText: "Yes",
       okType: "danger",
       cancelText: "No",
+      centered: true,
       onOk: async () => {
         setIsDeleting(true);
         try {
@@ -182,7 +194,6 @@ const FormKoiUpdate = ({
   };
 
   //Handle image
-
   const handleChangeFile = (e) => {
     const file = e.target.files?.[0];
     if (
@@ -202,16 +213,64 @@ const FormKoiUpdate = ({
     }
   };
 
-  console.log(updateKoiMutation.isPending);
+  // Handle pond click
+  const handlePondClick = () => {
+    Modal.confirm({
+      title: "View Pond Details",
+      content: "Do you want to view pond details?",
+      centered: true,
+      onOk: () => {
+        navigate(`/pond-detail/${pond.id}`);
+      }
+    });
+  };
+
+  const calculateFoodRecommendation = () => {
+    const weight = parseFloat(formik.values.weight);
+    if (!weight || weight <= 0) {
+      toast.error("Please enter a valid weight for the koi");
+      return;
+    }
+
+    // Calculate daily food amount (typically 1-3% of body weight)
+    const minFoodAmount = (weight * 10); // 1% in grams
+    const maxFoodAmount = (weight * 30); // 3% in grams
+    
+    // Calculate meals per day based on age
+    let mealsPerDay = 3; // default
+    if (koiAge !== null) {
+      if (koiAge < 6) mealsPerDay = 4; // young koi
+      else if (koiAge > 24) mealsPerDay = 2; // older koi
+    }
+
+    Modal.info({
+      title: "Food Recommendation",
+      content: (
+        <div>
+          <p>Based on the koi's weight of {weight}kg:</p>
+          <ul className="list-disc pl-5 mt-2">
+            <li>Daily food amount: {minFoodAmount.toFixed(1)} - {maxFoodAmount.toFixed(1)} grams</li>
+            <li>Recommended meals per day: {mealsPerDay}</li>
+            <li>Amount per meal: {(minFoodAmount/mealsPerDay).toFixed(1)} - {(maxFoodAmount/mealsPerDay).toFixed(1)} grams</li>
+          </ul>
+          <p className="mt-3 text-gray-500">Note: Adjust feeding based on koi information. Just only for reference.</p>
+        </div>
+      ),
+      centered: true,
+      icon: <BulbOutlined className="text-blue-500" />,
+      okText: "Got it",
+    });
+  };
+
   return (
     <Spin spinning={updateKoiMutation.isPending || isDeleting}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="shadow-lg">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6 ">
             <img
               src={imgSrc || koi?.imageUrl}
               alt={koi?.name || "Koi"}
-              className="w-full max-w-md h-auto rounded-lg object-cover"
+              className="w-full max-w-md h-auto rounded-lg object-cover "
             />
           </div>
           {/* Upload Button */}
@@ -221,7 +280,7 @@ const FormKoiUpdate = ({
               className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300"
             >
               <UploadOutlined className="text-lg" />
-              <span>Click or drag image to upload</span>
+              <span>Choose image to upload</span>
               <input
                 id="koi-image"
                 type="file"
@@ -328,11 +387,19 @@ const FormKoiUpdate = ({
                 Update
               </Button>
               <Button
+                onClick={calculateFoodRecommendation}
+                icon={<CalculatorOutlined />}
+                className="min-w-[120px]"
+              >
+                Food Recommendation
+              </Button>
+              <Button
                 onClick={() => {
                   Modal.confirm({
                     title: "Update without history",
                     content:
                       "Are you sure you want to update without update history?",
+                    centered: true,
                     onOk: () => {
                       const formData = new FormData();
                       const updatedKoi = {
@@ -392,42 +459,60 @@ const FormKoiUpdate = ({
             {pond && (
               <div className="mb-6">
                 <Title level={4}>Current Pond</Title>
-                <Card size="small" className="bg-gray-50">
+                <Card
+                  size="small"
+                  className="bg-gray-50 border-b-2 border-blue-500 cursor-pointer hover:bg-gray-100"
+                  onClick={handlePondClick}
+                >
                   <div className="flex items-center gap-4">
-                    <div className="w-24 h-24 relative">
+                    <div className="w-24 h-24 relative overflow-hidden rounded-lg border-2 border-blue-500 shadow-md hover:border-blue-600 transition-all duration-300">
                       {pond.imageUrl ? (
                         <img
                           src={pond.imageUrl}
                           alt={pond.name}
-                          className="w-full h-full object-cover rounded"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                           <PictureOutlined className="text-gray-400 text-2xl" />
                         </div>
                       )}
                     </div>
                     <div className="flex-1">
-                      <Title level={4} className="pond-name mb-2">
+                      <Title level={4} className="pond-name mb-3 text-xl">
                         {pond.name}
                       </Title>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         <div className="flex items-center gap-2">
-                          <ArrowsAltOutlined />
-                          <Text>Length: {pond.length}m</Text>
+                          <ArrowsAltOutlined className="text-lg text-gray-600" />
+                          <Text className="text-base">
+                            Length:{" "}
+                            <span className="font-semibold">
+                              {pond.length}m
+                            </span>
+                          </Text>
                         </div>
                         <div className="flex items-center gap-2">
-                          <ColumnWidthOutlined />
-                          <Text>Width: {pond.width}m</Text>
+                          <ColumnWidthOutlined className="text-lg text-gray-600" />
+                          <Text className="text-base">
+                            Width:{" "}
+                            <span className="font-semibold">{pond.width}m</span>
+                          </Text>
                         </div>
                         <div className="flex items-center gap-2">
-                          <VerticalAlignBottomOutlined />
-                          <Text>Depth: {pond.depth}m</Text>
+                          <VerticalAlignBottomOutlined className="text-lg text-gray-600" />
+                          <Text className="text-base">
+                            Depth:{" "}
+                            <span className="font-semibold">{pond.depth}m</span>
+                          </Text>
                         </div>
                         <div className="flex items-center gap-2">
-                          <AreaChartOutlined />
-                          <Text>
-                            Volume: {pond.length * pond.width * pond.depth}m³
+                          <AreaChartOutlined className="text-lg text-gray-600" />
+                          <Text className="text-base">
+                            Volume:{" "}
+                            <span className="font-semibold">
+                              {pond.length * pond.width * pond.depth}m³
+                            </span>
                           </Text>
                         </div>
                       </div>

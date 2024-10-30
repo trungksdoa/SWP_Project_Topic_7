@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import { Modal as AntModal } from "antd";
-import { useDeleteGrowth } from "../../../hooks/koi/useDeleteGrowth";
+import { useDeleteGrowth } from "../../../../hooks/koi/useDeleteGrowth";
 import { toast } from "react-toastify";
 
 
@@ -113,7 +113,7 @@ const GrowthListModal = ({
 
   // Error handling
   if (isError) {
-    return <div>Error loading growth data: {error.message}</div>;
+    return <div>Error loading growth data</div>;
   }
 
   return (

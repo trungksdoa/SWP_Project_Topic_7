@@ -1,20 +1,33 @@
-import React, { useState, useEffect, useMemo } from "react";
+import  { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
-import { Button, Spin, Pagination, Select, Space, Checkbox, Modal, Input, InputNumber, Form, DatePicker } from "antd";
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Pagination,
+  Select,
+  Modal,
+  Input,
+  InputNumber,
+  Form,
+  DatePicker,
+
+} from "antd";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { SearchOutlined } from "@ant-design/icons";
 import { useAddKoi } from "../../../hooks/koi/useAddKoi";
 import { useFormik } from "formik";
 import { manageKoiActions } from "../../../store/manageKoi/slice";
-const { Option } = Select;
+import KoiGrid from "./koiManage/KoiGrid";
+import KoiFilters from "./koiManage/KoiFilters";
+import KoiActions from "./koiManage/KoiActions";
+import LoadingSpinner from "../../layouts/LoadingSpinner";
+
 
 const KoiManegement = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -24,8 +37,8 @@ const KoiManegement = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortCriteria, setSortCriteria] = useState('dateCreated');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortCriteria, setSortCriteria] = useState("dateCreated");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedKoi, setSelectedKoi] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -41,6 +54,8 @@ const KoiManegement = () => {
   const [newKoiImgSrc, setNewKoiImgSrc] = useState("");
   const addKoiMutation = useAddKoi();
 
+  const [selectedPondFilter, setSelectedPondFilter] = useState(null);
+
   const updateKoiMutation = useUpdateKoi();
 
   const koiPerPage = 8;
@@ -52,14 +67,13 @@ const KoiManegement = () => {
     setAllSelected(false);
   }, [refetch, currentPage]);
 
-
   const handleDeleteKoi = () => {
     Modal.confirm({
-      title: 'Delete Koi',
-      content: 'Are you sure you want to delete this koi?',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Delete Koi",
+      content: "Are you sure you want to delete this koi?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk() {
         deleteKoi(selectedKoi.id);
       },
@@ -85,38 +99,48 @@ const KoiManegement = () => {
     return [...lstKoi].sort((a, b) => {
       let comparison = 0;
       switch (sortCriteria) {
-        case 'dateCreated':
+        case "dateCreated":
           const dateA = new Date(a.createdAt).getTime();
           const dateB = new Date(b.createdAt).getTime();
           comparison = dateB - dateA;
           break;
-        case 'name':
+        case "name":
           comparison = a.name.localeCompare(b.name);
           break;
-        case 'length':
+        case "length":
           comparison = parseFloat(b.length) - parseFloat(a.length);
           break;
-        case 'weight':
+        case "weight":
           comparison = parseFloat(b.weight) - parseFloat(a.weight);
           break;
-        case 'age':
-          comparison = calculateAge(b.dateOfBirth) - calculateAge(a.dateOfBirth);
+        case "age":
+          comparison =
+            calculateAge(b.dateOfBirth) - calculateAge(a.dateOfBirth);
+          break;
+        case "pond":
+          // Sort by pond name
+          const pondA = lstPond?.find((p) => p.id === a.pondId)?.name || "";
+          const pondB = lstPond?.find((p) => p.id === b.pondId)?.name || "";
+          comparison = pondA.localeCompare(pondB);
           break;
         default:
           comparison = 0;
       }
-      return sortCriteria === 'dateCreated' 
-        ? comparison 
-        : (sortOrder === 'asc' ? -comparison : comparison);
+      return sortCriteria === "dateCreated"
+        ? comparison
+        : sortOrder === "asc"
+        ? -comparison
+        : comparison;
     });
-  }, [lstKoi, sortCriteria, sortOrder]);
+  }, [lstKoi, sortCriteria, sortOrder, lstPond]);
 
   useEffect(() => {
     if (sortedKoi.length > 0) {
-      console.log('First few koi sorted by date:', 
-        sortedKoi.slice(0, 3).map(k => ({
+      console.log(
+        "First few koi sorted by date:",
+        sortedKoi.slice(0, 3).map((k) => ({
           name: k.name,
-          createdAt: k.createdAt
+          createdAt: k.createdAt,
         }))
       );
     }
@@ -125,10 +149,16 @@ const KoiManegement = () => {
   const indexOfLastKoi = currentPage * koiPerPage;
   const indexOfFirstKoi = indexOfLastKoi - koiPerPage;
   const filteredKoi = useMemo(() => {
-    return sortedKoi.filter(koi => 
-      koi.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [sortedKoi, searchTerm]);
+    return sortedKoi.filter((koi) => {
+      const nameMatch = koi.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const pondMatch = selectedPondFilter
+        ? koi.pondId === selectedPondFilter
+        : true;
+      return nameMatch && pondMatch;
+    });
+  }, [sortedKoi, searchTerm, selectedPondFilter]);
   const currentKoi = filteredKoi.slice(indexOfFirstKoi, indexOfLastKoi);
 
   const handleAddClick = () => {
@@ -136,9 +166,10 @@ const KoiManegement = () => {
   };
 
   const handleKoiClick = (koi) => {
-    const koiPond = lstPond.find(pond => pond.id === koi.pondId);
-    const age = calculateAge(koi.dateOfBirth);
-    setSelectedKoi({ ...koi, pond: koiPond, age: formatAge(age) });
+    const koiPond = lstPond.find((pond) => pond.id === koi.pondId);
+    const ageInMonths = calculateAge(koi.dateOfBirth);
+    const formattedAge = formatAge(ageInMonths);
+    setSelectedKoi({ ...koi, pond: koiPond, age: formattedAge, ageInMonths });
     setIsModalVisible(true);
   };
 
@@ -146,7 +177,6 @@ const KoiManegement = () => {
     setIsModalVisible(false);
     setSelectedKoi(null);
   };
-
 
   const handleUpdateKoi = () => {
     navigate(`/update-koi/${selectedKoi.id}`);
@@ -161,13 +191,13 @@ const KoiManegement = () => {
   };
 
   const toggleSortOrder = () => {
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
   const handleKoiSelection = (koiId) => {
-    setSelectedKoiForAction(prev => {
+    setSelectedKoiForAction((prev) => {
       const newSelection = prev.includes(koiId)
-        ? prev.filter(id => id !== koiId)
+        ? prev.filter((id) => id !== koiId)
         : [...prev, koiId];
       setAllSelected(newSelection.length === currentKoi.length);
       return newSelection;
@@ -181,11 +211,11 @@ const KoiManegement = () => {
     }
 
     Modal.confirm({
-      title: 'Delete Koi',
+      title: "Delete Koi",
       content: `Are you sure you want to delete ${selectedKoiForAction.length} koi?`,
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk() {
         deleteSelectedKoi();
       },
@@ -226,24 +256,26 @@ const KoiManegement = () => {
     setIsMovingKoi(true);
 
     try {
-      await Promise.all(selectedKoiForAction.map(koiId => {
-        const koi = lstKoi.find(k => k.id === koiId);
-        const formData = new FormData();
-        const updateKoi = {
-          ...koi,
-          pondId: selectedDestinationPond.id,
-        };
-        formData.append("fish", JSON.stringify(updateKoi));
-        
-        return updateKoiMutation.mutateAsync(
-          { id: koiId, payload: formData },
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-      }));
+      await Promise.all(
+        selectedKoiForAction.map((koiId) => {
+          const koi = lstKoi.find((k) => k.id === koiId);
+          const formData = new FormData();
+          const updateKoi = {
+            ...koi,
+            pondId: selectedDestinationPond.id,
+          };
+          formData.append("fish", JSON.stringify(updateKoi));
+
+          return updateKoiMutation.mutateAsync(
+            { id: koiId, payload: formData },
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        })
+      );
 
       toast.success("Koi moved successfully!");
       setShowMoveKoiConfirmation(false);
@@ -251,7 +283,9 @@ const KoiManegement = () => {
       refetch();
     } catch (error) {
       console.error("Error moving koi:", error);
-      toast.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
+      toast.error(
+        `Error moving koi: ${error.message || "An unexpected error occurred"}`
+      );
     } finally {
       setIsMovingKoi(false);
     }
@@ -261,33 +295,34 @@ const KoiManegement = () => {
     if (birthDate) {
       const today = dayjs();
       const birthDayjs = dayjs(birthDate);
-      const ageInMonths = today.diff(birthDayjs, 'month');
+      const ageInMonths = today.diff(birthDayjs, "month");
       return ageInMonths;
     }
     return null;
   };
 
   const formatAge = (ageInMonths) => {
-    if (ageInMonths === null) return 'Unknown';
+    if (ageInMonths === null) return "Unknown";
     const years = Math.floor(ageInMonths / 12);
     const months = ageInMonths % 12;
 
     const parts = [];
-    if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
-    if (months > 0 || parts.length === 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+    if (years > 0) parts.push(`${years} year${years !== 1 ? "s" : ""}`);
+    if (months > 0 || parts.length === 0)
+      parts.push(`${months} month${months !== 1 ? "s" : ""}`);
 
-    return parts.join(', ');
+    return parts.join(", ");
   };
 
   const formatDate = (date) => {
-    if (!date) return 'Unknown';
-    return dayjs(date).format('DD/MM/YYYY');
+    if (!date) return "Unknown";
+    return dayjs(date).format("DD/MM/YYYY");
   };
 
   const handleSelectAll = (checked) => {
     setAllSelected(checked);
     if (checked) {
-      setSelectedKoiForAction(currentKoi.map(koi => koi.id));
+      setSelectedKoiForAction(currentKoi.map((koi) => koi.id));
     } else {
       setSelectedKoiForAction([]);
     }
@@ -307,7 +342,13 @@ const KoiManegement = () => {
     let file = e.target.files?.[0];
     if (
       file &&
-      ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"].includes(file.type)
+      [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ].includes(file.type)
     ) {
       let reader = new FileReader();
       reader.readAsDataURL(file);
@@ -322,7 +363,7 @@ const KoiManegement = () => {
     if (!dateOfBirth) return 0;
     const birthDate = dayjs(dateOfBirth);
     const currentDate = dayjs();
-    const diffMonths = currentDate.diff(birthDate, 'month');
+    const diffMonths = currentDate.diff(birthDate, "month");
     return diffMonths;
   };
 
@@ -350,9 +391,11 @@ const KoiManegement = () => {
         weight: parseFloat(values.weight) || 0,
         length: parseFloat(values.length) || 0,
         pondId: parseInt(values.pondId) || null,
-        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
+        dateOfBirth: values.dateOfBirth
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : null,
         userId: userId,
-        date: dayjs().format('YYYY-MM-DD'),
+        date: dayjs().format("YYYY-MM-DD"),
         ageMonth: ageMonth,
       };
       formData.append("fish", JSON.stringify(newKoi));
@@ -380,11 +423,7 @@ const KoiManegement = () => {
   });
 
   if (isFetching) {
-    return (
-      <div className="flex justify-center items-center min-h-[450px]">
-        <Spin tip="Loading" size="large" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -392,127 +431,61 @@ const KoiManegement = () => {
       <div className="flex justify-center items-center text-bold text-3xl h-full m-4 mt-1">
         <strong>My Koi</strong>
       </div>
-      
+
       {lstPond?.length === 0 ? (
-         <div className="flex flex-row items-center justify-center space-x-4">
-         <div className="text-lg">You have no pond</div>
-         <Button 
-           className="w-50 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
-           onClick={() => navigate('/pond-management')}
+        <div className="flex flex-row items-center justify-center space-x-4">
+          <div className="text-lg">You have no pond</div>
+          <Button
+            className="w-50 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
+            onClick={() => navigate("/pond-management")}
           >
             {t("Create a pond first!")}
           </Button>
         </div>
-      
       ) : lstKoi?.length === 0 ? (
         <div className="flex flex-row items-center justify-center space-x-4">
           <div className="text-lg">You have no Koi</div>
-          <Button 
-           className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
-           onClick={handleAddClick}
+          <Button
+            className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-black border-1 text-black rounded-full flex items-center justify-center font-bold text-lg"
+            onClick={handleAddClick}
           >
             {t("Add a Koi")}
           </Button>
         </div>
       ) : (
         <>
-          <div className="flex justify-between items-center mx-4 my-6">
-            <div className="flex justify-start items-center w-1/3">
-              <Input
-                placeholder="Search by name"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ width: 300, height: 45, fontSize: 16 }}
-                className="mr-2"
-                suffix={<SearchOutlined style={{ fontSize: 16 }} />}
-              />
-            </div> 
-            <div className="flex justify-center items-center">
-              <button
-                className="w-40 h-auto min-h-[2.5rem] py-1 px-1 border-black border-2 rounded-full flex items-center justify-center font-bold mr-2"
-                onClick={handleAddClick}
-              >
-                Add a new Koi
-              </button>     
-              <button
-                className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForAction.length > 0 ? 'bg-red-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold`}
-                disabled={selectedKoiForAction.length === 0 || isDeletingKoi}
-                onClick={handleDeleteSelectedKoi}
-              >
-                {isDeletingKoi ? "Deleting..." : "Delete Koi"}
-              </button>
-              <button
-                className={`w-40 h-auto min-h-[2.5rem] py-1 px-1 ${selectedKoiForAction.length > 0 ? 'bg-orange-500 text-white' : 'bg-gray-500 text-white'} rounded-full flex items-center justify-center font-bold ml-2`}
-                disabled={selectedKoiForAction.length === 0 || isMovingKoi}
-                onClick={handleMoveSelectedKoi}
-              >
-                {isMovingKoi ? "Moving..." : "Move Koi"}
-              </button>
-            </div>
-            <div className="flex justify-end items-center w-1/3">
-              <Space>
-                <Select
-                  value={sortCriteria}
-                  style={{ width: 120 }}
-                  onChange={handleSortChange}
-                >
-                  <Option value="dateCreated">Date Created</Option>
-                  <Option value="name">Name</Option>
-                  <Option value="length">Length</Option>
-                  <Option value="weight">Weight</Option>
-                  <Option value="age">Age</Option>
-                </Select>
-                <Button onClick={toggleSortOrder}>
-                  {sortOrder === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
-                </Button>
-              </Space>
-              <Checkbox
-                onChange={(e) => handleSelectAll(e.target.checked)}
-                checked={allSelected}
-                className="ml-2 mr-2 whitespace-nowrap"
-              >
-                Select All
-              </Checkbox>
-              <Button
-                onClick={handleCancelSelect}
-                disabled={selectedKoiForAction.length === 0}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
+          <KoiFilters
+            searchTerm={searchTerm}
+            selectedPondFilter={selectedPondFilter}
+            sortCriteria={sortCriteria}
+            sortOrder={sortOrder}
+            allSelected={allSelected}
+            ponds={lstPond}
+            onSearchChange={setSearchTerm}
+            onPondFilterChange={setSelectedPondFilter}
+            onSortChange={handleSortChange}
+            onSortOrderToggle={toggleSortOrder}
+            onSelectAll={handleSelectAll}
+            onCancelSelect={handleCancelSelect}
+            selectedKoiCount={selectedKoiForAction.length}
+          />
 
-          <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-14 mb-2">
-            {currentKoi.map((koi, index) => {
-              const age = calculateAge(koi.dateOfBirth);
-              return (
-                <div key={index} className="text-center relative">
-                  <div 
-                    className="w-full cursor-pointer rounded-xl relative flex flex-col"
-                    onClick={() => handleKoiClick(koi)}
-                  >
-                    <div className="h-48 overflow-hidden rounded-xl relative">
-                      <img
-                        src={koi.imageUrl}
-                        alt={koi.name}
-                        className="w-full h-full object-cover transition-transform duration-300"
-                      />
-                      <Checkbox
-                        onChange={() => handleKoiSelection(koi.id)}
-                        checked={selectedKoiForAction.includes(koi.id)}
-                        className="absolute top-2 right-3 z-10 border-1 border-black rounded-full"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                    <h3 className="cursor-pointer mt-2 font-semibold truncate px-2">
-                      {koi.name}
-                    </h3>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          
+          <KoiActions
+            onAddClick={handleAddClick}
+            onDeleteClick={handleDeleteSelectedKoi}
+            onMoveClick={handleMoveSelectedKoi}
+            selectedCount={selectedKoiForAction.length}
+            isDeleting={isDeletingKoi}
+            isMoving={isMovingKoi}
+          />
+
+          <KoiGrid
+            koi={currentKoi}
+            selectedKoiIds={selectedKoiForAction}
+            onKoiClick={handleKoiClick}
+            onKoiSelect={handleKoiSelection}
+          />
+
           <div className="flex justify-center mb-8">
             <Pagination
               current={currentPage}
@@ -522,8 +495,7 @@ const KoiManegement = () => {
               showSizeChanger={false}
             />
           </div>
-      
-          
+
           {isModalVisible && selectedKoi && (
             <div
               id="modal-overlay"
@@ -552,7 +524,6 @@ const KoiManegement = () => {
                     />
                   </div>
                   <div className="md:w-1/2 mt-4 md:mt-0">
-                    
                     <div className="flex justify-between m-1">
                       <strong>Length:</strong>
                       <p>{selectedKoi.length} cm</p>
@@ -581,7 +552,7 @@ const KoiManegement = () => {
                       <strong>Age:</strong>
                       <p>{selectedKoi.age}</p>
                     </div>
-                    
+
                     {selectedKoi.pond && (
                       <div>
                         <h4 className="font-bold">This koi is in:</h4>
@@ -596,10 +567,9 @@ const KoiManegement = () => {
                       </div>
                     )}
                   </div>
-                  
                 </div>
                 <div className="flex justify-center items-center">
-                <button
+                  <button
                     onClick={handleUpdateKoi}
                     className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white 
                               rounded-full flex items-center justify-center font-bold mx-auto mt-8 mr-2"
@@ -632,15 +602,19 @@ const KoiManegement = () => {
         >
           <p>Select a pond to move the koi to:</p>
           <div className="grid grid-cols-4 gap-4 mt-4 mb-6">
-            {lstPond.map(pond => (
-              <div 
-                key={pond.id} 
-                className={`cursor-pointer border p-2 rounded ${selectedDestinationPond?.id === pond.id ? 'border-blue-500 bg-blue-100' : 'border-gray-300'}`}
+            {lstPond.map((pond) => (
+              <div
+                key={pond.id}
+                className={`cursor-pointer border p-2 rounded ${
+                  selectedDestinationPond?.id === pond.id
+                    ? "border-blue-500 bg-blue-100"
+                    : "border-gray-300"
+                }`}
                 onClick={() => setSelectedDestinationPond(pond)}
               >
-                <img 
-                  src={pond.imageUrl} 
-                  alt={pond.name} 
+                <img
+                  src={pond.imageUrl}
+                  alt={pond.name}
                   className="w-50 h-50 object-cover rounded mb-2"
                 />
                 <p className="text-center font-semibold">{pond.name}</p>
@@ -648,16 +622,16 @@ const KoiManegement = () => {
             ))}
           </div>
           <div className="flex justify-center items-center mt-4 space-x-4">
-            <Button 
-              key="cancel" 
+            <Button
+              key="cancel"
               onClick={() => setShowMoveKoiConfirmation(false)}
               className="w-40 h-auto min-h-[2.5rem] py-2 px-4 text-black rounded-full font-bold"
             >
               Cancel
             </Button>
-            <Button 
-              key="submit" 
-              type="primary" 
+            <Button
+              key="submit"
+              type="primary"
               onClick={confirmMoveKoi}
               disabled={!selectedDestinationPond || isMovingKoi}
               loading={isMovingKoi}
@@ -677,7 +651,7 @@ const KoiManegement = () => {
         >
           <div
             className="relative bg-white p-6 rounded-lg shadow-lg flex flex-col"
-            style={{ width: '90%', maxWidth: '800px', height: 'auto' }}
+            style={{ width: "90%", maxWidth: "800px", height: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -717,7 +691,9 @@ const KoiManegement = () => {
                     <Select
                       name="sex"
                       value={addKoiFormik.values.sex}
-                      onChange={(value) => addKoiFormik.setFieldValue("sex", value)}
+                      onChange={(value) =>
+                        addKoiFormik.setFieldValue("sex", value)
+                      }
                       className="w-full"
                     >
                       <Select.Option value={true}>Female</Select.Option>
@@ -729,7 +705,9 @@ const KoiManegement = () => {
                       name="purchasePrice"
                       min={0}
                       value={addKoiFormik.values.purchasePrice}
-                      onChange={(value) => addKoiFormik.setFieldValue("purchasePrice", value)}
+                      onChange={(value) =>
+                        addKoiFormik.setFieldValue("purchasePrice", value)
+                      }
                       className="w-full"
                     />
                   </Form.Item>
@@ -740,7 +718,9 @@ const KoiManegement = () => {
                       name="weight"
                       min={0}
                       value={addKoiFormik.values.weight}
-                      onChange={(value) => addKoiFormik.setFieldValue("weight", value)}
+                      onChange={(value) =>
+                        addKoiFormik.setFieldValue("weight", value)
+                      }
                       className="w-full"
                     />
                   </Form.Item>
@@ -749,7 +729,9 @@ const KoiManegement = () => {
                       name="length"
                       min={0}
                       value={addKoiFormik.values.length}
-                      onChange={(value) => addKoiFormik.setFieldValue("length", value)}
+                      onChange={(value) =>
+                        addKoiFormik.setFieldValue("length", value)
+                      }
                       className="w-full"
                     />
                   </Form.Item>
@@ -757,9 +739,13 @@ const KoiManegement = () => {
                     <DatePicker
                       name="dateOfBirth"
                       value={addKoiFormik.values.dateOfBirth}
-                      onChange={(date) => addKoiFormik.setFieldValue("dateOfBirth", date)}
+                      onChange={(date) =>
+                        addKoiFormik.setFieldValue("dateOfBirth", date)
+                      }
                       className="w-full"
-                      disabledDate={(current) => current && current > dayjs().endOf('day')}
+                      disabledDate={(current) =>
+                        current && current > dayjs().endOf("day")
+                      }
                     />
                   </Form.Item>
                   <Form.Item label="Image" className="mb-1">
@@ -781,10 +767,12 @@ const KoiManegement = () => {
                       key={pond.id}
                       className={`flex-shrink-0 w-32 text-center cursor-pointer rounded-xl transition-all duration-300 ${
                         pond.id === addKoiFormik.values.pondId
-                          ? 'bg-blue-100 border-2 border-blue-500'
-                          : 'filter grayscale hover:grayscale-0'
+                          ? "bg-blue-100 border-2 border-blue-500"
+                          : "filter grayscale hover:grayscale-0"
                       }`}
-                      onClick={() => addKoiFormik.setFieldValue("pondId", pond.id)}
+                      onClick={() =>
+                        addKoiFormik.setFieldValue("pondId", pond.id)
+                      }
                     >
                       <img
                         src={pond.imageUrl}
