@@ -1,135 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Select, DatePicker, Modal, Checkbox, Spin } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  Modal,
+  Spin,
+} from "antd";
 import { toast } from "react-toastify";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import { manageKoiActions } from "../../../store/manageKoi/slice";
 import dayjs from "dayjs";
-import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
+import { useGetKoiByKoiId } from "../../../hooks/koi/useGetKoiByKoiId";
 import { useGetGrowth } from "../../../hooks/koi/useGetGrowth";
-import { useAddGrowth } from "../../../hooks/koi/useAddGrowth";
-import { useQueryClient } from '@tanstack/react-query';
-import KoiGrowthChart from './Chart';
-import { useDeleteGrowth } from "../../../hooks/koi/useDeleteGrowth";
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Modal as AntModal } from 'antd';
+
+import KoiGrowthChart from "./Chart";
+import AddGrowthModal from "./AddGrowthModal";
+import GrowthListModal from "./GrowthListModal";
+
+import {
+  DeleteOutlined,
+  LineChartOutlined,
+  HistoryOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 
 const KoiUpdate = () => {
+  // Router hooks
   const { id } = useParams();
-  const location = useLocation();
-  console.log(id)
   const navigate = useNavigate();
+
+  // Redux hooks
   const dispatch = useDispatch();
-  const [imgSrc, setImgSrc] = useState("");
-  const [selectedPond, setSelectedPond] = useState(null);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
-  const { data: lstPond } = useGetAllPond(userId);
-  const updateKoiMutation = useUpdateKoi();
-  const deleteKoiMutation = useDeleteKoi();
-  const addGrowthMutation = useAddGrowth();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [koiAge, setKoiAge] = useState(null);
-  const [showPondInfo, setShowPondInfo] = useState(false);
-  const [selectedPondInfo, setSelectedPondInfo] = useState(null);
-  const [currentDay, setCurrentDay] = useState(dayjs());
-  const [form] = Form.useForm();
-  const queryClient = useQueryClient();
-  const { data: growthData, refetch: refetchGrowthData, isLoading, isError, error } = useGetGrowth(id);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isAddingGrowth, setIsAddingGrowth] = useState(false);
-  const [isGrowthListVisible, setIsGrowthListVisible] = useState(false);
-  const [selectedGrowths, setSelectedGrowths] = useState([]);
-  const deleteGrowthMutation = useDeleteGrowth();
-  const [allGrowthSelected, setAllGrowthSelected] = useState(false);
-  const [isLoadingGrowthList, setIsLoadingGrowthList] = useState(false);
-  const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
 
-  const koi = location.state?.koi;
-
-  const { data: lstKoi, refetch: refetchKoi, isFetching } = useGetAllKoi(userId);
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 1:
-        return "Slow Growth";
-      case 2:
-        return "Fast Growth";
-      case 3:
-        return "Normal Growth";
-      case 4:
-        return "Initial Measurement";
-      case 5:
-        return "Single Measurement";
-      default:
-        return "Unknown";
-    }
-  };
+  const [koi, setKoi] = useState(null);
+  // API Query hooks
+  const {
+    data: dataKoi,
+    isLoading: isLoadingKoi,
+    refetch: refetchKoi,
+  } = useGetKoiByKoiId(id);
 
   useEffect(() => {
-    if (koi) {
-      setImgSrc(koi.imageUrl);
-      setSelectedPond(koi.pondId);
-      calculateAge(koi.dateOfBirth);
-      setCurrentDay(koi.date ? dayjs(koi.date) : dayjs());
-      refetchKoi();
-      refetchGrowthData();
+    if (dataKoi) {
+      setKoi(dataKoi?.data);
     }
-  }, [koi, refetchKoi, refetchGrowthData]);
+  }, [dataKoi]);
+
+  const { data: lstPond } = useGetAllPond(userId);
+  const {
+    data: growthData,
+    refetch: refetchGrowthData,
+    isLoading,
+    isError,
+    error,
+  } = useGetGrowth(id);
+
+  // Mutation hooks
+  const updateKoiMutation = useUpdateKoi();
+  const deleteKoiMutation = useDeleteKoi();
 
 
-  const calculateAge = (birthDate) => {
-    if (birthDate) {
-      const today = dayjs();
-      const birthDayjs = dayjs(birthDate);
-      const ageInMonths = today.diff(birthDayjs, 'month');
-      setKoiAge(ageInMonths);
-    } else {
-      setKoiAge(null);
-    }
-  };
+  // UI State
+  const [imgSrc, setImgSrc] = useState("");
+  const [selectedPond, setSelectedPond] = useState(null);
+  const [koiAge, setKoiAge] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAddGrowthModalVisible, setIsAddGrowthModalVisible] = useState(false);
+  const [isGrowthListVisible, setIsGrowthListVisible] = useState(false);
 
-  const handleViewChart = () => {
-    setIsModalVisible(true);
-  };
+  // Pond related state
+  const [showPondInfo, setShowPondInfo] = useState(false);
+  const [selectedPondInfo, setSelectedPondInfo] = useState(null);
 
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const formatAge = (ageInMonths) => {
-    if (ageInMonths === null) return 'Unknown';
-    const years = Math.floor(ageInMonths / 12);
-    const months = ageInMonths % 12;
-
-    const parts = [];
-    if (years > 0) parts.push(`${years} year${years !== 1 ? 's' : ''}`);
-    if (months > 0 || parts.length === 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
-
-    return parts.join(', ');
-  };
-
-  const handleChangeFile = (e) => {
-    let file = e.target.files?.[0];
-    if (
-      file &&
-      ["image/jpeg", "image/jpg", "image/pn g", "image/gif", "image/webp"].includes(file.type)
-    ) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        setImgSrc(e.target?.result);
-      };
-      formik.setFieldValue("image", file);
-    }
-  };
+  // // Loading states
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       name: koi?.name || "",
       variety: koi?.variety || "",
@@ -143,59 +100,129 @@ const KoiUpdate = () => {
       date: koi?.date ? dayjs(koi.date) : dayjs(),
     },
     onSubmit: async (values) => {
-      const formData = new FormData();
-      const updatedKoi = {
-        name: values.name || "",
-        variety: values.variety || "",
-        sex: values.sex === "true",
-        purchasePrice: parseFloat(values.purchasePrice) || 0,
-        weight: parseFloat(values.weight) || 0,
-        length: parseFloat(values.length) || 0,
-        pondId: parseInt(values.pondId) || null,
-        dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
-        userId: userId,
-        date: values.date ? values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-      };
-      formData.append("fish", JSON.stringify(updatedKoi));
-      if (values.image) {
-        formData.append("image", values.image);
-      }
-
-      try {
-        await updateKoiMutation.mutateAsync(
-          { id: id, payload: formData },
-          {
-            onSuccess: (updatedKoi) => {
-              dispatch(manageKoiActions.updateKoi(updatedKoi));
-              toast.success("Koi updated successfully");
-              refetchKoi();
-              refetchGrowthData();
-            },
+      Modal.confirm({
+        title: "Update Koi",
+        content: "Are you sure you want to update this koi?",
+        onOk: async () => {
+          const formData = new FormData();
+          const updatedKoi = {
+            name: values.name || "",
+            variety: values.variety || "",
+            sex: values.sex === "true",
+            purchasePrice: parseFloat(values.purchasePrice) || 0,
+            weight: parseFloat(values.weight) || 0,
+            length: parseFloat(values.length) || 0,
+            pondId: parseInt(values.pondId) || null,
+            dateOfBirth: values.dateOfBirth
+              ? values.dateOfBirth.format("YYYY-MM-DD")
+              : null,
+            userId: userId,
+            date: values.date
+              ? values.date.format("YYYY-MM-DD")
+              : dayjs().format("YYYY-MM-DD"),
+          };
+          formData.append("fish", JSON.stringify(updatedKoi));
+          formData.append("isNew", "true");
+          if (values.image) {
+            formData.append("image", values.image);
           }
-        );
-      } catch (error) {
-        console.error("Error updating koi:", error);
-        toast.error(`Error updating koi: ${error.message}`);
-        if (error.response) {
-          console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
-        }
-      }
+
+          try {
+            await updateKoiMutation.mutateAsync(
+              { id: id, payload: formData },
+              {
+                onSuccess: (updatedKoi) => {
+                  dispatch(manageKoiActions.updateKoi(updatedKoi));
+                  toast.success("Koi updated successfully");
+                  refetchGrowthData();
+                },
+              }
+            );
+          } catch (error) {
+            console.error("Error updating koi:", error);
+            toast.error(`Error updating koi: ${error.message}`);
+          }
+        },
+      });
     },
   });
 
-  const handleReturn = () => {
-    navigate('/koi-management');
+  useEffect(() => {
+    if (koi) {
+      setImgSrc(koi.imageUrl);
+      setSelectedPond(koi.pondId);
+      calculateAge(koi.dateOfBirth);
+      refetchGrowthData();
+    }
+  }, [koi, refetchKoi, refetchGrowthData]);
+
+  if (isLoadingKoi) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const handleAddGrowth = (status) => {
+    setIsAddGrowthModalVisible(status);
   };
+  const calculateAge = (birthDate) => {
+    if (birthDate) {
+      const today = dayjs();
+      const birthDyjs = dayjs(birthDate);
+      const ageInMonths = today.diff(birthDyjs, "month");
+      setKoiAge(ageInMonths);
+    } else {
+      setKoiAge(null);
+    }
+  };
+
+  const handleViewChart = () => setIsModalVisible(true);
+
+  const handleModalClose = () => setIsModalVisible(false);
+
+  const formatAge = (ageInMonths) => {
+    if (ageInMonths === null) return "Unknown";
+    const years = Math.floor(ageInMonths / 12);
+    const months = ageInMonths % 12;
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years !== 1 ? "s" : ""}`);
+    if (months > 0 || parts.length === 0)
+      parts.push(`${months} month${months !== 1 ? "s" : ""}`);
+
+    return parts.join(", ");
+  };
+
+  const handleChangeFile = (e) => {
+    const file = e.target.files?.[0];
+    if (
+      file &&
+      [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ].includes(file.type)
+    ) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => setImgSrc(e.target?.result);
+      formik.setFieldValue("image", file);
+    }
+  };
+
+  const handleReturn = () => navigate("/koi-management");
 
   const handleDeleteClick = (koiId) => {
     Modal.confirm({
-      title: 'Delete Koi',
-      content: 'Are you sure you want to delete this koi?',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Delete Koi",
+      content: "Are you sure you want to delete this koi?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk() {
         deleteKoi(koiId);
       },
@@ -207,16 +234,13 @@ const KoiUpdate = () => {
     try {
       await deleteKoiMutation.mutateAsync(koiId);
       toast.success("Koi deleted successfully!");
-      refetchKoi();
-      navigate('/koi-management');
+      navigate("/koi-management");
     } catch (error) {
       toast.error(`Error deleting koi: ${error.message}`);
     } finally {
       setIsDeleting(false);
     }
   };
-
-  const currentPond = lstPond?.find(pond => pond.id === selectedPond);
 
   const handlePondClick = (pond) => {
     if (pond.id === selectedPond) {
@@ -228,136 +252,46 @@ const KoiUpdate = () => {
     }
   };
 
-  const handleAddGrowth = async () => {
-    setIsAddingGrowth(true);
-
-    const formData = new FormData();
-    const updatedKoi = {
-      name: formik.values.name || "",
-      variety: formik.values.variety || "",
-      sex: formik.values.sex === "true",
-      purchasePrice: parseFloat(formik.values.purchasePrice) || 0,
-      weight: parseFloat(formik.values.weight) || 0,
-      length: parseFloat(formik.values.length) || 0,
-      pondId: parseInt(formik.values.pondId) || null,
-      dateOfBirth: formik.values.dateOfBirth ? formik.values.dateOfBirth.format('YYYY-MM-DD') : null,
-      userId: userId,
-      date: formik.values.date ? formik.values.date.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-    };
-
-    formData.append("fish", JSON.stringify(updatedKoi));
-    if (formik.values.image) {
-      formData.append("image", formik.values.image);
-    }
-
-    try {
-      await updateKoiMutation.mutateAsync(
-        { id: id, payload: formData, isNew: true },
-        {
-          onSuccess: () => {
-            toast.success("Growth data added successfully");
-            refetchKoi();
-            refetchGrowthData();
-          },
-          onError: (error) => {
-            console.error("Error adding growth data:", error);
-            toast.error(`Error adding growth data: ${error.message}`);
-          },
-          onSettled: () => {
-            setIsAddingGrowth(false);
-          }
-        }
-      );
-    } catch (error) {
-      console.error("Error adding growth data:", error);
-      toast.error(`Error adding growth data: ${error.message}`);
-      setIsAddingGrowth(false);
-    }
-  };
-
-  const showGrowthList = async (id) => {
-    console.log(id)
-    setIsLoadingGrowthList(true);
+  const showGrowthList = async () => {
     if (!growthData || growthData.length === 0) {
       toast.info("No growth data available. Please add growth history first.");
     } else {
       setIsGrowthListVisible(true);
     }
-    setIsLoadingGrowthList(false);
   };
 
-  const hideGrowthList = () => {
-    setIsGrowthListVisible(false);
-  };
-
-  const handleSelectAllGrowth = (checked) => {
-    setAllGrowthSelected(checked);
-    if (checked) {
-      setSelectedGrowths(growthData.map(growth => growth.id));
-    } else {
-      setSelectedGrowths([]);
-    }
-  };
-
-  const handleCancelSelectGrowth = () => {
-    setSelectedGrowths([]);
-    setAllGrowthSelected(false);
-  };
-
-  const handleGrowthCheckboxChange = (growthId) => {
-    setSelectedGrowths(prev => {
-      const newSelection = prev.includes(growthId)
-        ? prev.filter(id => id !== growthId)
-        : [...prev, growthId];
-      setAllGrowthSelected(newSelection.length === growthData.length);
-      return newSelection;
-    });
-  };
-
-  const handleDeleteSelectedGrowths = async () => {
-    AntModal.confirm({
-      title: 'Delete Growth History',
-      content: `Are you sure you want to delete these growth history? This action cannot be undone.`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        setIsDeletingMultiple(true);
-        try {
-          await deleteSelectedGrowths();
-          hideGrowthList();
-        } finally {
-          setIsDeletingMultiple(false);
-        }
-      },
-    });
-  };
-
-  const deleteSelectedGrowths = async () => {
-    setIsDeletingMultiple(true);
-    try {
-      for (const growthId of selectedGrowths) {
-        await deleteGrowthMutation.mutateAsync(growthId);
-      }
-      await refetchGrowthData();
-      toast.success(`Successfully deleted ${selectedGrowths.length} growth history!`);
-      setSelectedGrowths([]);
-    } catch (error) {
-      toast.error(`Error deleting growth entries: ${error.message}`);
-    } finally {
-      setIsDeletingMultiple(false);
-    }
-  };
+  const hideGrowthList = () => setIsGrowthListVisible(false);
 
   return (
     <div>
-      <Button onClick={handleReturn} className="bg-gray-200 hover:bg-gray-300 m-4">
-        Return
-      </Button>
+      <div className="flex justify-between items-center">
+        <Button
+          onClick={handleReturn}
+          className="bg-gray-200 hover:bg-gray-300 m-4"
+        >
+          Return
+        </Button>
+        <div className="flex gap-2">
+          <Button
+            className="m-4 flex items-center gap-2 bg-blue-500 text-white hover:bg-blue-600"
+            onClick={handleViewChart}
+            icon={<LineChartOutlined />}
+          >
+            View Chart
+          </Button>
+          <Button
+            className="m-4 flex items-center gap-2 bg-green-500 text-white hover:bg-green-600"
+            onClick={showGrowthList}
+            icon={<HistoryOutlined />}
+          >
+            Growth List
+          </Button>
+        </div>
+      </div>
       <div className="flex justify-center items-center text-bold text-3xl">
         <strong>Koi Information</strong>
       </div>
-      
+
       <Form onFinish={formik.handleSubmit} layout="vertical">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 m-8">
           <div className="flex justify-center items-center">
@@ -371,7 +305,7 @@ const KoiUpdate = () => {
             <Form.Item label="Name" className="mb-2">
               <Input
                 name="name"
-                value={formik.values.name}  
+                value={formik.values.name}
                 onChange={formik.handleChange}
                 className="w-full"
               />
@@ -400,7 +334,9 @@ const KoiUpdate = () => {
                 name="purchasePrice"
                 min={0}
                 value={formik.values.purchasePrice}
-                onChange={(value) => formik.setFieldValue("purchasePrice", value)}
+                onChange={(value) =>
+                  formik.setFieldValue("purchasePrice", value)
+                }
                 className="w-full"
               />
             </Form.Item>
@@ -433,7 +369,9 @@ const KoiUpdate = () => {
                   calculateAge(date);
                 }}
                 className="w-full"
-                disabledDate={(current) => current && current > dayjs().endOf('day')}
+                disabledDate={(current) =>
+                  current && current > dayjs().endOf("day")
+                }
               />
             </Form.Item>
             <Form.Item label="Date" className="mb-2">
@@ -442,10 +380,11 @@ const KoiUpdate = () => {
                 value={formik.values.date}
                 onChange={(date) => {
                   formik.setFieldValue("date", date || dayjs());
-                  setCurrentDay(date || dayjs());
                 }}
                 className="w-full"
-                disabledDate={(current) => current && current > dayjs().endOf('day')}
+                disabledDate={(current) =>
+                  current && current > dayjs().endOf("day")
+                }
               />
             </Form.Item>
             <Form.Item label="Age" className="mb-2">
@@ -464,52 +403,71 @@ const KoiUpdate = () => {
             </Form.Item>
           </div>
         </div>
-        <div className="flex justify-between items-center mx-4 my-6">
-          <div className="flex">
-            {/* You can add something here if needed, or leave it empty */}
-          </div>
-          <div className="flex justify-center items-center">
-            <Form.Item className="flex justify-center">
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
-                loading={updateKoiMutation.isLoading}
-              >
-                Update Koi
-              </Button>
-              <Button
-                onClick={() => handleDeleteClick(id)}
-                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold text-xl mx-2"
-                loading={isDeleting}
-              >
-                Delete Koi
-              </Button>
-              <Button
-                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold text-xl mx-2"
-                onClick={handleViewChart}
-              >
-                View Chart
-              </Button>
-              <Button
-                className="w-50 h-auto min-h-[2.5rem] py-2 px-4 border-2 border-black rounded-full font-bold text-xl ml-2"
-                onClick={handleAddGrowth}
-                loading={isAddingGrowth}
-              >
-                Add Growth History
-              </Button>
-            </Form.Item>
-          </div>
-          <div className="flex justify-end">
-            <span 
-              className="text-blue-500 underline cursor-pointer"
-              onClick={() => {
-                showGrowthList(id)
-              }}
+        <div className="flex justify-center items-center mx-4 my-6">
+          <Form.Item className="flex justify-center">
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-auto h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2 text-xl"
+              loading={updateKoiMutation.isLoading}
             >
-              Growth List
-            </span>
-          </div>
+              <EditOutlined /> Update
+            </Button>
+            <Button
+              onClick={() => {
+                Modal.confirm({
+                  title: "Update without history",
+                  content:
+                    "Are you sure you want to update without update history?",
+                  onOk: () => {
+                    const formData = new FormData();
+                    const updatedKoi = {
+                      name: formik.values.name || "",
+                      variety: formik.values.variety || "",
+                      sex: formik.values.sex === "true",
+                      purchasePrice:
+                        parseFloat(formik.values.purchasePrice) || 0,
+                      weight: parseFloat(formik.values.weight) || 0,
+                      length: parseFloat(formik.values.length) || 0,
+                      pondId: parseInt(formik.values.pondId) || null,
+                      dateOfBirth: formik.values.dateOfBirth
+                        ? formik.values.dateOfBirth.format("YYYY-MM-DD")
+                        : null,
+                      userId: userId,
+                      date: formik.values.date
+                        ? formik.values.date.format("YYYY-MM-DD")
+                        : dayjs().format("YYYY-MM-DD"),
+                    };
+                    formData.append("fish", JSON.stringify(updatedKoi));
+                    formData.append("isNew", "false");
+                    if (formik.values.image) {
+                      formData.append("image", formik.values.image);
+                    }
+                    updateKoiMutation.mutate(
+                      { id: id, payload: formData },
+                      {
+                        onSuccess: (updatedKoi) => {
+                          dispatch(manageKoiActions.updateKoi(updatedKoi));
+                          toast.success("Koi updated successfully");
+                          refetchGrowthData();
+                        },
+                      }
+                    );
+                  },
+                });
+              }}
+              className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-green-500 text-white rounded-full font-bold text-xl mx-2"
+            >
+              <EditOutlined /> Modified
+            </Button>
+            <Button
+              onClick={() => handleDeleteClick(id)}
+              className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-red-500 text-white rounded-full font-bold text-xl mx-2"
+              loading={isDeleting}
+            >
+              <DeleteOutlined /> Delete
+            </Button>
+          </Form.Item>
         </div>
         <div className="items-center space-x-4 mb-4 ml-8">
           <div className="flex items-center space-x-4 mb-4 ml-8 font-bold text-xl">
@@ -520,9 +478,9 @@ const KoiUpdate = () => {
               <div
                 key={pond.id}
                 className={`flex-shrink-0 w-48 text-center cursor-pointer rounded-xl transition-all duration-300 ${
-                  pond.id === selectedPond 
-                    ? 'order-first bg-blue-100 border-2 border-blue-500' 
-                    : 'filter grayscale hover:grayscale-0'
+                  pond.id === selectedPond
+                    ? "order-first bg-blue-100 border-2 border-blue-500"
+                    : "filter grayscale hover:grayscale-0"
                 }`}
                 onClick={() => handlePondClick(pond)}
               >
@@ -545,9 +503,9 @@ const KoiUpdate = () => {
         isLoading={isLoading}
         isError={isError}
         error={error}
-        koiAge={koiAge} // Add this line
+        koiAge={koiAge}
       />
-          
+
       <Modal
         title="Pond Information"
         visible={showPondInfo}
@@ -556,7 +514,7 @@ const KoiUpdate = () => {
       >
         {selectedPondInfo && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
-            <div className="flex justify-center items-center"> 
+            <div className="flex justify-center items-center">
               <img
                 src={selectedPondInfo.imageUrl}
                 alt={selectedPondInfo.name}
@@ -566,13 +524,13 @@ const KoiUpdate = () => {
             <div className="grid grid-cols-2 mb-2 items-center">
               <p className="font-bold text-left">Name:</p>
               <p className="text-right">{selectedPondInfo.name}</p>
-              
+
               <p className="font-bold text-left">Length:</p>
               <p className="text-right">{selectedPondInfo.length} meters</p>
-              
+
               <p className="font-bold text-left">Width:</p>
               <p className="text-right">{selectedPondInfo.width} meters</p>
-              
+
               <p className="font-bold text-left">Depth:</p>
               <p className="text-right">{selectedPondInfo.depth} meters</p>
             </div>
@@ -581,75 +539,27 @@ const KoiUpdate = () => {
       </Modal>
 
       {/* Growth List Modal */}
-      <Modal
-        visible={isGrowthListVisible}
-        onCancel={hideGrowthList}
-        footer={[
-          <Button key="close" onClick={hideGrowthList}>
-            Close
-          </Button>
-        ]}
-        width={700}
-      >
-        <div className="flex justify-between items-center mb-4 mr-6">
-          <h2 className="text-2xl font-bold">Growth List</h2>
-          <div className="flex items-center">
-            <Checkbox
-              onChange={(e) => handleSelectAllGrowth(e.target.checked)}
-              checked={allGrowthSelected}
-              className="mr-2"
-            >
-              Select All
-            </Checkbox>
-            <Button
-              onClick={handleCancelSelectGrowth}
-              disabled={selectedGrowths.length === 0 || isDeletingMultiple}
-              className="mr-2"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="primary" 
-              danger
-              onClick={handleDeleteSelectedGrowths}
-              disabled={selectedGrowths.length === 0 || isDeletingMultiple}
-              icon={isDeletingMultiple ? <LoadingOutlined /> : <DeleteOutlined />}
-            >
-              {isDeletingMultiple 
-                ? `Deleting ${selectedGrowths.length} entries...` 
-                : `Delete History (${selectedGrowths.length})`
-              }
-            </Button>
-          </div>
-        </div>
-        <div className="max-h-[70vh] overflow-y-auto">
-          {isLoadingGrowthList ? (
-            <div className="flex justify-center items-center h-40">
-              <Spin size="large" />
-              <span className="ml-2">Loading growth data...</span>
-            </div>
-          ) : growthData && growthData.length > 0 ? (
-            <div className="grid grid-cols-3 gap-4">
-              {growthData.map((entry, index) => (
-                <div key={index} className="border p-2 rounded-lg shadow text-sm relative">
-                  <Checkbox
-                    className="absolute top-2 right-2"
-                    checked={selectedGrowths.includes(entry.id)}
-                    onChange={() => handleGrowthCheckboxChange(entry.id)}
-                  />
-                  <p><strong>Date:</strong> {entry.date}</p>
-                  <p><strong>Age:</strong> {entry.ageMonthHis} months</p>
-                  <p><strong>Weight:</strong> {entry.weight} kg</p>
-                  <p><strong>Length:</strong> {entry.length} cm</p>
-                  <p><strong>Status:</strong> {getStatusText(entry.status)}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No growth data available for this koi.</p>
-          )}
-        </div>
-      </Modal>
+      <GrowthListModal
+        growthData={growthData}
+        isGrowthListVisible={isGrowthListVisible}
+        hideGrowthList={hideGrowthList}
+        isOpenAddGrowthModal={handleAddGrowth}
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        refetchGrowthData={refetchGrowthData}
+      />
+
+      {/* Add Growth Modal */}
+
+      <AddGrowthModal
+        isVisible={isAddGrowthModalVisible}
+        onClose={() => setIsAddGrowthModalVisible(false)}
+        selectedPond={selectedPond}
+        lstPond={lstPond}
+        refetchGrowthData={refetchGrowthData}
+        fishId={id}
+      />
     </div>
   );
 };

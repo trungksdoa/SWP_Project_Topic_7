@@ -7,6 +7,7 @@ const api = apiInstanceHeader.create({
 
 export const manageKoiFishServices = {
     getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
+    getKoiByKoiId: (id) => api.get(`/${id}`),
     updateKoi: async (id, payload, isNew = false) => {
         const url = `/${id}?isNew=${isNew}`;
         try {
@@ -64,8 +65,7 @@ export const manageKoiFishServices = {
     deleteGrowth: (id) => api.delete(`/growthUpHistory/${id}`),
     deleteKoi: (id) => api.delete(`/${id}`),
     updateKoiPond: (id, payload) => api.put(`/${id}`, payload),
-    addGrowth: async (id, payload, isNew = true) => {
-
+    addGrowth: async (id, payload) => {
         const formData = new FormData();
         
         if (typeof payload.fishgrow === 'object') {
@@ -77,7 +77,7 @@ export const manageKoiFishServices = {
             throw new Error('Invalid fish data');
         }
 
-        const url = `/growthUpHistory/${id}?isNew=${isNew}`;
+        const url = `/growthUpHistory/${id}`;
 
         try {
             const response = await api.post(url, formData, {
