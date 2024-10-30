@@ -1,32 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useFormik } from "formik";
 import {
   Button,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  DatePicker,
-  Modal,
   Spin,
-  Card,
   Typography,
-  Divider,
 } from "antd";
-import { toast } from "react-toastify";
-import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
-import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useGetPondById } from "../../../hooks/koi/useGetPondById";
-import { manageKoiActions } from "../../../store/manageKoi/slice";
-import dayjs from "dayjs";
 import { useGetKoiByKoiId } from "../../../hooks/koi/useGetKoiByKoiId";
 import { useGetGrowth } from "../../../hooks/koi/useGetGrowth";
-import FormKoiUpdate from "./FormUpdatekoi";
+import FormKoiUpdate from "./KoiComponent/FormUpdatekoi";
 import KoiGrowthChart from "./Chart";
-import AddGrowthModal from "./AddGrowthModal";
-import GrowthListModal from "./GrowthListModal";
+import AddGrowthModal from "./KoiComponent/AddGrowthModal";
+import GrowthListModal from "./KoiComponent/GrowthListModal";
 
 import {
   LineChartOutlined,
@@ -34,7 +20,7 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const KoiUpdate = () => {
   const { id } = useParams();
