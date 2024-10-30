@@ -42,19 +42,13 @@ const KoiUpdate = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
 
-  const [koi, setKoi] = useState(null);
+
   // API Query hooks
   const {
-    data: dataKoi,
+    data: koi,
     isLoading: isLoadingKoi,
     refetch: refetchKoi,
   } = useGetKoiByKoiId(id);
-
-  useEffect(() => {
-    if (dataKoi) {
-      setKoi(dataKoi?.data);
-    }
-  }, [dataKoi]);
 
   const { data: lstPond } = useGetAllPond(userId);
   const {
