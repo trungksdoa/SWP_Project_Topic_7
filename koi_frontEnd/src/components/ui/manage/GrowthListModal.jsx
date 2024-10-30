@@ -10,28 +10,29 @@ import { Modal as AntModal } from "antd";
 import { useDeleteGrowth } from "../../../hooks/koi/useDeleteGrowth";
 import { toast } from "react-toastify";
 
+
 const GrowthListModal = ({
-  growthData,
   isGrowthListVisible,
   hideGrowthList,
+
   isOpenAddGrowthModal,
+  growthData,
+  refetchGrowthData,
   isLoading,
   isError,
-  error,
-  refetchGrowthData,
 }) => {
+
   // State
   const [allGrowthSelected, setAllGrowthSelected] = useState(false);
   const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
   const [selectedGrowths, setSelectedGrowths] = useState([]);
-  
 
   // Hooks
   const deleteGrowthMutation = useDeleteGrowth();
 
   if (isLoading) {
     return (
-      <Modal visible={isLoading} footer={null}>
+      <Modal open={isLoading} footer={null}>
         <Spin size="large" />
       </Modal>
     );
@@ -220,10 +221,10 @@ GrowthListModal.propTypes = {
   isGrowthListVisible: PropTypes.bool.isRequired,
   hideGrowthList: PropTypes.func.isRequired,
   isOpenAddGrowthModal: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  isError: PropTypes.bool.isRequired,
   refetchGrowthData: PropTypes.func.isRequired,
   growthData: PropTypes.array.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  isError: PropTypes.bool.isRequired,
 };
 
 export default GrowthListModal;

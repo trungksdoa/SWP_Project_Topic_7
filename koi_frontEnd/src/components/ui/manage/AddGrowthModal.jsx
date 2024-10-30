@@ -143,11 +143,8 @@ AddGrowthModal.propTypes = {
       name: PropTypes.string.isRequired,
     })
   ),
-  addGrowthMutation: PropTypes.shape({
-    mutateAsync: PropTypes.func.isRequired,
-  }).isRequired,
   refetchGrowthData: PropTypes.func.isRequired,
-  fishId: PropTypes.number.isRequired,
+  fishId: PropTypes.string.isRequired,
 };
 
 export default AddGrowthModal;
