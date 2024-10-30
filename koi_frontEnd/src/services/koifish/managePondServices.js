@@ -6,6 +6,7 @@ const api = apiInstanceHeader.create({
 });
 
 export const managePondServices = {
+    getPondById: (id) => api.get(`/${id}`),
     getPondByUserId: (id) => api.get(`/listpond/byuserid/${id}`),
     updatePond: async (id, payload) => {
         try {
