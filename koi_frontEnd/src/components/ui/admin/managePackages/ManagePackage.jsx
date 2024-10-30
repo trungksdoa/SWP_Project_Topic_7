@@ -96,7 +96,7 @@ const ManagePackage = () => {
         return (
           <div
             style={{
-              border: "1px solid #d9d9d9",
+              border: record.isDefault ? "6px solid #FFD700" : "1px solid #d9d9d9",
               padding: "4px 8px",
               borderRadius: "4px",
               backgroundColor: bgColor,
