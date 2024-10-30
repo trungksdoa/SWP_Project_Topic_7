@@ -12,6 +12,8 @@ app:
 
 # Spring Framework configs
 spring:
+  profiles:
+    active: prod
   application:
     name: Koi_control_application
 

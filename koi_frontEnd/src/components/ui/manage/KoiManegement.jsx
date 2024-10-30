@@ -149,7 +149,7 @@ const KoiManegement = () => {
 
 
   const handleUpdateKoi = () => {
-    navigate(`/update-koi/${selectedKoi.id}`, { state: { koi: selectedKoi } });
+    navigate(`/update-koi/${selectedKoi.id}`);
   };
 
   const onPageChange = (page) => {
