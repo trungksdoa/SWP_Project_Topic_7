@@ -53,6 +53,15 @@ const ManagePayment = () => {
       title: <div style={{ textAlign: 'center' }}>Payment Date</div>,
       dataIndex: "paymentDate",
       key: "paymentDate",
+      render: (_, payment) => {
+        const date = new Date(payment.paymentDate);
+        return (
+          <div style={{ textAlign: 'center' }}>
+            {date.getFullYear()}-{String(date.getMonth() + 1).padStart(2, '0')}-{String(date.getDate()).padStart(2, '0')}{' '}
+            {String(date.getHours()).padStart(2, '0')}:{String(date.getMinutes()).padStart(2, '0')}:{String(date.getSeconds()).padStart(2, '0')}
+          </div>
+        );
+      }
     },
     {
       title: <div style={{ textAlign: 'center' }}>Payment Status</div>,
