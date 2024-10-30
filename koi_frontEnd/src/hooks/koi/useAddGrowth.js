@@ -3,6 +3,6 @@ import { manageKoiFishServices } from "../../services/koifish/manageKoiFishServi
 
 export const useAddGrowth = () => {
   return useMutation({
-    mutationFn: ({ id, payload, isNew }) => manageKoiFishServices.addGrowth(id, payload, isNew)
+    mutationFn: ({ id, payload }) => manageKoiFishServices.addGrowth(id, payload)
   });
 };

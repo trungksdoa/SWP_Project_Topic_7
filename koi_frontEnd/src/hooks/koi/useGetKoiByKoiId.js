@@ -4,7 +4,7 @@ import { manageKoiFishServices } from "../../services/koifish/manageKoiFishServi
 export const useGetKoiByKoiId = (id) => {
   const q = useQuery({
     queryKey: ["Get-koi-by-koi-id"],
-    queryFn: () => manageKoiFishServices.getKoiById(id),
+    queryFn: () => manageKoiFishServices.getKoiByKoiId(id),
   });
   return {
     ...q,
