@@ -1,34 +1,19 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useQuery } from "@tanstack/react-query";
+import { managePondServices } from "../../services/koifish/managePondServices";
+
 
 export const useGetPondById = (pondId) => {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const q = useQuery({
+    queryKey: ["pond", pondId],
+    queryFn: async () => {
+      const response = await managePondServices.getPondById(pondId);
+      return response.data;
+    },
+    enabled: !!pondId, // Chỉ gọi API khi có pondId
+  });
 
-    useEffect(() => {
-
-        const fetchPond = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get(`/api/ponds/${pondId}`);
-                setData(response.data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (pondId) {
-            fetchPond().catch(err => console.error('Unhandled error in fetchPond:', err));
-        } else {
-            setLoading(false);
-        }
-
-        return () => {
-        };
-    }, [pondId]);
-
-    return { data, error, loading };
+  return {
+    ...q,
+    data: q?.data?.data,
+  };
 };
