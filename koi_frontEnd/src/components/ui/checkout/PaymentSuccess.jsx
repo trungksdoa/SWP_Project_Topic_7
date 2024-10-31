@@ -17,11 +17,11 @@ const PaymentSuccess = () => {
           {t("Your payment is successful !")}
         </h2>
         <NavLink
-          to={PATH.HOME}
+          to={PATH.HISTORY_ORDER}
           style={{ textDecoration: "underline" }}
           className="hover:text-orange-500 transition-all ease-in-out"
         >
-          {t("Back to home")}
+          {t("Go to order history")}
         </NavLink>
       </div>
     </div>

@@ -21,7 +21,6 @@ const BlogsDetail = () => {
   if (isError || !blog) {
     return (
       <div className="text-center py-10">
-        <p>Blog not found</p>
         <Link to="/blogs">
           <Button icon={<ArrowLeftOutlined />}>Return to Blogs</Button>
         </Link>

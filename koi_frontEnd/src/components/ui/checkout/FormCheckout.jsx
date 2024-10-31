@@ -1,9 +1,8 @@
-import React from "react";
-import { Form, Input, Button, Table } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button } from "antd";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { usePostOrder } from "../../../hooks/order/usePostOrder";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
 
@@ -11,6 +10,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const mutation = usePostOrder();
   const navigate = useNavigate();
+  const [phoneError, setPhoneError] = useState("");
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -27,6 +27,17 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
       });
     },
   });
+
+  // Handle phone number input
+  const handlePhoneNumberChange = (e) => {
+    const value = e.target.value;
+    if (/^[0-9]*$/.test(value)) {
+      setPhoneError("");
+      formik.handleChange(e);
+    } else {
+      setPhoneError("Please enter numbers only");
+    }
+  };
 
   React.useEffect(() => {
     const handlePopState = () => {
@@ -60,12 +71,18 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
               onChange={formik.handleChange}
             />
           </Form.Item>
-          <Form.Item label="Phone Number" className="w-[48%]">
+          <Form.Item 
+            label="Phone Number" 
+            className="w-[48%]"
+            validateStatus={phoneError ? "error" : ""}
+            help={phoneError}
+          >
             <Input
               name="phoneNumber"
               placeholder="Enter your phone number"
               value={formik.values.phoneNumber}
-              onChange={formik.handleChange}
+              onChange={handlePhoneNumberChange}
+              maxLength={11}
             />
           </Form.Item>
         </div>
