@@ -16,10 +16,10 @@ export const manageOrderServices = {
   deleteOrderById: (userId, orderId) => {
     return api.delete(`/user/${userId}/order/${orderId}`);
   },
-  getReceiptOrder: (id) => api.get(`/receive-order?orderId=${id}`),
+  // getReceiptOrder: (id) => api.get(`/receive-order?orderId=${id}`),
   getAllOrder: () => api.get(''),
   postSendOrder: (id) => api.post(`/send-order?orderId=${id}`),
-  receiveOrder: (id) => api.post(`/receive-order?orderId=${id}`),
+  receiveOrder: (payload) => api.post(`/receive-order`, payload),
   getOrderById: (id) => api.get(`/${id}`),
 
   // http://localhost:8080/api/admin/dashboard/order-status?startDate=2023%2F10%2F01&endDate=2024%2F10%2F21
