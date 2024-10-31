@@ -147,6 +147,7 @@ const KoiUpdate = () => {
         selectedPond={koi?.pondId}
         refetchGrowthData={refetchGrowthData}
         fishId={id}
+        userId={userId}
       />
     </div>
   );

@@ -4,18 +4,21 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { useAddGrowth } from "../../../../hooks/koi/useAddGrowth";
+import { useGetAllPond } from "../../../../hooks/koi/useGetAllPond";
 const AddGrowthModal = ({
+  userId,
   fishId,
   isVisible,
   onClose,
   selectedPond,
-  lstPond,
   refetchGrowthData,
 }) => {
+  const { data: lstPond } = useGetAllPond(userId);
   const [form] = Form.useForm();
   const [isAddingGrowth, setIsAddingGrowth] = useState(false);
 
   const addGrowthMutation = useAddGrowth();
+
   useEffect(() => {
     if (form) {
       form.setFieldsValue({
@@ -26,6 +29,8 @@ const AddGrowthModal = ({
       });
     }
   }, [form, selectedPond]);
+
+
 
   const handleSubmit = async (values) => {
     if (!values) return;
@@ -137,12 +142,7 @@ AddGrowthModal.propTypes = {
   isVisible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   selectedPond: PropTypes.number,
-  lstPond: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
+  userId: PropTypes.string.isRequired,
   refetchGrowthData: PropTypes.func.isRequired,
   fishId: PropTypes.string.isRequired,
 };
