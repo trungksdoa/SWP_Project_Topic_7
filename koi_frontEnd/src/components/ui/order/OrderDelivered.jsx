@@ -18,7 +18,10 @@ const OrderDelivered = ({
 
   const handleConfirmDelivery = (orderId) => {
     try {
-      manageOrderServices.receiveOrder(orderId);
+      const payload = {
+        orderId: orderId,
+      };
+      manageOrderServices.receiveOrder(payload);
       refetch();
       switchToCompleteTab();
       message.success("Order marked as completed");
