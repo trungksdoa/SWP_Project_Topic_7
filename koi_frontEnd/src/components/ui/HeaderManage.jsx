@@ -56,48 +56,46 @@ const HeaderManage = () => {
 
   return (
     <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
-      <div className="container flex justify-between items-center h-16 mx-auto">
-        <Link to={PATH.HOME} className="mr-[30px]">
-          <img className="w-[80px]" src="../../images/logo.webp" alt="logo" />
+      <div className="container flex justify-between items-center h-12 mx-auto">
+        <Link to={PATH.HOME} className="mr-4">
+          <img className="w-[60px]" src="../../images/logo.webp" alt="logo" />
         </Link>
-        <div className="">
-          <ul
-            className="scrollable-navbar flex whitespace-nowrap p-2 scrollbar-hide"
-            ref={navbarRef}
-          >
-            
-                  <NavLink
-                    rel="noopener noreferrer"
-                    to={PATH.KOI_MANAGEMENT}
-              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
-            >
-              {t(" My Koi")}
-            </NavLink>
-                
-                  <NavLink
-                    rel="noopener noreferrer"
-                    to={PATH.POND_MANAGEMENT}
-                    className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
-                    >
-                    {t("My Pond")}
-                  </NavLink>
-              
-            <NavLink
-              to={PATH.WATER_PARAMETER}
-              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
-            >
-              {t("Water Parameter")}
-            </NavLink>
-            <NavLink
-              to={PATH.FOOD_CALCULATOR}
-              className="flex menu_2 mr-[60px] cursor-pointer py-[20px] relative items-center text-white"
-            >
-              {t("Food Calculator")}
-            </NavLink>
-            
+        <div className="flex-1">
+          <ul className="flex items-center justify-between px-8 text-base">
+            <li>
+              <NavLink
+                to={PATH.KOI_MANAGEMENT}
+                className="text-white hover:text-orange-500"
+              >
+                {t("My Koi")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={PATH.POND_MANAGEMENT}
+                className="text-white hover:text-orange-500"
+              >
+                {t("My Pond")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={PATH.WATER_PARAMETER}
+                className="text-white hover:text-orange-500"
+              >
+                {t("Water Parameter")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={PATH.FOOD_CALCULATOR}
+                className="text-white hover:text-orange-500"
+              >
+                {t("Food Calculator")}
+              </NavLink>
+            </li>
             <li className="flex text-white">
               <NavLink
-                rel="noopener noreferrer"
                 to={PATH.STORE}
                 className={({ isActive }) =>
                   `flex items-center -mb-1 ${
@@ -110,9 +108,8 @@ const HeaderManage = () => {
                 {t("Store")}
               </NavLink>
             </li>
-            <li className="flex text-white">
+            <li>
               <NavLink
-                rel="noopener noreferrer"
                 to={PATH.BLOGS}
                 className={({ isActive }) =>
                   `flex items-center mr-[60px] -mb-1 ${
@@ -123,9 +120,9 @@ const HeaderManage = () => {
                 {t("Blog")}
               </NavLink>
             </li>
-            <li className=" py-[20px]">
+            <li>
               <NavLink to={PATH.PACKAGES}>
-                <button className="custom-button">Upgrade Account</button>
+                <button className="custom-button h-[35px]">Upgrade Account</button>
               </NavLink>
             </li>
           </ul>
@@ -196,7 +193,7 @@ const HeaderManage = () => {
               </svg>
             </button>
           </div>
-          <ul className="space-y-2 mt-[60px]">
+          <ul className="space-y-2 mt-[60px] text-lg">
             {/* Mobile menu items */}
             <li>
               <NavLink

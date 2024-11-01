@@ -43,16 +43,16 @@ const Header = () => {
   }, [carts, dispatch, isLoggedOut]);
   return (
     <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
-      <div className="container flex justify-between h-16 mx-auto">
+      <div className="container flex justify-between h-12 mx-auto">
         <Link to={PATH.HOME}>
-          <img className="w-[65px]" src="../../images/logo.webp" alt="logo" />
+          <img className="w-[50px]" src="../../images/logo.webp" alt="logo" />
         </Link>
-        <ul className="items-stretch hidden space-x-3 lg:flex">
-          <li className="flex text-white">
+        <ul className="items-center hidden flex-1 justify-center gap-20 px-8 lg:flex">
+          <li className="flex text-white text-base">
             <NavLink
               rel="noopener noreferrer"
               to={PATH.KOI_MANAGEMENT}
-              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
+              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
             >
               {t("Services")}
             </NavLink>
@@ -62,7 +62,7 @@ const Header = () => {
             <NavLink
               rel="noopener noreferrer"
               to={PATH.STORE}
-              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border- dark:text-violet-600 dark:border-violet-600'}`}
+              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
             >
               {t("Store")}
             </NavLink>
@@ -71,7 +71,7 @@ const Header = () => {
             <NavLink
               rel="noopener noreferrer"
               to={PATH.BLOGS}
-              className={({ isActive }) => `flex items-center px-4 -mb-1 ${isActive ? 'text-orange-500' : 'dark:border-'}`}
+              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
             >
               {t("Blog")}
             </NavLink>
@@ -142,7 +142,7 @@ const Header = () => {
               </svg>
             </button>
           </div>
-          <ul className="space-y-2 mt-[60px]">
+          <ul className="space-y-2 mt-[60px] text-lg">
             {/* Mobile menu items */}
             <li>
               <NavLink

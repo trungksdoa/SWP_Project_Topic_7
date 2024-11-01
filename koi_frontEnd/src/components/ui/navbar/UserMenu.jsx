@@ -1,6 +1,6 @@
 import { Popconfirm } from "antd";
 import { Modal } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { AiOutlineMenu } from "react-icons/ai";
 import { Button, Popover } from "antd";
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { manageUserActions } from "../../../store/manageUser/slice";
 import { manageCartActions } from "../../../store/manageCart/slice";
+import { manageUserServicesH } from "../../../services/admin/manageUserServiceH";
 
 export const UserMenu = () => {
   const [open, setOpen] = useState(false);
@@ -36,6 +37,23 @@ export const UserMenu = () => {
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalRegister, setIsModalRegister] = useState(false);
   const [isModalForgotPassword, setIsModalForgotPassword] = useState(false); // State cho Forgot Password
+
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userLogin?.id) {
+        try {
+          const response = await manageUserServicesH.getUserById(userLogin.id);
+          setUserData(response.data);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [userLogin?.id]);
 
   const showModalLogin = () => {
     setIsModalRegister(false);
@@ -105,33 +123,48 @@ export const UserMenu = () => {
       );
     }
 
-    // If user is logged in
+    const packageName = userData?.data?.userPackage?.name || '';
+    const isSVIP = packageName?.toUpperCase() === 'SVIP';
+
+    console.log('User Package Debug:', {
+      fetchedUserData: userData?.data,
+      packageName: packageName,
+      isSVIP: isSVIP,
+    });
+
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
         return (
           <div className="flex flex-col" key="admin">
             <NavLink
               to={PATH.ADMIN_DASHBOARD}
-              className="!mb-[15px] rounded-[6px] px-[15px] py-[4px] !w-[100px] text-center bg-black text-white hover:!text-white border-none hover:!bg-black"
+              className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px] bg-black text-white hover:!text-white border-none hover:!bg-black"
             >
               {t("Admin")}
             </NavLink>
             <NavLink
-              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.PROFILE}
             >
               {t("Profile")}
             </NavLink>
+            {isSVIP && (
+              <NavLink
+                to={PATH.DASHBOARD}
+                className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              >
+                {t("Dashboard")}
+              </NavLink>
+            )}
             <NavLink
-              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.HISTORY_ORDER}
             >
               {t("History")}
             </NavLink>
-            
             <Button
               onClick={handleLogout}
-              className=" bg-white text-black hover:!text-white !w-[100px] text-center hover:!border-black hover:!bg-black"
+              className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black mt-[15px]"
             >
               {t("Logout")}
             </Button>
@@ -143,32 +176,40 @@ export const UserMenu = () => {
           <div className="flex flex-col" key="member">
             <NavLink
               to={PATH.KOI_MANAGEMENT}
-              className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px]  bg-black text-white hover:!text-white border-none hover:!bg-black"
+              className="rounded-[6px] !w-[100px] text-center px-[15px] py-[4px] bg-black text-white hover:!text-white border-none hover:!bg-black"
             >
               {t("Manage")}
             </NavLink>
+            {isSVIP && (
+              <NavLink
+                to={PATH.DASHBOARD}
+                className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              >
+                {t("Dashboard")}
+              </NavLink>
+            )}
             <NavLink
-              className=" bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center my-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.PROFILE}
             >
               {t("Profile")}
             </NavLink>
             <NavLink
-              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mb-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.HISTORY_ORDER}
             >
               {t("History")}
             </NavLink>
             <Button
               onClick={handleLogout}
-              className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black"
+              className="!w-[100px] text-center duration-300 transition-all bg-white text-black hover:!text-white hover:!border-black hover:!bg-black mt-[15px]"
             >
               {t("Logout")}
             </Button>
           </div>
         );
       }
-      if (role.name === "ROLE_SHOP") {
+      if (role.name === "ROLE_CONTRIBUTOR") {
         return (
           <div className="flex flex-col" key="admin">
             <NavLink

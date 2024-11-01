@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Spin, Button, message } from "antd";
+import { Spin, Button, message, Modal } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
 import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
 import { usePostReciveOrder } from "../../../hooks/order/usePostReciveOrder";
@@ -17,18 +17,36 @@ const OrderDelivered = ({
       </div>
     );
   }
-  const mutation = usePostReciveOrder();
-  const handleConfirmDelivery = (orderId) => {
-    mutation.mutate(
-      { orderId },
-      {
-        onSuccess: () => {
-          refetch();
-          switchToCompleteTab();
+
+  const handleConfirmClick = (orderId) => {
+    Modal.confirm({
+      title: "Confirm Delivery",
+      content: "Are you sure you want to confirm this delivery?",
+      okText: "Yes",
+      okType: "primary",
+      cancelText: "No",
+      centered: true,
+      okButtonProps: {
+        className: "bg-black border-black text-white hover:!bg-gray-800 hover:!border-gray-800"
+      },
+      onOk: async () => {
+        try {
+          const payload = { orderId };
+          await manageOrderServices.receiveOrder(payload);
+          
+          await Promise.all([
+            refetch(),
+            new Promise(resolve => setTimeout(resolve, 500))
+          ]);
+          
           message.success("Order marked as completed");
-        },
-      }
-    );
+          switchToCompleteTab();
+        } catch (error) {
+          console.error('Error completing order:', error);
+          message.error('Failed to complete order. Please try again.');
+        }
+      },
+    });
   };
 
   return (
@@ -79,7 +97,7 @@ const OrderDelivered = ({
           <div className="mt-[15px] text-right">
             <Button
               className="w-[150px] bg-black border-black border-[1px] text-white hover:!bg-black hover:!text-white ml-2"
-              onClick={() => handleConfirmDelivery(order?.id)}
+              onClick={() => handleConfirmClick(order?.id)}
             >
               <strong>Confirm Delivery</strong>
             </Button>
