@@ -147,7 +147,12 @@ const ProductDetail = () => {
             <h1 className="text-black font-bold text-3xl">{product?.name}</h1>
             <div className="flex">
               <p className="font-bold mr-[6px]">Price: </p>
-              <p>${product?.price}</p>
+              <p>
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(product?.price)}
+              </p>
             </div>
             <div className="my-[20px]">
               <InputNumber
@@ -162,7 +167,7 @@ const ProductDetail = () => {
               <span className="mx-[10px]">|</span>
               {product?.disabled || product?.stock == 0 ? (
                 <Button className="bg-gray-300 text-white px-[20px] py-[10px] hover:!bg-gray-300 hover:!border-none hover:!text-white rounded-md cursor-not-allowed">
-                  Out of stock
+                  Item is not available
                 </Button>
               ) : (
                 <Button
