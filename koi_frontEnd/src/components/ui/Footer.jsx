@@ -8,13 +8,13 @@ const Footer = () => {
   return (
     <div className="w-full bg-black-400">
       <footer className="px-4 bg-black text-white">
-        <div className="container mx-auto pt-10 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div className="container mx-auto py-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {/* Column 1: Logo */}
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center">
               <NavLink to={PATH.HOME} rel="noopener noreferrer" className="inline-block text-center">
-                <img className="w-[150px] mx-auto" src="../../../images/logo.webp" alt={t("Koi Control logo")} />
-                <p className='text-orange-400 font-bold text-[40px] mt-2'>{t("KoiControl")}</p>
+                <img className="w-[100px] mx-auto" src="../../../images/logo.webp" alt={t("Koi Control logo")} />
+                <p className='text-orange-400 font-bold text-[30px]'>{t("KoiControl")}</p>
               </NavLink>
             </div>
 

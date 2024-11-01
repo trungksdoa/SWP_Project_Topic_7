@@ -43,6 +43,7 @@ import Endpoint from "../components/ui/Endpoint";
 import FoodCalculator from "../components/ui/manage/FoodCalculator";
 import AdminDashboard from "../components/ui/AdminDashboard";
 import ManageAdminBlog from "../components/ui/admin/manageAdminBlog";
+import Dashboard from '../components/ui/navbar/Dashboard';
 
 const router = [
   {
@@ -224,6 +225,10 @@ const router = [
         element: <CheckoutPage />,
       },
     ],
+  },
+  {
+    path: PATH.DASHBOARD,
+    element: <Dashboard />,
   },
   // Add this catch-all route at the end of the router array
   {
