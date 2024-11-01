@@ -16,18 +16,22 @@ const OrderDelivered = ({
     );
   }
 
-  const handleConfirmDelivery = (orderId) => {
+  const handleConfirmDelivery = async (orderId) => {
     try {
-      const payload = {
-        orderId: orderId,
-      };
-      manageOrderServices.receiveOrder(payload);
-      refetch();
-      switchToCompleteTab();
+      const payload = { orderId };
+      await manageOrderServices.receiveOrder(payload);
+      
+      // Wait for both operations to complete
+      await Promise.all([
+        refetch(), // Refetch the orders
+        new Promise(resolve => setTimeout(resolve, 500)) // Small delay for UI
+      ]);
+      
       message.success("Order marked as completed");
+      switchToCompleteTab(); // Switch tab after successful update
     } catch (error) {
-      // console.error('Error completing order:', error);
-      // message.error('Failed to complete order');
+      console.error('Error completing order:', error);
+      message.error('Failed to complete order. Please try again.');
     }
   };
 

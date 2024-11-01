@@ -4,12 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId";
 import { manageProductThunks } from "../../../store/manageProduct";
 import FormCheckout from "./FormCheckout";
+import LoadingSpinner from "../../layouts/LoadingSpinner";
 
 const Checkout = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: carts, refetch } = useGetCartByUserId(userLogin?.id);
+  const { data: carts, refetch, isFetching } = useGetCartByUserId(userLogin?.id);
   const dispatch = useDispatch();
   const [lstPrd, setLstPrd] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  
   let totalItems = 0;
   lstPrd?.map((prd) => {
     totalItems += prd?.quantity;
@@ -17,6 +20,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (carts) {
+      setIsLoadingProducts(true);
       const productIdList = carts.map((prd) => prd?.productId);
       Promise.all(
         productIdList.map((id) =>
@@ -26,15 +30,26 @@ const Checkout = () => {
         .then((results) => {
           const updatedProducts = results.map((product, index) => ({
             ...product,
-            quantity: carts[index]?.quantity, // Add quantity from carts
+            quantity: carts[index]?.quantity,
           }));
           setLstPrd(updatedProducts);
         })
         .catch((err) => {
-          // Handle error
+          console.error("Error loading products:", err);
+        })
+        .finally(() => {
+          setIsLoadingProducts(false);
         });
     }
   }, [carts]);
+
+  if (isFetching || isLoadingProducts) {
+    return (
+      <div className="min-h-[450px]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   const columns = [
     {
@@ -81,7 +96,7 @@ const Checkout = () => {
     carts?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
   
     return (
-    <div className="w-[60%] my-[40px] mx-auto">
+    <div className="w-[60%] my-[40px] mx-auto min-h-[450px]">
       <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
       <div className="text-right text-xl font-bold">
         Shipping fee: FREE
