@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { manageUserActions } from "../../../store/manageUser/slice";
 import { toast } from "react-toastify";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
+import { UserOutlined } from "@ant-design/icons";
 
 const FormUserUpdate = ({ user, refetch }) => {
   const mutation = useUpdateUser();
   const [imgSrc, setImgSrc] = useState("");
-  const [componentDisabled, setComponentDisabled] = useState(true); 
-  const dispatch = useDispatch()
-  const userLogin = useSelector((state) => state.manageUser.userLogin)
+  const dispatch = useDispatch();
+  const userLogin = useSelector((state) => state.manageUser.userLogin);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -21,7 +21,7 @@ const FormUserUpdate = ({ user, refetch }) => {
       email: user?.email || "",
       address: user?.address || "",
       phoneNumber: user?.phoneNumber || "",
-      image: null,
+      image: user?.avatar || null,
     },
     onSubmit: (values) => {
       const accessToken = userLogin?.accessToken 
@@ -33,9 +33,10 @@ const FormUserUpdate = ({ user, refetch }) => {
         email: values.email,
         address: values.address,
         phoneNumber: values.phoneNumber,
+        image: values.avatar,
       };
-      if (values.avatar) {
-        formData.append("image", values.avatar);
+      if (values.image) {
+        formData.append("image", values.image);
       }
       formData.append("user", JSON.stringify(updateUser));
       mutation.mutate(
@@ -50,7 +51,7 @@ const FormUserUpdate = ({ user, refetch }) => {
               email: values.email,
               address: values.address,
               phoneNumber: values.phoneNumber,
-              password: values.password,
+              avatar: values.avatar,
               active: "true",
             };
             dispatch(
@@ -59,7 +60,6 @@ const FormUserUpdate = ({ user, refetch }) => {
               })
             );
             localStorage.setItem(LOCAL_STORAGE_LOGIN_KEY, JSON.stringify(user));
-            setComponentDisabled(true);
             refetch();
             toast.success("User updated successfully");
           },
@@ -89,92 +89,117 @@ const FormUserUpdate = ({ user, refetch }) => {
         setImgSrc(e.target?.result);
       };
       formik.setFieldValue("image", file);
-      setComponentDisabled(false); 
-    } else {
-      setComponentDisabled(true); 
     }
   };
 
   return (
-    <div className="!w-[100%] mx-[auto] flex flex-col">
-      <>
-        <Checkbox
-          checked={!componentDisabled}
-          onChange={(e) => setComponentDisabled(!e.target.checked)}
-          className="mt-[15px] text-gray-600 underline cursor-pointer hover:text-orange-500 transition-all duration-300"
-        >
-          Update Info
-        </Checkbox>
+    <div className="flex gap-8">
+      {/* Left Column - Avatar and Welcome */}
+      <div className="w-1/3 flex flex-col items-center">
+        <div className="mb-6">
+          {imgSrc || user?.avatar ? (
+            <div className="h-[150px] w-[150px] rounded-full border border-black overflow-hidden">
+              <img 
+                src={imgSrc || user?.avatar} 
+                alt="Image" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-[150px] w-[150px] rounded-full border border-black flex justify-center items-center">
+              <UserOutlined style={{ fontSize: "80px" }} />
+            </div>
+          )}
+        </div>
+        
+        <h2 className="text-[32px] text-center">
+          Welcome,{" "}
+          <span className="font-bold text-orange-500">
+            {userLogin?.username}
+          </span>
+        </h2>
+      </div>
+
+      {/* Right Column - Form Fields */}
+      <div className="w-2/3">
         <Form
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 16 }}
-          layout="horizontal"
-          disabled={componentDisabled}
-          style={{ width: "100%", marginTop: "40px" }} // Đã thay đổi từ maxWidth thành width
+          layout="vertical"
+          className="w-full"
           onSubmitCapture={formik.handleSubmit}
         >
-          <Form.Item label="Name">
+          <Form.Item 
+            label="Name"
+            className="mb-6"
+          >
             <Input
               name="username"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur} 
               value={formik.values.username}
-              disabled={componentDisabled} 
+              className="py-2"
             />
           </Form.Item>
-          <Form.Item label="Address">
+
+          <Form.Item 
+            label="Address"
+            className="mb-6"
+          >
             <Input
               name="address"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.address}
-              disabled={componentDisabled}
+              className="py-2"
             />
           </Form.Item>
-          <Form.Item label="Phone">
+
+          <Form.Item 
+            label="Phone"
+            className="mb-6"
+            validateStatus={formik.values.phoneNumber && /[^\d+\-\s()]/g.test(formik.values.phoneNumber) ? "error" : ""}
+            help={formik.values.phoneNumber && /[^\d+\-\s()]/g.test(formik.values.phoneNumber) ? "Please enter numbers only" : ""}
+          >
             <Input
               name="phoneNumber"
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^\d+\-\s()]/g, '');
+                formik.setFieldValue('phoneNumber', value);
+              }}
               onBlur={formik.handleBlur}
               value={formik.values.phoneNumber}
-              disabled={componentDisabled}
+              className="py-2"
             />
           </Form.Item>
-          <Form.Item label="Avatar">
+
+          {/* Package Information */}
+          <Form.Item 
+            label="Current Package"
+            className="mb-6"
+          >
+            <Input
+              value={user?.userPackage?.name || 'No Package'}
+              disabled
+              className="py-2 !text-black"
+            />
+          </Form.Item>
+
             <input
-              disabled={componentDisabled}
               type="file"
               accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
               onChange={handleChangeFile}
-            />
-            {imgSrc || user?.avatar ? (
-              <img
-                src={imgSrc}
-                alt="Preview"
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  marginTop: "10px",
-                }}
-              />
-            ) : null}
-          </Form.Item>
-          <Form.Item label="Button">
+            className="mb-4 w-[200px]"
+          />
+          <Form.Item className="flex justify-center">
             <Button
               loading={mutation.isPending}
               htmlType="submit"
-              style={{
-                backgroundColor: componentDisabled ? "#ccc" : "#000",
-                color: "#fff",
-              }}
-              disabled={componentDisabled}
+              className="bg-black text-white hover:bg-gray-800 transition-colors duration-300 px-8 mb-8 font-bold text-lg"
             >
               Update
             </Button>
           </Form.Item>
         </Form>
-      </>
+      </div>
     </div>
   );
 };

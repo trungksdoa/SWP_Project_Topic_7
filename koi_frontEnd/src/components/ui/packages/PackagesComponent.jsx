@@ -21,74 +21,141 @@ const PackagesComponent = () => {
     );
   }
 
-  // Hàm xử lý khi nhấn nút "Buy Now"
   const handleBuyNow = (packageId) => {
-    const payload = {
-      packageId: packageId, // Cập nhật packageId vào payload
-    };
-    // Gọi mutation để post package
+    const payload = { packageId };
     mutation.mutate(payload, {
       onSuccess: (res) => {
         window.location.href = res?.data?.data?.shortLink;
       },
-      onError: (res) => {
-      },
+      onError: () => {},
     });
   };
 
-  return (
-    <div className="my-[150px]">
-      <div className="pricing-container">
-        {lstPackage?.map((packages, index) => {
-          const isUserPackage = userPackageId === packages?.id;
-          const isDisabled = index === 0 || packages?.id < userPackageId;
+  const firstRow = lstPackage?.slice(0, 3) || [];
+  const secondRow = lstPackage?.slice(3) || [];
+
+  const getPackageStyle = (packageName) => {
+    const name = packageName.toLowerCase();
+    switch (name) {
+      case 'advanced':
+        return { header: 'bg-[#FAF3E1]', text: 'text-gray-800' };
+      case 'professional':
+        return { header: 'bg-[#F5E7C6]', text: 'text-gray-800' };
+      case 'vip':
+        return { header: 'bg-[#FF6D1F]', text: 'text-white' };
+      case 'svip':
+        return { header: 'bg-[#222222]', text: 'text-white' };
+      default:
+        return { header: 'bg-gray-100', text: 'text-gray-800' };
+    }
+  };
+
+  const PackageCard = ({ pkg, index, isFirstRow }) => {
+    const isUserPackage = userPackageId === pkg?.id;
+    const isDisabled = (isFirstRow && index === 0) || pkg?.id < userPackageId;
+    const style = getPackageStyle(pkg?.name);
+    const isLoading = mutation.isPending && mutation.variables?.packageId === pkg?.id;
+
           return (
             <div
-              className={`pricing-card card-${index + 1} ${
-                isUserPackage ? "user-package" : ""
-              }`}
-              key={index}
-            >
-              <div className="wave-container relative">
-                <svg
-                  className="wave absolute bottom-0 left-0 w-full"
-                  viewBox="0 0 1440 320"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill="#fff"
-                    fillOpacity="1"
-                    d="M0,64L48,58.7C96,53,192,43,288,64C384,85,480,139,576,154.7C672,171,768,149,864,154.7C960,160,1056,192,1152,186.7C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-                  ></path>
-                </svg>
+        className={`
+          relative overflow-hidden rounded-lg bg-white shadow-lg transform transition-all duration-300 hover:-translate-y-2
+          ${isUserPackage ? 'ring-4 ring-blue-500' : ''}
+        `}
+      >
+        {isUserPackage && (
+          <div className="absolute top-2 right-2">
+            <span className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+              Current Plan
+            </span>
+          </div>
+        )}
+        
+        <div className={`px-4 py-4 text-center ${style.header}`}>
+          <h3 className={`text-xl font-bold mb-1 ${style.text}`}>
+            {pkg?.name}
+          </h3>
+          <div className={`text-2xl font-bold mb-2 ${style.text}`}>
+            {new Intl.NumberFormat('vi-VN', { 
+              style: 'currency', 
+              currency: 'VND' 
+            }).format(pkg?.price)}
               </div>
-              <div
-                className={`circle-header ${
-                  isUserPackage ? "!bg-gray-500" : ""
-                }`}
-              >
-                <h2>{packages?.name}</h2>
-                <p>{packages?.price} vnd</p>
               </div>
-              <ul className="features !mt-[100px]">
-                <li>Fish Slot: {packages?.fishSlots}</li>
-                <li>Pond Slot: {packages?.pondSlots}</li>
+
+        <div className="px-4 py-4 bg-white">
+          <ul className="space-y-2 mb-4">
+            <li className="flex items-center text-gray-600 text-sm">
+              <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Fish Slots: {pkg?.fishSlots}
+            </li>
+            <li className="flex items-center text-gray-600 text-sm">
+              <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Pond Slots: {pkg?.pondSlots}
+            </li>
               </ul>
+
               <button
-                className={`buy-btn ${
-                  isDisabled ? "!bg-gray-500 !cursor-no-drop" : "cursor-pointer"
-                } ${isUserPackage ? "!bg-gray-500 !cursor-no-drop" : ""}`}
                 onClick={() => {
                   if (!isDisabled && !isUserPackage) {
-                    handleBuyNow(packages?.id);
-                  }
-                }}
+                handleBuyNow(pkg?.id);
+              }
+            }}
+            className={`
+              w-full py-2 px-4 rounded-md font-semibold transition-all duration-200 text-sm
+              ${isFirstRow && index === 0 
+                ? `${style.header} ${style.text} cursor-not-allowed`
+                : isUserPackage
+                  ? `${style.header} ${style.text} cursor-not-allowed`
+                  : isDisabled
+                    ? `${style.header} ${style.text} cursor-not-allowed`
+                    : `${style.header} ${style.text} hover:opacity-90`
+              }
+            `}
+            disabled={isDisabled || isUserPackage || isLoading}
               >
-                {index === 0 ? "Default" : isUserPackage ? "In Use" : "Buy Now"}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <Spin size="small" />
+                <span className="ml-2">Processing...</span>
+              </div>
+            ) : (
+              isFirstRow && index === 0 ? "Default" : isUserPackage ? "Current Plan" : "Upgrade Now"
+            )}
               </button>
             </div>
+      </div>
           );
-        })}
+  };
+
+  return (
+    <div className="min-h-screen">
+      <div className="max-w-5xl mx-auto px-4">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Choose Your Package
+        </h1>
+        
+        {/* First Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {firstRow.map((pkg, index) => (
+            <PackageCard key={index} pkg={pkg} index={index} isFirstRow={true} />
+          ))}
+        </div>
+
+        {/* Second Row - Centered */}
+        {secondRow.length > 0 && (
+          <div className="flex justify-center w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-[600px]">
+              {secondRow.map((pkg, index) => (
+                <PackageCard key={index} pkg={pkg} index={index} isFirstRow={false} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

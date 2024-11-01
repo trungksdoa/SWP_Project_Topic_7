@@ -16,23 +16,35 @@ const OrderDelivered = ({
     );
   }
 
-  const handleConfirmDelivery = async (orderId) => {
+  const handleConfirmClick = (orderId) => {
+    Modal.confirm({
+      title: "Confirm Delivery",
+      content: "Are you sure you want to confirm this delivery?",
+      okText: "Yes",
+      okType: "primary",
+      cancelText: "No",
+      centered: true,
+      okButtonProps: {
+        className: "bg-black border-black text-white hover:!bg-gray-800 hover:!border-gray-800"
+      },
+      onOk: async () => {
     try {
       const payload = { orderId };
       await manageOrderServices.receiveOrder(payload);
       
-      // Wait for both operations to complete
       await Promise.all([
-        refetch(), // Refetch the orders
-        new Promise(resolve => setTimeout(resolve, 500)) // Small delay for UI
+            refetch(),
+            new Promise(resolve => setTimeout(resolve, 500))
       ]);
       
       message.success("Order marked as completed");
-      switchToCompleteTab(); // Switch tab after successful update
+          switchToCompleteTab();
     } catch (error) {
       console.error('Error completing order:', error);
       message.error('Failed to complete order. Please try again.');
     }
+      },
+    });
   };
 
   return (
@@ -83,7 +95,7 @@ const OrderDelivered = ({
           <div className="mt-[15px] text-right">
             <Button
               className="w-[150px] bg-black border-black border-[1px] text-white hover:!bg-black hover:!text-white ml-2"
-              onClick={() => handleConfirmDelivery(order?.id)}
+              onClick={() => handleConfirmClick(order?.id)}
             >
               <strong>Confirm Delivery</strong>
             </Button>
