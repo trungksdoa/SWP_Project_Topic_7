@@ -32,6 +32,7 @@
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.6.1",
     "install": "^0.13.0",
+    "koi-frontend": "file:",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "moment": "^2.30.1",
@@ -55,7 +56,6 @@
     "styled-components": "^6.1.13",
     "swiper": "^11.1.14",
     "tailwindcss": "^3.4.10",
-    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {
