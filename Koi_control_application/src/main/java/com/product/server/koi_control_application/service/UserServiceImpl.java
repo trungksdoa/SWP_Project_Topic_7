@@ -218,6 +218,7 @@ public class UserServiceImpl implements IUserService {
         if (rUser.getPhoneNumber() != null) {
             user.setPhoneNumber(rUser.getPhoneNumber());
         }
+
         usersRepository.save(user);
     }
 

@@ -17,15 +17,15 @@ public class ScheduledTasksService {
 
     private final OrderRepository orderRepository;
 
-    @Scheduled(cron = "9 * * * * *")
-    @Transactional
-    public void simulatorDeliveredOrders() {
-        int updatedCount = orderRepository.updateSimulatorOrder(
-                OrderCode.DELIVERED.getValue(),
-                OrderCode.SHIPPING.getValue()
-        );
-        log.info("Simulator  {} orders from SHIPPING to DELIVERED status", updatedCount);
-    }
+//    @Scheduled(cron = "9 * * * * *")
+//    @Transactional
+//    public void simulatorDeliveredOrders() {
+//        int updatedCount = orderRepository.updateSimulatorOrder(
+//                OrderCode.DELIVERED.getValue(),
+//                OrderCode.SHIPPING.getValue()
+//        );
+//        log.info("Simulator  {} orders from SHIPPING to DELIVERED status", updatedCount);
+//    }
 
     //Runs at 24:00 every day
 //    @Scheduled(cron = "0 0 0 * * *")

@@ -127,7 +127,7 @@ public class OrderController {
 
     //    @PostMapping("/send-order")
     @PostMapping(SEND_ORDER)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @Operation(summary = "Mark an order as shipped", description = "From admin updates the order status to SHIPPING" + " : " +
             "{" +
             "PENDING," +
@@ -142,7 +142,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping("/order/delivered")
     public ResponseEntity<BaseResponse> updateDeliveredOrder(HttpServletRequest request, @RequestBody OrderVerifyDTO data) {
         int orderId = data.getOrderId();
