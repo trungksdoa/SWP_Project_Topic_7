@@ -134,7 +134,7 @@ const FormUserUpdate = ({ user, refetch }) => {
             <Input
               name="username"
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur} 
+              onBlur={formik.handleBlur}
               value={formik.values.username}
               className="py-2"
             />
@@ -183,10 +183,10 @@ const FormUserUpdate = ({ user, refetch }) => {
             />
           </Form.Item>
 
-            <input
-              type="file"
-              accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-              onChange={handleChangeFile}
+          <input
+            type="file"
+            accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
+            onChange={handleChangeFile}
             className="mb-4 w-[200px]"
           />
           <Form.Item className="flex justify-center">

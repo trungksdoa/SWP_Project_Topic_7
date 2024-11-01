@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Spin, Button, message } from "antd";
+import { Spin, Button, message, Modal } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
 
 const OrderDelivered = ({
@@ -28,21 +28,21 @@ const OrderDelivered = ({
         className: "bg-black border-black text-white hover:!bg-gray-800 hover:!border-gray-800"
       },
       onOk: async () => {
-    try {
-      const payload = { orderId };
-      await manageOrderServices.receiveOrder(payload);
-      
-      await Promise.all([
+        try {
+          const payload = { orderId };
+          await manageOrderServices.receiveOrder(payload);
+          
+          await Promise.all([
             refetch(),
             new Promise(resolve => setTimeout(resolve, 500))
-      ]);
-      
-      message.success("Order marked as completed");
+          ]);
+          
+          message.success("Order marked as completed");
           switchToCompleteTab();
-    } catch (error) {
-      console.error('Error completing order:', error);
-      message.error('Failed to complete order. Please try again.');
-    }
+        } catch (error) {
+          console.error('Error completing order:', error);
+          message.error('Failed to complete order. Please try again.');
+        }
       },
     });
   };

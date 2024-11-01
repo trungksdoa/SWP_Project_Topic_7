@@ -56,8 +56,8 @@ const PackagesComponent = () => {
     const style = getPackageStyle(pkg?.name);
     const isLoading = mutation.isPending && mutation.variables?.packageId === pkg?.id;
 
-          return (
-            <div
+    return (
+      <div
         className={`
           relative overflow-hidden rounded-lg bg-white shadow-lg transform transition-all duration-300 hover:-translate-y-2
           ${isUserPackage ? 'ring-4 ring-blue-500' : ''}
@@ -80,8 +80,8 @@ const PackagesComponent = () => {
               style: 'currency', 
               currency: 'VND' 
             }).format(pkg?.price)}
-              </div>
-              </div>
+          </div>
+        </div>
 
         <div className="px-4 py-4 bg-white">
           <ul className="space-y-2 mb-4">
@@ -97,11 +97,11 @@ const PackagesComponent = () => {
               </svg>
               Pond Slots: {pkg?.pondSlots}
             </li>
-              </ul>
+          </ul>
 
-              <button
-                onClick={() => {
-                  if (!isDisabled && !isUserPackage) {
+          <button
+            onClick={() => {
+              if (!isDisabled && !isUserPackage) {
                 handleBuyNow(pkg?.id);
               }
             }}
@@ -117,7 +117,7 @@ const PackagesComponent = () => {
               }
             `}
             disabled={isDisabled || isUserPackage || isLoading}
-              >
+          >
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <Spin size="small" />
@@ -126,10 +126,10 @@ const PackagesComponent = () => {
             ) : (
               isFirstRow && index === 0 ? "Default" : isUserPackage ? "Current Plan" : "Upgrade Now"
             )}
-              </button>
-            </div>
+          </button>
+        </div>
       </div>
-          );
+    );
   };
 
   return (

@@ -12,9 +12,9 @@ const ProfileTemplage = () => {
 
   return (
     <div className="container mx-auto w-[80%]">
-       <div className="flex justify-center items-center text-bold text-3xl h-full m-2 mb-3">
-          <strong>Profile</strong>
-        </div>
+      <div className="flex justify-center items-center text-bold text-3xl h-full m-2 mb-3">
+        <strong>Profile</strong>
+      </div>
       <FormUserUpdate user={user} refetch={refetch} />
     </div>
   );
