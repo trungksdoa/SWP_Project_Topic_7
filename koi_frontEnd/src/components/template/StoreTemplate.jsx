@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Spin, Checkbox, Row, Card, Select, Pagination, message } from "antd";
+import { Spin, Checkbox, Row, Card, Select, Pagination, message, Input, Slider } from "antd";
 import { useTranslation } from "react-i18next";
 import { useGetAllProducts } from "../../hooks/admin/manageProducts/UseGetAllProducts";
 import { useNavigate } from "react-router-dom";
