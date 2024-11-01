@@ -244,7 +244,10 @@ const StoreTemplate = () => {
                     <p className="font-semibold">
                       Price:{" "}
                       <span className="!font-normal text-[16px]">
-                        {prd?.price} VND
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(prd?.price) }
                       </span>
                     </p>
                     <div className="flex items-center">
