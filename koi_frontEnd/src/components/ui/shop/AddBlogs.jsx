@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Input, Button, Form, Spin } from "antd";
+import { Input, Button, Form, Spin, message } from "antd";
 import { usePostBlog } from "../../../hooks/blogs/usePostBlog";
 import { useFormik } from "formik";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const AddBlogs = () => {
@@ -54,12 +53,12 @@ const AddBlogs = () => {
         onSuccess: (response) => {
           setIsLoading(false);
           formik.resetForm();
-          toast.success("Blog added successfully");
+          message.success("Blog added successfully");
           navigate('/blogs/manageblogs');
         },
         onError: (error) => {
           setIsLoading(false);
-          toast.error("Error adding blog");
+          message.error("Error adding blog");
         },
       });
     },

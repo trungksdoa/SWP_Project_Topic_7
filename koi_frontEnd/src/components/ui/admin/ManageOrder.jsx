@@ -9,10 +9,10 @@ import {
   Typography,
   Divider,
   Space,
+  message,
 } from "antd";
 import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
 
-import { toast } from "react-toastify";
 const { Title, Text } = Typography;
 
 const ManageOrder = () => {
@@ -25,14 +25,13 @@ const ManageOrder = () => {
   }, []);
 
   const handleSendClick = (orderId) => {
-    // Thực hiện logic khi nhấn button Send, ví dụ gửi yêu cầu API.
-    mutation.mutate(orderId, {
+    mutation.mutate({orderId}, {
       onSuccess: () => {
-        toast.success("Sent Order !");
+        message.success("Sent Order !");
         refetch();
       },
       onError: (error) => {
-        toast.error("Error: " + error.message);
+        message.error("Error: " + error.message);
       },
     });
   };
@@ -150,7 +149,6 @@ const ManageOrder = () => {
       dataIndex: "status",
       align: 'center',
       render: (_, record) => {
-        //{PENDING,CANCELLED, SUCCESS, SHIPPING, DELIVERED, COMPLETED}
         if (record.status === "PENDING") {
           return (
               <Tag color="gray" className="text-[13px] font-bold w-[150px] !bg-gray-500 !text-white text-center justify-center items-center">
@@ -213,7 +211,7 @@ const ManageOrder = () => {
           textAlign: 'center',
         };
 
-        if (record.status === "SUCCESS") {
+        if (record.status === "SUCCESS_PAYMENT") {
           return (
             <Button
               style={{

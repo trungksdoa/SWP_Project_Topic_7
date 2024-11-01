@@ -5,8 +5,7 @@ import { useSelector } from "react-redux";
 import { usePostFeedBack } from "../../../hooks/feedback/usePostFeedback";
 import { useTranslation } from "react-i18next";
 import { StarRating } from "./StarRating";
-import { toast } from "react-toastify";
-import { Button } from "antd";
+import { Button, message } from "antd";
 
 const ProductFeedback = ({ prdId }) => {
   const { data: feedbacks, refetch } = useGetFeedbackById(prdId);
@@ -25,12 +24,11 @@ const ProductFeedback = ({ prdId }) => {
       mutation.mutate(values, {
         onSuccess: () => {
           formik.resetForm();
-          toast.success("Add Feedback Successfully !");
+          message.success("Add Feedback Successfully !");
           refetch();
         },
         onError: (error) => {
-          console.error("Error adding feedback:", error);
-          toast.error("Failed to add feedback.");
+          message.error("Failed to add feedback.");
         },
       });
     },

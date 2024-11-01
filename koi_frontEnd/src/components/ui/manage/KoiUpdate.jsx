@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Select, DatePicker, Modal, Checkbox, Spin } from "antd";
-import { toast } from "react-toastify";
+import { Button, Form, Input, InputNumber, Select, DatePicker, Modal, Checkbox, Spin, message } from "antd";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
@@ -167,7 +166,7 @@ const KoiUpdate = () => {
           {
             onSuccess: (updatedKoi) => {
               dispatch(manageKoiActions.updateKoi(updatedKoi));
-              toast.success("Koi updated successfully");
+              message.success("Koi updated successfully");
               refetchKoi();
               refetchGrowthData();
             },
@@ -175,7 +174,7 @@ const KoiUpdate = () => {
         );
       } catch (error) {
         console.error("Error updating koi:", error);
-        toast.error(`Error updating koi: ${error.message}`);
+        message.error(`Error updating koi: ${error.message}`);
         if (error.response) {
           console.error("Response data:", error.response.data);
           console.error("Response status:", error.response.status);
@@ -206,11 +205,11 @@ const KoiUpdate = () => {
     setIsDeleting(true);
     try {
       await deleteKoiMutation.mutateAsync(koiId);
-      toast.success("Koi deleted successfully!");
+      message.success("Koi deleted successfully!");
       refetchKoi();
       navigate('/koi-management');
     } catch (error) {
-      toast.error(`Error deleting koi: ${error.message}`);
+      message.error(`Error deleting koi: ${error.message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -255,13 +254,13 @@ const KoiUpdate = () => {
         { id: id, payload: formData, isNew: true },
         {
           onSuccess: () => {
-            toast.success("Growth data added successfully");
+            message.success("Growth data added successfully");
             refetchKoi();
             refetchGrowthData();
           },
           onError: (error) => {
             console.error("Error adding growth data:", error);
-            toast.error(`Error adding growth data: ${error.message}`);
+            message.error(`Error adding growth data: ${error.message}`);
           },
           onSettled: () => {
             setIsAddingGrowth(false);
@@ -270,7 +269,7 @@ const KoiUpdate = () => {
       );
     } catch (error) {
       console.error("Error adding growth data:", error);
-      toast.error(`Error adding growth data: ${error.message}`);
+      message.error(`Error adding growth data: ${error.message}`);
       setIsAddingGrowth(false);
     }
   };
@@ -279,7 +278,7 @@ const KoiUpdate = () => {
     console.log(id)
     setIsLoadingGrowthList(true);
     if (!growthData || growthData.length === 0) {
-      toast.info("No growth data available. Please add growth history first.");
+      message.info("No growth data available. Please add growth history first.");
     } else {
       setIsGrowthListVisible(true);
     }
@@ -340,10 +339,10 @@ const KoiUpdate = () => {
         await deleteGrowthMutation.mutateAsync(growthId);
       }
       await refetchGrowthData();
-      toast.success(`Successfully deleted ${selectedGrowths.length} growth history!`);
+      message.success(`Successfully deleted ${selectedGrowths.length} growth history!`);
       setSelectedGrowths([]);
     } catch (error) {
-      toast.error(`Error deleting growth entries: ${error.message}`);
+      message.error(`Error deleting growth entries: ${error.message}`);
     } finally {
       setIsDeletingMultiple(false);
     }

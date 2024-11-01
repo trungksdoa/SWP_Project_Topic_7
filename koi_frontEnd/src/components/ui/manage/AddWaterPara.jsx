@@ -1,9 +1,8 @@
 import React from "react";
-import { Button, Form, Input, DatePicker } from "antd";
+import { Button, Form, Input, DatePicker, message } from "antd";
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { usePostWaterParameter } from "../../../hooks/koi/ usePostWaterParameter";
-import { toast } from "react-toastify";
 
 const calculateDaysBetween = (date1) => {
   const oneDay = 24 * 60 * 60 * 1000;
@@ -86,11 +85,11 @@ const AddWaterPara = ({ selectedPond, onSuccess }) => {
         { id: selectedPond?.id, payload: numericPayload },
         {
           onSuccess: () => {
-            toast.success("Add Water Parameter Successfully!");
+            message.success("Add Water Parameter Successfully!");
             onSuccess();
           },
           onError: (error) => {
-            toast.error(error.message || "Failed to add water parameter");
+            message.error(error.message || "Failed to add water parameter");
           },
         }
       );

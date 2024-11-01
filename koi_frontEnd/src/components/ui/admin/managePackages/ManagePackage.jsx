@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Table, Spin, Modal } from "antd";
 import { useGetPackage } from "../../../../hooks/admin/managePackages/useGetPackage";
 import { useDeletePackage } from "../../../../hooks/admin/managePackages/useDeletePackage";
-import { toast } from "react-toastify";
 import EditPackages from "./EditPackages";
 import AddPackage from "../managePackages/AddPackage";
 

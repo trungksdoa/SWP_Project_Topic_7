@@ -7,7 +7,6 @@ import { Spin, message, Button, Modal } from "antd";
 import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import { manageKoiFishServices } from "../../../services/koifish/manageKoiFishServices";
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
-import { toast } from "react-toastify";
 
 const KoiMove = () => {
     const navigate = useNavigate();
@@ -145,7 +144,7 @@ const KoiMove = () => {
             for (const koi of selectedPondKoi) {
                 await deleteKoiMutation.mutateAsync(koi.id);
             }
-            toast.success(`Successfully deleted ${selectedPondKoi.length} Koi!`);
+            message.success(`Successfully deleted ${selectedPondKoi.length} Koi!`);
             setSelectedPondKoi([]);
             
             // Refetch koi data
@@ -153,7 +152,7 @@ const KoiMove = () => {
             
         } catch (error) {
             console.error("Error deleting Koi:", error);
-            toast.error(`Error deleting koi: ${error.message}`);
+            message.error(`Error deleting koi: ${error.message}`);
         } finally {
             setIsDeleting(false);
         }

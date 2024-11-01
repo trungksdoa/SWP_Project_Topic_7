@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Radio, Modal } from "antd";
-import { toast } from "react-toastify";
+import { Button, Form, Input, InputNumber, Radio, Modal, message } from "antd";
 import { usePutPackage } from "../../../../hooks/admin/managePackages/usePutPackage";
 import { managePackageServiceH } from "../../../../services/admin/managePackageServiceH";
 
@@ -37,7 +36,7 @@ const EditPackages = ({ visible, onCancel, packageId, onSuccess }) => {
         { id: packageId, payload: values },
         {
           onSuccess: () => {
-            toast.success("Update Package Successfully!");
+            message.success("Update Package Successfully!");
             onSuccess();
             onCancel();
           },

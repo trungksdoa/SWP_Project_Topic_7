@@ -4,11 +4,11 @@ import {
   Input,
   InputNumber,
   Radio, 
-  Button
+  Button,
+  message
 } from "antd";
 import { useFormik } from "formik";
 import { usePostProducts } from "../../../../hooks/admin/manageProducts/usePostProducts";
-import { toast } from "react-toastify";
 
 const AddProduct = () => {
   const { TextArea } = Input;
@@ -69,10 +69,10 @@ const AddProduct = () => {
       mutation.mutate(formData, {
         onSuccess: (response) => {
           formik.resetForm()
-          toast.success("Product added successfully");
+          message.success("Product added successfully");
         },
         onError: (error) => {
-          toast.error("Error adding product");
+          message.error("Error adding product");
         },
       });
     },

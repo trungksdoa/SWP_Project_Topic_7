@@ -4,7 +4,6 @@ import { Controller } from "react-hook-form";
 import { Input, Button, message, Radio } from "antd";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import { manageUserActionThunks } from "../../../store/manageUser";
 import { useNavigate } from "react-router-dom";
 
@@ -38,16 +37,16 @@ const RegisterForm = ({ showModalLogin, onRegisterSuccess }) => {
     dispatch(manageUserActionThunks.registerThunk(formattedData))
       .unwrap()
       .then(() => {
-        toast.success("Account created successfully. Please check your email for the log in link.");
+        message.success("Account created successfully. Please check your email for the log in link.");
         if (typeof onRegisterSuccess === 'function') {
           onRegisterSuccess(); // Close the popup on successful registration
         }
       })
       .catch((err) => {
         if (err.response && err.response.status === 409) {
-          toast.warning("User already exists. Please check your email or try logging in.");
+          message.warning("User already exists. Please check your email or try logging in.");
         } else {
-          toast.error('Registration failed. Please try again.');
+          message.error('Registration failed. Please try again.');
         }
         console.error(err);
       });
