@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Button, Spin, Tooltip, Modal, Image, Checkbox } from "antd";
+import { Table, Button, Spin, Tooltip, Modal, Image, Checkbox, message } from "antd";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
-import { toast } from "react-toastify";
 import { useGetAllBlogs } from "../../../hooks/blogs/useGetAllBlogs";
 import { useDeleeteBlogById } from "../../../hooks/blogs/useDeleeteBlogById";
 
@@ -51,11 +50,11 @@ const ManageAdminBlog = () => {
       for (const id of selectedRowKeys) {
         await mutatetion.mutateAsync(id);
       }
-      toast.success("Selected blogs deleted successfully!");
+      message.success("Selected blogs deleted successfully!");
       setSelectedRowKeys([]);
       refetch();
     } catch (error) {
-      toast.error(`Error deleting blogs: ${error.message}`);
+      message.error(`Error deleting blogs: ${error.message}`);
     } finally {
       setIsDeletingSelected(false);
     }
@@ -83,10 +82,10 @@ const ManageAdminBlog = () => {
     setDeletingId(id);
     try {
       await mutatetion.mutateAsync(id);
-      toast.success("Blog deleted successfully!");
+      message.success("Blog deleted successfully!");
       refetch();
     } catch (error) {
-      toast.error(`Error deleting blog: ${error.message}`);
+      message.error(`Error deleting blog: ${error.message}`);
     } finally {
       setDeletingId(null);
     }

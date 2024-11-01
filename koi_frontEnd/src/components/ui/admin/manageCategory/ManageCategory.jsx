@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useGetCategory } from "../../../../hooks/admin/manageCategory/useGetCategory";
-import { Button, Table, Spin } from "antd";
+import { Button, Table, Spin, message } from "antd";
 import { PATH } from "../../../../constant";
 import { useNavigate } from "react-router-dom";
 import { useDeleteCategory } from "../../../../hooks/admin/manageCategory/useDeleteCategory";
-import { toast } from "react-toastify";
 const ManageCategory = () => {
   const { data: lstCategory, refetch, isFetching } = useGetCategory();
   const [deletingId, setDeletingId] = useState(null);
@@ -19,12 +18,12 @@ const ManageCategory = () => {
       setDeletingId(id);
       mutation.mutate(id, {
         onSuccess: () => {
-          toast.success("Delete Product Successfully!");
+          message.success("Delete Product Successfully!");
           refetch();
           setDeletingId(null);
         },
         onError: () => {
-          toast.error("Delete Product Failed!");
+          message.error("Delete Product Failed!");
           setDeletingId(null);
         },
       });

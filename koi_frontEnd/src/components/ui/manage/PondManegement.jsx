@@ -4,8 +4,7 @@ import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Spin, Modal, Select, Space, Pagination } from "antd"; // Removed Radio
-import { toast } from "react-toastify";
+import { Button, Checkbox, Form, Input, Spin, Modal, Select, Space, Pagination, message } from "antd"; // Removed Radio
 import { useUpdatePond } from "../../../hooks/koi/useUpdatePond";
 import { useDeletePond } from "../../../hooks/koi/useDeletePond"; // Add this import
 import { managePondActions } from "../../../store/managePond/slice";
@@ -136,11 +135,11 @@ const PondManagement = () => {
           setImgSrc("");
           addPondFormik.resetForm();
           refetch();
-          toast.success("Pond added successfully");
+          message.success("Pond added successfully");
         },
         onError: (error) => {
           console.error("Error adding pond:", error);
-          toast.error(`Error adding pond: ${error.message}`);
+          message.error(`Error adding pond: ${error.message}`);
         },
       });
     },
@@ -237,11 +236,11 @@ const PondManagement = () => {
     setIsDeleting(true);
     try {
       await deletePondMutation.mutateAsync(pondId);
-      toast.success("Pond deleted successfully!");
+      message.success("Pond deleted successfully!");
       setSelectedPond(null);
       refetch();
     } catch (error) {
-      toast.error(`Error deleting pond: ${error.message}`);
+      message.error(`Error deleting pond: ${error.message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -255,7 +254,7 @@ const PondManagement = () => {
 
   const confirmMoveFish = async () => {
     if (!destinationPond) {
-      toast.error("Please select a destination pond");
+      message.error("Please select a destination pond");
       return;
     }
 
@@ -282,7 +281,7 @@ const PondManagement = () => {
             },
             onError: (error) => {
               console.error(`Error updating koi ${koi.id}:`, error);
-              toast.error(`Error updating koi ${koi.id}: ${error.message}`);
+              message.error(`Error updating koi ${koi.id}: ${error.message}`);
             }
           }
         );
@@ -291,14 +290,14 @@ const PondManagement = () => {
       // Delete the original pond
       await deletePondMutation.mutateAsync(selectedPond.id);
 
-      toast.success("Fish moved and pond deleted successfully!");
+      message.success("Fish moved and pond deleted successfully!");
       setShowMoveConfirmation(false);
       setSelectedPond(null);
       setDestinationPond(null);
       refetch();
     } catch (error) {
       console.error("Error moving fish:", error);
-      toast.error(`Error moving fish: ${error.message || 'An unexpected error occurred'}`);
+      message.error(`Error moving fish: ${error.message || 'An unexpected error occurred'}`);
     } finally {
       setIsMovingFish(false);
     }

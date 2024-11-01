@@ -3,7 +3,6 @@ import { useGetAllKoi } from "../hooks/koi/useGetAllKoi.js";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../constant/config.js";
-import { toast } from "react-toastify";
 import KoiManagement from "../components/ui/manage/KoiManegement.jsx";
 import BreadcrumbComponent from "../components/ui/BreadcrumbCoponent.jsx";
 import { useTranslation } from "react-i18next";
@@ -15,7 +14,7 @@ const KoiManagementPage = () => {
 
   useEffect(() => {
     if (!userLogin) {
-      toast.warning(
+      message.warning(
         t("Please sign in or create an account to access this feature.")
       );
       navigate(PATH.HOME);

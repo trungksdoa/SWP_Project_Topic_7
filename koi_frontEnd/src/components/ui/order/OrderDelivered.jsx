@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Spin, Button, message } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
+import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
+import { usePostReciveOrder } from "../../../hooks/order/usePostReciveOrder";
 
 const OrderDelivered = ({
   lstDelivered,
@@ -15,20 +17,18 @@ const OrderDelivered = ({
       </div>
     );
   }
-
+  const mutation = usePostReciveOrder();
   const handleConfirmDelivery = (orderId) => {
-    try {
-      const payload = {
-        orderId: orderId,
-      };
-      manageOrderServices.receiveOrder(payload);
-      refetch();
-      switchToCompleteTab();
-      message.success("Order marked as completed");
-    } catch (error) {
-      // console.error('Error completing order:', error);
-      // message.error('Failed to complete order');
-    }
+    mutation.mutate(
+      { orderId },
+      {
+        onSuccess: () => {
+          refetch();
+          switchToCompleteTab();
+          message.success("Order marked as completed");
+        },
+      }
+    );
   };
 
   return (

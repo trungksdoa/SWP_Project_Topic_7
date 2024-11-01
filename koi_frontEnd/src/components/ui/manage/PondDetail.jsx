@@ -5,8 +5,7 @@ import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
 import { useGetPondById } from "../../../hooks/koi/useGetPondById.js";
 import { useUpdateKoi } from '../../../hooks/koi/useUpdateKoi';
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal, Pagination, Space } from "antd";
-import { toast } from "react-toastify";
+import { Button, Checkbox, Form, Input, Select, Spin, InputNumber, DatePicker, Modal, Pagination, Space, message } from "antd";
 import { manageKoiActions } from '../../../store/manageKoi/slice';
 import dayjs from 'dayjs';
 import { useUpdatePond } from '../../../hooks/koi/useUpdatePond';
@@ -157,13 +156,13 @@ const PondDetail = () => {
                 {
                     onSuccess: (updatedKoi) => {
                         dispatch(manageKoiActions.updateKoi(updatedKoi));
-                        toast.success("Koi updated successfully");
+                        message.success("Koi updated successfully");
                         setSelectedKoi(null);
                         refetch();
                     },
                     onError: (error) => {
                         console.error("Error updating koi:", error);
-                        toast.error(`Error updating koi: ${error.message}`);
+                        message.error(`Error updating koi: ${error.message}`);
                     },
                 }
             );
@@ -240,11 +239,11 @@ const PondDetail = () => {
                             imageUrl: imgSrc || pondData.imageUrl,
                         };
                         dispatch(managePondActions.updatePond(updatedPondWithImage));
-                        toast.success("Pond updated successfully");
+                        message.success("Pond updated successfully");
                         refetch();
                     },
                     onError: (error) => {
-                        toast.error(`Error updating pond: ${error.message}`);
+                        message.error(`Error updating pond: ${error.message}`);
                     },
                 }
             );
@@ -337,10 +336,10 @@ const PondDetail = () => {
         setIsDeleting(true);
         try {
           await deletePondMutation.mutateAsync(pondId);
-          toast.success("Pond deleted successfully!");
+          message.success("Pond deleted successfully!");
           navigate('/pond-management');
         } catch (error) {
-          toast.error(`Error deleting pond: ${error.message}`);
+          message.error(`Error deleting pond: ${error.message}`);
         } finally {
           setIsDeleting(false);
         }
@@ -354,7 +353,7 @@ const PondDetail = () => {
     
     const confirmMoveFish = async () => {
         if (!destinationPond) {
-          toast.error("Please select a destination pond");
+          message.error("Please select a destination pond");
           return;
         }
     
@@ -381,7 +380,7 @@ const PondDetail = () => {
                 },
                 onError: (error) => {
                   console.error(`Error updating koi ${koi.id}:`, error);
-                  toast.error(`Error updating koi ${koi.id}: ${error.message}`);
+                  message.error(`Error updating koi ${koi.id}: ${error.message}`);
                 }
               }
             );
@@ -390,13 +389,13 @@ const PondDetail = () => {
           // Delete the original pond
           await deletePondMutation.mutateAsync(pondIdNumber);
     
-          toast.success("Fish moved and pond deleted successfully!");
+          message.success("Fish moved and pond deleted successfully!");
           setShowMoveConfirmation(false);
           setDestinationPond(null);
           navigate('/pond-management');
         } catch (error) {
           console.error("Error moving fish:", error);
-          toast.error(`Error moving fish: ${error.message || 'An unexpected error occurred'}`);
+          message.error(`Error moving fish: ${error.message || 'An unexpected error occurred'}`);
         } finally {
           setIsMovingFish(false);
         }
@@ -414,7 +413,7 @@ const PondDetail = () => {
 
     const handleDeleteSelectedKoi = () => {
         if (selectedKoiForDeletion.length === 0) {
-            toast.error("Please select at least one Koi to delete.");
+            message.error("Please select at least one Koi to delete.");
             return;
         }
 
@@ -436,12 +435,12 @@ const PondDetail = () => {
             for (const koiId of selectedKoiForDeletion) {
                 await deleteKoiMutation.mutateAsync(koiId);
             }
-            toast.success(`Successfully deleted ${selectedKoiForDeletion.length} Koi!`);
+            message.success(`Successfully deleted ${selectedKoiForDeletion.length} Koi!`);
             setSelectedKoiForDeletion([]);
             refetch();
         } catch (error) {
             console.error("Error deleting Koi:", error);
-            toast.error(`Error deleting koi: ${error.message}`);
+            message.error(`Error deleting koi: ${error.message}`);
         } finally {
             setIsDeletingKoi(false);
         }
@@ -519,7 +518,7 @@ const PondDetail = () => {
                         imageUrl: newKoiImgSrc,
                     };
                     dispatch(manageKoiActions.addKoi(newKoiWithImage));
-                    toast.success("Koi added successfully");
+                    message.success("Koi added successfully");
                     handleCloseAddKoiModal();
                     refetch().then(() => {
                         resetForm();
@@ -528,7 +527,7 @@ const PondDetail = () => {
                 },
                 onError: (error) => {
                     console.error("Error adding koi:", error);
-                    toast.error(`Error adding koi: ${error.message}`);
+                    message.error(`Error adding koi: ${error.message}`);
                 },
             });
         },
@@ -585,7 +584,7 @@ const PondDetail = () => {
 
     const handleMoveSelectedKoi = () => {
         if (selectedKoiForDeletion.length === 0) {
-            toast.error("Please select at least one Koi to move.");
+            message.error("Please select at least one Koi to move.");
             return;
         }
         setShowMoveKoiConfirmation(true);
@@ -593,7 +592,7 @@ const PondDetail = () => {
 
     const confirmMoveKoi = async () => {
         if (!selectedDestinationPond) {
-            toast.error("Please select a destination pond");
+            message.error("Please select a destination pond");
             return;
         }
 
@@ -618,19 +617,18 @@ const PondDetail = () => {
                         },
                         onError: (error) => {
                             console.error(`Error updating koi ${koiId}:`, error);
-                            toast.error(`Error updating koi ${koiId}: ${error.message}`);
+                            message.error(`Error updating koi ${koiId}: ${error.message}`);
                         }
                     }
                 );
             }));
 
-            toast.success("Koi moved successfully!");
+            message.success("Koi moved successfully!");
             setShowMoveKoiConfirmation(false);
             setSelectedKoiForDeletion([]);
             refetch();
         } catch (error) {
-            console.error("Error moving koi:", error);
-            toast.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
+            message.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
         } finally {
             setIsMovingKoi(false);
         }

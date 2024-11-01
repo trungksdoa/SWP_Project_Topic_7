@@ -1,10 +1,10 @@
-import { Spin } from 'antd';
-
-export default function LoadingSpinner() {
+const LoadingSpinner = () => {
   return (
-    <div className="flex flex-col justify-center items-center min-h-[450px]">
-      <Spin size="large" />
-      <span className="mt-4 text-gray-500">Loading koi data...</span>
+    <div className="flex justify-center items-center h-[450px]">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      <span className="ml-4 text-xl">Loading...</span>
     </div>
   );
-}
+};
+
+export default LoadingSpinner;

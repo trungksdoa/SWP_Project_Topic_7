@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { manageCatgegoryServiceAdmin } from "../../../../services/admin/manageCategoryServiceAdmin";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Radio } from "antd";
+import { Button, Form, Input, InputNumber, message, Radio } from "antd";
 import { usePutCategory } from "../../../../hooks/admin/manageCategory/usePutCategory";
-import { toast } from "react-toastify";
 
 
 const EditCategory = () => {
@@ -32,7 +31,7 @@ const EditCategory = () => {
     onSubmit: (values) => {
       mutation.mutate({id: parseId, payload: values}, {
         onSuccess: () => {
-          toast.success("Update Category Successfully !")
+          message.success("Update Category Successfully !")
         }
       })
     }

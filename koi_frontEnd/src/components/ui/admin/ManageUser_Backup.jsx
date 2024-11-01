@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Spin } from "antd";
+import { Button, Table, Spin, message } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
 import { useGetAllUserByPage } from "../../../hooks/admin/UseGetAllUserByPage";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { PATH } from "../../../constant";
-import { toast } from "react-toastify";
 import { Input, Space } from "antd";
 
 const ManageUser = () => {
@@ -26,12 +25,12 @@ const ManageUser = () => {
       setLoadingId(id); 
       mutate.mutate(id, {
         onSuccess: () => {
-          toast.success("Delete User Successfully!");
+          message.success("Delete User Successfully!");
           refetch();
           setLoadingId(null);
         },
         onError: (error) => {
-          toast.error("Delete User Failed!");
+          message.error("Delete User Failed!");
           setLoadingId(null);
         },
       });

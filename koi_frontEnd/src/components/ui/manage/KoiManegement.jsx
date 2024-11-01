@@ -2,6 +2,9 @@ import  { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
+import {  Space, Checkbox, message } from "antd";
+import { useTranslation } from 'react-i18next';
+import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 import {
   Button,
   Pagination,
@@ -14,11 +17,9 @@ import {
 
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
-import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { useAddKoi } from "../../../hooks/koi/useAddKoi";
 import { useFormik } from "formik";
@@ -84,11 +85,11 @@ const KoiManegement = () => {
     setIsDeleting(true);
     try {
       await deleteKoiMutation.mutateAsync(koiId);
-      toast.success("Koi deleted successfully!");
+      message.success("Koi deleted successfully!");
       setIsModalVisible(false);
       refetch();
     } catch (error) {
-      toast.error(`Error deleting koi: ${error.message}`);
+      message.error(`Error deleting koi: ${error.message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -206,7 +207,7 @@ const KoiManegement = () => {
 
   const handleDeleteSelectedKoi = () => {
     if (selectedKoiForAction.length === 0) {
-      toast.error("Please select at least one Koi to delete.");
+      message.error("Please select at least one Koi to delete.");
       return;
     }
 
@@ -228,12 +229,12 @@ const KoiManegement = () => {
       for (const koiId of selectedKoiForAction) {
         await deleteKoiMutation.mutateAsync(koiId);
       }
-      toast.success(`Successfully deleted ${selectedKoiForAction.length} Koi!`);
+      message.success(`Successfully deleted ${selectedKoiForAction.length} Koi!`);
       setSelectedKoiForAction([]);
       refetch();
     } catch (error) {
       console.error("Error deleting Koi:", error);
-      toast.error(`Error deleting koi: ${error.message}`);
+      message.error(`Error deleting koi: ${error.message}`);
     } finally {
       setIsDeletingKoi(false);
     }
@@ -241,7 +242,7 @@ const KoiManegement = () => {
 
   const handleMoveSelectedKoi = () => {
     if (selectedKoiForAction.length === 0) {
-      toast.error("Please select at least one Koi to move.");
+      message.error("Please select at least one Koi to move.");
       return;
     }
     setShowMoveKoiConfirmation(true);
@@ -249,7 +250,7 @@ const KoiManegement = () => {
 
   const confirmMoveKoi = async () => {
     if (!selectedDestinationPond) {
-      toast.error("Please select a destination pond");
+      message.error("Please select a destination pond");
       return;
     }
 
@@ -277,15 +278,13 @@ const KoiManegement = () => {
         })
       );
 
-      toast.success("Koi moved successfully!");
+      message.success("Koi moved successfully!");
       setShowMoveKoiConfirmation(false);
       setSelectedKoiForAction([]);
       refetch();
     } catch (error) {
       console.error("Error moving koi:", error);
-      toast.error(
-        `Error moving koi: ${error.message || "An unexpected error occurred"}`
-      );
+      message.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
     } finally {
       setIsMovingKoi(false);
     }
@@ -410,13 +409,13 @@ const KoiManegement = () => {
             imageUrl: newKoiImgSrc,
           };
           dispatch(manageKoiActions.addKoi(newKoiWithImage));
-          toast.success("Koi added successfully");
+          message.success("Koi added successfully");
           refetch();
           handleCloseAddKoiModal();
         },
         onError: (error) => {
           console.error("Error adding koi:", error);
-          toast.error(`Error adding koi: ${error.message}`);
+          message.error(`Error adding koi: ${error.message}`);
         },
       });
     },
