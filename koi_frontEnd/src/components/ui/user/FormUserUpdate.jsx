@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Checkbox, Form, Input, message } from "antd";
 import { useUpdateUser } from "../../../hooks/user/useUpdateUser";
 import { useDispatch, useSelector } from "react-redux";
 import { manageUserActions } from "../../../store/manageUser/slice";
-import { toast } from "react-toastify";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { UserOutlined } from "@ant-design/icons";
 
@@ -61,10 +60,10 @@ const FormUserUpdate = ({ user, refetch }) => {
             );
             localStorage.setItem(LOCAL_STORAGE_LOGIN_KEY, JSON.stringify(user));
             refetch();
-            toast.success("User updated successfully");
+            message.success("User updated successfully");
           },
           onError: () => {
-            toast.error("Error updating user");
+            message.error("Error updating user");
           },
         }
       );

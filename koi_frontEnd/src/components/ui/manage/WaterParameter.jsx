@@ -23,7 +23,6 @@ import { PATH } from "../../../constant/config.js";
 import StoreTemplate from "../../template/StoreTemplate.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { useUpdateWaterParameter } from "../../../hooks/koi/useUpdateWaterParameter.js";
-import { toast } from "react-toastify";
 import { useGetWaterStandard } from "../../../hooks/koi/useGetWaterStandard.js";
 import { useTranslation } from "react-i18next";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
@@ -187,7 +186,7 @@ const WaterParameter = () => {
         { id: waterParameters?.pondId, payload: values },
         {
           onSuccess: () => {
-            toast.success("Update Water Parameter Success !");
+            message.success("Update Water Parameter Success !");
             refetch();
             refetchStandard();
           },

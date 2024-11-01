@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, InputNumber, Spin, Breadcrumb } from "antd";
-import { toast } from "react-toastify";
+import { Button, InputNumber, Spin, Breadcrumb, message } from "antd";
 import { useTranslation } from "react-i18next";
 import { useGetProductBySlug } from "../../../hooks/product/useGetProductBySlug";
 import { manageCartActions } from "../../../store/manageCart/slice"; // Redux slice
@@ -59,7 +58,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!userLogin) {
-      toast.error("Please login to add to cart");
+      message.error("Please login to add to cart");
       return;
     }
 
@@ -86,10 +85,10 @@ const ProductDetail = () => {
         {
           onSuccess: () => {
             refetchCart();
-            toast.success("Product quantity updated in cart");
+            message.success("Product quantity updated in cart");
           },
           onError: () => {
-            toast.error("This product existed in cart");
+            message.error("This product existed in cart");
             navigate(PATH.CART);
           },
         }
@@ -101,10 +100,10 @@ const ProductDetail = () => {
       mutate.mutate(payload, {
         onSuccess: () => {
           refetchCart();
-          toast.success("Product added to cart");
+          message.success("Product added to cart");
         },
         onError: (error) => {
-          toast.error(error?.response?.data?.message);
+          message.error(error?.response?.data?.message);
         },
       });
     }

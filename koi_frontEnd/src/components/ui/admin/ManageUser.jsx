@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Spin, Modal } from "antd";
+import { Button, Table, Spin, Modal, message } from "antd";
 import { useGetUserAll } from "../../../hooks/admin/UseGetUserAll";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteUser } from "../../../hooks/admin/UseDeleteUser";
 import { useGetAllUserByPage } from "../../../hooks/admin/UseGetAllUserByPage";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import { PATH } from "../../../constant";
-import { toast } from "react-toastify";
 import { Input, Space, Tag } from "antd";
 import { filter } from "@chakra-ui/react";
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -228,21 +227,21 @@ const ManageUser = () => {
   //   });
   // };
 
-  // const deleteSelectedUsers = async () => {
-  //   setIsDeletingSelected(true);
-  //   try {
-  //     for (const id of selectedRowKeys) {
-  //       await mutate.mutateAsync(id);
-  //     }
-  //     toast.success("Selected users deleted successfully!");
-  //     setSelectedRowKeys([]);
-  //     refetch();
-  //   } catch (error) {
-  //     toast.error(`Error deleting users: ${error.message}`);
-  //   } finally {
-  //     setIsDeletingSelected(false);
-  //   }
-  // };
+  const deleteSelectedUsers = async () => {
+    setIsDeletingSelected(true);
+    try {
+      for (const id of selectedRowKeys) {
+        await mutate.mutateAsync(id);
+      }
+      message.success("Selected users deleted successfully!");
+      setSelectedRowKeys([]);
+      refetch();
+    } catch (error) {
+      message.error(`Error deleting users: ${error.message}`);
+    } finally {
+      setIsDeletingSelected(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

@@ -1,8 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
-import { Input, Button } from "antd";
-import { toast } from "react-toastify";
+import { Input, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { manageUserActionThunks } from "../../../store/manageUser";
 
@@ -21,7 +20,7 @@ const ForgotPassword = ({ showModalLogin }) => {
     dispatch(manageUserActionThunks.forgotPasswordThunk(data))
     .unwrap()
     .then((res) => {
-      toast.success("New password sent to your email Successfully")
+      message.success("New password sent to your email Successfully")
       showModalLogin();
     })
   };

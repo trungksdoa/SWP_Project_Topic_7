@@ -1,7 +1,6 @@
-import { Button, Spin } from "antd";
+import { Button, message, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDeleteOrder } from "../../../hooks/order/useDeleteOrder";
-import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
@@ -21,7 +20,7 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
       { userId, orderId }, 
       {
         onSuccess: () => {
-          toast.success("Cancel Successfully!");
+          message.success("Cancel Successfully!");
           setLoadingId(null);
           refetch();
           switchToCancelledTab();
@@ -44,11 +43,11 @@ const OrderPending = ({ lstPending, refetch, switchToCancelledTab, isFetching })
         if (res?.data?.data?.shortLink) {
           window.location.href = res.data.data.shortLink;
         } else {
-          toast.error("Failed to generate payment link");
+          message.error("Failed to generate payment link");
         }
       },
       onError: (error) => {
-        toast.error("Error processing the order: " + error.message);
+        message.error("Error processing the order: " + error.message);
       }
     });
   }

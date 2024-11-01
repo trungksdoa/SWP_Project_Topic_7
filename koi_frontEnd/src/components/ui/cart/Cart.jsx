@@ -2,10 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetCartByUserId } from "../../../hooks/manageCart/useGetCartByUserId";
 // import { manageProductThunks } from "../../../store/manageProduct";
-import { InputNumber, Spin, Skeleton, Space, Modal } from "antd";
+import { InputNumber, Spin, Skeleton, Space, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDeleteProductsInCarts } from "../../../hooks/manageCart/useDeleteProductsInCarts";
-import { toast } from "react-toastify";
 import { usePutCarts } from "../../../hooks/manageCart/usePutCarts";
 import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
@@ -43,17 +42,17 @@ const Cart = () => {
         {
           onSuccess: (res) => {
             if (res && res.data) {
-              const { message } = res.data;
-              toast.success(
-                message || "Updated product quantity successfully!"
+              const { mess } = res.data;
+              message.success(
+                mess || "Updated product quantity successfully!"
               );
               refetch(); // Refetch cart data after successful update
             }
             setIsUpdating(false);
           },
           onError: (error) => {
-            toast.error(
-              error?.response?.data?.message ||
+            message.error(
+              error?.response?.data?.mess ||
                 "Failed to update product quantity."
             );
             setIsUpdating(false);
@@ -84,12 +83,12 @@ const Cart = () => {
         { productId, userId: userLogin?.id, quantity },
         {
           onSuccess: (response) => {
-            toast.success("Item removed from cart successfully!");
+            message.success("Delete product in cart successfully!");
             refetch();
           },
           onError: (error) => {
             console.error("API Error:", error);
-            toast.error("Failed to remove item from cart.");
+            message.error("Failed to delete product from cart.");
           },
         }
       );

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Spin, Checkbox, Row, Card, Select, Pagination, Input, Slider } from "antd";
+import { Spin, Checkbox, Row, Card, Select, Pagination, message } from "antd";
 import { useTranslation } from "react-i18next";
 import { useGetAllProducts } from "../../hooks/admin/manageProducts/UseGetAllProducts";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../constant";
-import { toast } from "react-toastify";
 import { useGetCategory } from "../../hooks/admin/manageCategory/useGetCategory";
 import BreadcrumbComponent from "../ui/BreadcrumbCoponent";
 import Title from "antd/es/skeleton/Title";
@@ -55,7 +54,7 @@ const StoreTemplate = () => {
 
   const addToCart = (product) => {
     if (!userLogin) {
-      toast.error("Please login to add to cart");
+      message.error("Please login to add to cart");
       return;
     }
     // Implement add to cart functionality here

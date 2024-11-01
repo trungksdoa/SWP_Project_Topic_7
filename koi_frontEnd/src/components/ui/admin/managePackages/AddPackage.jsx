@@ -1,7 +1,6 @@
 import React from "react";
 import { useFormik } from "formik";
-import { Button, Form, Input, InputNumber, Radio, Modal } from "antd";
-import { toast } from "react-toastify";
+import { Button, Form, Input, InputNumber, Radio, Modal, message } from "antd";
 import { useAddPackage } from "../../../../hooks/admin/managePackages/useAddPackage";
 
 const AddPackage = ({ visible, onCancel, onSuccess, nextId }) => {
@@ -23,12 +22,12 @@ const AddPackage = ({ visible, onCancel, onSuccess, nextId }) => {
 
       mutation.mutate(packageData, {
         onSuccess: () => {
-          toast.success("Package added successfully!");
+          message.success("Package added successfully!");
           onSuccess();
           formik.resetForm();
         },
         onError: (error) => {
-          toast.error(`Error adding package: ${error.message}`);
+          message.error(`Error adding package: ${error.message}`);
         },
       });
     },

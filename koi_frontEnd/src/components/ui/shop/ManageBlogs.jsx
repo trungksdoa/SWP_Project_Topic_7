@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { manageBlogsServicesH } from "../../../services/shop/manageBlogServicesH";
 import { useSelector } from "react-redux";
 import { useGetBlogsByAuthorId } from "../../../hooks/blogs/useGetBlogsByAuthorId";
-import { Table, Button, Spin, Tooltip, Modal } from "antd";
+import { Table, Button, Spin, Tooltip, Modal, message } from "antd";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
 import { useDeleeteBlogById } from "../../../hooks/blogs/useDeleeteBlogById";
-import { toast } from "react-toastify";
 
 const ManageBlogs = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -43,10 +42,10 @@ const ManageBlogs = () => {
     setDeletingId(id);
     try {
       await mutatetion.mutateAsync(id);
-      toast.success("Blog deleted successfully!");
+      message.success("Blog deleted successfully!");
       refetch();
     } catch (error) {
-      toast.error(`Error deleting blog: ${error.message}`);
+      message.error(`Error deleting blog: ${error.message}`);
     } finally {
       setDeletingId(null);
     }

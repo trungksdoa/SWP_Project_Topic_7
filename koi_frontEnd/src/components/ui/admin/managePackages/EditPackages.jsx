@@ -52,7 +52,7 @@ const EditPackages = ({ visible, onCancel, packageId, onSuccess }) => {
         { id: packageId, payload: values },
         {
           onSuccess: () => {
-            toast.success("Update Package Successfully!");
+            message.success("Update Package Successfully!");
             onSuccess();
             onCancel();
           },

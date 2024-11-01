@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Spin, Button, message, Modal } from "antd";
 import { manageOrderServices } from "../../../services/manageOderServices";
+import { usePostSendOrder } from "../../../hooks/order/usePostSendOrder";
+import { usePostReciveOrder } from "../../../hooks/order/usePostReciveOrder";
 
 const OrderDelivered = ({
   lstDelivered,

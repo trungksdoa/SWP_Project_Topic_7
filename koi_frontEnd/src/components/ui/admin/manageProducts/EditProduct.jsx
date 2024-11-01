@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetProductById } from "../../../../hooks/user/UserGetProductById";
-import { Button, Form, Input, InputNumber, Radio } from "antd";
+import { Button, Form, Input, InputNumber, message, Radio } from "antd";
 import { useFormik } from "formik";
 import { usePutProduct } from "../../../../hooks/admin/manageProducts/usePutProduct";
-import { toast } from "react-toastify";
 import { manageProductServiceH } from "../../../../services/admin/manageProductServiceH";
 import { manageProductsServices } from "../../../../services/manageProducrsServices";
 
@@ -58,10 +57,10 @@ const EditProduct = () => {
       // Gửi request PUT với formData và id
       mutation.mutate({ id: parseId, payload: formData }, {
         onSuccess: (response) => {
-          toast.success("Product updated successfully");
+          message.success("Product updated successfully");
         },
         onError: (error) => {
-          toast.error("Error updating product");
+          message.error("Error updating product");
         },
       });
     },

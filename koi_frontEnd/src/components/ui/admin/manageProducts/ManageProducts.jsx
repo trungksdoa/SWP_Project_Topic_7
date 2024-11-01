@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Spin } from "antd";
+import { Table, Input, Button, Spin, message } from "antd";
 import { useGetAllProducts } from "../../../../hooks/admin/manageProducts/UseGetAllProducts";
 import { EditOutlined } from "@ant-design/icons";
 import { useDeleteProduct } from "../../../../hooks/admin/manageProducts/UseDeleteProduct";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../constant";
-import { toast } from "react-toastify";
 
 const ManageProducts = () => {
   const { data: lstProducts, refetch, isFetching } = useGetAllProducts();
@@ -25,12 +24,12 @@ const ManageProducts = () => {
       setDeletingId(id); // Set ID sản phẩm đang được xóa
       mutate.mutate(id, {
         onSuccess: () => {
-          toast.success("Delete Product Successfully!");
+          message.success("Delete Product Successfully!");
           refetch();
           setDeletingId(null); // Xóa thành công, reset ID xóa
         },
         onError: () => {
-          toast.error("Delete Product Failed!");
+          message.error("Delete Product Failed!");
           setDeletingId(null); // Nếu lỗi, reset ID xóa
         },
       });
