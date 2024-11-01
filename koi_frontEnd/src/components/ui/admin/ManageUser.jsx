@@ -203,29 +203,29 @@ const ManageUser = () => {
     }),
   };
 
-  const handleSelectAll = () => {
-    setSelectAll(true);
-    setSelectedRowKeys(lstUser?.data?.content.map(user => user.id) || []);
-  };
+  // const handleSelectAll = () => {
+  //   setSelectAll(true);
+  //   setSelectedRowKeys(lstUser?.data?.content.map(user => user.id) || []);
+  // };
 
-  const handleCancelSelection = () => {
-    setSelectAll(false);
-    setSelectedRowKeys([]);
-  };
+  // const handleCancelSelection = () => {
+  //   setSelectAll(false);
+  //   setSelectedRowKeys([]);
+  // };
 
-  const handleDeleteSelected = () => {
-    confirm({
-      title: 'Delete Selected Users',
-      icon: <ExclamationCircleOutlined />,
-      content: `Are you sure you want to delete ${selectedRowKeys.length} selected user(s)?`,
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        deleteSelectedUsers();
-      },
-    });
-  };
+  // const handleDeleteSelected = () => {
+  //   confirm({
+  //     title: 'Delete Selected Users',
+  //     icon: <ExclamationCircleOutlined />,
+  //     content: `Are you sure you want to delete ${selectedRowKeys.length} selected user(s)?`,
+  //     okText: 'Yes',
+  //     okType: 'danger',
+  //     cancelText: 'No',
+  //     onOk() {
+  //       deleteSelectedUsers();
+  //     },
+  //   });
+  // };
 
   const deleteSelectedUsers = async () => {
     setIsDeletingSelected(true);
@@ -247,7 +247,7 @@ const ManageUser = () => {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-4 flex justify-between items-center">
         <div>
-          <Button
+          {/* <Button
             onClick={handleSelectAll}
             className="mr-2 border-black text-black hover:bg-blue-500 hover:text-white"
           >
@@ -266,7 +266,7 @@ const ManageUser = () => {
             className="bg-red-600 text-white hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out"
           >
             Delete Selected
-          </Button>
+          </Button> */}
         </div>
         <span>{`Selected ${selectedRowKeys.length} items`}</span>
       </div>

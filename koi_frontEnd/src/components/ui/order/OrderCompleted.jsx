@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Spin, Modal } from 'antd';
 import ReceiptComponent from "../checkout/ReceiptComponent";
 
-const OrderCompleted = ({ lstCompleted, isFetching }) => {
+const OrderCompleted = ({ lstCompleted, isFetching, refetch }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await refetch();
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+    
+    fetchData();
+    
+    const interval = setInterval(fetchData, 30000);
+    
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const handleClick = (order) => {
     setSelectedOrder(order);

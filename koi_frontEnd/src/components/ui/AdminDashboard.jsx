@@ -62,8 +62,13 @@ const StatCard = React.memo(({ title, value, prefix, suffix, loading }) => (
     />
   </Card>
 ));
+StatCard.displayName = 'StatCard';
 
 const StatCardTopProduct = React.memo(({ title, value, prefix, suffix, loading }) => {
+  if(value === undefined) {
+    value = 0;
+  };
+  
   const totalSales = value.reduce((sum, product) => sum + product.value, 0);
 
   const renderTopProducts = () => {
@@ -123,11 +128,15 @@ const StatCardTopProduct = React.memo(({ title, value, prefix, suffix, loading }
     </Card>
   );
 });
+StatCardTopProduct.displayName = 'StatCardTopProduct';
+
 const AdminDashboard = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalSales, setTotalSales] = useState(0);
   const defaultStartDate = useMemo(() => dayjs(DEFAULT_START_DATE), []);
   const [dateRange, setDateRange] = useState([defaultStartDate, dayjs()]);
+
+
   const [topProduct, setTopProduct] = useState([
     { name: "", value: 0 },
     { name: "", value: 0 },

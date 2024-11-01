@@ -8,10 +8,11 @@ import { useDeleteProductsInCarts } from "../../../hooks/manageCart/useDeletePro
 import { usePutCarts } from "../../../hooks/manageCart/usePutCarts";
 import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant";
+import LoadingSpinner from "../../layouts/LoadingSpinner";
 
 const Cart = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const { data: carts, refetch } = useGetCartByUserId(userLogin?.id);
+  const { data: carts, refetch, isFetching } = useGetCartByUserId(userLogin?.id);
   const mutationPutCart = usePutCarts();
   const navigate = useNavigate();
 
@@ -64,8 +65,21 @@ const Cart = () => {
   const mutate = useDeleteProductsInCarts();
 
   const handleDeleteCart = (productId, quantity) => {
-    if (window.confirm("Do you want to delete this item? YES or NO")) {
-      mutate.mutate(
+    Modal.confirm({
+      title: "Delete Item",
+      content: "Are you sure you want to remove this item from your cart?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        deleteCartItem(productId, quantity);
+      },
+    });
+  };
+
+  const deleteCartItem = async (productId, quantity) => {
+    try {
+      await mutate.mutateAsync(
         { productId, userId: userLogin?.id, quantity },
         {
           onSuccess: (response) => {
@@ -78,6 +92,9 @@ const Cart = () => {
           },
         }
       );
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item from cart.");
     }
   };
 
@@ -85,20 +102,23 @@ const Cart = () => {
   const totalPrice =
     carts?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
 
+  if (isFetching) {
+    return <LoadingSpinner />;
+  }
+
   if (carts?.length === 0) {
     return (
-      <div>
-        <div className="flex justify-center my-[60px]">
+      <div className="h-[450px]">
+        <div className="flex justify-center items-center">
           <img
             src="../../../../images/cart-empty.png"
-            className="w-[40%]"
+            className="w-[30%] h-[30%]"
             alt="empty"
           />
         </div>
         <div className="mb-[60px]">
           <h2 className="text-orange-500 text-center mb-[8px] text-[32px]">
-            There are no products in the cart, please back to the store to
-            select anything .
+            Your cart is empty. Please visit our store to add some items.
           </h2>
           <div className="flex justify-center">
             <NavLink
@@ -112,7 +132,6 @@ const Cart = () => {
       </div>
     );
   }
-  // }
 
   return (
     <div className="w-[60%] my-[40px] mx-auto">
@@ -163,9 +182,7 @@ const Cart = () => {
                     color: "red",
                     cursor: "pointer",
                   }}
-                  onClick={() => {
-                    handleDeleteCart(product?.productId);
-                  }}
+                  onClick={() => handleDeleteCart(product?.productId)}
                 />
               </div>
             </div>
