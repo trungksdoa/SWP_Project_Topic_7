@@ -98,21 +98,21 @@ const HeaderManage = () => {
               <NavLink
                 to={PATH.STORE}
                 className={({ isActive }) =>
-                  `flex items-center -mb-1 ${
+                  `flex items-center ${
                     isActive
                       ? "text-orange-500"
-                      : "dark:border- dark:text-violet-600 mr-[60px] dark:border-violet-600"
+                      : "dark:border- dark:text-violet-600  dark:border-violet-600"
                   }`
                 }
               >
                 {t("Store")}
               </NavLink>
             </li>
-            <li>
+            <li className="text-white flex">
               <NavLink
                 to={PATH.BLOGS}
                 className={({ isActive }) =>
-                  `flex items-center mr-[60px] -mb-1 ${
+                  `flex items-center  ${
                     isActive ? "text-orange-500" : "dark:border-"
                   }`
                 }
