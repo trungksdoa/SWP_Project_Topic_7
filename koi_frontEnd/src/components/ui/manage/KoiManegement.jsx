@@ -377,6 +377,7 @@ const KoiManegement = () => {
       pondId: null,
       dateOfBirth: null,
       image: null,
+      date: dayjs(),
     },
     onSubmit: (values) => {
       const formData = new FormData();
@@ -740,6 +741,19 @@ const KoiManegement = () => {
                       value={addKoiFormik.values.dateOfBirth}
                       onChange={(date) =>
                         addKoiFormik.setFieldValue("dateOfBirth", date)
+                      }
+                      className="w-full"
+                      disabledDate={(current) =>
+                        current && current > dayjs().endOf("day")
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item label="Date created" className="mb-1">
+                    <DatePicker
+                      name="date"
+                      value={addKoiFormik.values.date}
+                      onChange={(date) =>
+                        addKoiFormik.setFieldValue("date", date)
                       }
                       className="w-full"
                       disabledDate={(current) =>

@@ -62,7 +62,8 @@ const FormKoiUpdate = ({
       length: koi?.data?.length || 0,
       pondId: koi?.data?.pondId || null,
       dateOfBirth: koi?.data?.dateOfBirth ? dayjs(koi.data.dateOfBirth) : null,
-      date: koi?.data?.date ? dayjs(koi.data.date) : dayjs(),
+      date: koi?.data?.date ? dayjs(koi.data.date) : null,
+      ageMonth: koi?.data?.ageMonth || null,
       imageUrl: koi?.data?.imageUrl || "",
     },
     onSubmit: async (values) => {
@@ -132,11 +133,12 @@ const FormKoiUpdate = ({
       dateOfBirth: koi.data.dateOfBirth ? dayjs(koi.data.dateOfBirth) : null,
       image: null,
       date: koi.data.date ? dayjs(koi.data.date) : dayjs(),
+      ageMonth: koi.data.ageMonth || null,
       imageUrl: koi.data.imageUrl || "",
     });
 
     setImgSrc(koi.data.imageUrl);
-    calculateAge(koi.data.dateOfBirth);
+    // calculateAge(koi.data.dateOfBirth);
   }, [koi]);
 
   // Hook
@@ -367,9 +369,17 @@ const FormKoiUpdate = ({
                 />
               </Form.Item>
 
-              <Form.Item label="Age">
+              {/* <Form.Item label="Age">
                 <Input
                   value={formatAge(koiAge)}
+                  readOnly
+                  className="bg-gray-50"
+                />
+              </Form.Item> */}
+
+              <Form.Item label="Age (month)"> 
+                <Input
+                  value={formik.values.ageMonth}
                   readOnly
                   className="bg-gray-50"
                 />
