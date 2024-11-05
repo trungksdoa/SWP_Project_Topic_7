@@ -1,9 +1,7 @@
 package com.product.server.koi_control_application.repository;
 
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.pojo.OrderReport;
 import com.product.server.koi_control_application.pojo.report.BarChart;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,4 +55,10 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
             "GROUP BY DATE(o.createdAt) " +
             "ORDER BY DATE(o.createdAt)")
     List<BarChart> getTotalSalesByDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT o FROM Orders o LEFT JOIN OrderItems oi ON o.id = oi.order.id WHERE oi.productId.id = :productId and o.userId =:userId and o.status = 'COMPLETED'")
+    List<Orders> findOrdersByProductId(
+            @Param("productId") int productId,
+            @Param("userId") int userId
+    );
 }

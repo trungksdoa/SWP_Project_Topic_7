@@ -7,5 +7,6 @@ const api = apiInstanceHeader.create({
 
 export const manageFeedbackService = {
   postFeedback: (payload) => api.post("", payload),
-  getFeedbacById: (id) => api.get(`/product/${id}`)
+  getFeedbacById: (id) => api.get(`/product/${id}`),
+  putFeedback: (payload) => api.put("", payload),
 };

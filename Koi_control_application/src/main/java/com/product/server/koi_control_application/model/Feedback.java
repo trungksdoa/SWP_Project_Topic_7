@@ -35,6 +35,7 @@ public class Feedback {
     private Integer rating;
 
     @Column(length = 1000)
+    @Size(max = 1000, message = "Comment must be less than 1000 characters")
     private String comment;
 
     @Column(name = "created_at", updatable = false)
@@ -42,6 +43,9 @@ public class Feedback {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    private int orderId;
+
 
     @PrePersist
     protected void onCreate() {
