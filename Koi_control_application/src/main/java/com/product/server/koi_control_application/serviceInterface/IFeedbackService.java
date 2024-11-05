@@ -33,26 +33,11 @@ public interface IFeedbackService {
     /**
      * Updates an existing feedback entry.
      *
-     * @param id       The ID of the feedback to update.
      * @param feedback The Feedback object containing updated details.
      * @return        The updated Feedback object.
      */
-    Feedback updateFeedback(Integer id, Feedback feedback);
+    Feedback updateFeedback(FeedbackDTO feedback);
 
-    /**
-     * Deletes a feedback entry by its ID.
-     *
-     * @param id The ID of the feedback to delete.
-     */
-    void deleteFeedback(Integer id);
-
-    /**
-     * Retrieves a feedback entry by its ID.
-     *
-     * @param id The ID of the feedback to retrieve.
-     * @return   The Feedback object corresponding to the provided ID.
-     */
-    Feedback getFeedbackById(Integer id);
 
     /**
      * Retrieves all feedback entries for a specific product.
@@ -70,12 +55,5 @@ public interface IFeedbackService {
      */
     List<Feedback> getFeedbacksByUserId(Integer userId);
 
-    /**
-     * Retrieves a paginated list of all feedback entries.
-     *
-     * @param page The page number to retrieve.
-     * @param size The number of feedback entries per page.
-     * @return     A Page containing the list of Feedback objects.
-     */
-    Page<Feedback> getAllFeedbacks(int page, int size);
+
 }

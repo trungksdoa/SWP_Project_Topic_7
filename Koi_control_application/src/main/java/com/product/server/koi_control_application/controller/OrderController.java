@@ -2,16 +2,12 @@ package com.product.server.koi_control_application.controller;
 
 import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.facade.OrderFacade;
-import com.product.server.koi_control_application.model.Category;
 import com.product.server.koi_control_application.model.Orders;
-import com.product.server.koi_control_application.pojo.momo.MomoProduct;
 import com.product.server.koi_control_application.pojo.request.OrderRequestDTO;
 import com.product.server.koi_control_application.pojo.request.OrderVerifyDTO;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
-import com.product.server.koi_control_application.serviceInterface.ICategoryService;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
 import com.product.server.koi_control_application.serviceInterface.IPaymentService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
 import com.product.server.koi_control_application.ultil.JwtTokenUtil;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +113,7 @@ public class OrderController {
             "SHIPPING, " +
             "DELIVERED, " +
             "}")
-    public ResponseEntity<BaseResponse> receiveOrder(HttpServletRequest request, @RequestBody OrderVerifyDTO data) {
+    public ResponseEntity<BaseResponse> receiveOrder(@RequestBody OrderVerifyDTO data) {
         //To confirm that the user is an admin
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.COMPLETED.getValue());
@@ -136,7 +131,7 @@ public class OrderController {
             "SHIPPING, " +
             "DELIVERED, " +
             "}")
-    public ResponseEntity<BaseResponse> confirmOrder(HttpServletRequest request, @RequestBody OrderVerifyDTO data) {
+    public ResponseEntity<BaseResponse> confirmOrder(@RequestBody OrderVerifyDTO data) {
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.SHIPPING.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
@@ -144,10 +139,17 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping("/order/delivered")
-    public ResponseEntity<BaseResponse> updateDeliveredOrder(HttpServletRequest request, @RequestBody OrderVerifyDTO data) {
+    public ResponseEntity<BaseResponse> updateDeliveredOrder(@RequestBody OrderVerifyDTO data) {
         int orderId = data.getOrderId();
         Orders orders = orderService.updateOrderStatus(orderId, OrderCode.DELIVERED.getValue());
         return ResponseUtil.createSuccessResponse(orders, "Update order status successfully");
     }
 
+
+    @GetMapping("/feedback-order/{productId}")
+    public ResponseEntity<BaseResponse> getOrdersByStatus(HttpServletRequest request, @PathVariable int productId) {
+        int userId = jwtUtil.getUserIdFromToken(request);
+        List<Orders> orders = orderService.getAllOrderWithFeedback(productId, userId);
+        return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
+    }
 }

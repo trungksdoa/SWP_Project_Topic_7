@@ -54,13 +54,6 @@ public interface IOrderService {
      */
     void cancelPendingOrder(int userId, int orderId);
 
-    /**
-     * Cancels an order by an admin.
-     *
-     * @param orderId The ID of the order to cancel.
-     * @param message The message from the admin regarding the cancellation.
-     */
-    void cancelOrderByAdmin(int orderId, String message);
 
     /**
      * Retrieves a paginated list of orders for a user.
@@ -80,12 +73,6 @@ public interface IOrderService {
      */
     List<Orders> getOrdersByUser(int userId);
 
-    /**
-     * Deletes an order by its ID.
-     *
-     * @param id The ID of the order to delete.
-     */
-    void deleteOrder(int id);
 
-    void updateSimulatorOrder();
+    List<Orders> getAllOrderWithFeedback(int productId ,int userId);
 }

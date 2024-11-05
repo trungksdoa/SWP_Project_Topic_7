@@ -27,4 +27,5 @@ export const manageOrderServices = {
     dashboardApi.get(`/order-status?startDate=${startDate}&endDate=${endDate}`),
   getTotalSales: (startDate, endDate) =>
     dashboardApi.get(`/total-sales?startDate=${startDate}&endDate=${endDate}`),
+  getFeedbackOrder: (prdId) => api.get(`/feedback-order/${prdId}`),
 };

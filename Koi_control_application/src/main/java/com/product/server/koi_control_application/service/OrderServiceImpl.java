@@ -11,8 +11,6 @@ import com.product.server.koi_control_application.serviceHelper.interfaces.IIPro
 import com.product.server.koi_control_application.serviceHelper.interfaces.IOrderHelper;
 import com.product.server.koi_control_application.serviceInterface.ICartService;
 import com.product.server.koi_control_application.serviceInterface.IOrderService;
-import com.product.server.koi_control_application.serviceInterface.IProductService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,12 +30,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
-    private final IProductService productService;
     private final ICartService cartService;
     private final IIProcessHelper processHelper;
     private final IOrderHelper orderHelper;
-    private final IUserService userService;
-
 
     /**
      * Creates a new order for a user.
@@ -143,40 +138,6 @@ public class OrderServiceImpl implements IOrderService {
         processHelper.cancelOrderAndUpdateProductItem(order);
     }
 
-    /**
-     * Cancels an order by an admin.
-     *
-     * @param orderId The ID of the order to cancel.
-     * @param message The message from the admin regarding the cancellation.
-     */
-    @Override
-    @Transactional
-    public void cancelOrderByAdmin(int orderId, String message) {
-        Orders order = orderHelper.get(orderId);
-
-        order.setStatus(OrderCode.CANCELLED.getValue());
-        order.setResponseFromAdmin(message);
-        orderHelper.save(order);
-    }
-
-    /**
-     * Deletes an order by its ID.
-     *
-     * @param id The ID of the order to delete.
-     *           <p>
-     *           This method removes the order and all associated order items from the database.
-     */
-    @Override
-    @Transactional
-    public void deleteOrder(int id) {
-        Orders order = orderHelper.get(id);
-
-        // Clear all associated OrderItems
-        order.getItems().clear();
-
-        // Delete the Order
-        orderHelper.delete(order);
-    }
 
     /**
      * Retrieves a paginated list of orders for a user.
@@ -206,8 +167,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
+
     @Override
-    public void updateSimulatorOrder() {
-        orderRepository.updateSimulatorOrder(OrderCode.DELIVERED.getValue(), OrderCode.SHIPPING.getValue());
+    public List<Orders> getAllOrderWithFeedback(int productId ,int userId){
+        return orderRepository.findOrdersByProductId(productId, userId);
     }
 }

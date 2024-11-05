@@ -7,6 +7,7 @@ import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.serviceInterface.IFeedbackService;
 import com.product.server.koi_control_application.ultil.ResponseUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class FeedbackController {
     private final IFeedbackService feedbackService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse> createFeedback(@RequestBody FeedbackDTO feedback) {
+    public ResponseEntity<BaseResponse> createFeedback( @Valid @RequestBody FeedbackDTO feedback) {
         Users users = Users.builder().id(feedback.getUserId()).build();
         Product product = Product.builder().id(feedback.getProductId()).build();
 
@@ -46,6 +47,13 @@ public class FeedbackController {
         return ResponseUtil.createSuccessResponse(feedbackService.getFeedbacksByProductId(productId), "Feedbacks retrieved successfully by product " + productId);
     }
 
+    @PutMapping()
+    public ResponseEntity<BaseResponse> updateFeedback(@Valid @RequestBody FeedbackDTO feedback) {
+        return ResponseUtil.createResponse(
+                feedbackService.updateFeedback(feedback),
+                "Feedback updated successfully",
+                HttpStatus.OK);
+    }
 
     // ... other endpoints for update, delete, get feedbacks ...
 }
