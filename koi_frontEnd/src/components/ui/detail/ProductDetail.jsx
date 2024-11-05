@@ -188,7 +188,7 @@ const ProductDetail = () => {
         <hr className="border-gray-600 my-[40px]" />
 
         {/* Component Feedback */}
-        <ProductFeedback prdId={prdId} />
+        <ProductFeedback prdId={prdId} averageRating={product?.averageRating} />
       </div>
     </div>
   );
