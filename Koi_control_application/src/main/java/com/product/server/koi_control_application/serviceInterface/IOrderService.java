@@ -75,4 +75,6 @@ public interface IOrderService {
 
 
     List<Orders> getAllOrderWithFeedback(int productId ,int userId);
+
+    void deleteOrder(int i);
 }

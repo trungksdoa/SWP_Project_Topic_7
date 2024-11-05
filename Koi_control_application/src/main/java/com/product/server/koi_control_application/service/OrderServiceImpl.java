@@ -172,4 +172,15 @@ public class OrderServiceImpl implements IOrderService {
     public List<Orders> getAllOrderWithFeedback(int productId ,int userId){
         return orderRepository.findOrdersByProductId(productId, userId);
     }
+
+    @Override
+    public void deleteOrder(int id) {
+        Orders order = orderHelper.get(id);
+        // Clear all associated OrderItems
+        order.getItems().clear();
+        // Delete the Order
+        orderHelper.delete(order);
+    }
+
+
 }
