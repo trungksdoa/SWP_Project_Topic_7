@@ -27,7 +27,7 @@ const LoginForm = ({
     if (userLogin) {
       const role = userLogin.roles[0]?.name; // Assuming roles is an array
       if (role === "ROLE_ADMIN") {
-        navigate(PATH.MANAGE_USER);
+        navigate(PATH.ADMIN_DASHBOARD);
       } else if (role === "ROLE_MEMBER") {
         navigate(PATH.KOI_MANAGEMENT);
       } else if (role === "ROLE_SHOP") {
