@@ -12,7 +12,7 @@ import FeedbackForm from "./FeedBackForm";
 import "./colapseStyle.css";
 
 const ProductFeedback = ({ prdId, averageRating }) => {
-  
+
   const { t } = useTranslation();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
@@ -109,23 +109,6 @@ const ProductFeedback = ({ prdId, averageRating }) => {
     enableReinitialize: true, // Enable form reset when initialValues change
   });
 
-  if (!userLogin) {
-    return (
-      <div className="text-center p-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Please login to leave a review
-        </h1>
-      </div>
-    );
-  }
-
-  if (isFetchingNonFeedbackOrders || isFetchingFeedbacks) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const handleOrderSelect = (orderId) => {
     const existingFeedback = feedbacks?.find((fb) => fb.orderId === orderId);
@@ -144,6 +127,25 @@ const ProductFeedback = ({ prdId, averageRating }) => {
     </div>
   );
 
+  if (!userLogin) {
+    return (
+      <div className="text-center p-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Please login to leave a review
+        </h1>
+      </div>
+    );
+  }
+
+  if (isFetchingNonFeedbackOrders || isFetchingFeedbacks) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <div>
