@@ -169,7 +169,7 @@ const ProductFeedback = ({ prdId, averageRating }) => {
                       <span>{`Order ${order.id} - ${formatDate(order.createdAt)}`}</span>
                       {isNewOrder(order.createdAt) && (
                         <Tag color="success" className="ml-2 rounded-full px-3">
-                          New
+                          Recent order
                         </Tag>
                       )}
                       {order.feedback && (
