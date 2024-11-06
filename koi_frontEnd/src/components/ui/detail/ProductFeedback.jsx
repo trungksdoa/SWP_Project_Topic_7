@@ -172,6 +172,11 @@ const ProductFeedback = ({ prdId, averageRating }) => {
                           New
                         </Tag>
                       )}
+                      {order.feedback && (
+                        <Tag color="warning" className="ml-2 rounded-full px-3">
+                          {t("Reviewed")}
+                        </Tag>
+                      )}
                     </div>
                   </Select.Option>
                 ))}
