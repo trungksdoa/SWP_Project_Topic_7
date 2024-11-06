@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { useGetFeedbackById } from "../../../hooks/feedback/useGetFeedbackById";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
@@ -6,22 +6,36 @@ import { usePostFeedBack } from "../../../hooks/feedback/usePostFeedback";
 import { useUpdateFeedback } from "../../../hooks/feedback/useUpdateFeedback";
 import { useGetFeedbackOrder } from "../../../hooks/order/useGetNonFeedbackOrder";
 import { useTranslation } from "react-i18next";
-import { message, Select, Spin, Tag } from "antd";
+import { message, Select, Spin, Tag, Collapse } from "antd";
 import PropTypes from "prop-types";
 import FeedbackForm from "./FeedBackForm";
+import "./colapseStyle.css";
 
 const ProductFeedback = ({ prdId, averageRating }) => {
-  const { data: feedbacks, refetch: refreshFeedbacks } = useGetFeedbackById(prdId);
-  const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const mutation = usePostFeedBack();
-  const updateMutation = useUpdateFeedback();
+
   const { t } = useTranslation();
+  const userLogin = useSelector((state) => state.manageUser.userLogin);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [activeKey, setActiveKey] = useState([]);
+
+  const { data: feedbacks, refetch: refreshFeedbacks, isFetching: isFetchingFeedbacks } =
+    useGetFeedbackById(prdId);
   const {
     data: nonFeedbackOrders,
     refetch: refetchNonFeedbackOrders,
     isFetching: isFetchingNonFeedbackOrders,
   } = useGetFeedbackOrder(prdId);
+
+  
+  useEffect(() => {
+    refreshFeedbacks();
+    refetchNonFeedbackOrders();
+}, [prdId]);
+
+  const mutation = usePostFeedBack();
+  const updateMutation = useUpdateFeedback();
+
+  
 
   const isNewOrder = (createdAt) => {
     const diffDays = Math.ceil(
@@ -34,17 +48,17 @@ const ProductFeedback = ({ prdId, averageRating }) => {
     if (!date) return "";
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    const seconds = String(d.getSeconds()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const seconds = String(d.getSeconds()).padStart(2, "0");
     return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
   };
 
   const handleSubmitSuccess = async (res = null) => {
     await Promise.all([refreshFeedbacks(), refetchNonFeedbackOrders()]);
-    
+
     if (res) {
       const { comment, rating } = res.data.data;
       setSelectedFeedback(res.data.data);
@@ -73,7 +87,7 @@ const ProductFeedback = ({ prdId, averageRating }) => {
         return;
       }
 
-      if(values.rating === 0) {
+      if (values.rating === 0) {
         message.error("Please rate the product");
         return;
       }
@@ -92,25 +106,9 @@ const ProductFeedback = ({ prdId, averageRating }) => {
         },
       });
     },
+    enableReinitialize: true, // Enable form reset when initialValues change
   });
 
-  if (!userLogin) {
-    return (
-      <div className="text-center p-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Please login to leave a review
-        </h1>
-      </div>
-    );
-  }
-
-  if (isFetchingNonFeedbackOrders) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const handleOrderSelect = (orderId) => {
     const existingFeedback = feedbacks?.find((fb) => fb.orderId === orderId);
@@ -129,6 +127,25 @@ const ProductFeedback = ({ prdId, averageRating }) => {
     </div>
   );
 
+  if (!userLogin) {
+    return (
+      <div className="text-center p-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Please login to leave a review
+        </h1>
+      </div>
+    );
+  }
+
+  if (isFetchingNonFeedbackOrders || isFetchingFeedbacks) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <div>
@@ -149,73 +166,119 @@ const ProductFeedback = ({ prdId, averageRating }) => {
           </div>
         </div>
 
-        <form onSubmit={formik.handleSubmit} className="space-y-8 bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-sm">
-          {nonFeedbackOrders?.length > 0 && (
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <label className="text-gray-800 font-semibold block mb-3">
-                {t("Select Order")}
-              </label>
-              <Select
-                className="w-full"
-                placeholder={t("Select an order to review")}
-                onChange={handleOrderSelect}
-                value={formik.values.orderId}
-                size="large"
-                style={{ borderRadius: "0.75rem" }}
-              >
-                {nonFeedbackOrders.map((order) => (
-                  <Select.Option key={order.id} value={order.id}>
-                    <div className="flex items-center justify-between">
-                      <span>{`Order ${order.id} - ${formatDate(order.createdAt)}`}</span>
-                      {isNewOrder(order.createdAt) && (
-                        <Tag color="success" className="ml-2 rounded-full px-3">
-                          Recent order
-                        </Tag>
-                      )}
-                      {order.feedback && (
-                        <Tag color="warning" className="ml-2 rounded-full px-3">
-                          {t("Reviewed")}
-                        </Tag>
-                      )}
-                    </div>
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-          )}
-
-          {selectedFeedback ? (
-            <>
-              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 space-y-6">
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                  <label className="text-gray-800 font-semibold block mb-3">
-                    {t("Your feedback")}
-                  </label>
-                  <p className="text-gray-600 italic">{selectedFeedback.comment}</p>
-                  <div className="flex items-center mt-4">
-                    <span className="text-gray-700 font-medium mr-3">
-                      {t("Previous Rating")}:
-                    </span>
-                    {renderStars(selectedFeedback.rating)}
-                  </div>
+        <Collapse
+          activeKey={activeKey}
+          onChange={(keys) => setActiveKey(keys)}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden "
+        >
+          <Collapse.Panel
+            header={
+              <div className="flex items-center justify-between w-full py-2">
+                <div className="flex flex-col">
+                  <span className="text-lg font-semibold text-gray-800">
+                    {t("Write a Review")}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {t("Share your experience")}
+                  </span>
                 </div>
               </div>
-              <FeedbackForm
-                title="Update Your Comment"
-                formik={formik}
-                mutation={updateMutation}
-                isUpdate={true}
-                id={selectedFeedback.id}
-              />
-            </>
-          ) : (
-            <FeedbackForm
-              title="Your Comment"
-              formik={formik}
-              mutation={mutation}
-            />
-          )}
-        </form>
+            }
+            key="1"
+          >
+            <form
+              onSubmit={formik.handleSubmit}
+              className="space-y-8 bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-sm"
+            >
+              {nonFeedbackOrders?.length == 0 && (
+                <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl">
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                    You have not ordered this product yet
+                  </h3>
+                  <p className="text-gray-600">
+                    Please make a purchase to share your feedback
+                  </p>
+                </div>
+              )}
+              {nonFeedbackOrders?.length > 0 && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <label className="text-gray-800 font-semibold block mb-3">
+                    {t("Select Order")}
+                  </label>
+                  <Select
+                    className="w-full"
+                    placeholder={t("Select an order to review")}
+                    onChange={handleOrderSelect}
+                    value={formik.values.orderId}
+                    size="large"
+                    style={{ borderRadius: "0.75rem" }}
+                  >
+                    {nonFeedbackOrders.map((order) => (
+                      <Select.Option key={order.id} value={order.id}>
+                        <div className="flex items-center justify-between">
+                          <span>{`Order ${order.id} - ${formatDate(
+                            order.createdAt
+                          )}`}</span>
+                          {isNewOrder(order.createdAt) && (
+                            <Tag
+                              color="success"
+                              className="ml-2 rounded-full px-3"
+                            >
+                              Recent Order
+                            </Tag>
+                          )}
+                          {order.feedback && (
+                            <Tag
+                              color="warning"
+                              className="ml-2 rounded-full px-3"
+                            >
+                              {t("Reviewed")}
+                            </Tag>
+                          )}
+                        </div>
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+              )}
+              
+              {nonFeedbackOrders?.length > 0 && selectedFeedback && (
+                <>
+                  <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 space-y-6">
+                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                      <label className="text-gray-800 font-semibold block mb-3">
+                        {t("Your feedback")}
+                      </label>
+                      <p className="text-gray-600 italic">
+                        {selectedFeedback.comment}
+                      </p>
+                      <div className="flex items-center mt-4">
+                        <span className="text-gray-700 font-medium mr-3">
+                          {t("Previous Rating")}:
+                        </span>
+                        {renderStars(selectedFeedback.rating)}
+                      </div>
+                    </div>
+                  </div>
+                  <FeedbackForm
+                    title="Update Your Comment"
+                    formik={formik}
+                    mutation={updateMutation}
+                    isUpdate={true}
+                    id={selectedFeedback.id}
+                  />
+                </>
+              )}
+              {nonFeedbackOrders?.length > 0 && !selectedFeedback && (
+                <FeedbackForm
+                  title="Your Comment"
+                  formik={formik}
+                  mutation={mutation}
+                />
+              )}
+            </form>
+          </Collapse.Panel>
+        </Collapse>
 
         <div className="mt-12 space-y-6">
           <h3 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -238,7 +301,9 @@ const ProductFeedback = ({ prdId, averageRating }) => {
                     <h4 className="font-semibold text-gray-800">
                       {fb?.user?.username}
                     </h4>
-                    <p className="text-sm text-gray-500">{formatDate(fb?.createdAt)}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(fb?.createdAt)}
+                    </p>
                   </div>
                 </div>
                 {renderStars(fb?.rating)}
