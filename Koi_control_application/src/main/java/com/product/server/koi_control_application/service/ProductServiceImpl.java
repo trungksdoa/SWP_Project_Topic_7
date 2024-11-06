@@ -196,7 +196,11 @@ public class ProductServiceImpl implements IProductService {
     @Override
     @Transactional(readOnly = true)
     public Product getProductBySlug(String slug) {
-        return productRepository.findBySlug(slug).orElseThrow(() -> new NotFoundException("Product not found"));
+
+        Product prod = productRepository.findBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        prod.calculateAverageRating();
+        return prod;
     }
 
     //endregion
