@@ -6,16 +6,13 @@ const api = apiInstanceHeader.create({
 })
 
 export const manageKoiFishServices = {
+    getKoiByPondId: (id) => api.get(`/listkoi/bypondid/${id}`),
     getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
     getKoiByKoiId: (id) => api.get(`/${id}`),
     updateKoi: async (id, payload, isNew = false) => {
         const url = `/${id}?isNew=${isNew}`;
-        try {
-            const response = await api.put(url, payload);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
+        const response = await api.put(url, payload);
+        return response.data;
     },
     addKoi: async (payload) => {
 

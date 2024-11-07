@@ -92,7 +92,10 @@ const AddGrowthModal = ({
           label="Date"
           rules={[{ required: true, message: "Please select a date" }]}
         >
-          <DatePicker className="w-full" />
+          <DatePicker 
+            className="w-full"
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
+          />
         </Form.Item>
 
         <Form.Item

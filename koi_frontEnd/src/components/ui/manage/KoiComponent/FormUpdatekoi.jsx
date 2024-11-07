@@ -22,7 +22,6 @@ import {
   VerticalAlignBottomOutlined,
   AreaChartOutlined,
   UploadOutlined,
-  BulbOutlined,
   CalculatorOutlined,
 } from "@ant-design/icons";
 const { Title, Text } = Typography;
@@ -33,14 +32,11 @@ import { useDeleteKoi } from "../../../../hooks/koi/useDeleteKoi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
+import {
+  calculateFood
+} from "../../../../utils/FoodCalculator";
 import dayjs from "dayjs";
 
-// Custom modal style to center it
-const modalStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
 
 const FormKoiUpdate = ({
   koi,
@@ -67,6 +63,12 @@ const FormKoiUpdate = ({
       imageUrl: koi?.data?.imageUrl || "",
     },
     onSubmit: async (values) => {
+      // Validate date of birth not in future
+      if (values.dateOfBirth && values.dateOfBirth.isAfter(dayjs())) {
+        toast.error("Date of birth cannot be in the future");
+        return;
+      }
+
       Modal.confirm({
         title: "Update Koi",
         content: "Are you sure you want to update this koi?",
@@ -228,40 +230,9 @@ const FormKoiUpdate = ({
   };
 
   const calculateFoodRecommendation = () => {
-    const weight = parseFloat(formik.values.weight);
-    if (!weight || weight <= 0) {
-      toast.error("Please enter a valid weight for the koi");
-      return;
+    if(koi?.data){
+      calculateFood(koi.data, koi.data.ageMonth);
     }
-
-    // Calculate daily food amount (typically 1-3% of body weight)
-    const minFoodAmount = (weight * 10); // 1% in grams
-    const maxFoodAmount = (weight * 30); // 3% in grams
-    
-    // Calculate meals per day based on age
-    let mealsPerDay = 3; // default
-    if (koiAge !== null) {
-      if (koiAge < 6) mealsPerDay = 4; // young koi
-      else if (koiAge > 24) mealsPerDay = 2; // older koi
-    }
-
-    Modal.info({
-      title: "Food Recommendation",
-      content: (
-        <div>
-          <p>Based on the koi's weight of {weight}kg:</p>
-          <ul className="list-disc pl-5 mt-2">
-            <li>Daily food amount: {minFoodAmount.toFixed(1)} - {maxFoodAmount.toFixed(1)} grams</li>
-            <li>Recommended meals per day: {mealsPerDay}</li>
-            <li>Amount per meal: {(minFoodAmount/mealsPerDay).toFixed(1)} - {(maxFoodAmount/mealsPerDay).toFixed(1)} grams</li>
-          </ul>
-          <p className="mt-3 text-gray-500">Note: Adjust feeding based on koi information. Just only for reference.</p>
-        </div>
-      ),
-      centered: true,
-      icon: <BulbOutlined className="text-blue-500" />,
-      okText: "Got it",
-    });
   };
 
   return (
@@ -358,6 +329,17 @@ const FormKoiUpdate = ({
                 />
               </Form.Item>
 
+              <Form.Item label="Date">
+                <DatePicker
+                  value={formik.values.date}
+                  onChange={(date) => {
+                    formik.setFieldValue("date", date);
+                  }}
+                  className="w-full"
+                  disabledDate={(current) => current && current > dayjs().endOf('day')}
+                />
+              </Form.Item>
+
               <Form.Item label="Date of Birth">
                 <DatePicker
                   value={formik.values.dateOfBirth}
@@ -366,16 +348,9 @@ const FormKoiUpdate = ({
                     calculateAge(date);
                   }}
                   className="w-full"
+                  disabledDate={(current) => current && current > dayjs().endOf('day')}
                 />
               </Form.Item>
-
-              {/* <Form.Item label="Age">
-                <Input
-                  value={formatAge(koiAge)}
-                  readOnly
-                  className="bg-gray-50"
-                />
-              </Form.Item> */}
 
               <Form.Item label="Age (month)"> 
                 <Input

@@ -42,7 +42,7 @@ const Header = () => {
     }
   }, [carts, dispatch, isLoggedOut]);
   return (
-    <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
+    <header className="p-3 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between h-12 mx-auto">
         <Link to={PATH.HOME}>
           <img className="w-[50px]" src="../../images/logo.webp" alt="logo" />
