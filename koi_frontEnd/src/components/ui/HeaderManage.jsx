@@ -55,7 +55,7 @@ const HeaderManage = () => {
   }, []);
 
   return (
-    <header className="p-1 bg-black top-0 left-0 right-0 z-30 sticky">
+    <header className="p-3 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between items-center h-12 mx-auto">
         <Link to={PATH.HOME} className="mr-4">
           <img className="w-[60px]" src="../../images/logo.webp" alt="logo" />
