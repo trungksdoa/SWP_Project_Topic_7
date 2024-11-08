@@ -123,10 +123,10 @@ export const UserMenu = () => {
       );
     }
 
-    const packageName = userData?.data?.userPackage?.name || '';
-    const isSVIP = packageName?.toUpperCase() === 'SVIP';
+    const packageName = userData?.data?.userPackage?.name || "";
+    const isSVIP = packageName?.toUpperCase() === "SVIP";
 
-    console.log('User Package Debug:', {
+    console.log("User Package Debug:", {
       fetchedUserData: userData?.data,
       packageName: packageName,
       isSVIP: isSVIP,
@@ -156,6 +156,12 @@ export const UserMenu = () => {
                 {t("Dashboard")}
               </NavLink>
             )}
+            <NavLink
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.TODO_MANAGE}
+            >
+              {t("Schedule")}
+            </NavLink>
             <NavLink
               className="!w-[100px] text-center bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.HISTORY_ORDER}
@@ -188,6 +194,12 @@ export const UserMenu = () => {
                 {t("Dashboard")}
               </NavLink>
             )}
+            <NavLink
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+              to={PATH.TODO_MANAGE}
+            >
+              {t("Todo Schedule")}
+            </NavLink>
             <NavLink
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.PROFILE}
@@ -273,7 +285,10 @@ export const UserMenu = () => {
         onCancel={handleCancelRegister}
         footer={null}
       >
-        <RegisterForm showModalLogin={showModalLogin} onRegisterSuccess={handleRegisterSuccess} />
+        <RegisterForm
+          showModalLogin={showModalLogin}
+          onRegisterSuccess={handleRegisterSuccess}
+        />
       </Modal>
       <Modal
         title=""

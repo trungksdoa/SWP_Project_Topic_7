@@ -38,7 +38,7 @@ public class OrderController {
     private final IPaymentService paymentService;
     private final OrderFacade orderFacade;
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @PostMapping(CREATE_ORDER)
     public ResponseEntity<BaseResponse> createOrder(@RequestBody OrderRequestDTO req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);
@@ -46,7 +46,7 @@ public class OrderController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @GetMapping(GET_ORDER_BY_ID)
     public ResponseEntity<BaseResponse> getOrder(@PathVariable int id) {
         Orders order = orderService.getOrderById(id);
@@ -60,7 +60,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     //    @GetMapping("/user/{userId}/")
     @GetMapping(GET_ORDER_BY_USER + '/')
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId, @RequestParam int page, @RequestParam int size) {
@@ -68,14 +68,14 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @GetMapping(GET_ORDER_LIST_BY_USER)
     public ResponseEntity<BaseResponse> getAllOrdersByUser(@PathVariable int userId) {
         List<Orders> orders = orderService.getOrdersByUser(userId);
         return ResponseUtil.createSuccessResponse(orders, "Orders retrieved successfully");
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @GetMapping(GET_ORDER_STATUS)
     public ResponseEntity<BaseResponse> getOrderStatus(@PathVariable int orderId) {
         Orders order = orderService.getOrderById(orderId);
@@ -85,7 +85,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(map, "Order status retrieved successfully");
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @GetMapping(GET_ORDER_BY_USER)
     public ResponseEntity<BaseResponse> getOrdersByUser(@PathVariable int userId,
                                                         @RequestParam(defaultValue = "0", required = false) int page,
@@ -94,7 +94,7 @@ public class OrderController {
         return ResponseUtil.createSuccessResponse(orders, "User orders retrieved successfully");
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @DeleteMapping(CANCEL_PENDING_ORDER)
     public ResponseEntity<BaseResponse> cancelPendingOrderByUser(@PathVariable int userId, @PathVariable int orderId) {
         orderService.cancelPendingOrder(userId, orderId);
@@ -103,7 +103,7 @@ public class OrderController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     @PostMapping(VERIFY_ORDER)
     @Operation(summary = "Mark an order as received", description = "From other user updates their order status to DELIVERED " + " : " +
             "{" +

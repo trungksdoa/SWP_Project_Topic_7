@@ -31,7 +31,7 @@ import java.util.Map;
 @RequestMapping("/api/ponds")
 @RequiredArgsConstructor
 @Validated
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
 @Tag(name = "Pond", description = "API for Pond")
 public class PondController {
     private final IPondService iPondService;

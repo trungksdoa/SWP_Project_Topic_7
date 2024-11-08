@@ -21,7 +21,7 @@ import static com.product.server.koi_control_application.mappingInterface.Feedba
 @RequestMapping(BASE_FEEDBACK)
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
 @Tag(name = "Feedback", description = "APIs for managing feedbacks")
 public class FeedbackController {
     private final IFeedbackService feedbackService;
