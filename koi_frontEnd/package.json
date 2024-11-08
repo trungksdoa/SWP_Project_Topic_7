@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
+    "@ant-design/plots": "^2.3.2",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -40,6 +41,7 @@
     "playwright": "^1.48.0",
     "postcss": "^8.4.45",
     "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-draggable": "^4.4.6",
     "react-dual-listbox": "^6.0.3",

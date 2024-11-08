@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
 @Tag(name = "WaterParameter", description = "API for WaterParameter")
 public class WaterParameterController {
 
