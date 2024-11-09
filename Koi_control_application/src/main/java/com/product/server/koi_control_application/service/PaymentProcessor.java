@@ -65,7 +65,7 @@ public class PaymentProcessor {
     private void processPackagePayment(PaymentContext context) {
         // Handle package addition for the user
         UserPackage userPackage = new UserPackage();
-        userPackage.setId(Integer.parseInt(context.getUserId()));
+        userPackage.setId(Integer.parseInt(context.getOrderId()));
 
         userService.addPackage(Integer.parseInt(context.getUserId()), userPackage);
         log.info("User {} has been added package successfully", context.getUserId());
