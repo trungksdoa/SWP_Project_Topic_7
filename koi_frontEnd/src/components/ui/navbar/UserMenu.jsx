@@ -198,7 +198,7 @@ export const UserMenu = () => {
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.TODO_MANAGE}
             >
-              {t("Todo Schedule")}
+               {t("Schedule")}
             </NavLink>
             <NavLink
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"

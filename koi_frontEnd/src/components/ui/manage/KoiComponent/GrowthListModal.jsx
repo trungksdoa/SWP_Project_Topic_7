@@ -10,7 +10,6 @@ import { Modal as AntModal } from "antd";
 import { useDeleteGrowth } from "../../../../hooks/koi/useDeleteGrowth";
 import { toast } from "react-toastify";
 
-
 const GrowthListModal = ({
   isGrowthListVisible,
   hideGrowthList,
@@ -20,6 +19,7 @@ const GrowthListModal = ({
   refetchGrowthData,
   isLoading,
   isError,
+  pond,
 }) => {
 
   // State
@@ -30,6 +30,15 @@ const GrowthListModal = ({
   // Hooks
   const deleteGrowthMutation = useDeleteGrowth();
 
+  console.log(growthData)
+  // Map pond names to growth data
+  const growthDataWithPondNames = growthData?.map(growth => ({
+    ...growth,
+    pondName: pond?.find(pond => pond.id === growth.pondId)?.name || ''
+  }));
+
+  console.log(growthDataWithPondNames)
+
   if (isLoading) {
     return (
       <Modal open={isLoading} footer={null}>
@@ -37,11 +46,12 @@ const GrowthListModal = ({
       </Modal>
     );
   }
+
   // Helper function
   const getStatusText = (status) => {
     const statusMap = {
       1: "Slow Growth",
-      2: "Fast Growth",
+      2: "Fast Growth", 
       3: "Normal Growth",
       4: "Initial Measurement",
       5: "Single Measurement",
@@ -56,7 +66,7 @@ const GrowthListModal = ({
 
   const handleSelectAllGrowth = (checked) => {
     setAllGrowthSelected(checked);
-    setSelectedGrowths(checked ? growthData.map((growth) => growth.id) : []);
+    setSelectedGrowths(checked ? growthDataWithPondNames.map((growth) => growth.id) : []);
   };
 
   const handleCancelSelectGrowth = () => {
@@ -69,7 +79,7 @@ const GrowthListModal = ({
       const newSelection = prev.includes(growthId)
         ? prev.filter((id) => id !== growthId)
         : [...prev, growthId];
-      setAllGrowthSelected(newSelection.length === growthData.length);
+      setAllGrowthSelected(newSelection.length === growthDataWithPondNames.length);
       return newSelection;
     });
   };
@@ -179,9 +189,9 @@ const GrowthListModal = ({
             <Spin size="large" />
             <span className="ml-2">Loading growth data...</span>
           </div>
-        ) : growthData && growthData.length > 0 ? (
+        ) : growthDataWithPondNames && growthDataWithPondNames.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">
-            {growthData.map((entry, index) => (
+            {growthDataWithPondNames.map((entry, index) => (
               <div
                 key={index}
                 className="border p-2 rounded-lg shadow text-sm relative"
@@ -202,6 +212,9 @@ const GrowthListModal = ({
                 </p>
                 <p>
                   <strong>Length:</strong> {entry.length} cm
+                </p>
+                <p>
+                  <strong>Pond:</strong> {entry.pondName}
                 </p>
                 <p>
                   <strong>Status:</strong> {getStatusText(entry.status)}
@@ -225,6 +238,7 @@ GrowthListModal.propTypes = {
   growthData: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
+  pond: PropTypes.array.isRequired,
 };
 
 export default GrowthListModal;

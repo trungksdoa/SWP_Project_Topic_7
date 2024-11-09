@@ -9,6 +9,7 @@ import {
 import { useGetPondById } from "../../../hooks/koi/useGetPondById";
 import { useGetKoiByKoiId } from "../../../hooks/koi/useGetKoiByKoiId";
 import { useGetGrowth } from "../../../hooks/koi/useGetGrowth";
+import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
 import FormKoiUpdate from "./KoiComponent/FormUpdatekoi";
 import KoiGrowthChart from "./Chart";
 import AddGrowthModal from "./KoiComponent/AddGrowthModal";
@@ -41,6 +42,10 @@ const KoiUpdate = () => {
     isLoading: isLoadingPond,
     refetch: refetchPond,
   } = useGetPondById(koi?.data?.pondId);
+
+  const {
+    data: lstPond,
+  } = useGetAllPond(userId);
 
   const {
     data: growthData,
@@ -94,7 +99,10 @@ const KoiUpdate = () => {
             Growth Chart
           </Button>
           <Button
-            onClick={() => setIsGrowthListVisible(true)}
+            onClick={() => {
+              refetchGrowthData();
+              setIsGrowthListVisible(true);
+            }}
             icon={<HistoryOutlined />}
             type="primary"
           >
@@ -139,6 +147,7 @@ const KoiUpdate = () => {
         refetchGrowthData={refetchGrowthData}
         isLoading={isLoading}
         isError={isError}
+        pond={lstPond}
       />
 
       <AddGrowthModal
