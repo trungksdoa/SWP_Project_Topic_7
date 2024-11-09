@@ -14,6 +14,11 @@ export const manageKoiFishServices = {
         const response = await api.put(url, payload);
         return response.data;
     },
+    moveKoi: async (id, payload, isNew = true) => {
+        const url = `/${id}?isNew=${isNew}`;
+        const response = await api.put(url, payload);
+        return response.data;
+    },
     addKoi: async (payload) => {
 
         // Check if payload is already a FormData object
