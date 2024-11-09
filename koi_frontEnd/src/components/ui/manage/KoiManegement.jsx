@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { useDeleteKoi } from "../../../hooks/koi/useDeleteKoi";
-import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi";
+import { useMoveKoi } from "../../../hooks/koi/useMoveKoi";
 import dayjs from "dayjs";
 import { useAddKoi } from "../../../hooks/koi/useAddKoi";
 import { useFormik } from "formik";
@@ -57,8 +57,7 @@ const KoiManegement = () => {
 
   const [selectedPondFilter, setSelectedPondFilter] = useState(null);
 
-  const updateKoiMutation = useUpdateKoi();
-
+  const moveKoiMutation = useMoveKoi();
   const koiPerPage = 8;
 
   const dispatch = useDispatch();
@@ -267,20 +266,18 @@ const KoiManegement = () => {
           };
           formData.append("fish", JSON.stringify(updateKoi));
 
-          return updateKoiMutation.mutateAsync(
-            { id: koiId, payload: formData },
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          return moveKoiMutation.mutateAsync({ 
+            id: koiId, 
+            payload: formData,
+            isNew: true
+          });
         })
       );
 
       message.success("Koi moved successfully!");
       setShowMoveKoiConfirmation(false);
       setSelectedKoiForAction([]);
+      setSelectedDestinationPond(null);
       refetch();
     } catch (error) {
       console.error("Error moving koi:", error);
