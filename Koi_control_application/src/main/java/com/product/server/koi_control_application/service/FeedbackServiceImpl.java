@@ -1,5 +1,6 @@
 package com.product.server.koi_control_application.service;
 
+import com.product.server.koi_control_application.customException.BadRequestException;
 import com.product.server.koi_control_application.customException.NotFoundException;
 import com.product.server.koi_control_application.model.Feedback;
 import com.product.server.koi_control_application.model.Product;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +26,22 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Override
     @Transactional
     public Feedback createFeedback(Users user, Product product, FeedbackDTO feedback) {
-       try{
-           log.info("Creating feedback for product with id: {}", product.getId());
-           return feedbackRepository.save(Feedback.builder()
-                   .user(user)
-                   .product(product)
-                   .rating(feedback.getRating())
-                   .comment(feedback.getComment())
-                   .build());
-       }catch (Exception e){
-           throw new NotFoundException("Product or User not found");
-       }
+        if(findByOrderId(feedback.getOrderId()).isPresent()) {
+            throw new BadRequestException("Feedback already exists for order with id: " + feedback.getOrderId());
+        }
+
+        try {
+            log.info("Creating feedback for product with id: {}", product.getId());
+            return feedbackRepository.save(Feedback.builder()
+                    .user(user)
+                    .product(product)
+                    .rating(feedback.getRating())
+                    .comment(feedback.getComment())
+                    .orderId(feedback.getOrderId())
+                    .build());
+        } catch (Exception e) {
+            throw new NotFoundException("Product or User not found");
+        }
     }
 
     @Override
@@ -43,20 +50,20 @@ public class FeedbackServiceImpl implements IFeedbackService {
     }
 
     @Override
-    public Feedback updateFeedback(Integer id, Feedback feedback) {
-        return null;
+    public Feedback updateFeedback(FeedbackDTO feedback) {
+
+        if (findFeedbackById(feedback.getId()) == null) {
+            throw new NotFoundException("Feedback not found with id: " + feedback.getId());
+        }
+        Feedback fed = findFeedbackById(feedback.getId());
+
+        Optional.ofNullable(feedback.getRating()).ifPresent(fed::setRating);
+        Optional.ofNullable(feedback.getComment()).ifPresent(fed::setComment);
+        log.info("Updating feedback with id: {}", feedback.getId());
+
+        return feedbackRepository.save(fed);
     }
 
-    @Override
-    @Transactional
-    public void deleteFeedback(Integer id) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Feedback getFeedbackById(Integer id) {
-        return null;
-    }
 
     @Override
     public List<Feedback> getFeedbacksByProductId(Integer productId) {
@@ -68,10 +75,14 @@ public class FeedbackServiceImpl implements IFeedbackService {
         return feedbackRepository.findByUser_Id(userId);
     }
 
-    @Override
-    public Page<Feedback> getAllFeedbacks(int page, int size) {
-        return null;
+
+    private Feedback findFeedbackById(Integer id) {
+        return feedbackRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Feedback not found with id: " + id));
     }
 
+    private Optional<Feedback> findByOrderId(int orderId) {
+        return feedbackRepository.findByOrderId(orderId);
+    }
     // ... other methods implementation ...
 }

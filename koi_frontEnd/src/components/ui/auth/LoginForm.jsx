@@ -18,7 +18,7 @@ const LoginForm = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+const navigate = useNavigate();
   const { isFetchingLogin, userLogin } = useSelector(
     (state) => state.manageUser
   );

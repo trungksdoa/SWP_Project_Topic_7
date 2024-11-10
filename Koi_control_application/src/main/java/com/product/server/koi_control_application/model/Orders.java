@@ -52,10 +52,13 @@ public class Orders {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private boolean isFeedback ;
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        isFeedback = false;
     }
 
     @PreUpdate
