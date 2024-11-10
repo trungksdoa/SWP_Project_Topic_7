@@ -34,4 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<BarChart> getTopSellingProductsByDateRange(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:name%")
+    List<Product> findBySlugAndNameContaining(@Param("name") String name);
 }

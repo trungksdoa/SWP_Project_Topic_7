@@ -1,7 +1,12 @@
 package com.product.server.koi_control_application.service;
 
 import com.product.server.koi_control_application.enums.OrderCode;
+import com.product.server.koi_control_application.model.TodoTask;
+import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.repository.OrderRepository;
+import com.product.server.koi_control_application.repository.TodoTaskRepository;
+import com.product.server.koi_control_application.serviceInterface.IEmailService;
+import com.product.server.koi_control_application.serviceInterface.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,16 +22,42 @@ import java.time.LocalDateTime;
 public class ScheduledTasksService {
 
     private final OrderRepository orderRepository;
+    private final TodoTaskRepository todoTaskRepository;
+    private final IEmailService emailService;
+    private final IUserService userService;
 
-//    @Scheduled(cron = "9 * * * * *")
-//    @Transactional
-//    public void simulatorDeliveredOrders() {
-//        int updatedCount = orderRepository.updateSimulatorOrder(
-//                OrderCode.DELIVERED.getValue(),
-//                OrderCode.SHIPPING.getValue()
-//        );
-//        log.info("Simulator  {} orders from SHIPPING to DELIVERED status", updatedCount);
-//    }
+    @Scheduled(cron = "0 0 8 * * *") // Chạy 1 lần mỗi ngày lúc 8:00
+    @Transactional
+    public void notificateToCustomer() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sevenDaysFromNow = now.plusDays(7);
+        LocalDateTime oneDayFromNow = now.plusDays(1);
+
+        // Find tasks with due dates within 7 days
+        List<TodoTask> tasksDueInSevenDays = todoTaskRepository.findByDueDateRange(now, sevenDaysFromNow);
+        if (tasksDueInSevenDays.isEmpty()) {
+            log.info("No tasks due in 7 days");
+            return;
+        }
+
+        for (TodoTask task : tasksDueInSevenDays) {
+            Users users = userService.getUser(task.getUserId());
+            emailService.sendMail(users.getEmail(), "Task Due in 7 Days", "Reminder: Your task \"" + task.getTitle() + "\" is due in 7 days. Please make sure to complete it on time.");
+        }
+        log.info("Sent {} emails for tasks due in 7 days", tasksDueInSevenDays.size());
+
+        // Find tasks with due dates within 1 day
+        List<TodoTask> tasksDueInOneDay = todoTaskRepository.findByDueDateRange(now, oneDayFromNow);
+        if (tasksDueInOneDay.isEmpty()) {
+            log.info("No tasks due in 1 day");
+            return;
+        }
+        for (TodoTask task : tasksDueInOneDay) {
+            Users users = userService.getUser(task.getUserId());
+            emailService.sendMail(users.getEmail(), "Task Due in 1 Day", "Urgent: Your task \"" + task.getTitle() + "\" is due in 1 day. Please make sure to complete it as soon as possible.");
+        }
+        log.info("Sent {} emails for tasks due in 1 day", tasksDueInOneDay.size());
+    }
 
     //Runs at 24:00 every day
 //    @Scheduled(cron = "0 0 0 * * *")
