@@ -12,6 +12,7 @@ import {
   InputNumber,
   DatePicker,
   Spin,
+  Checkbox,
 } from "antd";
 import {
   EditOutlined,
@@ -22,7 +23,6 @@ import {
   VerticalAlignBottomOutlined,
   AreaChartOutlined,
   UploadOutlined,
-  BulbOutlined,
   CalculatorOutlined,
 } from "@ant-design/icons";
 const { Title, Text } = Typography;
@@ -33,14 +33,8 @@ import { useDeleteKoi } from "../../../../hooks/koi/useDeleteKoi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
+import { calculateFood } from "../../../../utils/FoodCalculator";
 import dayjs from "dayjs";
-
-// Custom modal style to center it
-const modalStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
 
 const FormKoiUpdate = ({
   koi,
@@ -67,9 +61,15 @@ const FormKoiUpdate = ({
       imageUrl: koi?.data?.imageUrl || "",
     },
     onSubmit: async (values) => {
+      // Validate date of birth not in future
+      if (values.dateOfBirth && values.dateOfBirth.isAfter(dayjs())) {
+        toast.error("Date of birth cannot be in the future");
+        return;
+      }
+
       Modal.confirm({
-        title: "Update Koi",
-        content: "Are you sure you want to update this koi?",
+        title: isModified ? "Modified koi" : "Update koi",
+        content: isModified ? "Are you sure you want to update this koi?" : "Are you sure you want to update this koi?",
         centered: true,
         onOk: async () => {
           const formData = new FormData();
@@ -90,7 +90,7 @@ const FormKoiUpdate = ({
               : dayjs().format("YYYY-MM-DD"),
           };
           formData.append("fish", JSON.stringify(updatedKoi));
-          formData.append("isNew", "true");
+          formData.append("isNew", isModified ? "false" : "true");
           if (values.image) {
             formData.append("image", values.image);
           }
@@ -116,8 +116,8 @@ const FormKoiUpdate = ({
   });
   // State
   const [imgSrc, setImgSrc] = useState("");
-  const [koiAge, setKoiAge] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isModified, setIsModified] = useState(false);
   const navigate = useNavigate();
 
   // Effect
@@ -151,11 +151,8 @@ const FormKoiUpdate = ({
       const today = dayjs();
       const birthDyjs = dayjs(birthDate);
       const ageInMonths = today.diff(birthDyjs, "month");
-      setKoiAge(ageInMonths);
       addKoiAge(ageInMonths);
-    } else {
-      setKoiAge(null);
-    }
+    } 
   };
 
   const formatAge = (ageInMonths) => {
@@ -223,45 +220,14 @@ const FormKoiUpdate = ({
       centered: true,
       onOk: () => {
         navigate(`/pond-detail/${pond.id}`);
-      }
+      },
     });
   };
 
   const calculateFoodRecommendation = () => {
-    const weight = parseFloat(formik.values.weight);
-    if (!weight || weight <= 0) {
-      toast.error("Please enter a valid weight for the koi");
-      return;
+    if (koi?.data) {
+      calculateFood(koi.data, koi.data.ageMonth);
     }
-
-    // Calculate daily food amount (typically 1-3% of body weight)
-    const minFoodAmount = (weight * 10); // 1% in grams
-    const maxFoodAmount = (weight * 30); // 3% in grams
-    
-    // Calculate meals per day based on age
-    let mealsPerDay = 3; // default
-    if (koiAge !== null) {
-      if (koiAge < 6) mealsPerDay = 4; // young koi
-      else if (koiAge > 24) mealsPerDay = 2; // older koi
-    }
-
-    Modal.info({
-      title: "Food Recommendation",
-      content: (
-        <div>
-          <p>Based on the koi's weight of {weight}kg:</p>
-          <ul className="list-disc pl-5 mt-2">
-            <li>Daily food amount: {minFoodAmount.toFixed(1)} - {maxFoodAmount.toFixed(1)} grams</li>
-            <li>Recommended meals per day: {mealsPerDay}</li>
-            <li>Amount per meal: {(minFoodAmount/mealsPerDay).toFixed(1)} - {(maxFoodAmount/mealsPerDay).toFixed(1)} grams</li>
-          </ul>
-          <p className="mt-3 text-gray-500">Note: Adjust feeding based on koi information. Just only for reference.</p>
-        </div>
-      ),
-      centered: true,
-      icon: <BulbOutlined className="text-blue-500" />,
-      okText: "Got it",
-    });
   };
 
   return (
@@ -358,6 +324,19 @@ const FormKoiUpdate = ({
                 />
               </Form.Item>
 
+              <Form.Item label="Date">
+                <DatePicker
+                  value={formik.values.date}
+                  onChange={(date) => {
+                    formik.setFieldValue("date", date);
+                  }}
+                  className="w-full"
+                  disabledDate={(current) =>
+                    current && current > dayjs().endOf("day")
+                  }
+                />
+              </Form.Item>
+
               <Form.Item label="Date of Birth">
                 <DatePicker
                   value={formik.values.dateOfBirth}
@@ -366,99 +345,64 @@ const FormKoiUpdate = ({
                     calculateAge(date);
                   }}
                   className="w-full"
+                  disabled={!isModified}
+                  disabledDate={(current) =>
+                    current && current > dayjs().endOf("day")
+                  }
                 />
               </Form.Item>
 
-              {/* <Form.Item label="Age">
-                <Input
-                  value={formatAge(koiAge)}
-                  readOnly
-                  className="bg-gray-50"
-                />
-              </Form.Item> */}
-
-              <Form.Item label="Age (month)"> 
-                <Input
-                  value={formik.values.ageMonth}
-                  readOnly
-                  className="bg-gray-50"
-                />
+              <Form.Item label="Current Age">
+                <div className="flex flex-col gap-2">
+                  <Input
+                    value={formatAge(formik.values.ageMonth)} 
+                    readOnly
+                    className="bg-gray-50"
+                  />
+                  <Text type="secondary" className="text-xs">
+                    {formik.values.ageMonth ? `${formik.values.ageMonth} months in total` : 'Age not available'}
+                  </Text>
+                  {formik.values.dateOfBirth && (
+                    <Text type="secondary" className="text-xs">
+                      Born on: {dayjs(formik.values.dateOfBirth).format('MMMM D, YYYY')}
+                    </Text>
+                  )}
+                </div>
               </Form.Item>
             </div>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center items-center gap-6 mt-4">
               <Button
                 type="primary"
                 htmlType="submit"
                 icon={<EditOutlined />}
                 loading={updateKoiMutation.isLoading}
-                className="min-w-[120px]"
+                className="min-w-[140px] h-[40px] flex items-center justify-center bg-blue-500 hover:bg-blue-600"
               >
                 Update
               </Button>
               <Button
                 onClick={calculateFoodRecommendation}
                 icon={<CalculatorOutlined />}
-                className="min-w-[120px]"
+                className="min-w-[140px] h-[40px] flex items-center justify-center bg-green-500 hover:bg-green-600 text-white"
               >
-                Food Recommendation
+                Food Calculator
               </Button>
-              <Button
-                onClick={() => {
-                  Modal.confirm({
-                    title: "Update without history",
-                    content:
-                      "Are you sure you want to update without update history?",
-                    centered: true,
-                    onOk: () => {
-                      const formData = new FormData();
-                      const updatedKoi = {
-                        name: formik.values.name || "",
-                        variety: formik.values.variety || "",
-                        sex: formik.values.sex === "true",
-                        purchasePrice:
-                          parseFloat(formik.values.purchasePrice) || 0,
-                        weight: parseFloat(formik.values.weight) || 0,
-                        length: parseFloat(formik.values.length) || 0,
-                        pondId: parseInt(formik.values.pondId) || null,
-                        dateOfBirth: formik.values.dateOfBirth
-                          ? formik.values.dateOfBirth.format("YYYY-MM-DD")
-                          : null,
-                        userId: userId,
-                        date: formik.values.date
-                          ? formik.values.date.format("YYYY-MM-DD")
-                          : dayjs().format("YYYY-MM-DD"),
-                      };
-                      formData.append("fish", JSON.stringify(updatedKoi));
-                      formData.append("isNew", "false");
-                      if (formik.values.image) {
-                        formData.append("image", formik.values.image);
-                      }
-                      updateKoiMutation.mutate(
-                        { id: id, payload: formData },
-                        {
-                          onSuccess: (updatedKoi) => {
-                            dispatch(manageKoiActions.updateKoi(updatedKoi));
-                            toast.success("Koi updated successfully");
-                            refetchGrowthData();
-                          },
-                        }
-                      );
-                    },
-                  });
+              <Checkbox
+                checked={isModified}
+                onChange={(e) => {
+                  setIsModified(e.target.checked);
                 }}
-                icon={<EditOutlined />}
-                loading={updateKoiMutation.isLoading}
-                className="min-w-[120px] bg-green-500 text-white hover:bg-green-600"
+                className="flex items-center"
               >
-                Modified
-              </Button>
+                <span className="ml-2">Modified</span>
+              </Checkbox>
               <Button
                 danger
                 icon={<DeleteOutlined />}
                 onClick={handleDeleteClick}
                 loading={isDeleting}
-                className="min-w-[120px]"
+                className="min-w-[140px] h-[40px] flex items-center justify-center hover:bg-red-600"
               >
                 Delete
               </Button>

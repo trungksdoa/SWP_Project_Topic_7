@@ -51,7 +51,7 @@ public class PaymentStatusController {
 
 
     @GetMapping(GET_PAYMENT_GATEWAY_URL + '/')
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN'," + "'ROLE_MEMBER'," + "'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN'," + "'ROLE_MEMBER'," + "'ROLE_CONTRIBUTOR')")
     public ResponseEntity<BaseResponse> getPaymentGatewayUrl(@RequestParam int orderId, HttpServletRequest request) {
         int userId = jwt.getUserIdFromToken(request);
 

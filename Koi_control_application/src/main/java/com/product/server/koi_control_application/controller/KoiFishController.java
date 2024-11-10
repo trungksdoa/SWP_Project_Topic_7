@@ -36,7 +36,7 @@ import java.util.Map;
 @RequestMapping("/api/koifishs")
 @RequiredArgsConstructor
 @Validated
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
 @Tag(name = "KoiFish", description = "API for KoiFish")
 public class KoiFishController {
 

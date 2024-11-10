@@ -27,7 +27,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -88,7 +87,7 @@ public class UserController {
     @PostMapping(UserMappings.USER_REGISTER)
     public ResponseEntity<BaseResponse> registerUser(@RequestBody UserRegister users) {
 
-        Users savedUser = userService.saveUser(users);
+        userService.saveUser(users);
 
         return ResponseUtil.createResponse(null, "User registered successfully", HttpStatus.CREATED);
     }
@@ -164,7 +163,7 @@ public class UserController {
 
 //    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PutMapping(UserMappings.USER_UPDATE_BY_ID)
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     public ResponseEntity<BaseResponse> patchUser(@PathVariable("id") int userId,
                                                   @Schema(type = "string", format = "json", implementation = UserDTO.class)
                                                   @RequestPart("user") String userJson,
@@ -181,7 +180,7 @@ public class UserController {
 
 //    @PostMapping("/add-package")
     @PostMapping(UserMappings.USER_ADD_PACKAGE)
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_CONTRIBUTOR')")
     public ResponseEntity<BaseResponse> createServiceOrder(@RequestBody OrderPackageDTO req, HttpServletRequest request) throws Exception {
         int userId = jwtUtil.getUserIdFromToken(request);
         UserPackage pack = packageService.getPackageById(req.getPackageId());

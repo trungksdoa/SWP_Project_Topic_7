@@ -1,5 +1,4 @@
-  
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond.js";
 import { useSelector } from "react-redux";
 import {
@@ -11,142 +10,70 @@ import {
   Modal,
   Checkbox,
   message,
-  Select,
 } from "antd";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
-import { manageWaterServices } from "../../../services/koifish/manageWaterServices.js";
+
 import BreadcrumbComponent from "../BreadcrumbCoponent.jsx";
 import AddWaterPara from "./AddWaterPara.jsx";
-import { NavLink, useNavigate } from "react-router-dom";
 import { PATH } from "../../../constant/config.js";
+
 import { useUpdateWaterParameter } from "../../../hooks/koi/useUpdateWaterParameter.js";
 import { useGetWaterStandard } from "../../../hooks/koi/useGetWaterStandard.js";
-import { useTranslation } from "react-i18next";
-import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi.js";
+
+// Add these imports at the top
+import { useGetWaterParameters } from "../../../hooks/koi/useGetWaterParameters.js";
+import { exportToPDF } from "./exportFile.jsx";
+
 
 const WaterParameter = () => {
-  const { t } = useTranslation();
-  const [selectedPond, setSelectedPond] = useState(null); // Hồ được chọn
-  const [showStore, setShowStore] = useState(false);
-  const [waterParameters, setWaterParameters] = useState(null); // Thông số nước của hồ
-  const [waterStandard, setWaterStandard] = useState(null); // Tiêu chuẩn nước của hồ
-  const [loading, setLoading] = useState(false); // Trạng thái loading
-  const [validationErrors, setValidationErrors] = useState([]); // Lưu lỗi validation
-  const [warningMessages, setWarningMessages] = useState([]); // Thêm state cho cảnh báo
-  const [isModalVisible, setIsModalVisible] = useState(false); // Hiển thị Modal
+  const [selectedPond, setSelectedPond] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [warningMessages, setWarningMessages] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditEnabled, setIsEditEnabled] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [disabled, setDisabled] = useState(true);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] =
+    useState(false);
+
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
   const mutation = useUpdateWaterParameter();
-  const draggleRef = useRef(null);
-  const { data: lstKoi } = useGetAllKoi(userLogin?.id);
-  const { data: waterStandards, refetchStandard } = useGetWaterStandard(
-    selectedPond?.id
-  );
-  const { data: lstPond, refetch } = useGetAllPond(userId); // Lấy danh sách hồ
-  const [saltMessage, setSaltMessage] = useState(""); // Thêm state để lưu thông báo muối
-  const [isAddWaterParaModalVisible, setIsAddWaterParaModalVisible] =
-    useState(false);
-  const handleGoToStore = () => {
-    setShowStore(true);
-  };
 
-  const handleClickSalt = (value) => {
-    let newError = "";
-    if (value === "salt03") {
-      newError = "Salt: must be equal to 5.18";
-    } else if (value === "salt05") {
-      newError = "Salt: must be equal to 8.64";
-    } else if (value === "salt07") {
-      newError = "Salt: must be equal to 12.1";
-    }
-    setError(newError);
-  };
+  const { data: waterStandards, refetch: refetchWaterStandard } =
+    useGetWaterStandard(selectedPond?.id);
+  const { data: lstPond, refetch: refetchPond } = useGetAllPond(userId);
+  const { data: waterParamsData, refetch: refetchWaterParams } =
+    useGetWaterParameters(selectedPond?.id);
 
-  const handleChangeDatePicker = (date) => {
-    if (date) {
-      formik.setFieldValue("birthday", date.format("DD/MM/YYYY"));
-    } else {
-      formik.setFieldValue("birthday", null);
-    }
-  };
-  const handleEditToggle = (e) => {
-    setIsEditEnabled(e.target.checked);
-  };
-  // Fetch dữ liệu thông số nước và tiêu chuẩn nước khi chọn hồ
+  const handleEditToggle = (e) => setIsEditEnabled(e.target.checked);
 
   useEffect(() => {
-    const fetchWaterData = async () => {
-      if (selectedPond) {
-        try {
-          setLoading(true);
-          const waterParamsRes = await manageWaterServices.getWaterByPondId(
-            selectedPond.id
-          );
-          const waterStandardRes = await manageWaterServices.getWaterStandard(
-            selectedPond.id
-          );
+    if (!selectedPond) {
+      setLoading(false);
+      return;
+    }
 
-          setWaterParameters(waterParamsRes?.data?.data || null);
-          setWaterStandard(waterStandardRes?.data?.data || null);
-        } catch (error) {
-          console.error("Error fetching water data:", error);
-          setWaterParameters(null);
-          setWaterStandard(null);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setWaterParameters(null);
-        setWaterStandard(null);
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    refetchWaterParams();
+    refetchWaterStandard();
 
-    fetchWaterData();
-  }, [selectedPond, refetch, refetchStandard]);
+    setInterval(() => {
+      setLoading(false);
+    }, 1000);
+  }, [selectedPond]);
 
-  const showModal = () => {
-    setVisible(true);
-  };
-
-  const handleOk = () => {
-    setVisible(false);
-  };
-
-  const handleCancelModal = () => {
-    setVisible(false);
-  };
-
-  // Hàm xử lý khi click vào hồ để hiển thị Modal
+  const showModal = () => setVisible(true);
+  const handleOk = () => setVisible(false);
+  const handleCancelModal = () => setVisible(false);
   const handleClick = (pond) => {
     setSelectedPond(pond);
     setIsModalVisible(true);
   };
 
-  // Add this function to check if koi exists in the selected pond
-  const checkKoiExistence = () => {
-    if (!lstKoi || lstKoi.length === 0) {
-      return (
-        <div>
-          <p className="mb-[10px]">
-            Let add Koi in pond to calculate food and salt for this pond,
-            <span className="text-orange-500">
-              <NavLink to={PATH.KOI_MANAGEMENT}>Add Koi</NavLink>
-            </span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  const handleCancel = () => setIsModalVisible(false);
 
-  // Modify the modal button click handler to show parameters that do not meet standards
   const handleShowParameters = () => {
     if (validationErrors.length > 0 || warningMessages.length > 0) {
       showModal();
@@ -155,12 +82,8 @@ const WaterParameter = () => {
     }
   };
 
-  // Đóng Modal
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+  
 
-  // Formik để xử lý form nhập liệu water parameters
   const formik = useFormik({
     initialValues: {
       nitriteNO2: 0,
@@ -180,165 +103,179 @@ const WaterParameter = () => {
       lastCleaned: false,
     },
     onSubmit: (values) => {
-      console.log(values);
       mutation.mutate(
-        { id: waterParameters?.pondId, payload: values },
+        { id: waterParamsData?.pondId, payload: values },
         {
           onSuccess: () => {
-            message.success("Update Water Parameter Success !");
-            refetch();
-            refetchStandard();
+            message.success("Update Water Parameter Success!");
+            refetchWaterParams();
+            refetchWaterStandard();
           },
         }
       );
     },
   });
 
-  // Cập nhật formik với dữ liệu waterParameters từ server
   useEffect(() => {
-    if (waterParameters) {
+    if (waterParamsData) {
       formik.setValues({
-        nitriteNO2: waterParameters.nitriteNO2 || 0,
-        nitrateNO3: waterParameters.nitrateNO3 || 0,
-        ammoniumNH4: waterParameters.ammoniumNH4 || 0,
-        hardnessGH: waterParameters.hardnessGH || 0,
-        salt: waterParameters.salt || 0,
-        temperature: waterParameters.temperature || 0,
-        carbonateHardnessKH: waterParameters.carbonateHardnessKH || 0,
-        co2: waterParameters.co2 || 0,
-        totalChlorines: waterParameters.totalChlorines || 0,
-        amountFed: waterParameters.amountFed || 0,
-        pondId: waterParameters.pondId || 0,
-        lastCleanedAt: waterParameters.lastCleanedAt || "2024-10-03",
-        cleanedDayCount: waterParameters.cleanedDayCount || 0,
-        ph: waterParameters.ph || 0,
+        nitriteNO2: waterParamsData.nitriteNO2 || 0,
+        nitrateNO3: waterParamsData.nitrateNO3 || 0,
+        ammoniumNH4: waterParamsData.ammoniumNH4 || 0,
+        hardnessGH: waterParamsData.hardnessGH || 0,
+        salt: waterParamsData.salt || 0,
+        temperature: waterParamsData.temperature || 0,
+        carbonateHardnessKH: waterParamsData.carbonateHardnessKH || 0,
+        co2: waterParamsData.co2 || 0,
+        totalChlorines: waterParamsData.totalChlorines || 0,
+        amountFed: waterParamsData.amountFed || 0,
+        pondId: waterParamsData.pondId || 0,
+        lastCleanedAt: waterParamsData.lastCleanedAt || "2024-10-03",
+        cleanedDayCount: waterParamsData.cleanedDayCount || 0,
+        ph: waterParamsData.ph || 0,
       });
     }
-  }, [waterParameters]);
+  }, [waterParamsData]);
 
-  // Xử lý validation và cảnh báo khi waterParameters vượt quá tiêu chuẩn
   useEffect(() => {
-    if (waterParameters && waterStandard) {
-      const errors = [];
-      const warnings = [];
+    if (!waterParamsData || !waterStandards) return;
 
-      // Nitrite NO2
-      if (waterParameters.nitriteNO2 > waterStandard.no2Standard) {
-        errors.push(`Nitrite NO2 is too high (${waterParameters.nitriteNO2} mg/L). Must be less than ${waterStandard.no2Standard} mg/L. This can be toxic to fish!`);
-      } else if (waterParameters.nitriteNO2 > waterStandard.no2Standard * 0.8) {
-        warnings.push(`Nitrite NO2 (${waterParameters.nitriteNO2} mg/L) is approaching dangerous levels. Consider water change.`);
+    const errors = [];
+    const warnings = [];
+
+    // Validation checks
+    const validateParameter = (value, min, max, name, unit, message) => {
+      if (value < min || value > max) {
+        errors.push(
+          `${name} (${value} ${unit}) is outside safe range (${min} - ${max} ${unit}). ${message}`
+        );
+      } else if (value > max * 0.8) {
+        warnings.push(
+          `${name} (${value} ${unit}) is approaching dangerous levels. Consider water change.`
+        );
+      }
+    };
+
+    validateParameter(
+      waterParamsData.nitriteNO2,
+      0,
+      waterStandards.no2Standard,
+      "Nitrite NO2",
+      "mg/L",
+      "This can be toxic to fish!"
+    );
+    validateParameter(
+      waterParamsData.nitrateNO3,
+      0,
+      waterStandards.no3Standard,
+      "Nitrate NO3",
+      "mg/L",
+      "High nitrates indicate poor water quality."
+    );
+    validateParameter(
+      waterParamsData.ammoniumNH4,
+      waterStandards.nh4StandardMin,
+      waterStandards.nh4Standard,
+      "Ammonium NH4",
+      "mg/L",
+      "This is highly toxic to fish!"
+    );
+    validateParameter(
+      waterParamsData.ph,
+      waterStandards.phMin,
+      waterStandards.phMax,
+      "pH",
+      "",
+      "This can stress fish!"
+    );
+    validateParameter(
+      waterParamsData.temperature,
+      waterStandards.temperatureMin,
+      waterStandards.temperatureMax,
+      "Temperature",
+      "°C",
+      "This affects fish metabolism!"
+    );
+    validateParameter(
+      waterParamsData.hardnessGH,
+      waterStandards.generalHardnessGhMin,
+      waterStandards.generalHardnessGhMax,
+      "Hardness GH",
+      "ppm",
+      "This affects osmoregulation!"
+    );
+    validateParameter(
+      waterParamsData.carbonateHardnessKH,
+      waterStandards.carbonateHardnessKhMin,
+      waterStandards.carbonateHardnessKhMax,
+      "Carbonate Hardness KH",
+      "ppm",
+      "This affects pH stability!"
+    );
+    validateParameter(
+      waterParamsData.co2,
+      waterStandards.oxygenMin,
+      waterStandards.oxygenMax,
+      "CO2",
+      "mg/L",
+      "This affects breathing!"
+    );
+    validateParameter(
+      waterParamsData.totalChlorines,
+      waterStandards.chlorineMin,
+      waterStandards.chlorineMax,
+      "Total Chlorines",
+      "g",
+      "Chlorine is toxic to fish!"
+    );
+
+    // Salt concentration analysis
+    if (waterParamsData.salt) {
+      const saltPPM = waterParamsData.salt;
+      const pondVolume = selectedPond?.volume || 0;
+
+      const calculateSaltAmount = (ppm) => (ppm * pondVolume) / 1000000;
+
+      const saltAmounts = {
+        3000: calculateSaltAmount(3000),
+        5000: calculateSaltAmount(5000),
+        7000: calculateSaltAmount(7000),
+      };
+
+      if (saltPPM === 0) {
+        warnings.push(
+          `No salt detected. Consider adding ${saltAmounts[3000].toFixed(
+            2
+          )}kg of salt for basic health maintenance (3000 PPM).`
+        );
+      } else if (saltPPM < 3000) {
+        const additionalSaltNeeded =
+          saltAmounts[3000] - calculateSaltAmount(saltPPM);
+        warnings.push(
+          `Salt concentration too low (${saltPPM} PPM). Add ${additionalSaltNeeded.toFixed(
+            2
+          )}kg more salt to reach 3000 PPM for optimal health.`
+        );
+      } else if (saltPPM > 7000) {
+        const excessSalt = (
+          calculateSaltAmount(saltPPM) - saltAmounts[7000]
+        ).toFixed(2);
+        errors.push(
+          `Salt concentration too high (${saltPPM} PPM). Remove approximately ${excessSalt}kg of salt or perform water change. High salt levels may stress fish!`
+        );
       }
 
-      // Nitrate NO3
-      if (waterParameters.nitrateNO3 > waterStandard.no3Standard) {
-        errors.push(`Nitrate NO3 is too high (${waterParameters.nitrateNO3} mg/L). Must be less than ${waterStandard.no3Standard} mg/L. High nitrates indicate poor water quality.`);
-      } else if (waterParameters.nitrateNO3 > waterStandard.no3Standard * 0.8) {
-        warnings.push(`Nitrate NO3 (${waterParameters.nitrateNO3} mg/L) is getting high. Plan a water change soon.`);
-      }
-
-      // Ammonium NH4
-      if (waterParameters.ammoniumNH4 < waterStandard.nh4StandardMin || waterParameters.ammoniumNH4 > waterStandard.nh4Standard) {
-        errors.push(`Ammonium NH4 (${waterParameters.ammoniumNH4} mg/L) is outside safe range (${waterStandard.nh4StandardMin} - ${waterStandard.nh4Standard} mg/L). This is highly toxic to fish!`);
-      } else if (waterParameters.ammoniumNH4 > waterStandard.nh4Standard * 0.8) {
-        warnings.push(`Ammonium NH4 levels (${waterParameters.ammoniumNH4} mg/L) are rising. Monitor closely.`);
-      }
-
-      // pH
-      if (waterParameters.ph < waterStandard.phMin || waterParameters.ph > waterStandard.phMax) {
-        errors.push(`pH (${waterParameters.ph}) is outside safe range (${waterStandard.phMin} - ${waterStandard.phMax}). This can stress fish!`);
-      } else if (Math.abs(waterParameters.ph - 7) > 1) {
-        warnings.push(`pH (${waterParameters.ph}) is deviating from neutral. Monitor for changes.`);
-      }
-
-      // Temperature
-      if (waterParameters.temperature < waterStandard.temperatureMin || waterParameters.temperature > waterStandard.temperatureMax) {
-        errors.push(`Temperature (${waterParameters.temperature}°C) is outside optimal range (${waterStandard.temperatureMin}°C - ${waterStandard.temperatureMax}°C). This affects fish metabolism!`);
-      } else if (Math.abs(waterParameters.temperature - ((waterStandard.temperatureMax + waterStandard.temperatureMin)/2)) > 2) {
-        warnings.push(`Temperature (${waterParameters.temperature}°C) is not ideal. Consider adjusting.`);
-      }
-
-      // Hardness GH
-      if (waterParameters.hardnessGH < waterStandard.generalHardnessGhMin || waterParameters.hardnessGH > waterStandard.generalHardnessGhMax) {
-        errors.push(`Hardness GH (${waterParameters.hardnessGH} ppm) is outside safe range (${waterStandard.generalHardnessGhMin} - ${waterStandard.generalHardnessGhMax} ppm). This affects osmoregulation!`);
-      }
-
-      // KH
-      if (waterParameters.carbonateHardnessKH < waterStandard.carbonateHardnessKhMin || waterParameters.carbonateHardnessKH > waterStandard.carbonateHardnessKhMax) {
-        errors.push(`Carbonate Hardness KH (${waterParameters.carbonateHardnessKH} ppm) is outside safe range (${waterStandard.carbonateHardnessKhMin} - ${waterStandard.carbonateHardnessKhMax} ppm). This affects pH stability!`);
-      }
-
-      // CO2
-      if (waterParameters.co2 < waterStandard.oxygenMin || waterParameters.co2 > waterStandard.oxygenMax) {
-        errors.push(`CO2 (${waterParameters.co2} mg/L) is outside safe range (${waterStandard.oxygenMin} - ${waterStandard.oxygenMax} mg/L). This affects breathing!`);
-      }
-
-      // Chlorine
-      if (waterParameters.totalChlorines < waterStandard.chlorineMin || waterParameters.totalChlorines > waterStandard.chlorineMax) {
-        errors.push(`Total Chlorines (${waterParameters.totalChlorines}g) is outside safe range (${waterStandard.chlorineMin} - ${waterStandard.chlorineMax}g). Chlorine is toxic to fish!`);
-      }
-
-      // Salt concentration analysis
-      if (waterParameters.salt) {
-        const saltPercentage = waterParameters.salt / 10000; // Convert to percentage
-        if (saltPercentage === 0.3) {
-          warnings.push("Salt concentration at 0.3% - Ideal for normal koi development and stress recovery");
-        } else if (saltPercentage === 0.5) {
-          warnings.push("Salt concentration at 0.5% - Good for balancing pressure when transferring koi and removing harmful bacteria");
-        } else if (saltPercentage === 0.7) {
-          warnings.push("Salt concentration at 0.7% - Effective for eliminating bacteria, fungi, and parasites");
-        } else if (saltPercentage > 0.7) {
-          errors.push(`Salt concentration too high (${saltPercentage}%). May stress fish!`);
-        }
-      }
-
-      setValidationErrors(errors);
-      setWarningMessages(warnings);
+      warnings.push(`
+Salt amount recommendations for ${pondVolume}L pond:
+- For 3000 PPM (health maintenance): ${saltAmounts[3000].toFixed(2)}kg
+- For 5000 PPM (bacteria control): ${saltAmounts[5000].toFixed(2)}kg  
+- For 7000 PPM (treatment): ${saltAmounts[7000].toFixed(2)}kg
+`);
     }
-  }, [waterParameters, waterStandard]);
 
-  // Export water quality report
-  const exportReport = () => {
-    const reportContent = `Water Quality Analysis Report
-${new Date().toLocaleString()}
------------------------------------------
-
-${selectedPond ? `Pond: ${selectedPond.name}` : ''}
-
-CRITICAL ISSUES:
-${validationErrors.map(error => `- ${error}`).join('\n')}
-
-WARNINGS:
-${warningMessages.map(warning => `- ${warning}`).join('\n')}
-
-SALT CONCENTRATION GUIDE:
-- 0.3%: Ideal for normal koi development and stress recovery
-- 0.5%: Balances pressure when transferring koi and removes harmful bacteria
-- 0.7%: Eliminates bacteria, fungi, and parasites
-
-Current Parameters:
-- NO2: ${waterParameters?.nitriteNO2} mg/L
-- NO3: ${waterParameters?.nitrateNO3} mg/L
-- NH4: ${waterParameters?.ammoniumNH4} mg/L
-- pH: ${waterParameters?.ph}
-- Temperature: ${waterParameters?.temperature}°C
-- Salt: ${waterParameters?.salt / 10000}%
-`;
-
-    const blob = new Blob([reportContent], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'water-quality-report.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
-
-  // Render danh sách hồ
-  if (!lstPond) {
-    return <div>Loading...</div>;
-  }
+    setValidationErrors(errors);
+    setWarningMessages(warnings);
+  }, [waterParamsData, waterStandards, selectedPond]);
 
   return (
     <div>
@@ -350,7 +287,7 @@ Current Parameters:
       </div>
 
       <div className="container grid grid-cols-4 gap-6 my-16">
-        {lstPond.map((pond, index) => (
+        {lstPond?.map((pond, index) => (
           <div key={index} className="text-center">
             <img
               onClick={() => handleClick(pond)}
@@ -378,9 +315,9 @@ Current Parameters:
       >
         {loading ? (
           <Spin />
-        ) : !waterParameters ||
-          waterParameters === null ||
-          Object.keys(waterParameters).length === 0 ? (
+        ) : !waterParamsData ||
+          waterParamsData === null ||
+          Object.keys(waterParamsData).length === 0 ? (
           <div className="flex w-80%">
             {/* Left column: Image */}
             <div className="w-1/2 pr-4 flex items-start justify-center">
@@ -516,7 +453,10 @@ Current Parameters:
                           className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 w-3/4"
                         />
                       </Form.Item>
-                      <Form.Item label="Last Cleaned At" className="mb-2 hidden">
+                      <Form.Item
+                        label="Last Cleaned At"
+                        className="mb-2 hidden"
+                      >
                         <DatePicker
                           name="lastCleanedAt"
                           value={
@@ -590,106 +530,220 @@ Current Parameters:
                   >
                     Show Water Quality Analysis
                   </Button>
-
-                  <Button
-                    className="bg-green-600 text-white hover:bg-green-700 transition duration-200"
-                    onClick={exportReport}
-                  >
-                    Export Report
-                  </Button>
                 </div>
 
                 <Modal
-                  title="Water Quality Analysis Report"
-                  visible={visible}
+                  title={
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-gray-800">
+                        Water Quality Analysis Report
+                      </h2>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Generated on {new Date().toLocaleString()}
+                      </p>
+
+                      <Button
+                        key="export"
+                        onClick={exportToPDF}
+                        className="mt-2 bg-gradient-to-r from-blue-500 to-blue-800 text-white hover:from-blue-600 hover:to-blue-800 transition-all duration-300 px-6 py-2 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center mx-auto border-2 border-blue-400"
+                        icon={<span className="mr-2 text-lg">📑</span>}
+                      >
+                        Export Report
+                      </Button>
+                    </div>
+                  }
+                  open={visible}
                   onOk={handleOk}
                   onCancel={handleCancelModal}
-                  width="60%"
-                  bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
+                  width="70%"
+                  style={{ maxHeight: "80vh", overflowY: "auto" }}
                   centered
+                  className="water-quality-modal"
                 >
                   {/* Critical Issues Section */}
                   {validationErrors.length > 0 && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <h3 className="text-red-700 font-bold mb-3">⚠️ Critical Issues:</h3>
-                      <ul className="list-disc pl-5">
+                    <div className="mb-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+                      <div className="flex items-center mb-4">
+                        <span className="text-2xl mr-2">⚠️</span>
+                        <h3 className="text-xl text-red-700 font-bold">
+                          Critical Issues Detected
+                        </h3>
+                      </div>
+                      <ul className="space-y-3">
                         {validationErrors.map((error, index) => (
-                          <li key={index} className="text-red-600 mb-2">{error}</li>
+                          <li key={index} className="flex items-start">
+                            <span className="inline-block w-4 h-4 mt-1 mr-2 bg-red-500 rounded-full flex-shrink-0"></span>
+                            <p className="text-red-700 leading-relaxed">
+                              {error}
+                            </p>
+                          </li>
                         ))}
                       </ul>
+                      <div className="mt-4 p-3 bg-red-100 rounded">
+                        <p className="text-red-800 text-sm font-medium">
+                          ⚡ Immediate action required! These issues can
+                          severely impact fish health.
+                        </p>
+                      </div>
                     </div>
                   )}
 
                   {/* Warnings Section */}
                   {warningMessages.length > 0 && (
-                    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <h3 className="text-yellow-700 font-bold mb-3">⚠️ Warnings:</h3>
-                      <ul className="list-disc pl-5">
+                    <div className="mb-8 p-6 bg-amber-50 border-l-4 border-amber-500 rounded-lg shadow-md">
+                      <div className="flex items-center mb-4">
+                        <span className="text-2xl mr-2">⚠️</span>
+                        <h3 className="text-xl text-amber-700 font-bold">
+                          Important Warnings
+                        </h3>
+                      </div>
+                      <ul className="space-y-3">
                         {warningMessages.map((warning, index) => (
-                          <li key={index} className="text-yellow-600 mb-2">{warning}</li>
+                          <li key={index} className="flex items-start">
+                            <span className="inline-block w-4 h-4 mt-1 mr-2 bg-amber-500 rounded-full flex-shrink-0"></span>
+                            <p className="text-amber-700 leading-relaxed whitespace-pre-line">
+                              {warning}
+                            </p>
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
                   {/* Salt Guide Section */}
-                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h3 className="text-blue-700 font-bold mb-3">🧂 Salt Concentration Guide:</h3>
-                    <ul className="list-disc pl-5">
-                      <li className="text-blue-600 mb-2">0.3%: Ideal for normal koi development and stress recovery</li>
-                      <li className="text-blue-600 mb-2">0.5%: Balances pressure when transferring koi and removes harmful bacteria</li>
-                      <li className="text-blue-600 mb-2">0.7%: Eliminates bacteria, fungi, and parasites</li>
-                    </ul>
+                  <div className="mb-8 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-md">
+                    <div className="flex items-center mb-4">
+                      <span className="text-2xl mr-2">🧂</span>
+                      <h3 className="text-xl text-blue-700 font-bold">
+                        Salt Concentration Guidelines
+                      </h3>
+                    </div>
+                    <div className="bg-white p-5 rounded-lg shadow-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h4 className="font-bold text-blue-800 mb-2">
+                            Maintenance Level
+                          </h4>
+                          <p className="text-blue-700">3000 PPM</p>
+                          <p className="text-sm text-blue-600 mt-2">
+                            Ideal for normal development and stress recovery
+                          </p>
+                        </div>
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h4 className="font-bold text-blue-800 mb-2">
+                            Treatment Level
+                          </h4>
+                          <p className="text-blue-700">5000 PPM</p>
+                          <p className="text-sm text-blue-600 mt-2">
+                            For pressure balance and bacteria control
+                          </p>
+                        </div>
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h4 className="font-bold text-blue-800 mb-2">
+                            Therapeutic Level
+                          </h4>
+                          <p className="text-blue-700">7000 PPM</p>
+                          <p className="text-sm text-blue-600 mt-2">
+                            For eliminating parasites and infections
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-blue-800 font-medium">
+                            Current Salt Level:
+                          </span>
+                          <span className="text-blue-800 font-bold">
+                            {waterParamsData?.salt} PPM
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Recommendations Section */}
-                  {(validationErrors.length > 0 || warningMessages.length > 0) && (
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h3 className="text-blue-700 font-bold mb-3">💡 Recommendations:</h3>
-                      <ul className="list-disc pl-5">
-                        {validationErrors.length > 0 && (
-                          <li className="text-blue-600 mb-2">
-                            Perform an immediate water change of 25-50% to dilute harmful parameters
-                          </li>
-                        )}
-                        {warningMessages.length > 0 && (
-                          <li className="text-blue-600 mb-2">
-                            Schedule a maintenance check within the next 48 hours
-                          </li>
-                        )}
-                        <li className="text-blue-600 mb-2">
-                          Check filtration system and ensure it's working properly
-                        </li>
-                        <li className="text-blue-600">
-                          Consider using water treatment products from our store
-                        </li>
-                      </ul>
+                  {(validationErrors.length > 0 ||
+                    warningMessages.length > 0) && (
+                    <div className="mb-8 p-6 bg-emerald-50 border-l-4 border-emerald-500 rounded-lg shadow-md">
+                      <div className="flex items-center mb-4">
+                        <span className="text-2xl mr-2">💡</span>
+                        <h3 className="text-xl text-emerald-700 font-bold">
+                          Action Plan
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 bg-white rounded-lg shadow-sm">
+                          <h4 className="font-bold text-emerald-800 mb-3">
+                            Immediate Actions:
+                          </h4>
+                          <ul className="space-y-2">
+                            {validationErrors.length > 0 && (
+                              <li className="flex items-center text-emerald-700">
+                                <span className="mr-2">🔄</span>
+                                Perform 25-50% water change
+                              </li>
+                            )}
+                            {warningMessages.length > 0 && (
+                              <li className="flex items-center text-emerald-700">
+                                <span className="mr-2">📅</span>
+                                Schedule maintenance within 48h
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                        <div className="p-4 bg-white rounded-lg shadow-sm">
+                          <h4 className="font-bold text-emerald-800 mb-3">
+                            Preventive Measures:
+                          </h4>
+                          <ul className="space-y-2">
+                            <li className="flex items-center text-emerald-700">
+                              <span className="mr-2">🔍</span>
+                              Inspect filtration system
+                            </li>
+                            <li className="flex items-center text-emerald-700">
+                              <span className="mr-2">💊</span>
+                              Consider water treatments
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {validationErrors.length === 0 && warningMessages.length === 0 && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="text-green-700 font-bold mb-3">✅ Good News!</h3>
-                      <p className="text-green-600">
-                        All water parameters are within optimal ranges. Keep up the good work!
-                      </p>
-                    </div>
-                  )}
+                  {validationErrors.length === 0 &&
+                    warningMessages.length === 0 && (
+                      <div className="p-6 bg-green-50 border-l-4 border-green-500 rounded-lg shadow-md">
+                        <div className="flex items-center mb-4">
+                          <span className="text-2xl mr-2">✨</span>
+                          <h3 className="text-xl text-green-700 font-bold">
+                            Perfect Water Conditions!
+                          </h3>
+                        </div>
+                        <p className="text-green-700 leading-relaxed">
+                          All parameters are within optimal ranges. Your koi are
+                          swimming in perfect conditions!
+                        </p>
+                        <div className="mt-4 p-3 bg-green-100 rounded">
+                          <p className="text-green-800 text-sm font-medium">
+                            💡 Tip: Maintain regular testing schedule to ensure
+                            continued water quality excellence.
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
-                  <div className="mt-6">
-                    <p className="text-gray-700 mb-4">
-                      Need supplies to maintain optimal water quality?
+                  <div className="mt-8 text-center">
+                    <p className="text-gray-700 mb-4 font-medium">
+                      Need professional-grade water treatment supplies?
                     </p>
-                    <div className="flex justify-center">
-                      <Button
-                        onClick={() => {
-                          window.open(PATH.STORE, "_blank");
-                        }}
-                        className="bg-black text-white hover:bg-gray-800 transition-colors duration-200 px-6 py-2"
-                      >
-                        Visit Store
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => {
+                        window.open(PATH.STORE, "_blank");
+                      }}
+                      className="bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:from-blue-700 hover:to-blue-900 transition-all duration-300 px-8 py-2 rounded-full shadow-lg hover:shadow-xl"
+                    >
+                      Browse Our Store
+                    </Button>
                   </div>
                 </Modal>
               </Form>
@@ -700,11 +754,11 @@ Current Parameters:
 
       {/* Modal for Add Water Parameter */}
       <Modal
-        visible={isAddWaterParaModalVisible}
+        open={isAddWaterParaModalVisible}
         onCancel={() => setIsAddWaterParaModalVisible(false)}
         footer={null}
         width="60%"
-        bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }}
+        style={{ maxHeight: "80vh", overflowY: "auto" }}
         centered
         className="custom-modal"
       >
@@ -721,7 +775,8 @@ Current Parameters:
               selectedPond={selectedPond}
               onSuccess={() => {
                 setIsAddWaterParaModalVisible(false);
-                refetch();
+                refetchWaterParams();
+                refetchWaterStandard();
               }}
             />
           </div>

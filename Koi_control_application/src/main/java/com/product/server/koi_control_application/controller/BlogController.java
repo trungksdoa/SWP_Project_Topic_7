@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.server.koi_control_application.model.Blogs;
 import com.product.server.koi_control_application.model.Users;
 import com.product.server.koi_control_application.pojo.request.BlogCreateDTO;
-import com.product.server.koi_control_application.pojo.request.BlogRequestApprove;
 import com.product.server.koi_control_application.pojo.response.BaseResponse;
 import com.product.server.koi_control_application.serviceInterface.IBlogService;
 import com.product.server.koi_control_application.serviceInterface.IUserService;
@@ -45,7 +44,7 @@ public class BlogController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_CONTRIBUTOR')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> createBlog(
             @RequestPart("blog") @Schema(type = "string", format = "json", implementation = BlogCreateDTO.class) String blogJson,
@@ -66,7 +65,7 @@ public class BlogController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_CONTRIBUTOR')")
     @PutMapping(value = UPDATE_BLOG, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse> updateBlog(
             @PathVariable int updateBlogId,
@@ -78,7 +77,7 @@ public class BlogController {
         return ResponseUtil.createResponse(blogService.updateBlog(updateBlogId, blog, headerImage, bodyImage), "Created blog successfully", HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SHOP')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_CONTRIBUTOR')")
     @DeleteMapping(DELETE_BLOG)
     public ResponseEntity<BaseResponse> deleteBlog(@PathVariable int deleteBlogId) {
         blogService.deleteBlog(deleteBlogId);
@@ -104,10 +103,4 @@ public class BlogController {
         return ResponseUtil.createSuccessResponse(blogService.searchBlogs(title, headerTop, headerMiddle), "Retrieved blogs successfully");
     }
 
-//    @PostMapping("/accept")
-//    public ResponseEntity<BaseResponse> acceptBlog(@RequestBody BlogRequestApprove request) {
-//        int blogId = request.getBlogRequestId();
-//        blogService.acceptBlog(blogId);
-//        return ResponseUtil.createSuccessResponse(null, "Accepted blog successfully");
-//    }
 }

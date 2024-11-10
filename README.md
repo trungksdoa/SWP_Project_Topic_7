@@ -3,12 +3,11 @@
  
  **Host server:** [Link](https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/)
 
- Architechture diagram 
-  ![image](https://github.com/user-attachments/assets/f8d15c09-d5e4-43a3-b190-669863a34c0a)
-
  **Role:**
  Member
- Admin
+ Admin,
+ Contributer,
+ Staff
 
 **Feature:**
  - Chức năng cho phép quản lý thông tin hồ cá Koi (tên, hình ảnh, kích thước, độ sâu, thể tích, số lượng cống thoát, công suất máy bơm, ...).

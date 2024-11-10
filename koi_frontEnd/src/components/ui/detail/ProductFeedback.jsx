@@ -12,7 +12,7 @@ import FeedbackForm from "./FeedBackForm";
 import "./colapseStyle.css";
 
 const ProductFeedback = ({ prdId, averageRating }) => {
-
+  console.log(prdId);
   const { t } = useTranslation();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
@@ -302,7 +302,7 @@ const ProductFeedback = ({ prdId, averageRating }) => {
                       {fb?.user?.username}
                     </h4>
                     <p className="text-sm text-gray-500">
-                      {formatDate(fb?.createdAt)}
+                       {fb?.updatedAt !== fb?.createdAt ? `Updated at ${formatDate(fb?.updatedAt)}` : formatDate(fb?.createdAt)}
                     </p>
                   </div>
                 </div>
