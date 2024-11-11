@@ -49,26 +49,8 @@ const AdminTemplate = () => {
   };
 
   const getSectionName = (pathname) => {
-    if (pathname.includes('dashboard')) {
-      return null;
-    }
-    
-    return (
-      <>
-        <span style={{ marginRight: "20px" }}>
-          {t(pathname.split("/").pop().split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "))}
-        </span>
-        <Button
-          type="text"
-          className="bg-black text-white hover:!text-white hover:!bg-black"
-          icon={<LogoutOutlined />}
-          onClick={handleLogout}
-          style={{ marginLeft: "850px", verticalAlign: "middle" }}
-        >
-          {t("Logout")}
-        </Button>
-      </>
-    );
+    const isOnDashboard = pathname.includes('dashboard');
+    return isOnDashboard ? null : t(pathname.split("/").pop().split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "));
   };
 
   return (
@@ -320,6 +302,16 @@ const AdminTemplate = () => {
             >
               {getSectionName(location.pathname)}
             </h2>
+            {!location.pathname.includes('dashboard') && (
+              <Button
+                type="text"
+                className="bg-black text-white hover:!text-white hover:!bg-black"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+              >
+                {t("Logout")}
+              </Button>
+            )}
           </Header>
           <div
             style={{
