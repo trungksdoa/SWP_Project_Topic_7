@@ -30,6 +30,7 @@ public class TodoService {
                         .userId(userId)
                         .taskType(todoTask.getTaskType())
                         .title(todoTask.getTitle())
+                        .description(todoTask.getDescription())
                         .placeIndex(nextPlaceIndex)
                         .build()
         );
@@ -48,6 +49,7 @@ public class TodoService {
             Optional.ofNullable(todo.getPriority()).ifPresent(todoTask::setPriority);
             Optional.ofNullable(todo.getTaskType()).ifPresent(todoTask::setTaskType);
             Optional.ofNullable(todo.getDueDate()).ifPresent(todoTask::setDueDate);
+            Optional.ofNullable(todo.getDescription()).ifPresent(todoTask::setDescription);
             todoTaskRepository.save(todoTask);
         });
     }
