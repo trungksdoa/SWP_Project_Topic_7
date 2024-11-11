@@ -4,10 +4,7 @@ import com.product.server.koi_control_application.enums.OrderCode;
 import com.product.server.koi_control_application.model.UserPackage;
 import com.product.server.koi_control_application.pojo.momo.MomoCallbackResponse;
 import com.product.server.koi_control_application.pojo.momo.PaymentContext;
-import com.product.server.koi_control_application.serviceInterface.ICartService;
-import com.product.server.koi_control_application.serviceInterface.IOrderService;
-import com.product.server.koi_control_application.serviceInterface.IPaymentService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +20,7 @@ public class PaymentProcessor {
     private final IUserService userService;
     private final ICartService cartService;
     private final IPaymentService paymentService;
-
+    private final IEmailService emailService;
     public void processCallback(MomoCallbackResponse response) {
         PaymentContext context = PaymentContext.fromCallback(response);
 
@@ -68,7 +65,8 @@ public class PaymentProcessor {
         userPackage.setId(Integer.parseInt(context.getOrderId()));
 
         userService.addPackage(Integer.parseInt(context.getUserId()), userPackage);
-        log.info("User {} has been added package successfully", context.getUserId());
+        emailService.sendMail(context.getUserId(), "Upgrade package", "Your package has been upgraded successfully. Go to the website to view changes: https://swp-project-topic-7.vercel.app/packages");
+        log.info("User {} has been added package successfully", context.getUserId());        log.info("User {} has been added package successfully", context.getUserId());
     }
 
     private void processProductPayment(PaymentContext context) {

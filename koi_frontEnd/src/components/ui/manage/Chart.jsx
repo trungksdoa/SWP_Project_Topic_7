@@ -1,217 +1,106 @@
-import React, { useState, useMemo } from 'react';
-import { Modal, Select } from 'antd';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import PropTypes from 'prop-types';
-const { Option } = Select
+import React, { useState, useMemo } from "react";
+import { Modal, Select } from "antd";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Customized,
+} from "recharts";
+import PropTypes from "prop-types";
+const { Option } = Select;
 
-const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, error, koiAge }) => {
-  const [selectedYear, setSelectedYear] = useState(null);
-  const [selectedHistories, setSelectedHistories] = useState([]);
+const KoiGrowthChart = ({
+  isVisible,
+  onClose,
+  growthData,
+  isLoading,
+  isError,
+  error,
+}) => {
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [displayMode, setDisplayMode] = useState("full");
+  const [zoomLevel, setZoomLevel] = useState(1); // M?c ?? zoom m?c ??nh l� 1 (kh�ng zoom)
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
+  const calculateStandardLength = (ageMonth) => {
+    let initialLength = 4.0;
+    let standardLength = initialLength;
 
-  const calculateStandardLength = (ageMonths) => {
-    let standardLength = 3.5;
-    
-    // Đảm bảo ageMonths là số
-    ageMonths = Number(ageMonths) || 0;
-    
-    for (let month = 1; month <= ageMonths; month++) {
+    for (let month = 1; month <= ageMonth; month++) {
       if (month <= 2) {
-        standardLength *= 1.5; // Điều chỉnh tỷ lệ tăng trưởng
+        standardLength += initialLength * (2 - 1) / 2;
       } else if (month <= 6) {
-        standardLength += 2;
+        standardLength += 2.5;
       } else if (month <= 12) {
-        standardLength += 1;
+        standardLength += 1.5;
       } else {
         standardLength += 0.5;
       }
     }
-    
-    return Math.round(standardLength * 10) / 10; // Làm tròn 1 số thập phân
-  };
-  const calculateGrowthRate = (currentLength, previousLength, previousAge, currentAge) => {
-    const expectedGrowth = calculateExpectedGrowth(previousLength, previousAge, currentAge);
-    const actualGrowth = currentLength - previousLength;
-    const growthDiff = ((actualGrowth - expectedGrowth) / expectedGrowth) * 100;
 
-    if (growthDiff <= -10) return "Slow growth";
-    if (growthDiff >= 10) return "Fast growth";
-    return "Normal growth";
-  };
-
-  const calculateExpectedGrowth = (previousLength, previousAgeMonth, currentAgeMonth) => {
-    let expectedGrowth = 0.0;
-
-    for (let ageMonth = previousAgeMonth + 1; ageMonth <= currentAgeMonth; ageMonth++) {
-      if (ageMonth <= 2) {
-        expectedGrowth += previousLength * (2 - 1) / 2;
-      } else if (ageMonth <= 6) {
-        expectedGrowth += 2.5;
-      } else if (ageMonth <= 12) {
-        expectedGrowth += 1.5;
-      } else {
-        expectedGrowth += 0.5;
-      }
-    }
-
-    return expectedGrowth;
+    return Math.round(standardLength * 10) / 10;
   };
 
   const processedGrowthData = useMemo(() => {
     if (!growthData || growthData.length < 2) return [];
 
-    return growthData.map((data, index) => {
+    return growthData.map((data) => {
       const standardLength = calculateStandardLength(data.ageMonthHis);
-      
-      let growthRate = "Initial";
-      if (index > 0) {
-        const prevData = growthData[index - 1];
-        growthRate = calculateGrowthRate(
-          data.length,
-          prevData.length,
-          prevData.ageMonthHis,
-          data.ageMonthHis
-        );
-      }
+      const difference = Math.round((data.length - standardLength) * 10) / 10;
 
       return {
         ...data,
         standardLength,
-        growthRate
+        difference,
       };
     });
-  }, [growthData]);
-
-  const years = useMemo(() => {
-    if (!growthData) return [];
-    const uniqueYears = [...new Set(growthData.map(data => new Date(data.date).getFullYear()))];
-    return uniqueYears.sort((a, b) => a - b);
   }, [growthData]);
 
   const filteredGrowthData = useMemo(() => {
-    if (!processedGrowthData) return [];
-    let filtered = processedGrowthData.filter(data => data.ageMonthHis > 0);
-    if (selectedYear) {
-      filtered = filtered.filter(data => new Date(data.date).getFullYear() === selectedYear);
-    }
-    return filtered;
-  }, [processedGrowthData, selectedYear]);
+    if (!processedGrowthData || processedGrowthData.length === 0) return [];
 
-  const handleYearChange = (year) => {
-    setSelectedYear(year);
-    setSelectedHistories([]);
-  };
-
-  const handleHistoryChange = (selectedDates) => {
-    setSelectedHistories(selectedDates);
-  };
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc' }}>
-          <p><strong>Age:</strong> {label} months</p>
-          {payload.map((entry, index) => (
-            <p key={index}>
-              <strong>{entry.name}:</strong> {entry.value} cm
-              {entry.dataKey.startsWith('length_') && (
-                <>
-                  <br />
-                  <strong>Growth Rate:</strong> {entry.payload[`growthRate_${entry.dataKey.split('_')[1]}`]}
-                  <br /> 
-                  <strong>Date:</strong> {formatDate(entry.payload[`date_${entry.dataKey.split('_')[1]}`])}
-                </>
-              )}
-            </p>
-          ))}
-        </div>
+    let filtered = processedGrowthData;
+    if (selectedStartDate && selectedEndDate) {
+      filtered = processedGrowthData.filter(
+        (data) =>
+          new Date(data.date) >= new Date(selectedStartDate) &&
+          new Date(data.date) <= new Date(selectedEndDate)
       );
     }
-    return null;
+    return filtered;
+  }, [processedGrowthData, selectedStartDate, selectedEndDate]);
+
+  const handleStartDateChange = (startDate) => {
+    setSelectedStartDate(startDate);
   };
 
-  const chartData = useMemo(() => {
-    if (!filteredGrowthData || filteredGrowthData.length === 0) return [];
-    
-    if (selectedHistories.length === 0) {
-      return filteredGrowthData.map(data => ({
-        ageMonthHis: data.ageMonthHis,
-        length: data.length,
-        standardLength: data.standardLength,
-        date: data.date,
-        growthRate: data.growthRate
-      }));
+  const handleEndDateChange = (endDate) => {
+    setSelectedEndDate(endDate);
+  };
+
+  const handleDisplayModeChange = (mode) => {
+    setDisplayMode(mode);
+  };
+
+  // H�m x? l� s? ki?n cu?n chu?t
+  const handleWheel = (e) => {
+    if (e.deltaY > 0) {
+      // Cu?n xu?ng, thu nh?
+      setZoomLevel((prevZoom) => Math.min(prevZoom * 1.1, 5)); // Gi?i h?n zoom t?i ?a l� 5
+    } else {
+      // Cu?n l�n, ph�ng to
+      setZoomLevel((prevZoom) => Math.max(prevZoom / 1.1, 1)); // Gi?i h?n zoom t?i thi?u l� 1
     }
-
-    // Get all unique age months from selected histories
-    const allAgeMonths = Array.from(new Set(
-      filteredGrowthData
-        .filter(data => selectedHistories.includes(data.date))
-        .map(data => data.ageMonthHis)
-    )).sort((a, b) => a - b);
-
-    // Create data points for each age month
-    return allAgeMonths.map(age => {
-      const dataPoint = {
-        ageMonthHis: age,
-        standardLength: calculateStandardLength(age)
-      };
-
-      // Add data for each selected history
-      selectedHistories.forEach((date, index) => {
-        const historyData = filteredGrowthData.find(data => 
-          data.date === date && data.ageMonthHis === age
-        );
-        if (historyData) {
-          dataPoint[`length_${index}`] = historyData.length;
-          dataPoint[`date_${index}`] = historyData.date;
-          dataPoint[`growthRate_${index}`] = historyData.growthRate;
-        }
-      });
-
-      return dataPoint;
-    });
-  }, [filteredGrowthData, selectedHistories]);
-
-  const renderChart = (data) => (
-    <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="ageMonthHis" label={{ value: 'Age (months)', position: 'insideBottom', offset: -3 }} />
-        <YAxis label={{ value: 'Length (cm)', angle: -90, position: 'insideLeft', offset: 0 }} />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend />
-        {selectedHistories.length === 0 ? (
-          <>
-            <Line type="monotone" dataKey="length" stroke="#8884d8" name="Actual Length" connectNulls />
-            <Line type="monotone" dataKey="standardLength" stroke="#82ca9d" name="Standard Length" connectNulls />
-          </>
-        ) : (
-          <>
-            {selectedHistories.map((date, index) => (
-              <Line 
-                key={date}
-                type="monotone" 
-                dataKey={`length_${index}`}
-                stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
-                name={`Length (${formatDate(date)})`}
-                connectNulls
-              />
-            ))}
-            <Line type="monotone" dataKey="standardLength" stroke="#82ca9d" name="Standard Length" connectNulls />
-          </>
-        )}
-      </LineChart>
-    </ResponsiveContainer>
-  );
+  };
 
   return (
     <Modal
-      title={`Koi Growth Data Comparison ${selectedYear ? `(${selectedYear})` : ''}`}
+      title="Koi Growth Data Comparison"
       open={isVisible}
       onCancel={onClose}
       footer={null}
@@ -219,45 +108,92 @@ const KoiGrowthChart = ({ isVisible, onClose, growthData, isLoading, isError, er
     >
       {isLoading && <p>Loading growth data...</p>}
       {isError && <p>Error loading growth data: {error?.message}</p>}
-      <>
-        <div className="flex gap-4 mb-4">
-          <Select
-            style={{ width: 120 }}
-            placeholder="Select Year"
-            onChange={handleYearChange}
-            value={selectedYear}
-          >
-            <Option value={null}>All Years</Option>
-            {years.map(year => (
-              <Option key={year} value={year}>{year}</Option>
-            ))}
-          </Select>
+      <div className="flex gap-4 mb-4">
+        <Select
+          style={{ width: 150 }}
+          placeholder="Select Start Date"
+          onChange={handleStartDateChange}
+          value={selectedStartDate}
+        >
+          {processedGrowthData.map((data) => (
+            <Option key={data.date} value={data.date}>
+              {data.date} ({data.length}cm)
+            </Option>
+          ))}
+        </Select>
 
-          <Select
-            mode="multiple"
-            style={{ width: 300 }}
-            placeholder="Select Chart Points"
-            onChange={handleHistoryChange}
-            value={selectedHistories}
-            maxTagCount={1}
-            maxTagTextLength={20}
-            maxTagPlaceholder={`${selectedHistories.length} points selected`}
-          >
-            {filteredGrowthData.map(data => (
-              <Option 
-                key={data.date} 
-                value={data.date}
-              >
-                {formatDate(data.date)} ({data.length}cm)
-              </Option>
-            ))}
-          </Select>
-        </div>
+        <Select
+          style={{ width: 150 }}
+          placeholder="Select End Date"
+          onChange={handleEndDateChange}
+          value={selectedEndDate}
+        >
+          {processedGrowthData.map((data) => (
+            <Option key={data.date} value={data.date}>
+              {data.date} ({data.length}cm)
+            </Option>
+          ))}
+        </Select>
 
-        <div>
-          {renderChart(chartData)}
-        </div>
-      </>
+        <Select
+          style={{ width: 150 }}
+          placeholder="Display Mode"
+          onChange={handleDisplayModeChange}
+          value={displayMode}
+        >
+          <Option value="actual">Actual</Option>
+          <Option value="standard">Standard</Option>
+          <Option value="full">Full</Option>
+        </Select>
+      </div>
+
+      <ResponsiveContainer width="100%" height={400} onWheel={handleWheel}>
+        <LineChart data={filteredGrowthData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="ageMonthHis"
+            label={{
+              value: "Age (months)",
+              position: "insideBottom",
+              offset: -3,
+            }}
+            domain={['auto', 'auto']} // ?i?u ch?nh ph?m vi tr?c X t? ??ng
+            interval={zoomLevel > 1 ? Math.ceil(zoomLevel) : 1} // ?i?u ch?nh kho?ng c�ch gi?a c�c m?c theo zoom
+          />
+          <YAxis
+            label={{
+              value: "Length (cm)",
+              angle: -90,
+              position: "insideLeft",
+              offset: 0,
+            }}
+            domain={['auto', 'auto']} // ?i?u ch?nh ph?m vi tr?c Y t? ??ng
+            allowDataOverflow={true} // Cho ph�p tr?c Y m? r?ng
+            tickCount={zoomLevel > 1 ? 10 : 5} // ?i?u ch?nh s? l??ng c�c m?c theo m?c zoom
+          />
+          <Tooltip />
+          <Legend />
+
+          {(displayMode === "actual" || displayMode === "full") && (
+            <Line
+              type="monotone"
+              dataKey="length"
+              stroke="#8884d8"
+              name="Actual Length"
+              connectNulls
+            />
+          )}
+          {(displayMode === "standard" || displayMode === "full") && (
+            <Line
+              type="monotone"
+              dataKey="standardLength"
+              stroke="#82ca9d"
+              name="Standard Length"
+              connectNulls
+            />
+          )}
+        </LineChart>
+      </ResponsiveContainer>
     </Modal>
   );
 };
@@ -269,7 +205,6 @@ KoiGrowthChart.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   error: PropTypes.object,
-  koiAge: PropTypes.number,
 };
 
 export default KoiGrowthChart;

@@ -11,10 +11,7 @@ import com.product.server.koi_control_application.pojo.momo.MomoPaymentRequest;
 import com.product.server.koi_control_application.pojo.momo.MomoRequestBody;
 import com.product.server.koi_control_application.service.PaymentProcessor;
 import com.product.server.koi_control_application.serviceHelper.interfaces.IMomoHelper;
-import com.product.server.koi_control_application.serviceInterface.ICartService;
-import com.product.server.koi_control_application.serviceInterface.IOrderService;
-import com.product.server.koi_control_application.serviceInterface.IPaymentService;
-import com.product.server.koi_control_application.serviceInterface.IUserService;
+import com.product.server.koi_control_application.serviceInterface.*;
 import com.product.server.koi_control_application.ultil.PaymentUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +38,7 @@ public class MomoPaymentHelper implements IMomoHelper {
     private final IUserService userService;
     private final ICartService cartService;
     private final IPaymentService paymentService;
-
+    private final IEmailService emailService;
     @Override
     public ResponseEntity<JsonNode> createPayment(MomoPaymentRequest request) throws Exception {
         MomoPaymentInfo paymentInfo = getPaymentInfo(request);
@@ -75,7 +72,8 @@ public class MomoPaymentHelper implements IMomoHelper {
                 orderService,
                 userService,
                 cartService,
-                paymentService
+                paymentService,
+                emailService
         );
         processor.processCallback(momoCallbackResponse);
     }

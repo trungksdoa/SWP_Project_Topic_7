@@ -233,7 +233,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<Product> searchProductByName(String name) {
-        return List.of();
+        return productRepository.findBySlugAndNameContaining(name);
     }
 
     /*

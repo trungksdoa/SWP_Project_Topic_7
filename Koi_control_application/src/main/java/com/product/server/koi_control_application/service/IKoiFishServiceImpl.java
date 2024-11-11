@@ -133,7 +133,6 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         } else {
             koiFish.setImageUrl(koiFish.getImageUrl());
         }
-
         Optional.ofNullable(request.getWeight()).ifPresent(koiFish::setWeight);
         Optional.ofNullable(request.getLength()).ifPresent(koiFish::setLength);
         Optional.ofNullable(request.getName()).ifPresent(koiFish::setName);
@@ -160,9 +159,12 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .date(koiFish.getDate());
 
 
-        if (!isNew) {
+
+
+        if(!isNew || koiFish.getDate().isEqual(getGrowthHistory(getLastestKoigrownId(koiFish.getId())).getDate())  ){
             builder.id(getLastestKoigrownId(koiFish.getId()));
         }
+
         koiGrowthHistoryRepository.save(builder.build());
 
         if (request.getDateOfBirth()!= null && request.getDateOfBirth()!= koiFish.getDateOfBirth()){
@@ -230,6 +232,11 @@ public class IKoiFishServiceImpl implements IKoiFishService {
                 .length(request.getLength())
                 .pondId(request.getPondId())
                 .date(request.getDate());
+
+
+        if(getGrowthHistoryByDate(request.getDate(), id) != null){
+            builder.id(getGrowthHistoryByDate(request.getDate(), id).getId());
+        }
 
        KoiGrowthHistory saved = koiGrowthHistoryRepository.save(builder.build());
 
@@ -490,5 +497,16 @@ public class IKoiFishServiceImpl implements IKoiFishService {
         evaluateAndUpdateKoiFishStatus(koiFish);
         koiFish.countageMonth();
         return koiFishRepository.save(koiFish);
+    }
+
+    @Override
+    public KoiGrowthHistory getGrowthHistoryByDate(LocalDate date, int koiId) {
+        List<KoiGrowthHistory> koihisList = getGrowthHistorys(koiId);
+        for (KoiGrowthHistory koiGrowthHistory : koihisList) {
+            if (koiGrowthHistory.getDate().equals(date)) {
+                return koiGrowthHistory;
+            }
+        }
+        return null;
     }
 }
