@@ -146,11 +146,14 @@ const ManageOrder = () => {
       title: "Order ID",
       dataIndex: "id",
       align: "center",
+      width: "8%",
     },
     {
       title: "Full Name",
       dataIndex: "fullName",
       align: "center",
+      width: "15%",
+      render: (text) => <div style={{ textAlign: 'left' }}>{text}</div>,
     },
     {
       title: "Address",
@@ -161,6 +164,7 @@ const ManageOrder = () => {
       title: "Total Amount",
       dataIndex: "totalAmount",
       align: "center",
+      width: "15%",
       render: (totalAmount) =>
         `${new Intl.NumberFormat("vi-VN", {
           style: "currency",
@@ -170,6 +174,7 @@ const ManageOrder = () => {
     {
       title: "Date order",
       dataIndex: "createdAt",
+      width: "10%",
       align: "center",
       render: (createdAt) => {
         return new Date(createdAt).toLocaleString();
@@ -179,6 +184,7 @@ const ManageOrder = () => {
       title: "Status",
       dataIndex: "status",
       align: "center",
+      width: "10%",
       render: (_, record) => {
         if (record.status === "PENDING") {
           return (
@@ -247,6 +253,7 @@ const ManageOrder = () => {
       title: "Action",
       key: "action",
       align: "center",
+      width: "5%",
       render: (_, record) => {
         const buttonStyle = {
           width: "80px",
@@ -260,22 +267,22 @@ const ManageOrder = () => {
           textAlign: "center",
         };
 
-        if (record.status === "SUCCESS_PAYMENT") {
-          return (
-            <Button
-              style={{
-                ...buttonStyle,
-                backgroundColor: "#1890ff",
-                borderColor: "#1890ff",
-                color: "white",
-              }}
-              loading={mutation.isPending}
-              onClick={() => handleSendClick(record?.id)}
-            >
-              Send order
-            </Button>
-          );
-        }
+        // if (record.status === "SUCCESS_PAYMENT") {
+        //   return (
+        //     <Button
+        //       style={{
+        //         ...buttonStyle,
+        //         backgroundColor: "#1890ff",
+        //         borderColor: "#1890ff",
+        //         color: "white",
+        //       }}
+        //       loading={mutation.isPending}
+        //       onClick={() => handleSendClick(record?.id)}
+        //     >
+        //       Send order
+        //     </Button>
+        //   );
+        // }
 
         if (
           record.status === "SHIPPING" ||

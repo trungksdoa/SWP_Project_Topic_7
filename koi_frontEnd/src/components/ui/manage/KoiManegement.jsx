@@ -31,6 +31,8 @@ import KoiFilters from "./koiManage/KoiFilters";
 import KoiActions from "./koiManage/KoiActions";
 import LoadingSpinner from "../../layouts/LoadingSpinner";
 
+import * as Yup from "yup";
+
 const KoiManegement = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const userId = userLogin?.id;
@@ -368,6 +370,35 @@ const KoiManegement = () => {
     return diffMonths;
   };
 
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required('Name is required')
+      .max(50, 'Name must not exceed 50 characters'),
+    variety: Yup.string()
+      .required('Variety is required'),
+    sex: Yup.boolean()
+      .required('Sex is required'),
+    purchasePrice: Yup.number()
+      .required('Purchase price is required')
+      .positive('Price must be positive'),
+    weight: Yup.number()
+      .required('Weight is required')
+      .positive('Weight must be positive')
+      .max(100, 'Weight must not exceed 100 kg'),
+    length: Yup.number()
+      .required('Length is required')
+      .positive('Length must be positive')
+      .max(200, 'Length must not exceed 200 cm'),
+    pondId: Yup.number()
+      .required('Please select a pond'),
+    dateOfBirth: Yup.date()
+      .required('Date of birth is required')
+      .max(new Date(), 'Date of birth cannot be in the future'),
+    date: Yup.date()
+      .required('Date is required')
+      .max(new Date(), 'Date cannot be in the future'),
+  });
+
   const addKoiFormik = useFormik({
     initialValues: {
       name: "",
@@ -381,6 +412,7 @@ const KoiManegement = () => {
       image: null,
       date: null,
     },
+    validationSchema,
     onSubmit: (values) => {
       const formData = new FormData();
       const ageMonth = calculateAgeMonths(values.dateOfBirth);
@@ -685,23 +717,40 @@ const KoiManegement = () => {
                   />
                 </div>
                 <div>
-                  <Form.Item label="Name" className="mb-1">
+                  <Form.Item 
+                    label="Name" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.name && addKoiFormik.errors.name ? "error" : ""}
+                    help={addKoiFormik.touched.name && addKoiFormik.errors.name}
+                  >
                     <Input
                       name="name"
                       value={addKoiFormik.values.name}
                       onChange={addKoiFormik.handleChange}
+                      onBlur={addKoiFormik.handleBlur}
                       className="w-full"
                     />
                   </Form.Item>
-                  <Form.Item label="Variety" className="mb-1">
+                  <Form.Item 
+                    label="Variety" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.variety && addKoiFormik.errors.variety ? "error" : ""}
+                    help={addKoiFormik.touched.variety && addKoiFormik.errors.variety}
+                  >
                     <Input
                       name="variety"
                       value={addKoiFormik.values.variety}
                       onChange={addKoiFormik.handleChange}
+                      onBlur={addKoiFormik.handleBlur}
                       className="w-full"
                     />
                   </Form.Item>
-                  <Form.Item label="Sex" className="mb-1">
+                  <Form.Item 
+                    label="Sex" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.sex && addKoiFormik.errors.sex ? "error" : ""}
+                    help={addKoiFormik.touched.sex && addKoiFormik.errors.sex}
+                  >
                     <Select
                       name="sex"
                       value={addKoiFormik.values.sex}
@@ -714,7 +763,12 @@ const KoiManegement = () => {
                       <Select.Option value={false}>Male</Select.Option>
                     </Select>
                   </Form.Item>
-                  <Form.Item label="Purchase Price (VND)" className="mb-1">
+                  <Form.Item 
+                    label="Purchase Price (VND)" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.purchasePrice && addKoiFormik.errors.purchasePrice ? "error" : ""}
+                    help={addKoiFormik.touched.purchasePrice && addKoiFormik.errors.purchasePrice}
+                  >
                     <InputNumber
                       name="purchasePrice"
                       min={0}
@@ -722,34 +776,47 @@ const KoiManegement = () => {
                       onChange={(value) =>
                         addKoiFormik.setFieldValue("purchasePrice", value)
                       }
+                      onBlur={() => addKoiFormik.setFieldTouched("purchasePrice", true)}
                       className="w-full"
                     />
                   </Form.Item>
                 </div>
                 <div>
-                  <Form.Item label="Weight (kg)" className="mb-1">
+                  <Form.Item 
+                    label="Weight (kg)" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.weight && addKoiFormik.errors.weight ? "error" : ""}
+                    help={addKoiFormik.touched.weight && addKoiFormik.errors.weight}
+                  >
                     <InputNumber
                       name="weight"
                       min={0}
                       value={addKoiFormik.values.weight}
-                      onChange={(value) =>
-                        addKoiFormik.setFieldValue("weight", value)
-                      }
+                      onChange={(value) => addKoiFormik.setFieldValue("weight", value)}
+                      onBlur={() => addKoiFormik.setFieldTouched("weight", true)}
                       className="w-full"
                     />
                   </Form.Item>
-                  <Form.Item label="Length (cm)" className="mb-1">
+                  <Form.Item 
+                    label="Length (cm)" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.length && addKoiFormik.errors.length ? "error" : ""}
+                    help={addKoiFormik.touched.length && addKoiFormik.errors.length}
+                  >
                     <InputNumber
                       name="length"
-                      min={0}
                       value={addKoiFormik.values.length}
-                      onChange={(value) =>
-                        addKoiFormik.setFieldValue("length", value)
-                      }
+                      onChange={(value) => addKoiFormik.setFieldValue("length", value)}
+                      onBlur={() => addKoiFormik.setFieldTouched("length", true)}
                       className="w-full"
                     />
                   </Form.Item>
-                  <Form.Item label="Date of Birth" className="mb-1">
+                  <Form.Item 
+                    label="Date of Birth" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.dateOfBirth && addKoiFormik.errors.dateOfBirth ? "error" : ""}
+                    help={addKoiFormik.touched.dateOfBirth && addKoiFormik.errors.dateOfBirth}
+                  >
                     <DatePicker
                       name="dateOfBirth"
                       value={addKoiFormik.values.dateOfBirth}
@@ -762,7 +829,12 @@ const KoiManegement = () => {
                       }
                     />
                   </Form.Item>
-                  <Form.Item label="Date created" className="mb-1">
+                  <Form.Item 
+                    label="Date created" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.date && addKoiFormik.errors.date ? "error" : ""}
+                    help={addKoiFormik.touched.date && addKoiFormik.errors.date}
+                  >
                     <DatePicker
                       name="date"
                       value={addKoiFormik.values.date}
@@ -782,7 +854,12 @@ const KoiManegement = () => {
                     />
                   </Form.Item>
 
-                  <Form.Item label="Image" className="mb-1">
+                  <Form.Item 
+                    label="Image" 
+                    className="mb-1"
+                    validateStatus={addKoiFormik.touched.image && addKoiFormik.errors.image ? "error" : ""}
+                    help={addKoiFormik.touched.image && addKoiFormik.errors.image}
+                  >
                     <input
                       type="file"
                       accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
@@ -824,6 +901,14 @@ const KoiManegement = () => {
                   htmlType="submit"
                   className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold text-xl"
                   loading={addKoiMutation.isPending}
+                  onClick={() => {
+                    if (!addKoiFormik.isValid) {
+                      // Touch all fields to show validation errors
+                      Object.keys(addKoiFormik.values).forEach(field => {
+                        addKoiFormik.setFieldTouched(field, true);
+                      });
+                    }
+                  }}
                 >
                   Add Koi
                 </Button>
