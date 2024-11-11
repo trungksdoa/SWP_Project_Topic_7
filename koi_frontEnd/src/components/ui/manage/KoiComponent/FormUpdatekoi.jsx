@@ -270,7 +270,6 @@ const FormKoiUpdate = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Form.Item label="Name">
                 <Input
-                  disabled={!isModified}
                   name="name"
                   value={formik.values.name}
                   onChange={formik.handleChange}
@@ -279,7 +278,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Variety">
                 <Input
-                  disabled={!isModified}
                   name="variety"
                   value={formik.values.variety}
                   onChange={formik.handleChange}
@@ -288,7 +286,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Sex">
                 <Select
-                  disabled={!isModified}
                   value={formik.values.sex}
                   onChange={(value) => formik.setFieldValue("sex", value)}
                 >
@@ -299,7 +296,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Purchase Price (VND)">
                 <InputNumber
-                  disabled={!isModified}
                   name="purchasePrice"
                   min={0}
                   value={formik.values.purchasePrice}
@@ -312,7 +308,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Weight (kg)">
                 <InputNumber
-                  disabled={!isModified}
                   name="weight"
                   min={0}
                   value={formik.values.weight}
@@ -323,7 +318,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Length (cm)">
                 <InputNumber
-                  disabled={!isModified}
                   name="length"
                   min={0}
                   value={formik.values.length}
@@ -334,7 +328,6 @@ const FormKoiUpdate = ({
 
               <Form.Item label="Date">
                 <DatePicker
-                  disabled={!isModified}
                   value={formik.values.date}
                   onChange={(date) => {
                     formik.setFieldValue("date", date);
