@@ -7,7 +7,7 @@ const PaymentLayout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header className="mt-[100px]" />
-      <div className="flex-1 bg-gray-200">
+      <div className="flex-1 bg-white">
         <Outlet/>
       </div>
       <Footer />

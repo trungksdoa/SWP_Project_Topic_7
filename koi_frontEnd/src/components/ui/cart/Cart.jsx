@@ -80,7 +80,7 @@ const Cart = () => {
   if (carts?.length === 0) return renderEmptyCart();
 
   return (
-    <div className="w-[60%] my-[40px] mx-auto bg-gray-100 p-5 rounded-lg shadow-lg">
+    <div className="w-[60%] my-[40px] mx-auto bg-gray-100 p-5 rounded-lg shadow-md">
       {renderCartHeader()}
       {carts.map((product, index) => renderCartItem(product, index))}
       {renderCartSummary(totalItems, totalPrice)}
@@ -109,7 +109,7 @@ const Cart = () => {
 
   function renderCartHeader() {
     return (
-      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px] shadow-md">
+      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px] shadow-sm">
         <h2 className="text-center w-[20%] font-bold">Image</h2>
         <h2 className="text-center w-[40%] font-bold">Name</h2>
         <h2 className="text-center w-[15%] font-bold">Price</h2>
@@ -160,7 +160,7 @@ const Cart = () => {
 
   function renderCartSummary(totalItems, totalPrice) {
     return (
-      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px] shadow-md">
+      <div className="w-full justify-between items-center px-[40px] flex p-[15px] bg-white mb-[30px] rounded-[12px] shadow-sm">
         <p className="font-semibold">
           Total: <Space />
           {isUpdating ? (
@@ -182,7 +182,7 @@ const Cart = () => {
           </p>
           <button
             disabled={isUpdating || hasInvalidQuantity}
-            className={`rounded-[6px] ml-[30px] px-[30px] py-[10px] ${
+            className={`rounded-[6px] ml-[35px] px-[35px] py-[5px] ${
               isUpdating || hasInvalidQuantity ? "bg-gray-400" : "bg-black"
             } text-white transition duration-300 hover:bg-orange-500`}
             onClick={() => navigate(PATH.CHECKOUT)}

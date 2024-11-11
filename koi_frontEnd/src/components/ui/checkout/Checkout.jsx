@@ -96,8 +96,8 @@ const Checkout = () => {
     carts?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
   
     return (
-    <div className="w-[60%] my-[40px] mx-auto min-h-[450px] p-[30px] bg-gray-200 border rounded-lg shadow-lg">
-      <Table columns={columns} dataSource={data} className="mb-[30px]" pagination={false} />
+    <div className="w-[60%] my-[40px] mx-auto min-h-[450px] p-[30px] bg-gray-100 border rounded-lg shadow-sm">
+      <Table columns={columns} dataSource={data} className="mb-[30px] rounded-lg border-2 bg-gray-50" pagination={false} />
       <div className="text-right text-xl font-bold">
         Shipping fee: <span className="text-green-500">FREE</span>
         <br />
