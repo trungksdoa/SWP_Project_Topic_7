@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { Divider } from "antd";
 import dayjs from "dayjs";
-import { DatePicker, Select, Input, Pagination, Form, Button, Modal } from "antd";
+import {
+  DatePicker,
+  Select,
+  Input,
+  Pagination,
+  Form,
+  Button,
+  Modal,
+  Checkbox,
+} from "antd";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import {
@@ -11,6 +21,7 @@ import {
   useDeleteTask,
   useGetAllTasks,
   useUpdateTaskIndex,
+  useUncompleteTask,
 } from "../../../hooks/user/useTodo";
 
 const TodoManage = () => {
@@ -28,8 +39,10 @@ const TodoManage = () => {
     priority: "",
     dueDate: null,
     status: "",
+    description: "",
   });
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState([]);
 
   const { data: tasks, refetch: refetchTasks } = useGetAllTasks();
   const createTaskMutation = useCreateTask();
@@ -37,6 +50,7 @@ const TodoManage = () => {
   const deleteTaskMutation = useDeleteTask();
   const completeTaskMutation = useCompleteTask();
   const updateTaskIndexMutation = useUpdateTaskIndex();
+  const uncompleteTaskMutation = useUncompleteTask();
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -54,6 +68,7 @@ const TodoManage = () => {
         taskType: editTaskData.taskType,
         priority: editTaskData.priority,
         dueDate: editTaskData.dueDate,
+        description: editTaskData.description,
       });
     }
   }, [editTaskData, isEditModalVisible, editForm]);
@@ -61,13 +76,21 @@ const TodoManage = () => {
   const handleSubmit = async (values) => {
     if (!values) return;
 
+    if (values.taskType === "TODO") {
+      toast.error("Task type cannot be TODO");
+      return;
+    }
+
     setIsAddingTask(true);
     try {
       const taskData = {
         title: values.title,
         taskType: values.taskType || "TODO",
-        priority: values.priority || "MEDIUM", 
-        dueDate: values.dueDate ? dayjs(values.dueDate).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
+        priority: values.priority || "MEDIUM",
+        dueDate: values.dueDate
+          ? dayjs(values.dueDate).format("YYYY-MM-DDTHH:mm:ss")
+          : dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        description: values.description || "", // Changed to empty string if undefined
         userId: userId,
       };
 
@@ -78,8 +101,8 @@ const TodoManage = () => {
           refetchTasks();
         },
       });
-    } catch (error) {
-      toast.error("Error adding task");
+    } catch (err) {
+      toast.error("Error adding task", err);
     } finally {
       setIsAddingTask(false);
     }
@@ -92,7 +115,10 @@ const TodoManage = () => {
         title: values.title,
         taskType: values.taskType,
         priority: values.priority,
-        dueDate: values.dueDate ? dayjs(values.dueDate).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
+        dueDate: values.dueDate
+          ? dayjs(values.dueDate).format("YYYY-MM-DDTHH:mm:ss")
+          : dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        description: values.description || "", // Changed to empty string if undefined
         status: editTaskData.status,
         userId: userId,
       };
@@ -108,6 +134,7 @@ const TodoManage = () => {
               priority: "",
               dueDate: null,
               status: "",
+              description: "",
             });
             setIsEditModalVisible(false);
             refetchTasks();
@@ -122,8 +149,8 @@ const TodoManage = () => {
 
   const handleDelete = async (id) => {
     try {
-      setLocalTasks(prev => prev.filter(task => task.id !== id));
-      
+      setLocalTasks((prev) => prev.filter((task) => task.id !== id));
+
       await deleteTaskMutation.mutateAsync(id, {
         onSuccess: () => {
           refetchTasks();
@@ -135,13 +162,37 @@ const TodoManage = () => {
       toast.error("Failed to delete task");
     }
   };
+  
+  const toggleUncomplete = async (id) => {
+    try {
+      if (editTaskData.status === "Completed") {
+        setLocalTasks((prev) =>
+          prev.map((task) =>
+            task.id === id ? { ...task, status: "ongoing" } : task
+          )
+        );
+
+        await uncompleteTaskMutation.mutateAsync(id, {
+          onSuccess: () => {
+            refetchTasks();
+            toast.success("Task uncompleted");
+          },
+        });
+      }
+    } catch (error) {
+      refetchTasks(); 
+      toast.error("Failed to uncomplete task");
+    }
+  };
 
   const toggleComplete = async (id) => {
     try {
       if (editTaskData.status !== "Completed") {
-        setLocalTasks(prev => prev.map(task => 
-          task.id === id ? {...task, status: "Completed"} : task
-        ));
+        setLocalTasks((prev) =>
+          prev.map((task) =>
+            task.id === id ? { ...task, status: "Completed" } : task
+          )
+        );
 
         await completeTaskMutation.mutateAsync(id, {
           onSuccess: () => {
@@ -156,6 +207,14 @@ const TodoManage = () => {
     }
   };
 
+  const toggleDescription = (taskId) => {
+    setExpandedTasks((prev) =>
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
   const handleDragEnd = async (result) => {
     if (!result.destination) return;
 
@@ -167,10 +226,10 @@ const TodoManage = () => {
       const startIndex = (currentPage - 1) * pageSize;
       const updatedItems = items.map((item, index) => ({
         ...item,
-        placeIndex: startIndex + index + 1
+        placeIndex: startIndex + index + 1,
       }));
 
-      setLocalTasks(prev => {
+      setLocalTasks((prev) => {
         const newTasks = [...prev];
         const pageStartIndex = (currentPage - 1) * pageSize;
         newTasks.splice(pageStartIndex, pageSize, ...updatedItems);
@@ -185,6 +244,7 @@ const TodoManage = () => {
         dueDate: item.dueDate,
         taskType: item.taskType,
         priority: item.priority,
+        description: item.description || "", // Changed to empty string if undefined
         userId: item.userId,
       }));
 
@@ -208,41 +268,40 @@ const TodoManage = () => {
     const daysUntilDue = due.diff(today, "day");
 
     if (daysUntilDue < 0) return { color: "text-red-600", message: "Overdue!" };
-    if (daysUntilDue <= 3) return { color: "text-orange-500", message: "Due soon!" };
-    if (daysUntilDue <= 7) return { color: "text-yellow-500", message: "Upcoming" };
+    if (daysUntilDue <= 3)
+      return { color: "text-orange-500", message: "Due soon!" };
+    if (daysUntilDue <= 7)
+      return { color: "text-yellow-500", message: "Upcoming" };
     return null;
   };
 
-  const [sortBy, setSortBy] = useState('priority'); // Add new state for sort option
+  const [sortBy, setSortBy] = useState("priority");
 
   const filteredTasks = Array.isArray(localTasks)
     ? localTasks
         .filter((task) => {
-          const matchesText = task.title.toLowerCase().includes(searchText.toLowerCase());
-          const matchesDate = !searchDate || dayjs(task.dueDate).isSame(searchDate, 'day');
+          const matchesText = task.title
+            .toLowerCase()
+            .includes(searchText.toLowerCase());
+          const matchesDate =
+            !searchDate || dayjs(task.dueDate).isSame(searchDate, "day");
           return matchesText && matchesDate;
         })
         .sort((a, b) => {
-          if (sortBy === 'priority') {
-            // Sort by priority first
+          if (sortBy === "priority") {
             const priorityOrder = { HIGH: 1, MEDIUM: 2, LOW: 3 };
-            
-            // If both tasks have LOW priority, use placeIndex only
-            if (a.priority === 'LOW' && b.priority === 'LOW') {
+
+            if (a.priority === "LOW" && b.priority === "LOW") {
               return a.placeIndex - b.placeIndex;
             }
-            
-            // For other cases, sort by priority first
+
             if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
               return priorityOrder[a.priority] - priorityOrder[b.priority];
             }
-            
-            // If priorities are equal (and not both LOW), maintain original placeIndex order
-            return a.placeIndex - b.placeIndex;
-          } else {
-            // Sort by placeIndex only
+
             return a.placeIndex - b.placeIndex;
           }
+          return a.placeIndex - b.placeIndex;
         })
     : [];
 
@@ -269,6 +328,7 @@ const TodoManage = () => {
               taskType: "TODO",
               priority: "MEDIUM",
               dueDate: dayjs(),
+              description: "", // Changed to empty string
             }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -280,18 +340,20 @@ const TodoManage = () => {
                 <Input placeholder="Task title" className="rounded-md" />
               </Form.Item>
 
-              <Form.Item 
+              <Form.Item
                 label="Due Date"
                 name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
-                <DatePicker className="w-full rounded-md" />
+                <DatePicker showTime className="w-full rounded-md" />
               </Form.Item>
 
               <Form.Item
-                label="Priority Level" 
+                label="Priority Level"
                 name="priority"
-                rules={[{ required: true, message: "Please select priority level" }]}
+                rules={[
+                  { required: true, message: "Please select priority level" },
+                ]}
               >
                 <Select placeholder="Priority">
                   <Select.Option value="HIGH">High</Select.Option>
@@ -303,14 +365,37 @@ const TodoManage = () => {
               <Form.Item
                 label="Task Category"
                 name="taskType"
-                rules={[{ required: true, message: "Please select task category" }]}
+                rules={[
+                  { required: true, message: "Please select task category" },
+                ]}
               >
                 <Select placeholder="Task Type">
-                  <Select.Option value="WATER_CHANGE">Water Change</Select.Option>
+                  <Select.Option value="WATER_CHANGE">
+                    Water Change
+                  </Select.Option>
                   <Select.Option value="FEEDING">Feeding</Select.Option>
                   <Select.Option value="MAINTENANCE">Maintenance</Select.Option>
-                  <Select.Option value="HEALTH_CHECK">Health Check</Select.Option>
+                  <Select.Option value="HEALTH_CHECK">
+                    Health Check
+                  </Select.Option>
                 </Select>
+              </Form.Item>
+
+              {/* Add Description Field */}
+              <Form.Item
+                label="Description"
+                name="description"
+                rules={[
+                  { required: true, message: "Please enter task description" },
+                ]}
+                className="md:col-span-2"
+              >
+                <Input.TextArea
+                  placeholder="Enter task description"
+                  rows={4}
+                  name="description"
+                  className="rounded-md"
+                />
               </Form.Item>
             </div>
 
@@ -376,61 +461,94 @@ const TodoManage = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
+                          className="flex flex-col p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="text-gray-500">#{index + 1}</span>
-                            <input
-                              type="checkbox"
-                              checked={task.status === "Completed"}
-                              disabled={task.status === "Completed"}
-                              onChange={() => toggleComplete(task.id)}
-                              className="h-5 w-5"
-                            />
-                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-500">
+                                #{index + 1}
+                              </span>
+                              <input
+                                type="checkbox"
+                                checked={task.status === "Completed"}
+                                disabled={task.status === "Completed"}
+                                onChange={() => toggleComplete(task.id)}
+                                className="h-5 w-5"
+                              />
+                            </div>
 
-                          <div className="flex-1">
-                            <div className="font-medium">{task.title}</div>
-                            <div className="text-sm text-gray-500">
-                              Due: {dayjs(task.dueDate).format("MMM D, YYYY")}
-                              {getDueDateStatus(task.dueDate)?.message && (
-                                <span className={`ml-2 ${getDueDateStatus(task.dueDate).color}`}>
-                                  {getDueDateStatus(task.dueDate).message}
-                                </span>
-                              )}
+                            <div className="flex-1">
+                              <div className="font-medium">{task.title}</div>
+                              <div className="text-sm text-gray-500">
+                                Due:{" "}
+                                {dayjs(task.dueDate).format(
+                                  "MMM D, YYYY HH:mm"
+                                )}
+                                {getDueDateStatus(task.dueDate)?.message && (
+                                  <span
+                                    className={`ml-2 ${
+                                      getDueDateStatus(task.dueDate).color
+                                    }`}
+                                  >
+                                    {getDueDateStatus(task.dueDate).message}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 mr-4">
+                              <span
+                                className={`px-2 py-1 text-xs font-medium rounded ${
+                                  task.priority === "HIGH"
+                                    ? "bg-red-100 text-red-800"
+                                    : task.priority === "MEDIUM"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-green-100 text-green-800"
+                                }`}
+                              >
+                                {task.priority}
+                              </span>
+                            </div>
+
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => toggleDescription(task.id)}
+                              >
+                                {expandedTasks.includes(task.id)
+                                  ? "Hide Description"
+                                  : "View Description"}
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setEditingTask(task.id);
+                                  setEditTaskData({
+                                    title: task.title,
+                                    taskType: task.taskType,
+                                    priority: task.priority,
+                                    dueDate: dayjs(task.dueDate),
+                                    status: task.status,
+                                    description: task.description,
+                                  });
+                                  setIsEditModalVisible(true);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                danger
+                                onClick={() => handleDelete(task.id)}
+                              >
+                                Delete
+                              </Button>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 mr-4">
-                            <span className={`px-2 py-1 text-xs font-medium rounded ${
-                              task.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
-                              task.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-green-100 text-green-800'
-                            }`}>
-                              {task.priority}
-                            </span>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => {
-                                setEditingTask(task.id);
-                                setEditTaskData({
-                                  title: task.title,
-                                  taskType: task.taskType,
-                                  priority: task.priority,
-                                  dueDate: dayjs(task.dueDate),
-                                  status: task.status,
-                                });
-                                setIsEditModalVisible(true);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                            <Button danger onClick={() => handleDelete(task.id)}>
-                              Delete
-                            </Button>
-                          </div>
+                          {/* Description Collapse */}
+                          {expandedTasks.includes(task.id) && (
+                            <div className="mt-3 pl-10 text-gray-600 bg-gray-50 p-3 rounded">
+                              {task.description || "No description provided"}
+                            </div>
+                          )}
                         </li>
                       )}
                     </Draggable>
@@ -451,46 +569,28 @@ const TodoManage = () => {
         />
 
         {/* Edit Task Modal */}
-        <Modal
-          title="Edit Task"
-          open={isEditModalVisible}
-          onOk={handleUpdate}
-          onCancel={() => {
-            setIsEditModalVisible(false);
-            setEditingTask(null);
-            setEditTaskData({
-              title: "",
-              taskType: "",
-              priority: "",
-              dueDate: null,
-              status: "",
-            });
-            editForm.resetFields();
-          }}
-        >
-          <Form 
-            form={editForm}
-            layout="vertical" 
-            initialValues={editTaskData}
-          >
-            <Form.Item 
-              label="Task Title" 
-              name="title" 
+        <Modal title="Edit Task" open={isEditModalVisible}>
+          <Form form={editForm} layout="vertical" initialValues={editTaskData}>
+            <Form.Item
+              label="Task Title"
+              name="title"
               rules={[{ required: true, message: "Please enter task title" }]}
             >
               <Input />
             </Form.Item>
-            <Form.Item 
-              label="Due Date" 
-              name="dueDate" 
+            <Form.Item
+              label="Due Date"
+              name="dueDate"
               rules={[{ required: true, message: "Please select due date" }]}
             >
-              <DatePicker className="w-full" />
+              <DatePicker showTime className="w-full" />
             </Form.Item>
-            <Form.Item 
-              label="Priority Level" 
-              name="priority" 
-              rules={[{ required: true, message: "Please select priority level" }]}
+            <Form.Item
+              label="Priority Level"
+              name="priority"
+              rules={[
+                { required: true, message: "Please select priority level" },
+              ]}
             >
               <Select>
                 <Select.Option value="HIGH">High</Select.Option>
@@ -498,10 +598,12 @@ const TodoManage = () => {
                 <Select.Option value="LOW">Low</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item 
-              label="Task Category" 
-              name="taskType" 
-              rules={[{ required: true, message: "Please select task category" }]}
+            <Form.Item
+              label="Task Category"
+              name="taskType"
+              rules={[
+                { required: true, message: "Please select task category" },
+              ]}
             >
               <Select>
                 <Select.Option value="WATER_CHANGE">Water Change</Select.Option>
@@ -510,6 +612,32 @@ const TodoManage = () => {
                 <Select.Option value="HEALTH_CHECK">Health Check</Select.Option>
               </Select>
             </Form.Item>
+            <Form.Item label="Description" name="description">
+              <Input.TextArea rows={4} name="description" />
+            </Form.Item>
+            <Divider />
+            <Button
+              key="cancel"
+              onClick={() => {
+                setIsEditModalVisible(false);
+                setEditingTask(null);
+                setEditTaskData({
+                  title: "",
+                  taskType: "",
+                  priority: "",
+                  dueDate: null,
+                  status: "",
+                  description: "",
+                });
+                editForm.resetFields();
+              }}
+            >
+              Cancel
+            </Button>
+            ,
+            <Button key="submit" type="primary" onClick={handleUpdate}>
+              Save Changes
+            </Button>
           </Form>
         </Modal>
       </div>
