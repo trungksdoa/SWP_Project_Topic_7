@@ -42,4 +42,5 @@ export const PATH = {
   MANAGE_PAYMENT_STATUS: '/admin/manage-payment-status',
   ADMIN_BLOG: '/admin/manage-admin-blog',
   TODO_MANAGE: '/todo-manage',
+  STORE_SEARCH: '/search'
 };

@@ -25,29 +25,29 @@ const ManagePackage = () => {
     }
   }, [lstPackage]);
 
-  // const handleDelete = (id) => {
-  //   Modal.confirm({
-  //       title: 'Delete Package',
-  //       content: 'Are you sure you want to delete this package?',
-  //       okText: 'Yes',
-  //       okType: 'danger',
-  //       cancelText: 'No',
-  //       onOk() {
-  //           setDeletingId(id);
-  //           mutate.mutate(id, {
-  //               onSuccess: () => {
-  //                   toast.success("Delete package successfully!");
-  //                   refetch();
-  //                   setDeletingId(null);
-  //               },
-  //               onError: () => {
-  //                   toast.error("Delete package failed!");
-  //                   setDeletingId(null);
-  //               },
-  //           });
-  //       },
-  //   });
-  // }
+  const handleDelete = (id) => {
+    Modal.confirm({
+      title: "Delete Package",
+      content: "Are you sure you want to delete this package?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        setDeletingId(id);
+        mutate.mutate(id, {
+          onSuccess: () => {
+            toast.success("Delete package successfully!");
+            refetch();
+            setDeletingId(null);
+          },
+          onError: () => {
+            toast.error("Delete package failed!");
+            setDeletingId(null);
+          },
+        });
+      },
+    });
+  };
 
   const handleEdit = (packageId) => {
     setEditingPackageId(packageId);
@@ -95,7 +95,9 @@ const ManagePackage = () => {
         return (
           <div
             style={{
-              border: record.isDefault ? "6px solid #FFD700" : "1px solid #d9d9d9",
+              border: record.isDefault
+                ? "6px solid #FFD700"
+                : "1px solid #d9d9d9",
               padding: "4px 8px",
               borderRadius: "4px",
               backgroundColor: bgColor,
@@ -136,9 +138,15 @@ const ManagePackage = () => {
           >
             Edit
           </Button>
+          <Button
+            onClick={() => handleDelete(pkg?.id)}
+            className="w-[70px] bg-red-400 text-white hover:!bg-red-500 hover:!text-white mb-2"
+          >
+            Delete
+          </Button>
         </div>
       ),
-      width: "15%",
+      width: "20%",
     },
   ];
   const data = lstPackage;
@@ -155,14 +163,16 @@ const ManagePackage = () => {
   }
 
   return (
-    <div>
-      {/* <Button
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <Button
         className="bg-orange-500 mb-4 text-white px-4 py-2 rounded-md"
         onClick={() => setAddModalVisible(true)}
+        disabled={lstPackage.length === 5}
       >
-        Add new package
-      </Button> */}
+        Add package
+      </Button>
       <Table
+        className="shadow-lg rounded-lg overflow-hidden"
         columns={columns}
         dataSource={data}
         onChange={onChange}
@@ -170,7 +180,6 @@ const ManagePackage = () => {
           target: "sorter-icon",
         }}
         size="small"
-        className="compact-table"
       />
       <EditPackages
         visible={editModalVisible}

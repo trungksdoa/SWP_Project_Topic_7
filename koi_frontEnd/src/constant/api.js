@@ -24,3 +24,4 @@ export const MANAGE_PAYMENT_STATUS_API = import.meta.env
   .VITE_MANAGE_PAYMENT_STATUS_API;
 export const DASHBOARD_API = import.meta.env.VITE_DASHBOARD_API;
 export const MANAGE_TODO_API = import.meta.env.VITE_MANAGE_TODO_API;
+export const MANAGE_API_SEARCH = import.meta.env.VITE_MANAGE_SEARCH_PRODUCT_API;

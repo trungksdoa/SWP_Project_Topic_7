@@ -45,6 +45,8 @@ import AdminDashboard from "../components/ui/AdminDashboard";
 import ManageAdminBlog from "../components/ui/admin/manageAdminBlog";
 import Dashboard from '../components/ui/navbar/Dashboard';
 import TodoManage from "../components/ui/todo/todoManage";
+import StoreSearch from "../components/ui/store/StoreSearch";
+import StoreSearchPage from "../pages/StoreSearchPage";
 const router = [
   {
     element: <MainLayout />,
@@ -119,6 +121,10 @@ const router = [
         path: PATH.TODO_MANAGE,
         element: <TodoManage />,
       },
+      {
+        path: PATH.STORE_SEARCH,
+        element: <StoreSearchPage />
+      }
     ],
   },
   {

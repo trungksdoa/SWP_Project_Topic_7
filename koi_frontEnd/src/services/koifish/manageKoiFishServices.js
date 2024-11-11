@@ -7,15 +7,15 @@ const api = apiInstanceHeader.create({
 
 export const manageKoiFishServices = {
     getKoiByPondId: (id) => api.get(`/listkoi/bypondid/${id}`),
-    getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}/page?page=0&size=10`),
+    getKoiByUserId: (id) => api.get(`/listkoi/byuserid/${id}`),
     getKoiByKoiId: (id) => api.get(`/${id}`),
     updateKoi: async (id, payload, isNew = false) => {
         const url = `/${id}?isNew=${isNew}`;
         const response = await api.put(url, payload);
         return response.data;
     },
-    moveKoi: async (id, payload, isNew = true) => {
-        const url = `/${id}?isNew=${isNew}`;
+    moveKoi: async (id, payload) => {
+        const url = `/swappondbylistkoi/${id}`;
         const response = await api.put(url, payload);
         return response.data;
     },
@@ -94,7 +94,6 @@ export const manageKoiFishServices = {
         }
     },
     getGrowth: (id) => {
-        console.log(id)
        return api.get(`/growthUpHistory/${id}`);
     }
 }

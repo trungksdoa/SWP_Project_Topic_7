@@ -321,7 +321,7 @@ const ManageOrder = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <Button
         className="mb-[15px] bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
         onClick={() => refetch()}

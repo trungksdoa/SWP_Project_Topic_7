@@ -18,7 +18,7 @@ const LoginForm = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+const navigate = useNavigate();
   const { isFetchingLogin, userLogin } = useSelector(
     (state) => state.manageUser
   );
@@ -30,7 +30,7 @@ const LoginForm = ({
         navigate(PATH.ADMIN_DASHBOARD);
       } else if (role === "ROLE_MEMBER") {
         navigate(PATH.KOI_MANAGEMENT);
-      } else if (role === "ROLE_SHOP") {
+      } else if (role === "ROLE_CONTRIBUTOR") {
         navigate(PATH.MANAGE_BLOG);
       }
     }

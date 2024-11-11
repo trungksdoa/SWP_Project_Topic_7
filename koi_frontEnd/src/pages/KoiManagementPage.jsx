@@ -18,7 +18,7 @@ const KoiManagementPage = () => {
         t("Please sign in or create an account to access this feature.")
       );
       navigate(PATH.HOME);
-    } else if (userLogin.roles && userLogin.roles[0].name === "ROLE_SHOP") {
+    } else if (userLogin.roles && userLogin.roles[0].name === "ROLE_CONTRIBUTOR") {
       message.warning("Please register account Member to access this feature.");
       navigate(PATH.MANAGE_BLOG);
     }

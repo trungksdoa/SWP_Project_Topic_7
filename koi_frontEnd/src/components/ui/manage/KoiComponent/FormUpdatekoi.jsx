@@ -69,7 +69,9 @@ const FormKoiUpdate = ({
 
       Modal.confirm({
         title: isModified ? "Modified koi" : "Update koi",
-        content: isModified ? "Are you sure you want to update this koi?" : "Are you sure you want to update this koi?",
+        content: isModified
+          ? "Are you sure you want to update this koi?"
+          : "Are you sure you want to update this koi?",
         centered: true,
         onOk: async () => {
           const formData = new FormData();
@@ -152,7 +154,7 @@ const FormKoiUpdate = ({
       const birthDyjs = dayjs(birthDate);
       const ageInMonths = today.diff(birthDyjs, "month");
       addKoiAge(ageInMonths);
-    } 
+    }
   };
 
   const formatAge = (ageInMonths) => {
@@ -355,16 +357,19 @@ const FormKoiUpdate = ({
               <Form.Item label="Current Age">
                 <div className="flex flex-col gap-2">
                   <Input
-                    value={formatAge(formik.values.ageMonth)} 
+                    value={formatAge(formik.values.ageMonth)}
                     readOnly
                     className="bg-gray-50"
                   />
                   <Text type="secondary" className="text-xs">
-                    {formik.values.ageMonth ? `${formik.values.ageMonth} months in total` : 'Age not available'}
+                    {formik.values.ageMonth
+                      ? `${formik.values.ageMonth} months in total`
+                      : "Age not available"}
                   </Text>
                   {formik.values.dateOfBirth && (
                     <Text type="secondary" className="text-xs">
-                      Born on: {dayjs(formik.values.dateOfBirth).format('MMMM D, YYYY')}
+                      Born on:{" "}
+                      {dayjs(formik.values.dateOfBirth).format("MMMM D, YYYY")}
                     </Text>
                   )}
                 </div>

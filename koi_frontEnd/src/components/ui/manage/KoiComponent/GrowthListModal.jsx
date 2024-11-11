@@ -30,14 +30,12 @@ const GrowthListModal = ({
   // Hooks
   const deleteGrowthMutation = useDeleteGrowth();
 
-  console.log(growthData)
   // Map pond names to growth data
   const growthDataWithPondNames = growthData?.map(growth => ({
     ...growth,
     pondName: pond?.find(pond => pond.id === growth.pondId)?.name || ''
   }));
 
-  console.log(growthDataWithPondNames)
 
   if (isLoading) {
     return (

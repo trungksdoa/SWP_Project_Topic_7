@@ -4,7 +4,9 @@ import { manageProductsServices } from "../../services/manageProducrsServices"
 export const useGetProductBySlug = (slug) => {
     const q = useQuery({
         queryKey: ["Get-Product-Slug"],
-        queryFn: () => manageProductsServices.getProductBySlug(slug)
+        queryFn: async () => {
+            return await manageProductsServices.getProductBySlug(slug)
+        }
     })
     return {
         ...q,

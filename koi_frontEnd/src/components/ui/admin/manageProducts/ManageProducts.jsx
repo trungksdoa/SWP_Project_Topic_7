@@ -136,7 +136,7 @@ const ManageProducts = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <Search
         style={{ marginBottom: "20px" }}
         placeholder="input search text"
@@ -154,6 +154,8 @@ const ManageProducts = () => {
         columns={columns}
         dataSource={data}
         showSorterTooltip={{ target: "sorter-icon" }}
+        className="shadow-lg rounded-lg overflow-hidden"
+        bordered={false}
       />
     </div>
   );

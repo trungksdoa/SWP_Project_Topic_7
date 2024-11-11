@@ -55,11 +55,11 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
   }, [navigate]);
 
   return (
-    <div>
+    <div className="bg-gray-200">
       <h2 className="text-lg font-bold mb-[30px]">Delivery Address</h2>
       <Form
         layout="vertical"
-        className="mb-4"
+        className="mb-4 bg-gray-250 p-4 border rounded-lg shadow-md"
         onSubmitCapture={formik.handleSubmit}
       >
         <div className="flex justify-between">
@@ -69,6 +69,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
               placeholder="Enter your full name"
               value={formik.values.fullName}
               onChange={formik.handleChange}
+              className="border rounded"
             />
           </Form.Item>
           <Form.Item 
@@ -83,6 +84,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
               value={formik.values.phoneNumber}
               onChange={handlePhoneNumberChange}
               maxLength={11}
+              className="border rounded"
             />
           </Form.Item>
         </div>
@@ -92,28 +94,22 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
             placeholder="Enter your full address"
             value={formik.values.address}
             onChange={formik.handleChange}
+            className="border rounded"
           />
         </Form.Item>
         <div className="flex justify-between items-center mt-4">
-          <span>
-            Total:{" "}
-            <span className="text-orange-500 font-bold">{totalItems}</span>{" "}
-            items
-          </span>
-          <span>
-            Total Price:{" "}
-            <span className="text-orange-500 font-bold">{totalPrice} VND</span>{" "}
-          </span>
+          <span className="font-semibold">Total: <span className="text-orange-500">{totalItems}</span> items</span>
+          <span className="font-semibold">Total Price: <span className="text-orange-500">{totalPrice} VND</span></span>
         </div>
-       <div className="text-right mt-[15px]">
-       <Button
-          className="!bg-black text-white hover:!bg-black hover:!text-white p-4"
-          loading={mutation.isPending}
-        htmlType="submit"
-        >
-          PLACE ORDER
-        </Button>
-       </div>
+        <div className="text-right mt-[15px]">
+          <Button
+            className="!bg-black text-white hover:!bg-black hover:!text-white p-4 rounded"
+            loading={mutation.isPending}
+            htmlType="submit"
+          >
+            PLACE ORDER
+          </Button>
+        </div>
       </Form>
     </div>
   );

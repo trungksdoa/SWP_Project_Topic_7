@@ -8,16 +8,19 @@ import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
 import { manageCartActions } from "../../store/manageCart/slice";
-
+import SearchProduct from './SearchProduct';
 
 const Header = () => {
   const { t } = useTranslation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isOverlay, setIsOverlay] = useState(false);
-  const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const [menuState, setMenuState] = useState({
+    isMenuOpen: false,
+    isOverlay: false,
+    isLoggedOut: false,
+  });
+  const { isMenuOpen, isOverlay } = menuState;
   const cartCount = useSelector((state) => state.manageCart.cartCount);
   const userLogin = useSelector((state) => state.manageUser.userLogin);
-  const userId = userLogin?.id
+  const userId = userLogin?.id;
   const { data: carts } = useGetCartByUserId(userId);
 
   // Calculate total quantity from carts
@@ -28,19 +31,37 @@ const Header = () => {
   const navigate = useNavigate();
 
   const toggleOverlay = () => {
-    setIsMenuOpen(!isMenuOpen);
-    setIsOverlay(!isOverlay);
+    setMenuState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen, isOverlay: !prev.isOverlay }));
   };
 
   const toggleMenu = () => {
-    setIsOverlay(!isOverlay);
-    setIsMenuOpen(!isMenuOpen);
+    setMenuState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen, isOverlay: !prev.isOverlay }));
   };
+
+  const toggleSearchPopup = () => {
+    setMenuState((prev) => ({ ...prev, isSearchPopupOpen: !prev.isSearchPopupOpen, isOverlay: !prev.isOverlay }));
+  };
+
   useEffect(() => {
-    if (!isLoggedOut) {
+    if (!menuState.isLoggedOut) {
       dispatch(manageCartActions.setCartCount(carts?.length || 0));
     }
-  }, [carts, dispatch, isLoggedOut]);
+  }, [carts, dispatch, menuState.isLoggedOut]);
+
+  const NavLinkItem = ({ to, label }) => (
+    <li className="flex text-white">
+      <NavLink
+        rel="noopener noreferrer"
+        to={to}
+        className={({ isActive }) =>
+          `flex items-center ${isActive ? "text-orange-500" : "text-white"}`
+        }
+      >
+        {t(label)}
+      </NavLink>
+    </li>
+  );
+
   return (
     <header className="p-3 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between h-12 mx-auto">
@@ -48,37 +69,14 @@ const Header = () => {
           <img className="w-[50px]" src="../../images/logo.webp" alt="logo" />
         </Link>
         <ul className="items-center hidden flex-1 justify-center gap-20 px-8 lg:flex">
-          <li className="flex text-white text-base">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.KOI_MANAGEMENT}
-              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
-            >
-              {t("Services")}
-            </NavLink>
-          </li>
-          
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.STORE}
-              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
-            >
-              {t("Store")}
-            </NavLink>
-          </li> 
-          <li className="flex text-white">
-            <NavLink
-              rel="noopener noreferrer"
-              to={PATH.BLOGS}
-              className={({ isActive }) => `flex items-center ${isActive ? 'text-orange-500' : 'text-white'}`}
-            >
-              {t("Blog")}
-            </NavLink>
-          </li>
+          <NavLinkItem to={PATH.KOI_MANAGEMENT} label="Services" />
+          <NavLinkItem to={PATH.STORE} label="Store" />
+          <NavLinkItem to={PATH.BLOGS} label="Blog" />
         </ul>
         <div className="items-center flex-shrink-0 hidden lg:flex">
           <div className="relative">
+            <SearchProduct />
+
             <ShoppingCartOutlined
               style={{
                 color: "white",
@@ -88,6 +86,7 @@ const Header = () => {
               }}
               onClick={() => navigate(PATH.CART)}
             />
+
             {cartCount > 0 && (
               <span className="text-white text-center absolute top-[-17px] right-[0px] bg-green-400 !w-[30px] !h-[30px] leading-[30px] !rounded-full">
                 {cartCount}
@@ -95,6 +94,7 @@ const Header = () => {
             )}
           </div>
           <UserMenu />
+
           <div className="ml-4">
             <LanguageSwitcher />
           </div>
@@ -215,12 +215,6 @@ const Header = () => {
           </div>
         </div>
       </div>
-      <div
-        className={`fixed z-10 top-0 left-0 w-full h-full bg-black opacity-50 ${
-          isOverlay ? "block" : "hidden"
-        } lg:hidden`}
-        onClick={toggleOverlay}
-      ></div>
     </header>
   );
 };

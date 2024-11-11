@@ -25,7 +25,7 @@ const KoiGrowthChart = ({
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [displayMode, setDisplayMode] = useState("full");
-  const [zoomLevel, setZoomLevel] = useState(1); // M?c ?? zoom m?c ??nh là 1 (không zoom)
+  const [zoomLevel, setZoomLevel] = useState(1); // M?c ?? zoom m?c ??nh lï¿½ 1 (khï¿½ng zoom)
 
   const calculateStandardLength = (ageMonth) => {
     let initialLength = 4.0;
@@ -87,14 +87,14 @@ const KoiGrowthChart = ({
     setDisplayMode(mode);
   };
 
-  // Hàm x? lý s? ki?n cu?n chu?t
+  // Hï¿½m x? lï¿½ s? ki?n cu?n chu?t
   const handleWheel = (e) => {
     if (e.deltaY > 0) {
       // Cu?n xu?ng, thu nh?
-      setZoomLevel((prevZoom) => Math.min(prevZoom * 1.1, 5)); // Gi?i h?n zoom t?i ?a là 5
+      setZoomLevel((prevZoom) => Math.min(prevZoom * 1.1, 5)); // Gi?i h?n zoom t?i ?a lï¿½ 5
     } else {
-      // Cu?n lên, phóng to
-      setZoomLevel((prevZoom) => Math.max(prevZoom / 1.1, 1)); // Gi?i h?n zoom t?i thi?u là 1
+      // Cu?n lï¿½n, phï¿½ng to
+      setZoomLevel((prevZoom) => Math.max(prevZoom / 1.1, 1)); // Gi?i h?n zoom t?i thi?u lï¿½ 1
     }
   };
 
@@ -158,7 +158,7 @@ const KoiGrowthChart = ({
               offset: -3,
             }}
             domain={['auto', 'auto']} // ?i?u ch?nh ph?m vi tr?c X t? ??ng
-            interval={zoomLevel > 1 ? Math.ceil(zoomLevel) : 1} // ?i?u ch?nh kho?ng cách gi?a các m?c theo zoom
+            interval={zoomLevel > 1 ? Math.ceil(zoomLevel) : 1} // ?i?u ch?nh kho?ng cï¿½ch gi?a cï¿½c m?c theo zoom
           />
           <YAxis
             label={{
@@ -168,8 +168,8 @@ const KoiGrowthChart = ({
               offset: 0,
             }}
             domain={['auto', 'auto']} // ?i?u ch?nh ph?m vi tr?c Y t? ??ng
-            allowDataOverflow={true} // Cho phép tr?c Y m? r?ng
-            tickCount={zoomLevel > 1 ? 10 : 5} // ?i?u ch?nh s? l??ng các m?c theo m?c zoom
+            allowDataOverflow={true} // Cho phï¿½p tr?c Y m? r?ng
+            tickCount={zoomLevel > 1 ? 10 : 5} // ?i?u ch?nh s? l??ng cï¿½c m?c theo m?c zoom
           />
           <Tooltip />
           <Legend />
