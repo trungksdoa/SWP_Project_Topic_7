@@ -20,7 +20,7 @@ const ManageProductRecovery  = () => {
       okType: 'primary',
       cancelText: 'No',
       onOk() {
-        recoverMutate.mutate({id: id}, {
+        recoverMutate.mutate(id, {
           onSuccess: () => {
             message.success("Product recovered successfully!");
             refetch();
