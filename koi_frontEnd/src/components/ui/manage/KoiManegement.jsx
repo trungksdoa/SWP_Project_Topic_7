@@ -379,7 +379,7 @@ const KoiManegement = () => {
       pondId: null,
       dateOfBirth: null,
       image: null,
-      date: dayjs(),
+      date: null,
     },
     onSubmit: (values) => {
       const formData = new FormData();
@@ -409,7 +409,7 @@ const KoiManegement = () => {
           ? values.dateOfBirth.format("YYYY-MM-DD")
           : null,
         userId: userId,
-        date: dayjs().format("YYYY-MM-DD"),
+        date: values.date.format("YYYY-MM-DD"),
         ageMonth: ageMonth,
       };
       formData.append("fish", JSON.stringify(newKoi));
