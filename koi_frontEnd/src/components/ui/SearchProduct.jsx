@@ -42,7 +42,6 @@ const SearchProduct = () => {
   const handleSearch = (value) => {
     setIsSearchPopupOpen(!isSearchPopupOpen);
     manageProductsServices.searchProduct(value).then((res) => {
-      console.log(res.data?.data)
       dispatch(manageProductAction.setSearchName(value))
       dispatch(manageProductAction.setSearchResult(res.data?.data))
     })
