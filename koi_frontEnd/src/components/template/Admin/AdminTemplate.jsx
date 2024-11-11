@@ -15,6 +15,7 @@ import {
   DesktopOutlined,
   ProductOutlined,
   UnorderedListOutlined,
+  LogoutOutlined
 } from "@ant-design/icons";
 import { LOCAL_STORAGE_LOGIN_KEY } from "../../../constant/localStorage";
 import {
@@ -48,13 +49,8 @@ const AdminTemplate = () => {
   };
 
   const getSectionName = (pathname) => {
-    const path = pathname.split("/").pop();
-    return t(
-      path
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ")
-    );
+    const isOnDashboard = pathname.includes('dashboard');
+    return isOnDashboard ? null : t(pathname.split("/").pop().split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "));
   };
 
   return (
@@ -306,14 +302,16 @@ const AdminTemplate = () => {
             >
               {getSectionName(location.pathname)}
             </h2>
-            <Button
-              className="bg-black text-white hover:!text-white hover:!bg-black"
-              onClick={() => {
-                handleLogout();
-              }}
-            >
-              {t("Logout")}
-            </Button>
+            {!location.pathname.includes('dashboard') && (
+              <Button
+                type="text"
+                className="bg-black text-white hover:!text-white hover:!bg-black"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+              >
+                {t("Logout")}
+              </Button>
+            )}
           </Header>
           <div
             style={{
@@ -323,13 +321,7 @@ const AdminTemplate = () => {
           >
             <Outlet />
           </div>
-          <Footer
-            style={{
-              textAlign: "center",
-            }}
-          >
-            Ant Design ©{new Date().getFullYear()} Created by Ant UED
-          </Footer>
+          
         </Layout>
       </Layout>
     </div>
