@@ -26,7 +26,7 @@ public class SearchController {
     private final IProductService productService;
     private final IOrderService orderService;
     private final IUserService userService;
-//
+
     @PostMapping(GET_PRODUCT_BY_NAME)
     public ResponseEntity<BaseResponse> getProductByName(@RequestParam String name) {
         List<Product> products = productService.searchProductByName(name);
