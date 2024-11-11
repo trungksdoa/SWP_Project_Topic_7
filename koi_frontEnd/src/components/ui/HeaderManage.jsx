@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useGetCartByUserId } from "../../hooks/manageCart/useGetCartByUserId";
 import { manageCartActions } from "../../store/manageCart/slice";
+import SearchProduct from "./SearchProduct";
 
 const HeaderManage = () => {
   const { t } = useTranslation();
@@ -54,6 +55,38 @@ const HeaderManage = () => {
     };
   }, []);
 
+  const menuItems = [
+    { path: PATH.KOI_MANAGEMENT, label: "My Koi" },
+    { path: PATH.POND_MANAGEMENT, label: "My Pond" },
+    { path: PATH.WATER_PARAMETER, label: "Water Parameter" },
+    { path: PATH.FOOD_CALCULATOR, label: "Food Calculator" },
+    { path: PATH.STORE, label: "Store" },
+    { path: PATH.BLOGS, label: "Blog" },
+    { path: PATH.PACKAGES, label: "Upgrade Account", isButton: true },
+  ];
+
+  const MenuItems = ({ items, toggleMenu }) => (
+    <ul className="flex items-center justify-between px-8 text-base">
+      {items.map((item, index) => (
+        <li key={index}>
+          {item.isButton ? (
+            <NavLink to={item.path}>
+              <button className="custom-button h-[35px]">{item.label}</button>
+            </NavLink>
+          ) : (
+            <NavLink
+              to={item.path}
+              className="text-white hover:text-orange-500"
+              onClick={toggleMenu}
+            >
+              {item.label}
+            </NavLink>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <header className="p-3 bg-black top-0 left-0 right-0 z-30 sticky">
       <div className="container flex justify-between items-center h-12 mx-auto">
@@ -61,75 +94,12 @@ const HeaderManage = () => {
           <img className="w-[60px]" src="../../images/logo.webp" alt="logo" />
         </Link>
         <div className="flex-1">
-          <ul className="flex items-center justify-between px-8 text-base">
-            <li>
-              <NavLink
-                to={PATH.KOI_MANAGEMENT}
-                className="text-white hover:text-orange-500"
-              >
-                {t("My Koi")}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to={PATH.POND_MANAGEMENT}
-                className="text-white hover:text-orange-500"
-              >
-                {t("My Pond")}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to={PATH.WATER_PARAMETER}
-                className="text-white hover:text-orange-500"
-              >
-                {t("Water Parameter")}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to={PATH.FOOD_CALCULATOR}
-                className="text-white hover:text-orange-500"
-              >
-                {t("Food Calculator")}
-              </NavLink>
-            </li>
-            <li className="flex text-white">
-              <NavLink
-                to={PATH.STORE}
-                className={({ isActive }) =>
-                  `flex items-center ${
-                    isActive
-                      ? "text-orange-500"
-                      : "dark:border- dark:text-violet-600  dark:border-violet-600"
-                  }`
-                }
-              >
-                {t("Store")}
-              </NavLink>
-            </li>
-            <li className="text-white flex">
-              <NavLink
-                to={PATH.BLOGS}
-                className={({ isActive }) =>
-                  `flex items-center  ${
-                    isActive ? "text-orange-500" : "dark:border-"
-                  }`
-                }
-              >
-                {t("Blog")}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={PATH.PACKAGES}>
-                <button className="custom-button h-[35px]">Upgrade Account</button>
-              </NavLink>
-            </li>
-          </ul>
+          <MenuItems items={menuItems} toggleMenu={toggleMenu} />
         </div>
 
         <div className="items-center ml-[30px] flex-shrink-0 hidden lg:flex">
           <div className="relative">
+            <SearchProduct />
             <ShoppingCartOutlined
               style={{
                 color: "white",

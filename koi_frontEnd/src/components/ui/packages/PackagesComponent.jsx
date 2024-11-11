@@ -11,7 +11,6 @@ const PackagesComponent = () => {
   const { data: user } = useGetUserById(userLogin?.id);
   const mutation = usePostPackage();
   const userPackage = user?.userPackage;
-  console.log(userPackage)
   const userPackageId = userPackage?.id;
 
   if (isFetching) {

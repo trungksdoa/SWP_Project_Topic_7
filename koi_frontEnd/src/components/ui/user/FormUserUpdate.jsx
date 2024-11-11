@@ -12,6 +12,7 @@ const FormUserUpdate = ({ user, refetch }) => {
   const [imgSrc, setImgSrc] = useState("");
   const dispatch = useDispatch();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -20,18 +21,20 @@ const FormUserUpdate = ({ user, refetch }) => {
       email: user?.email || "",
       address: user?.address || "",
       phoneNumber: user?.phoneNumber || "",
+      password: user?.password || "",
       image: user?.avatar || null,
     },
     onSubmit: (values) => {
-      const accessToken = userLogin?.accessToken 
-      const roles = userLogin?.roles
-      const id = userLogin?.id
+      const accessToken = userLogin?.accessToken;
+      const roles = userLogin?.roles;
+      const id = userLogin?.id;
       const formData = new FormData();
       const updateUser = {
         username: values.username,
         email: values.email,
         address: values.address,
         phoneNumber: values.phoneNumber,
+        password: values.password,
         image: values.avatar,
       };
       if (values.image) {
@@ -45,11 +48,12 @@ const FormUserUpdate = ({ user, refetch }) => {
             const user = {
               accessToken,
               roles,
-              id, 
+              id,
               username: values.username,
               email: values.email,
               address: values.address,
               phoneNumber: values.phoneNumber,
+              password: values.password,
               avatar: values.avatar,
               active: "true",
             };
@@ -98,9 +102,9 @@ const FormUserUpdate = ({ user, refetch }) => {
         <div className="mb-6">
           {imgSrc || user?.avatar ? (
             <div className="h-[150px] w-[150px] rounded-full border border-black overflow-hidden">
-              <img 
-                src={imgSrc || user?.avatar} 
-                alt="Image" 
+              <img
+                src={imgSrc || user?.avatar}
+                alt="Image"
                 className="h-full w-full object-cover"
               />
             </div>
@@ -110,7 +114,7 @@ const FormUserUpdate = ({ user, refetch }) => {
             </div>
           )}
         </div>
-        
+
         <h2 className="text-[32px] text-center">
           Welcome,{" "}
           <span className="font-bold text-orange-500">
@@ -126,10 +130,7 @@ const FormUserUpdate = ({ user, refetch }) => {
           className="w-full"
           onSubmitCapture={formik.handleSubmit}
         >
-          <Form.Item 
-            label="Name"
-            className="mb-6"
-          >
+          <Form.Item label="Name" className="mb-6">
             <Input
               name="username"
               onChange={formik.handleChange}
@@ -138,11 +139,8 @@ const FormUserUpdate = ({ user, refetch }) => {
               className="py-2"
             />
           </Form.Item>
-
-          <Form.Item 
-            label="Address"
-            className="mb-6"
-          >
+          
+          <Form.Item label="Address" className="mb-6">
             <Input
               name="address"
               onChange={formik.handleChange}
@@ -152,17 +150,27 @@ const FormUserUpdate = ({ user, refetch }) => {
             />
           </Form.Item>
 
-          <Form.Item 
+          <Form.Item
             label="Phone"
             className="mb-6"
-            validateStatus={formik.values.phoneNumber && /[^\d+\-\s()]/g.test(formik.values.phoneNumber) ? "error" : ""}
-            help={formik.values.phoneNumber && /[^\d+\-\s()]/g.test(formik.values.phoneNumber) ? "Please enter numbers only" : ""}
+            validateStatus={
+              formik.values.phoneNumber &&
+              /[^\d+\-\s()]/g.test(formik.values.phoneNumber)
+                ? "error"
+                : ""
+            }
+            help={
+              formik.values.phoneNumber &&
+              /[^\d+\-\s()]/g.test(formik.values.phoneNumber)
+                ? "Please enter numbers only"
+                : ""
+            }
           >
             <Input
               name="phoneNumber"
               onChange={(e) => {
-                const value = e.target.value.replace(/[^\d+\-\s()]/g, '');
-                formik.setFieldValue('phoneNumber', value);
+                const value = e.target.value.replace(/[^\d+\-\s()]/g, "");
+                formik.setFieldValue("phoneNumber", value);
               }}
               onBlur={formik.handleBlur}
               value={formik.values.phoneNumber}
@@ -171,12 +179,9 @@ const FormUserUpdate = ({ user, refetch }) => {
           </Form.Item>
 
           {/* Package Information */}
-          <Form.Item 
-            label="Current Package"
-            className="mb-6"
-          >
+          <Form.Item label="Current Package" className="mb-6">
             <Input
-              value={user?.userPackage?.name || 'No Package'}
+              value={user?.userPackage?.name || "No Package"}
               disabled
               className="py-2 !text-black"
             />
@@ -188,6 +193,26 @@ const FormUserUpdate = ({ user, refetch }) => {
             onChange={handleChangeFile}
             className="mb-4 w-[200px]"
           />
+          
+          <Form.Item className="mb-6">
+            
+            <Checkbox 
+            className="mb-6"
+              checked={showPassword} 
+              onChange={(e) => setShowPassword(e.target.checked)}
+            >
+              Change Password
+            </Checkbox>
+            {showPassword && (
+              <Input.Password
+                name="password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+                className="py-2"
+              />
+            )}
+          </Form.Item>
           <Form.Item className="flex justify-center">
             <Button
               loading={mutation.isPending}

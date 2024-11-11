@@ -125,12 +125,6 @@ export const UserMenu = () => {
     const packageName = userData?.data?.userPackage?.name || "";
     const isSVIP = packageName?.toUpperCase() === "SVIP";
 
-    console.log("User Package Debug:", {
-      fetchedUserData: userData?.data,
-      packageName: packageName,
-      isSVIP: isSVIP,
-    });
-
     return userLogin.roles?.map((role) => {
       if (role.name === "ROLE_ADMIN") {
         return (

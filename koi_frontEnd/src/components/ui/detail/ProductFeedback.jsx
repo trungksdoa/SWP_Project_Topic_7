@@ -12,7 +12,6 @@ import FeedbackForm from "./FeedBackForm";
 import "./colapseStyle.css";
 
 const ProductFeedback = ({ prdId, averageRating }) => {
-  console.log(prdId);
   const { t } = useTranslation();
   const userLogin = useSelector((state) => state.manageUser.userLogin);
   const [selectedFeedback, setSelectedFeedback] = useState(null);

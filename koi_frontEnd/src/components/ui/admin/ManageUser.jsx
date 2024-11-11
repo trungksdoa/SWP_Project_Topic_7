@@ -245,31 +245,6 @@ const ManageUser = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          {/* <Button
-            onClick={handleSelectAll}
-            className="mr-2 border-black text-black hover:bg-blue-500 hover:text-white"
-          >
-            Select All Users
-          </Button>
-          <Button
-            onClick={handleCancelSelection}
-            className="mr-2 bg-gray-400 text-white hover:bg-gray-500 hover:text-white"
-          >
-            Cancel Selection
-          </Button>
-          <Button 
-            onClick={handleDeleteSelected} 
-            disabled={selectedRowKeys.length === 0}
-            loading={isDeletingSelected}
-            className="bg-red-600 text-white hover:bg-red-500 hover:text-white transition-all duration-300 ease-in-out"
-          >
-            Delete Selected
-          </Button> */}
-        </div>
-        <span>{`Selected ${selectedRowKeys.length} items`}</span>
-      </div>
 
       <Search
         style={{ marginBottom: "20px" }}

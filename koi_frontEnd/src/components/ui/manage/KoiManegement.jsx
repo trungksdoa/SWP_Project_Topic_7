@@ -1,10 +1,13 @@
-import  { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetAllKoi } from "../../../hooks/koi/useGetAllKoi";
 import { useGetAllPond } from "../../../hooks/koi/useGetAllPond";
-import {  Space, Checkbox, message } from "antd";
-import { useTranslation } from 'react-i18next';
-import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
+import { Space, Checkbox, message } from "antd";
+import { useTranslation } from "react-i18next";
+import {
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Pagination,
@@ -14,7 +17,6 @@ import {
   InputNumber,
   Form,
   DatePicker,
-
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +30,6 @@ import KoiGrid from "./koiManage/KoiGrid";
 import KoiFilters from "./koiManage/KoiFilters";
 import KoiActions from "./koiManage/KoiActions";
 import LoadingSpinner from "../../layouts/LoadingSpinner";
-
 
 const KoiManegement = () => {
   const userLogin = useSelector((state) => state.manageUser.userLogin);
@@ -228,7 +229,9 @@ const KoiManegement = () => {
       for (const koiId of selectedKoiForAction) {
         await deleteKoiMutation.mutateAsync(koiId);
       }
-      message.success(`Successfully deleted ${selectedKoiForAction.length} Koi!`);
+      message.success(
+        `Successfully deleted ${selectedKoiForAction.length} Koi!`
+      );
       setSelectedKoiForAction([]);
       refetch();
     } catch (error) {
@@ -266,10 +269,10 @@ const KoiManegement = () => {
           };
           formData.append("fish", JSON.stringify(updateKoi));
 
-          return moveKoiMutation.mutateAsync({ 
-            id: koiId, 
+          return moveKoiMutation.mutateAsync({
+            id: koiId,
             payload: formData,
-            isNew: true
+            isNew: true,
           });
         })
       );
@@ -281,7 +284,9 @@ const KoiManegement = () => {
       refetch();
     } catch (error) {
       console.error("Error moving koi:", error);
-      message.error(`Error moving koi: ${error.message || 'An unexpected error occurred'}`);
+      message.error(
+        `Error moving koi: ${error.message || "An unexpected error occurred"}`
+      );
     } finally {
       setIsMovingKoi(false);
     }
@@ -379,6 +384,18 @@ const KoiManegement = () => {
     onSubmit: (values) => {
       const formData = new FormData();
       const ageMonth = calculateAgeMonths(values.dateOfBirth);
+
+      if (values.date && values.dateOfBirth) {
+        const birthDate = values.dateOfBirth;
+        const minCreatedDate = birthDate.clone().add(1, "day");
+
+        if (values.date.isBefore(minCreatedDate)) {
+          message.error(
+            "Date created must be at least one day after Date of Birth."
+          );
+          return;
+        }
+      }
 
       const newKoi = {
         name: values.name || "",
@@ -753,11 +770,18 @@ const KoiManegement = () => {
                         addKoiFormik.setFieldValue("date", date)
                       }
                       className="w-full"
-                      disabledDate={(current) =>
-                        current && current > dayjs().endOf("day")
-                      }
+                      disabledDate={(current) => {
+                        return (
+                          current &&
+                          ((addKoiFormik.values.dateOfBirth &&
+                            current <
+                              addKoiFormik.values.dateOfBirth.add(1, "day")) ||
+                            current > dayjs().endOf("day"))
+                        );
+                      }}
                     />
                   </Form.Item>
+
                   <Form.Item label="Image" className="mb-1">
                     <input
                       type="file"
