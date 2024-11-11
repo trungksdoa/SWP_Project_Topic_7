@@ -113,7 +113,7 @@ const ProductChart = ({ dateRange, onDateRangeChange, setTopProduct, productData
 
   return (
     <div>
-      <Row justify="center" style={{ marginBottom: "20px" }}>
+      {/* <Row justify="center" style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={24} md={20} lg={16} xl={12}>
           <Space size={12} style={{ width: "100%", justifyContent: "center" }}>
             <RangePicker
@@ -133,8 +133,8 @@ const ProductChart = ({ dateRange, onDateRangeChange, setTopProduct, productData
             </Button>
           </Space>
         </Col>
-      </Row>
-      <Divider style={{ marginBottom: "24px" }} />
+      </Row> */}
+      {/* <Divider style={{ marginBottom: "24px" }} /> */}
       <Row gutter={[24, 24]}>
         <Col xs={24} md={12}>
           <Card 

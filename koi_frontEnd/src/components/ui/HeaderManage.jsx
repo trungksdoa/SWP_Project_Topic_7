@@ -59,7 +59,7 @@ const HeaderManage = () => {
     { path: PATH.KOI_MANAGEMENT, label: "My Koi" },
     { path: PATH.POND_MANAGEMENT, label: "My Pond" },
     { path: PATH.WATER_PARAMETER, label: "Water Parameter" },
-    { path: PATH.FOOD_CALCULATOR, label: "Food Calculator" },
+    //{ path: PATH.FOOD_CALCULATOR, label: "Food Calculator" },
     { path: PATH.STORE, label: "Store" },
     { path: PATH.BLOGS, label: "Blog" },
     { path: PATH.PACKAGES, label: "Upgrade Account", isButton: true },

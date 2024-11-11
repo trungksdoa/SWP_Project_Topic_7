@@ -17,6 +17,8 @@ import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi"; // Assuming you 
 import { SortAscendingOutlined, SortDescendingOutlined, SearchOutlined } from '@ant-design/icons';
 import { manageKoiActions } from '../../../store/manageKoi/slice';
 import * as Yup from 'yup';
+import { calculateFoodByPond } from "../../../utils/FoodCalculator";
+import { EyeOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -389,6 +391,14 @@ const PondManagement = () => {
     setSelectedPond(null);
   };
 
+  const calculateFoodRecommendation = () => {
+    if (selectedPond && koiInSelectedPond.length > 0) {
+      const result = calculateFoodByPond(koiInSelectedPond);
+    } else {
+      message.warning('Add koi before calculating food');
+    }
+  };
+
   if (isFetching) {
     return (
       <div className="flex justify-center items-center min-h-[450px]">
@@ -710,6 +720,13 @@ const PondManagement = () => {
               )}
             </div>
             <div className="flex justify-center mt-6">
+              <Button
+                onClick={calculateFoodRecommendation}
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-white border border-black text-black rounded-full font-bold mr-2"
+                icon={<EyeOutlined />}
+              >
+                Food Amount
+              </Button>
               <Button
                 onClick={() => handleDetailClick(selectedPond.id)}
                 className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2"
