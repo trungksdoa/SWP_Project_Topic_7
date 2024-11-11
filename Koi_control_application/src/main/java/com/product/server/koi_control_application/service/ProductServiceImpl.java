@@ -236,6 +236,14 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.findBySlugAndNameContaining(name);
     }
 
+    @Override
+    @Transactional
+    public void softDeleteProduct(int productId) {
+        Product product = productHelper.get(productId);
+        product.setDisabled(true);
+        productHelper.save(product);
+    }
+
     /*
      * Checks if there is enough stock for a product and updates the stock if possible.
      *
@@ -278,6 +286,14 @@ public class ProductServiceImpl implements IProductService {
     @Transactional(readOnly = true)
     public boolean isProductIsDisabledFromCart(List<CartProductDTO> cart) {
         return cart.stream().anyMatch(CartProductDTO::isDisabled);
+    }
+
+    @Override
+    @Transactional
+    public void recovery(int productId) {
+        Product product = productHelper.get(productId);
+        product.setDisabled(false);
+        productHelper.save(product);
     }
 
     //endregion

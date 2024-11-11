@@ -68,6 +68,17 @@ public class ManageProductController {
         return ResponseUtil.createSuccessResponse(null, "Access granted,  deleted successfully");
     }
 
+    @PutMapping("/{id}/soft-delete")
+    public ResponseEntity<BaseResponse> softDeleteProduct(@PathVariable int id) {
+        productService.softDeleteProduct(id);
+        return ResponseUtil.createSuccessResponse(null, "Access granted,  deleted successfully");
+    }
+
+    @PutMapping("/{id}/recovery")
+    public ResponseEntity<BaseResponse> recoveryProduct(@PathVariable int id) {
+         productService.recovery(id);
+        return ResponseUtil.createResponse(null, "Access granted, created successfully", HttpStatus.CREATED);
+    }
 
     @PostMapping("/bulk-create")
     @Operation(summary = "Bulk create products", description = "Creates multiple products in a single request")

@@ -17,7 +17,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
     initialValues: {
       fullName: "",
       phoneNumber: userLogin?.phoneNumber || "",
-      address: "",
+      address: userLogin?.address || "",
     },
     onSubmit: (values) => {
       mutation.mutate(values, {
@@ -68,6 +68,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
               name="fullName"
               placeholder="Enter your full name"
               value={formik.values.fullName}
+              rules={[{ required: true, message: "Please enter your full name" }]}
               onChange={formik.handleChange}
               className="border rounded"
             />
@@ -75,7 +76,8 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
           <Form.Item 
             label="Phone Number" 
             className="w-[48%]"
-            validateStatus={phoneError ? "error" : ""}
+            rules={[{ required: true, message: "Please enter your phone number" }]}
+            // validateStatus={phoneError ? "error" : ""}
             help={phoneError}
           >
             <Input
@@ -88,7 +90,7 @@ const FormCheckout = ({ totalItems, totalPrice }) => {
             />
           </Form.Item>
         </div>
-        <Form.Item label="Full Address">
+        <Form.Item label="Full Address" rules={[{ required: true, message: "Please enter your full address" }]}>
           <Input
             name="address"
             placeholder="Enter your full address"

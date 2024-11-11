@@ -1,46 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Spin, message } from "antd";
+import { Table, Input, Button, Spin, message, Tag, Tabs } from "antd";
 import { useGetAllProducts } from "../../../../hooks/admin/manageProducts/UseGetAllProducts";
-import { EditOutlined } from "@ant-design/icons";
-import { useDeleteProduct } from "../../../../hooks/admin/manageProducts/UseDeleteProduct";
+import { useDeleteProduct, useSoftDeleteProduct } from "../../../../hooks/admin/manageProducts/UseDeleteProduct";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "../../../../constant";
+import { Modal } from "antd";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import ManageProductRecovery from "./ManageProductRecovery";
 
 const ManageProducts = () => {
   const { data: lstProducts, refetch, isFetching } = useGetAllProducts();
   const mutate = useDeleteProduct();
+  const softMutate = useSoftDeleteProduct();
   const navigate = useNavigate();
   const [filteredName, setFilteredName] = useState([]);
+  const [activeTab, setActiveTab] = useState('1');
 
   useEffect(() => {
     refetch();
   }, []);
 
-  // State để lưu trữ ID sản phẩm đang được xóa
-  const [deletingId, setDeletingId] = useState(null);
-
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      setDeletingId(id); // Set ID sản phẩm đang được xóa
-      mutate.mutate(id, {
-        onSuccess: () => {
-          message.success("Delete Product Successfully!");
-          refetch();
-          setDeletingId(null); // Xóa thành công, reset ID xóa
-        },
-        onError: () => {
-          message.error("Delete Product Failed!");
-          setDeletingId(null); // Nếu lỗi, reset ID xóa
-        },
-      });
-    }
+    Modal.confirm({
+      title: 'Delete Product',
+      icon: <ExclamationCircleFilled className="text-red-500" />,
+      content: '(DANGEROUS WARNING) This will delete all information related to this product. Do you want to continue?',
+      okText: 'Yes',
+      okType: 'danger', 
+      cancelText: 'No',
+      onOk() {
+        mutate.mutate(id, {
+          onSuccess: () => {
+            message.success("Delete Product Successfully!");
+            refetch();
+          },
+          onError: () => {
+            message.error("Delete Product Failed!");
+          }
+        });
+      },
+      cancelButtonProps: {
+        style: { float: 'left' }
+      }
+    });     
   };
 
-  // Cột bảng
+  const handleSoftDelete = (id) => {
+    softMutate.mutate(id, {
+      onSuccess: () => {
+        message.success("Product soft deleted successfully!");
+        refetch();
+        setActiveTab('2'); // Switch to disabled products tab after soft delete
+      },
+      onError: () => {
+        message.error("Failed to soft delete product!");
+      }
+    });
+  }
+
   const columns = [
     {
       title: "Id",
-      dataIndex: "id",
+      dataIndex: "id", 
       defaultSortOrder: "ascend",
       sorter: (a, b) => a.id - b.id,
       sortDirections: ["ascend", "descend"],
@@ -53,7 +74,7 @@ const ManageProducts = () => {
       width: "15%",
     },
     {
-      title: "Price",
+      title: "Price", 
       dataIndex: "price",
       sorter: (a, b) => a.price - b.price,
       width: "5%",
@@ -74,7 +95,7 @@ const ManageProducts = () => {
     },
     {
       title: "Stock",
-      dataIndex: "stock",
+      dataIndex: "stock", 
       sorter: (a, b) => a.stock - b.stock,
       width: "5%",
     },
@@ -84,7 +105,7 @@ const ManageProducts = () => {
       render: (categoryId) => {
         if (categoryId === 1) return "Water management";
         if (categoryId === 2) return "Koi management";
-        return "Unknown"; // Hoặc có thể trả về giá trị khác nếu cần
+        return "Unknown";
       },
       sorter: (a, b) => a.categoryId - b.categoryId,
       width: "10%",
@@ -102,20 +123,41 @@ const ManageProducts = () => {
             Edit
           </Button>
           <Button
-            className="w-[70px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white  transition-all duration-300 ease-in-out"
-            onClick={() => handleDelete(prd?.id)}
-            loading={deletingId === prd?.id} // Kiểm tra nếu ID trùng với ID đang xóa thì hiện loading
-            disabled={deletingId === prd?.id} // Vô hiệu hóa nút nếu đang xóa
+            className="w-[90px] bg-yellow-600 text-white hover:!bg-yellow-500 hover:!text-white mb-2 transition-all duration-300 ease-in-out"
+            onClick={() => {
+              Modal.confirm({
+                title: 'Soft Delete Product',
+                icon: <ExclamationCircleFilled className="text-yellow-500" />,
+                content: 'This will disable the product. Do you want to continue?',
+                okText: 'Yes',
+                okType: 'warning',
+                cancelText: 'No',
+                onOk() {
+                  console.log(prd?.id);
+                  handleSoftDelete(prd?.id);
+                },
+                cancelButtonProps: {
+                  style: { float: 'left' }
+                }
+              });
+            }}
           >
-            Delete
+            Soft Delete
+          </Button>
+          <Button
+            className="w-[90px] bg-red-600 text-white hover:!bg-red-500 hover:!text-white transition-all duration-300 ease-in-out"
+            onClick={() => {
+              handleDelete(prd?.id);
+            }}
+          >
+            Force Delete
           </Button>
         </div>
       ),
-      width: "15%",
+      width: "20%",
     },
   ];
 
-  // Tìm kiếm theo tên sản phẩm
   const { Search } = Input;
   const onKeyUp = (e) => {
     const input = e?.target.value.toLowerCase();
@@ -125,7 +167,7 @@ const ManageProducts = () => {
     setFilteredName(filtered || []);
   };
 
-  const data = filteredName.length > 0 ? filteredName : lstProducts;
+  const data = (filteredName.length > 0 ? filteredName : lstProducts)?.filter(product => !product.disabled);
 
   if (isFetching) {
     return (
@@ -135,28 +177,45 @@ const ManageProducts = () => {
     );
   }
 
+  const items = [
+    {
+      key: '1',
+      label: 'Active Products',
+      children: (
+        <>
+          <Search
+            style={{ marginBottom: "20px" }}
+            placeholder="input search text"
+            allowClear
+            size="large"
+            onKeyUp={onKeyUp}
+          />
+          <button
+            className="bg-orange-500 mb-[20px] text-white px-4 py-2 rounded-md"
+            onClick={() => navigate(PATH.ADD_PRODUCT)}
+          >
+            Add new product
+          </button>
+          <Table
+            columns={columns}
+            dataSource={data}
+            showSorterTooltip={{ target: "sorter-icon" }}
+            className="shadow-lg rounded-lg overflow-hidden"
+            bordered={false}
+          />
+        </>
+      ),
+    },
+    {
+      key: '2',
+      label: 'Recovery Products',
+      children: <ManageProductRecovery />,
+    },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <Search
-        style={{ marginBottom: "20px" }}
-        placeholder="input search text"
-        allowClear
-        size="large"
-        onKeyUp={onKeyUp}
-      />
-      <button
-        className="bg-orange-500 mb-[20px] text-white px-4 py-2 rounded-md"
-        onClick={() => navigate(PATH.ADD_PRODUCT)}
-      >
-        Add new product
-      </button>
-      <Table
-        columns={columns}
-        dataSource={data}
-        showSorterTooltip={{ target: "sorter-icon" }}
-        className="shadow-lg rounded-lg overflow-hidden"
-        bordered={false}
-      />
+      <Tabs activeKey={activeTab} onChange={setActiveTab} items={items} />
     </div>
   );
 };
