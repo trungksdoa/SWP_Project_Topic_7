@@ -124,4 +124,8 @@ public interface IProductService {
      */
 
      List<Product> searchProductByName(String name);
+
+     void softDeleteProduct(int productId);
+
+     void recovery(int productId);
 }
