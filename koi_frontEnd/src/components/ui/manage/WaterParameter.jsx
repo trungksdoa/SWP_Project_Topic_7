@@ -280,7 +280,7 @@ Salt amount recommendations for ${pondVolume}L pond:
   return (
     <div>
       <BreadcrumbComponent
-        items={[{ name: "Home", path: "/" }, { name: "Calculator" }]}
+        items={[{ name: "Home", path: "/" }, { name: "Water Parameter" }]}
       />
       <div className="flex justify-center items-center text-bold text-3xl h-full m-8">
         <strong>Water Parameter</strong>

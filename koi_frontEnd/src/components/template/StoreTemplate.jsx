@@ -18,7 +18,6 @@ const StoreTemplate = () => {
   const { data: lstProducts, isFetching } = useGetAllProducts();
 
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchFields, setSearchFields] = useState(['name']);

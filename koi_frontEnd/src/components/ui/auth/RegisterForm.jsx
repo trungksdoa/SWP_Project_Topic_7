@@ -68,7 +68,7 @@ const RegisterForm = ({ showModalLogin, onRegisterSuccess }) => {
 
   const showPolicy = () => {
     setIsPolicyVisible(true);
-    setIsPolicyViewed(true); // Đánh dấu là đã xem chính sách
+    setIsPolicyViewed(true); 
   };
 
   return (
@@ -233,13 +233,12 @@ const RegisterForm = ({ showModalLogin, onRegisterSuccess }) => {
                   {...field}
                   onChange={(e) => {
                     if (isPolicyViewed) {
-                      // Kiểm tra nếu đã xem chính sách
                       field.onChange(e.target.checked);
                       setIsPolicyAccepted(e.target.checked);
                     }
                   }}
                   checked={isPolicyAccepted}
-                  disabled={!isPolicyViewed} // Vô hiệu hóa checkbox nếu chưa xem chính sách
+                  disabled={!isPolicyViewed} 
                 >
                   I have read and agree to our policy
                 </Checkbox>

@@ -232,6 +232,24 @@ const FormKoiUpdate = ({
     }
   };
 
+  // Thêm hàm để lấy trạng thái từ mã
+  const getStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return "Phát triển không bình thường (có lúc nhanh có lúc chậm)";
+      case 2:
+        return "Phát triển chậm";
+      case 3:
+        return "Phát triển nhanh";
+      case 4:
+        return "Phát triển bình thường";
+      case 5:
+        return "Lịch sử phát triển chỉ mới có 1 phần tử, không thể đánh giá";
+      default:
+        return "Trạng thái không xác định";
+    }
+  };
+
   return (
     <Spin spinning={updateKoiMutation.isPending || isDeleting}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -334,7 +352,7 @@ const FormKoiUpdate = ({
                   }}
                   className="w-full"
                   disabledDate={(current) =>
-                    current && current > dayjs().endOf("day")
+                    current && (current <= dayjs(koi.data.date).endOf("day") || current > dayjs())
                   }
                 />
               </Form.Item>
@@ -373,6 +391,14 @@ const FormKoiUpdate = ({
                     </Text>
                   )}
                 </div>
+              </Form.Item>
+
+              <Form.Item label="Status">
+                <Input
+                  value={getStatusText(koi.data.status)}
+                  readOnly
+                  className="bg-gray-50"
+                />
               </Form.Item>
             </div>
 

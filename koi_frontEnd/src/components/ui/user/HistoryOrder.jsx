@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useGetOrder } from "../../../hooks/order/useGetOrder";
 import { useSelector } from "react-redux";
-import { Radio, Tabs } from "antd";
+import { Button, Radio, Tabs } from "antd";
 import OrderPaid from "../order/OrderPaid";
 import OrderPending from "../order/OrderPending";
 import OrderCancel from "../order/OrderCancel";
@@ -21,26 +21,26 @@ const HistoryOrder = () => {
   const [lstDelivering, setLstDelivering] = useState([]);
   const [lstCompleted, setLstCompleted] = useState([]);
   useEffect(() => {
-    const paidOrders =
-      lstOrder?.filter((order) => order?.status === "SUCCESS_PAYMENT") || [];
-    const pendingOrders =
-      lstOrder?.filter((order) => order?.status === "PENDING") || [];
-    const cancelledOrders =
-      lstOrder?.filter((order) => order?.status === "CANCELLED") || [];
-    const deliveredOrders =
-      lstOrder?.filter((order) => order?.status === "DELIVERED") || [];
-     const deliveringOrders =
-       lstOrder?.filter((order) => order?.status === "SHIPPING") || [];
-    const completedOrders =
-      lstOrder?.filter((order) => order?.status === "COMPLETED") || [];
+    const paidOrdds =
+      lstOrder?.filter((ord) => ord?.status === "SUCCESS_PAYMENT") || [];
+    const pendingOrdds =
+      lstOrder?.filter((ord) => ord?.status === "PENDING") || [];
+    const cancelledOrdds =
+      lstOrder?.filter((ord) => ord?.status === "CANCELLED") || [];
+    const deliveredOrdds =
+      lstOrder?.filter((ord) => ord?.status === "DELIVERED") || [];
+    const deliveringOrdds =
+      lstOrder?.filter((ord) => ord?.status === "SHIPPING") || [];
+    const completedOrdds =
+      lstOrder?.filter((ord) => ord?.status === "COMPLETED") || [];
 
-    setLstPaid(paidOrders);
-    setLstPending(pendingOrders);
-    setLstCancel(cancelledOrders);
-    setLstDelivered(deliveredOrders);
-    setLstDelivering(deliveringOrders);
-    setLstCompleted(completedOrders);
-  }, [lstOrder]); 
+    setLstPaid(paidOrdds);
+    setLstPending(pendingOrdds);
+    setLstCancel(cancelledOrdds);
+    setLstDelivered(deliveredOrdds);
+    setLstDelivering(deliveringOrdds);
+    setLstCompleted(completedOrdds);
+  }, [lstOrder]);
 
   useEffect(() => {
     refetch();
@@ -50,7 +50,7 @@ const HistoryOrder = () => {
     setMode(e.target.value);
   };
 
-  const [activeKey, setActiveKey] = useState("paid"); 
+  const [activeKey, setActiveKey] = useState("paid");
 
   const switchToCancelledTab = () => {
     setActiveKey("cancel");
@@ -59,12 +59,17 @@ const HistoryOrder = () => {
     setActiveKey("completed");
   };
 
-
   return (
     <div>
-      <div className="flex justify-center items-center text-bold text-3xl m-2 mb-2">
-        <strong>History Order</strong>
-      </div>      
+      <div className="flex flex-col justify-center items-center text-bold text-3xl m-2 mb-2">
+        <h2 className="font-semibold mb-[15px]">History Order</h2>
+        <Button
+          className="mb-[15px] bg-blue-600 text-white hover:!bg-blue-500 hover:!text-white transition-all duration-300 ease-in-out"
+          onClick={() => refetch()}
+        >
+          Refresh Data
+        </Button>
+      </div>
       <div>
         <Radio.Group
           onChange={handleModeChange}
@@ -78,7 +83,7 @@ const HistoryOrder = () => {
         </Radio.Group>
         <Tabs
           activeKey={activeKey}
-          onChange={setActiveKey} 
+          onChange={setActiveKey}
           defaultActiveKey="1"
           tabPosition={mode}
           style={{}}
@@ -86,7 +91,14 @@ const HistoryOrder = () => {
             {
               label: "Pending Orders",
               key: "pending",
-              children: <OrderPending lstPending={lstPending} isFetching={isFetching} refetch={refetch} switchToCancelledTab={switchToCancelledTab} />,
+              children: (
+                <OrderPending
+                  lstPending={lstPending}
+                  isFetching={isFetching}
+                  refetch={refetch}
+                  switchToCancelledTab={switchToCancelledTab}
+                />
+              ),
             },
             {
               label: "Paid Orders",
@@ -96,23 +108,42 @@ const HistoryOrder = () => {
             {
               label: "Delivering Orders",
               key: "delivering",
-              children: <OrderDelivering lstDelivering={lstDelivering} isFetching={isFetching} />,
+              children: (
+                <OrderDelivering
+                  lstDelivering={lstDelivering}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Delivered Orders",
               key: "delivered",
-              children: <OrderDelivered lstDelivered={lstDelivered} isFetching={isFetching} refetch={refetch} switchToCompleteTab={switchToCompleteTab} />,
+              children: (
+                <OrderDelivered
+                  lstDelivered={lstDelivered}
+                  isFetching={isFetching}
+                  refetch={refetch}
+                  switchToCompleteTab={switchToCompleteTab}
+                />
+              ),
             },
             {
               label: "Completed Orders",
               key: "completed",
-              children: <OrderCompleted lstCompleted={lstCompleted} isFetching={isFetching} />,
+              children: (
+                <OrderCompleted
+                  lstCompleted={lstCompleted}
+                  isFetching={isFetching}
+                />
+              ),
             },
             {
               label: "Cancelled Orders",
               key: "cancel",
-              children: <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />,
-            }
+              children: (
+                <OrderCancel lstCancel={lstCancel} isFetching={isFetching} />
+              ),
+            },
           ]}
         />
       </div>
