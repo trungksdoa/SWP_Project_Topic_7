@@ -101,7 +101,7 @@ const HistoryOrder = () => {
               ),
             },
             {
-              label: "Paid Orders",
+              label: "Processing Orders",
               key: "paid",
               children: <OrderPaid lstPaid={lstPaid} isFetching={isFetching} />,
             },

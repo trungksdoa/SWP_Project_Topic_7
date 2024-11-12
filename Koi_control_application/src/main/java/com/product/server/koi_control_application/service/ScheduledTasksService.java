@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,60 +28,51 @@ public class ScheduledTasksService {
     private final IEmailService emailService;
     private final IUserService userService;
 
-    @Scheduled(cron = "0 0 8 * * *") // Chạy 1 lần mỗi ngày lúc 8:00
+    @Scheduled(cron = "0 */30 * * * *")  // Chạy mỗi 30 phút
     @Transactional
     public void notificateToCustomer() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime sevenDaysFromNow = now.plusDays(7);
-        LocalDateTime oneDayFromNow = now.plusDays(1);
 
-        // Find tasks with due dates within 7 days
-        List<TodoTask> tasksDueInSevenDays = todoTaskRepository.findByDueDateRange(now, sevenDaysFromNow);
-        if (tasksDueInSevenDays.isEmpty()) {
-            log.info("No tasks due in 7 days");
-            return;
-        }
+        // Gửi thông báo cho các khoảng thời gian khác nhau
+        sendNotificationsForDueRange(now, 7, "Task Due in 7 Days",
+                "Reminder: Your task \"%s\" is due in 7 days. Please make sure to complete it on time.");
 
-        for (TodoTask task : tasksDueInSevenDays) {
-            Users users = userService.getUser(task.getUserId());
-            emailService.sendMail(users.getEmail(), "Task Due in 7 Days", "Reminder: Your task \"" + task.getTitle() + "\" is due in 7 days. Please make sure to complete it on time.");
-        }
-        log.info("Sent {} emails for tasks due in 7 days", tasksDueInSevenDays.size());
-
-        // Find tasks with due dates within 1 day
-        List<TodoTask> tasksDueInOneDay = todoTaskRepository.findByDueDateRange(now, oneDayFromNow);
-        if (tasksDueInOneDay.isEmpty()) {
-            log.info("No tasks due in 1 day");
-            return;
-        }
-        for (TodoTask task : tasksDueInOneDay) {
-            Users users = userService.getUser(task.getUserId());
-            emailService.sendMail(users.getEmail(), "Task Due in 1 Day", "Urgent: Your task \"" + task.getTitle() + "\" is due in 1 day. Please make sure to complete it as soon as possible.");
-        }
-        log.info("Sent {} emails for tasks due in 1 day", tasksDueInOneDay.size());
+        sendNotificationsForDueRange(now, 1, "Task Due in 1 Day",
+                "Urgent: Your task \"%s\" is due in 1 day. Please make sure to complete it as soon as possible.");
     }
 
-    //Runs at 24:00 every day
-//    @Scheduled(cron = "0 0 0 * * *")
-//    @Transactional
-//    public void updatePendingOrders() {
-//        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-//        int updatedCount = orderRepository.updateOrderStatusForOldOrders(
-//                OrderCode.COMPLETED.getValue(),
-//                OrderCode.DELIVERED.getValue(),
-//                sevenDaysAgo
-//        );
-//        log.info("Updated {} orders from DELIVERED to COMPLETED status", updatedCount);
-//    }
-//    @Scheduled(cron = "${app.schedule.task.update-order-status.cron}") // Runs at 1:00 AM every day
-//    @Transactional
-//    public void updatePendingOrders() {
-//        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-//        int updatedCount = orderRepository.updateOrderStatusForOldOrders(
-//                OrderCode.COMPLETED.getValue(),
-//                OrderCode.DELIVERED.getValue(),
-//                sevenDaysAgo
-//        );
-//        log.info("Updated {} orders from DELIVERED to COMPLETED status", updatedCount);
-//    }
+    private void sendNotificationsForDueRange(LocalDateTime now, int days, String subject, String messageTemplate) {
+        LocalDateTime endDate = now.plusDays(days);
+
+        List<TodoTask> tasks = todoTaskRepository.findByDueDateRange(now, endDate);
+        if (tasks.isEmpty()) {
+            return;
+        }
+
+        // Nhóm tasks theo userId để tránh query users nhiều lần
+        Map<Integer, List<TodoTask>> tasksByUser = tasks.stream()
+                .collect(Collectors.groupingBy(TodoTask::getUserId));
+
+        // Xử lý từng user một
+        tasksByUser.forEach((userId, userTasks) -> {
+            try {
+                Users user = userService.getUser(userId);
+                userTasks.forEach(task -> {
+                    try {
+                        String message = String.format(messageTemplate, task.getTitle());
+                        emailService.sendMail(user.getEmail(), subject, message);
+                    } catch (Exception e) {
+                        log.error("Failed to send email for task {} to user {}: {}",
+                                task.getId(), userId, e.getMessage());
+                    }
+                });
+            } catch (Exception e) {
+                log.error("Failed to process notifications for user {}: {}",
+                        userId, e.getMessage());
+            }
+        });
+
+        log.info("Sent {} notifications for {} tasks due in {} days",
+                tasks.size(), tasks.size(), days);
+    }
 }

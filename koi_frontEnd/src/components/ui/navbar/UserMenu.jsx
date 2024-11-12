@@ -46,7 +46,7 @@ export const UserMenu = () => {
           const response = await manageUserServicesH.getUserById(userLogin.id);
           setUserData(response.data);
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error("Error fetching user data:", error);
         }
       }
     };
@@ -141,14 +141,12 @@ export const UserMenu = () => {
             >
               {t("Profile")}
             </NavLink>
-            {isSVIP && (
-              <NavLink
-                to={PATH.DASHBOARD}
-                className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
-              >
-                {t("Dashboard")}
-              </NavLink>
-            )}
+            <NavLink
+              to={PATH.DASHBOARD}
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+            >
+              {t("Dashboard")}
+            </NavLink>
             <NavLink
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.TODO_MANAGE}
@@ -179,19 +177,17 @@ export const UserMenu = () => {
             >
               {t("Manage")}
             </NavLink>
-            {isSVIP && (
-              <NavLink
-                to={PATH.DASHBOARD}
-                className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
-              >
-                {t("Dashboard")}
-              </NavLink>
-            )}
+            <NavLink
+              to={PATH.DASHBOARD}
+              className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
+            >
+              {t("Dashboard")}
+            </NavLink>
             <NavLink
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"
               to={PATH.TODO_MANAGE}
             >
-               {t("Schedule")}
+              {t("Schedule")}
             </NavLink>
             <NavLink
               className="bg-white rounded-[6px] px-[15px] py-[4px] border-[1px] !w-[100px] text-center mt-[15px] duration-300 transition-all text-black hover:!text-white hover:!border-black hover:!bg-black"

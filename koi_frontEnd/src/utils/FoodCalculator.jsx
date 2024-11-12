@@ -314,7 +314,7 @@ const calculateFoodByPond = (lstKoi, waterData) => {
   }
 
   // Lấy nhiệt độ nước từ dữ liệu đầu vào
-  const waterTemperature = waterData?.temperature;
+  const waterTemperature = waterData?.temperature || 0;
 
   // Hàm lấy mùa hiện tại dựa vào tháng trong năm
   const getCurrentSeason = () => {

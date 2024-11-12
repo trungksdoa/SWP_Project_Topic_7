@@ -20,4 +20,6 @@ export const manageProductServiceH = {
     dashboardApi.get(
       `/top-selling-products?startDate=${startDate}&endDate=${endDate}`
     ),
+  softDeleteProduct: (id) => api.put(`/${id}/soft-delete`),
+  recoveryProduct: (id) => api.put(`/${id}/recovery`),
 };

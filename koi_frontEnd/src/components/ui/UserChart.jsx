@@ -81,7 +81,7 @@ const UserDataChart = ({ dateRange,onDateRangeChange, userData, isLoading, isErr
 
   return (
     <div>
-      <Row justify="center" style={{ marginBottom: "20px" }}>
+      {/* <Row justify="center" style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={24} md={20} lg={16} xl={12}>
           <Space size={12} style={{ width: "100%", justifyContent: "center" }}>
             <RangePicker
@@ -100,8 +100,8 @@ const UserDataChart = ({ dateRange,onDateRangeChange, userData, isLoading, isErr
             </Button>
           </Space>
         </Col>
-      </Row>
-      <Divider style={{ marginBottom: "24px" }} />
+      </Row> */}
+      {/* <Divider style={{ marginBottom: "24px" }} /> */}
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <Card title="Total Users" className="stat-card">

@@ -34,6 +34,10 @@ const { TabPane } = Tabs;
 
 const DEFAULT_START_DATE = "2024-09-01";
 
+// Add constants for layout measurements
+const SIDER_WIDTH = 200;  // Default antd sider width
+const COLLAPSED_WIDTH = 80;  // Width when sider is collapsed
+
 {/* ===== Stat Card Components ===== */}
 const StatCard = React.memo(({ title, value, prefix, suffix, loading }) => (
   <Card
@@ -162,6 +166,22 @@ const AdminDashboard = () => {
   const formattedStartDate = dateRange[0].format("YYYY/MM/DD");
   const formattedEndDate = dateRange[1].format("YYYY/MM/DD");
 
+  // Add collapsed state
+  const [collapsed, setCollapsed] = useState(false);
+
+  // Add effect to listen to sider collapse from AdminTemplate
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if window width is less than breakpoint
+      setCollapsed(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   {/* ===== API Hooks ===== */}
   const { 
     data: totalSalesData, 
@@ -250,36 +270,54 @@ const AdminDashboard = () => {
   ]
 
   const renderHeader = () => (
-    <Card style={{ borderRadius: "12px", marginBottom: "24px" }}>
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "8px 0"
-      }}>
-        <Title level={2} style={{ margin: 0, fontSize: "24px", color: "#1a1a1a" }}>
-          Admin Dashboard
-        </Title>
-        <VN 
-          title="Vietnam" 
-          style={{
-            width: "30px",
-            height: "auto",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            borderRadius: "4px"
-          }}
-        />
-        <RangePicker
-          value={dateRange}
-          onChange={handleDateRangeChange}
-          style={{ 
-            width: "300px",
-            borderRadius: "6px"
-          }}
-        />
-        <Button type="primary" onClick={handleRefresh}>Refresh</Button>
-      </div>
-    </Card>
+    <div style={{
+      position: "fixed",
+      top: 15,  // Height of AdminTemplate header
+      left: collapsed ? COLLAPSED_WIDTH : SIDER_WIDTH,
+      right: 0,
+      zIndex: 1000,
+      background: "#f5f7fa",
+      borderBottom: "1px solid #e8e8e8",
+      padding: "0px 24px",
+      transition: "left 0.2s", // Smooth transition when sider collapses
+    }}>
+      <Card 
+        style={{ 
+          borderRadius: "12px",
+          margin: "0 auto",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+        }}
+      >
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "8px 0"
+        }}>
+          <Title level={2} style={{ margin: 0, fontSize: "24px", color: "#1a1a1a" }}>
+            Admin Dashboard
+          </Title>
+          <VN 
+            title="Vietnam" 
+            style={{
+              width: "30px",
+              height: "auto",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              borderRadius: "4px"
+            }}
+          />
+          <RangePicker
+            value={dateRange}
+            onChange={handleDateRangeChange}
+            style={{ 
+              width: "300px",
+              borderRadius: "6px"
+            }}
+          />
+          <Button type="primary" onClick={handleRefresh}>Refresh</Button>
+        </div>
+      </Card>
+    </div>
   );
 
   const renderStatsSummary = () => (
@@ -387,16 +425,39 @@ const AdminDashboard = () => {
   );
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f5f7fa" }}>
-      <Content style={{ padding: "24px", maxWidth: "2400px", margin: "0 auto" }}>
-        <Space direction="vertical" size="large" style={{ width: "100%" }}>
-          {renderHeader()}
-          {renderStatsSummary()}
-          {renderTopProducts()}
-          {renderCharts()}
-        </Space>
-      </Content>
-    </Layout>
+    <>
+      {renderHeader()}
+      <Layout style={{ minHeight: "100vh", background: "#f5f7fa" }}>
+        <Content style={{ 
+          padding: "24px", 
+          maxWidth: "2400px", 
+          margin: "0 auto",
+          marginTop: "10px",
+        }}>
+          <div style={{ 
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+            paddingLeft: 0,
+            transition: "padding-left 0.2s"
+          }}>
+            <Space 
+              direction="vertical"
+              size="large" 
+              style={{ 
+                width: "925px",
+                margin: "0 auto"
+              }}
+            >
+              {renderStatsSummary()}
+              {renderTopProducts()}
+              {renderCharts()}
+            </Space>
+          </div>
+        </Content>
+      </Layout>
+    </>
   );
 };
 

@@ -16,6 +16,9 @@ import 'react-dual-listbox/lib/react-dual-listbox.css';
 import { useUpdateKoi } from "../../../hooks/koi/useUpdateKoi"; // Assuming you have this hook
 import { SortAscendingOutlined, SortDescendingOutlined, SearchOutlined } from '@ant-design/icons';
 import { manageKoiActions } from '../../../store/manageKoi/slice';
+import * as Yup from 'yup';
+import { calculateFoodByPond } from "../../../utils/FoodCalculator";
+import { EyeOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -50,6 +53,74 @@ const PondManagement = () => {
   const { data: lstPond, refetch, isFetching } = useGetAllPond(userId);
   const mutation = useUpdatePond();
   const addPondMutation = useAddPond();
+
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required('Pond name is required')
+      .max(50, 'Name must not exceed 50 characters'),
+    width: Yup.number()
+      .required('Width is required')
+      .positive('Width must not be zero')
+      .max(200, 'Width must not exceed 200 meters'),
+    length: Yup.number()
+      .required('Length is required')
+      .positive('Length must not be zero')
+      .max(200, 'Length must not exceed 200 meters'),
+    depth: Yup.number()
+      .required('Depth is required')
+      .positive('Depth must not be zero')
+      .max(200, 'Depth must not exceed 200 meters'),
+  });
+
+  const addPondFormik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      name: "",
+      width: 0,
+      length: 0,
+      depth: 0,
+      image: null,
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      const newPond = {
+        name: values.name,
+        width: parseFloat(values.width),
+        length: parseFloat(values.length),
+        depth: parseFloat(values.depth),
+        volume:
+          parseFloat(values.width) *
+          parseFloat(values.length) *
+          parseFloat(values.depth),
+        fishCount: 0, // Assuming a new pond starts with no fish
+        userId: userId,
+      };
+
+      const payload = {
+        pond: newPond,
+        image: values.image,
+      };
+
+      addPondMutation.mutate(payload, {
+        onSuccess: (addedPond) => {
+          const newPondWithImage = {
+            ...addedPond,
+            imageUrl: imgSrc,
+          };
+          dispatch(managePondActions.addPond(newPondWithImage));
+          setShowAddPopup(false);
+          setImgSrc("");
+          addPondFormik.resetForm();
+          refetch();
+          message.success("Pond added successfully");
+        },
+        onError: (error) => {
+          console.error("Error adding pond:", error);
+          message.error(`Error adding pond: ${error.message}`);
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     refetch();
@@ -95,57 +166,6 @@ const PondManagement = () => {
       addPondFormik.setFieldValue("image", file);
     }
   };
-
-  const addPondFormik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      name: "",
-      width: 0,
-      length: 0,
-      depth: 0,
-      image: null,
-    },
-    onSubmit: (values) => {
-      const newPond = {
-        name: values.name,
-        width: parseFloat(values.width),
-        length: parseFloat(values.length),
-        depth: parseFloat(values.depth),
-        volume:
-          parseFloat(values.width) *
-          parseFloat(values.length) *
-          parseFloat(values.depth),
-        fishCount: 0, // Assuming a new pond starts with no fish
-        userId: userId,
-      };
-
-      const payload = {
-        pond: newPond,
-        image: values.image,
-      };
-
-      addPondMutation.mutate(payload, {
-        onSuccess: (addedPond) => {
-          const newPondWithImage = {
-            ...addedPond,
-            imageUrl: imgSrc,
-          };
-          dispatch(managePondActions.addPond(newPondWithImage));
-          setShowAddPopup(false);
-          setImgSrc("");
-          addPondFormik.resetForm();
-          refetch();
-          message.success("Pond added successfully");
-        },
-        onError: (error) => {
-          console.error("Error adding pond:", error);
-          message.error(`Error adding pond: ${error.message}`);
-        },
-      });
-    },
-  });
-
-
 
   const handleDeleteClick = (pondId) => {
     const pond = lstPond.find(p => p.id === pondId);
@@ -371,6 +391,14 @@ const PondManagement = () => {
     setSelectedPond(null);
   };
 
+  const calculateFoodRecommendation = () => {
+    if (selectedPond && koiInSelectedPond.length > 0) {
+      const result = calculateFoodByPond(koiInSelectedPond);
+    } else {
+      message.warning('Add koi before calculating food');
+    }
+  };
+
   if (isFetching) {
     return (
       <div className="flex justify-center items-center min-h-[450px]">
@@ -486,7 +514,7 @@ const PondManagement = () => {
             </h2>
             <button
               onClick={handleCloseAddPopup}
-              className="absolute -top-1 right-2 text-2xl font-bold"
+              className="absolute top-2 right-4 text-2xl font-bold"
             >
               &times;
             </button>
@@ -508,63 +536,121 @@ const PondManagement = () => {
               </div>
               <div className="flex flex-col w-full">
                 <Form onFinish={addPondFormik.handleSubmit}>
-                  <div className="flex justify-between m-1">
-                    <strong>Name:</strong>
-                    <Input
-                      className="text-right w-1/2 pr-2"
-                      style={{ color: "black" }}
-                      name="name"
-                      value={addPondFormik.values.name}
-                      onChange={addPondFormik.handleChange}
-                    />
-                  </div>
-                  <div className="flex justify-between m-1">
-                    <strong>Width (meters):</strong>
-                    <Input
-                      className="text-right w-1/2 pr-2"
-                      style={{ color: "black" }}
-                      name="width"
-                      min={0}
-                      type="number"
-                      value={addPondFormik.values.width}
-                      onChange={addPondFormik.handleChange}
-                    />
-                  </div>
-                  <div className="flex justify-between m-1">
-                    <strong>Length (meters):</strong>
-                    <Input
-                      className="text-right w-1/2 pr-2"
-                      style={{ color: "black" }}
-                      name="length"
-                      min={0}
-                      type="number"
-                      value={addPondFormik.values.length}
-                      onChange={addPondFormik.handleChange}
-                    />
-                  </div>
-                  <div className="flex justify-between m-1">
-                    <strong>Depth (meters):</strong>
-                    <Input
-                      className="text-right w-1/2 pr-2"
-                      style={{ color: "black" }}
-                      name="depth"
-                      min={0}
-                      type="number"
-                      value={addPondFormik.values.depth}
-                      onChange={addPondFormik.handleChange}
-                    />
-                  </div>
+                  <div className="flex flex-col w-full">
+                    <div className="flex flex-col m-1">
+                      <div className="flex justify-between">
+                        <strong>Name:</strong>
+                        <Input
+                          className="text-right w-1/2 pr-2"
+                          style={{ 
+                            color: "black",
+                            borderColor: addPondFormik.touched.name && addPondFormik.errors.name ? "red" : undefined 
+                          }}
+                          name="name"
+                          value={addPondFormik.values.name}
+                          onChange={addPondFormik.handleChange}
+                          onBlur={addPondFormik.handleBlur}
+                        />
+                      </div>
+                      {addPondFormik.touched.name && addPondFormik.errors.name && (
+                        <span className="text-red-500 text-sm mt-1 text-right">{addPondFormik.errors.name}</span>
+                      )}
+                    </div>
 
-                  <Form.Item className="flex justify-center mt-6 mb-2">
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      className="w-40 h-auto min-h-[2.5rem] py-2 px-2 bg-black text-white rounded-full font-bold mt-4"
-                      loading={addPondMutation.isPending}
-                    >
-                      Add Pond
-                    </Button>
-                  </Form.Item>
+                    <div className="flex flex-col m-1">
+                      <div className="flex justify-between">
+                        <strong>Width (meters):</strong>
+                        <Input
+                          className="text-right w-1/2 pr-2"
+                          style={{ 
+                            color: "black",
+                            borderColor: addPondFormik.touched.width && addPondFormik.errors.width ? "red" : undefined 
+                          }}
+                          name="width"
+                          type="number"
+                          min={0}
+                          max={200}
+                          value={addPondFormik.values.width}
+                          onChange={addPondFormik.handleChange}
+                          onBlur={addPondFormik.handleBlur}
+                        />
+                      </div>
+                      {addPondFormik.touched.width && addPondFormik.errors.width && (
+                        <span className="text-red-500 text-sm mt-1 text-right">{addPondFormik.errors.width}</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col m-1">
+                      <div className="flex justify-between">
+                        <strong>Length (meters):</strong>
+                        <Input
+                          className="text-right w-1/2 pr-2"
+                          style={{ 
+                            color: "black",
+                            borderColor: addPondFormik.touched.length && addPondFormik.errors.length ? "red" : undefined 
+                          }}
+                          name="length"
+                          type="number"
+                          min={0}
+                          max={200}
+                          value={addPondFormik.values.length}
+                          onChange={addPondFormik.handleChange}
+                          onBlur={addPondFormik.handleBlur}
+                        />
+                      </div>
+                      {addPondFormik.touched.length && addPondFormik.errors.length && (
+                        <span className="text-red-500 text-sm mt-1 text-right">{addPondFormik.errors.length}</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col m-1">
+                      <div className="flex justify-between">
+                        <strong>Depth (meters):</strong>
+                        <Input
+                          className="text-right w-1/2 pr-2"
+                          style={{ 
+                            color: "black",
+                            borderColor: addPondFormik.touched.depth && addPondFormik.errors.depth ? "red" : undefined 
+                          }}
+                          name="depth"
+                          type="number"
+                          min={0}
+                          max={200}
+                          value={addPondFormik.values.depth}
+                          onChange={addPondFormik.handleChange}
+                          onBlur={addPondFormik.handleBlur}
+                        />
+                      </div>
+                      {addPondFormik.touched.depth && addPondFormik.errors.depth && (
+                        <span className="text-red-500 text-sm mt-1 text-right">{addPondFormik.errors.depth}</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col m-1">
+                      {addPondFormik.touched.image && addPondFormik.errors.image && (
+                        <span className="text-red-500 text-sm mt-1">{addPondFormik.errors.image}</span>
+                      )}
+                    </div>
+
+                    <Form.Item className="flex justify-center mt-6 mb-2">
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        className="w-40 h-auto min-h-[2.5rem] py-2 px-2 bg-black text-white rounded-full font-bold mt-4"
+                        loading={addPondMutation.isPending}
+                        onClick={() => {
+                          if (!addPondFormik.isValid) {
+                            // Touch all fields to show validation errors
+                            Object.keys(addPondFormik.values).forEach(field => {
+                              addPondFormik.setFieldTouched(field, true);
+                            });
+                          }
+                        }}
+                      >
+                        Add Pond
+                      </Button>
+                    </Form.Item>
+                  </div>
                 </Form>
               </div>
             </div>
@@ -634,6 +720,13 @@ const PondManagement = () => {
               )}
             </div>
             <div className="flex justify-center mt-6">
+              <Button
+                onClick={calculateFoodRecommendation}
+                className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-white border border-black text-black rounded-full font-bold mr-2"
+                icon={<EyeOutlined />}
+              >
+                Food Amount
+              </Button>
               <Button
                 onClick={() => handleDetailClick(selectedPond.id)}
                 className="w-40 h-auto min-h-[2.5rem] py-2 px-4 bg-black text-white rounded-full font-bold mr-2"

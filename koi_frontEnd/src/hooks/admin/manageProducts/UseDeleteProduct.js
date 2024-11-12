@@ -5,3 +5,14 @@ export const useDeleteProduct = () => {
         mutationFn: (id) => manageProductServiceH.deleteProduct(id)
     })
 }
+export const useSoftDeleteProduct = () => {
+    return useMutation({
+        mutationFn: (id) => manageProductServiceH.softDeleteProduct(id)
+    })
+}
+
+export const useRecoverProduct = () => {
+    return useMutation({
+        mutationFn: (id) => manageProductServiceH.recoveryProduct(id)
+    })
+}
