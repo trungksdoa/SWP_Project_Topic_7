@@ -345,7 +345,11 @@ const TodoManage = () => {
                 name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
-                <DatePicker showTime className="w-full rounded-md" />
+                <DatePicker 
+                  showTime 
+                  className="w-full rounded-md" 
+                  disabledDate={(current) => current && current < dayjs().startOf('day')}
+                />
               </Form.Item>
 
               <Form.Item
