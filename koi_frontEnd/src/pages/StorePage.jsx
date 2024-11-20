@@ -10,7 +10,7 @@ const StorePage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if(userLogin.roles && userLogin.roles[0].name === "ROLE_CONTRIBUTOR") {
+    if(userLogin?.roles && userLogin?.roles[0].name === "ROLE_CONTRIBUTOR") {
       message.warning("Please register account Member to access this feature.");
       navigate(PATH.MANAGE_BLOG);
     }
