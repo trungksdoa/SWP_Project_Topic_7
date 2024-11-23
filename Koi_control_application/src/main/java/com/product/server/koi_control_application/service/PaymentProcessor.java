@@ -30,6 +30,7 @@ public class PaymentProcessor {
             } else {
                 handleFailedPayment(context);
             }
+            paymentService.addTransactionId(Integer.parseInt(context.getOrderId()), context.getOrderType(), context.getTransId());
         } catch (Exception ex) {
             log.error("Error processing payment callback: {}", ex.getMessage());
             handlePaymentError(context);
@@ -63,9 +64,8 @@ public class PaymentProcessor {
         // Handle package addition for the user
         UserPackage userPackage = new UserPackage();
         userPackage.setId(Integer.parseInt(context.getOrderId()));
-
         userService.addPackage(Integer.parseInt(context.getUserId()), userPackage);
-        emailService.sendMail(context.getUserId(), "Upgrade package", "Your package has been upgraded successfully. Go to the website to view changes: https://swp-project-topic-7.vercel.app/packages");
+        emailService.sendMail(context.getUserId(), "Upgrade package", "Your package has been upgraded successfully. Go to the website to view changes: https://fishcareathome.vercel.app/packages");
         log.info("User {} has been added package successfully", context.getUserId());        log.info("User {} has been added package successfully", context.getUserId());
     }
 

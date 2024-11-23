@@ -9,17 +9,17 @@ import lombok.Data;
 public class PaymentContext {
     private String orderId;
     private String orderType;
+    private Long transId;
     private String userId;
-    private PaymentStatus status;
     private String description;
 
     public static PaymentContext fromCallback(MomoCallbackResponse response) {
         String[] parts = response.getOrderId().split("-");
         return PaymentContext.builder()
-            .orderId(parts[0])
-            .orderType(parts[1])
-            .userId(parts[2])
-            .build();
+                .orderId(parts[0])
+                .orderType(parts[1])
+                .userId(parts[2])
+                .transId(response.getTransId()).description(response.getMessage()).build();
     }
 
     public boolean isProductOrder() {

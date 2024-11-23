@@ -43,15 +43,8 @@ public interface IPaymentService {
      */
     void updatePaymentStatus(int referenceId, String referenceName, String paymentStatus);
 
-    /**
-     * Updates the status of a payment to indicate failure.
-     *
-     * @param referenceId   The reference ID of the payment to update.
-     * @param referenceName The name associated with the payment reference.
-     * @param paymentStatus The new status to set for the payment.
-     * @param description   A description of the failure.
-     */
-    void updatePaymentStatusFail(int referenceId, String referenceName, String paymentStatus, String description);
+
+    void addTransactionId(int referenceId, String referenceName, Long transactionId);
 
     /**
      * Clears payment statuses within a specified date range.
