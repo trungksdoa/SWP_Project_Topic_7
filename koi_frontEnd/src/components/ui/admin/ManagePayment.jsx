@@ -4,11 +4,18 @@ import { useGetPaymentStatus } from "../../../hooks/admin/managePaymentStatus/us
 
 const ManagePayment = () => {
   const { data: lstStatus } = useGetPaymentStatus();
+
+  
   const columns = [
     {
       title: "Id",
       dataIndex: "id",
       key: "id",
+    },
+    {
+      title: "TransactionId",
+      dataIndex:"transactionId",
+      key: "transactionId",
     },
     {
       title: "Payment Type",
