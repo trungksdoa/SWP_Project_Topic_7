@@ -12,7 +12,7 @@ import java.net.URI;
 
 public class ResponseUtil {
 
-    public static final  String WEBSITE_URL = "https://swp-project-topic-7.vercel.app/";
+    public static final  String WEBSITE_URL = "https://fishcareathome.vercel.app/";
 
     private ResponseUtil() {
     }

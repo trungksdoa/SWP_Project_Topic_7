@@ -38,11 +38,11 @@ public class PaymentService implements IPaymentService {
         paymentRepository.save(payment);
     }
 
+
     @Override
-    public void updatePaymentStatusFail(int referenceId, String referenceName, String paymentStatus, String description) {
+    public void addTransactionId(int referenceId, String referenceName, Long transactionId) {
         PaymentStatus payment = getPaymentStatus(referenceId, referenceName);
-        payment.setPaymentDescription(description);
-        payment.setPaymentStatus(paymentStatus);
+        payment.setTransactionId(transactionId);
         paymentRepository.save(payment);
     }
 

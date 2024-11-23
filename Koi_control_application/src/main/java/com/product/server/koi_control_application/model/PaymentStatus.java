@@ -22,6 +22,7 @@ public class PaymentStatus {
     private String referenceType; // "OrderCode" hoặc "PACKAGE"
     private String paymentMethod;
     private String paymentDescription;
+    private Long transactionId;
     private String paymentStatus;
 
     private String paymentGatewayUrl;

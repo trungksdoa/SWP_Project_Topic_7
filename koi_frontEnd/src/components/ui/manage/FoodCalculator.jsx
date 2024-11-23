@@ -58,6 +58,8 @@ const FoodCalculator = () => {
     }
   );
 
+  console.log(lstKoi)
+
   const updateState = (updates) => {
     setState(prev => ({ ...prev, ...updates }));
   };
@@ -71,13 +73,13 @@ const FoodCalculator = () => {
       });
 
       await new Promise(resolve => {
-        if (!isLoadingKoi && !isLoadingWater && lstKoi && waterData) {
+        if (!isLoadingKoi && !isLoadingWater && lstKoi) {
           resolve();
           return;
         }
 
         const checkInterval = setInterval(() => {
-          if (!isLoadingKoi && !isLoadingWater && lstKoi && waterData) {
+          if (!isLoadingKoi && !isLoadingWater && lstKoi) {
             clearInterval(checkInterval);
             resolve();
           }
@@ -190,7 +192,7 @@ const FoodCalculator = () => {
 
   const renderKoiGrid = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      {lstKoi && waterData && lstKoi?.length > 0 &&
+      {lstKoi && lstKoi?.length > 0 &&
         lstKoi.map((koi, index) => (
           <div key={index} className="relative text-center">
             <div
