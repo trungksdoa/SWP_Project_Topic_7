@@ -19,7 +19,7 @@ spring:
 
   # Database config
   datasource:
-    url: jdbc:postgresql://sukuna.postgres.database.azure.com:5432/azure_sys?useSSL=true&requireSSL=false
+    url: jdbc:postgresql://sukuna.postgres.database.azure.com:5432/koi_control?useSSL=true&requireSSL=false
     username: hashicorp_admin
     password: 123456789qQ_Group2
 
