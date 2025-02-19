@@ -1,9 +1,10 @@
 # Application specific configs
 app:
+
   image:
-    host: ${serverHost}/api/image/
+    host: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net/api/image/
   jwt:
-    secret: ${jwtSecrect}
+    secret: SecretKeyToGenJWTs
   schedule:
     task:
       update-order-status:
@@ -11,6 +12,8 @@ app:
 
 # Spring Framework configs
 spring:
+  #  profiles:
+  #    active: prod
   application:
     name: Koi_control_application
 
@@ -29,22 +32,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  cloud:
-    azure:
-      keyvault:
-        secret:
-          property-sources[0]:
-            endpoint: https://secrect.vault.azure.net/
-      profile:
-        tenant-id: ${tenant-id}  # Tenant ID từ Azure AD
-      credential:
-        managed-identity-enabled: true
+
   # Mail config
   mail:
     host: smtp.gmail.com
     port: 587
     username: trungvhse182490@fpt.edu.vn
-    password: ${googlePwd}
+    password: upivsinlboafdhdr
     properties:
       mail:
         smtp:
@@ -66,10 +60,19 @@ spring:
   web:
     resources:
       add-mappings: false
+  cloud:
+    azure:
+      keyvault:
+        secret:
+          endpoint: https://secrect.vault.azure.net/
+      profile:
+        tenant-id: 447080b4-b9c6-4b0b-92fd-b543a68b4e97  # Tenant ID từ Azure AD
+      credential:
+        managed-identity:
+          enabled: true
 
 # Server configs
 server:
-  port: 8080
   error:
     whitelabel:
       enabled: false
@@ -89,7 +92,7 @@ openapi:
       email: trungksdoa@gmail.com
     api-docs: /v3/api-docs
     servers:
-      prod: ${serverHost}
+      prod: https://koi-controls-e5hxekcpd0cmgjg2.eastasia-01.azurewebsites.net
       dev: http://localhost:8080
 
 # Monitoring configs
