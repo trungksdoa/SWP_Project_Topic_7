@@ -14,10 +14,10 @@ import java.util.TimeZone;
 
 
 @SpringBootApplication
-@EnableAspectJAutoProxy
+//@EnableAspectJAutoProxy
 @Log4j2
 @EnableScheduling
-@ConditionalOnEnabledMetricsExport("prometheus")
+//@ConditionalOnEnabledMetricsExport("prometheus")
 public class KoiControlApplication {
 
 
