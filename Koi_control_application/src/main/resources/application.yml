@@ -19,9 +19,9 @@ spring:
 
   # Database config
   datasource:
-    url: jdbc:mysql://koifishcontrol.mysql.database.azure.com:3306/koicontrol
-    username: adminuser
-    password: g#H-GthWyfq_2bKs;7'R9}
+    url: jdbc:postgresql://sukuna.postgres.database.azure.com:5432/azure_sys?useSSL=true&requireSSL=false
+    username: hashicorp_admin
+    password: 123456789qQ_Group2
 
   # JPA config
   jpa:
