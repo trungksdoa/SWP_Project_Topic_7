@@ -16,9 +16,9 @@ spring:
 
   # Database config
   datasource:
-    url: ${mysqlUrl}
-    username: ${mysqlUsername}
-    password: ${mysqlPassword}
+    url: jdbc:postgresql://sukuna.postgres.database.azure.com:5432/azure_sys?useSSL=true&requireSSL=false
+    username: hashicorp_admin
+    password: 123456789qQ_Group2
 
   # JPA config
   jpa:
