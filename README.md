@@ -22,7 +22,7 @@
  **Link tham khảo:** https://Koicontrol.com
 
 # Software Requirements Specification
-**Bảng tiếng Anh**
+**Bảng tiếng Anh (English)**
 [another.docx](https://github.com/user-attachments/files/17564894/another.docx)
 
 
